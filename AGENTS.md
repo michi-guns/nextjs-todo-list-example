@@ -16,6 +16,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - Board (exact name): `Next.js Todo List Example`
 - Always pass `--board "Next.js Todo List Example"` to `jz-trello-flow`.
+- Card titles use prefix **`WU-N: `** (example: `WU-4: Scaffold module bowl dirs with gitkeep`). Keep metadata `id` and title prefix in sync when renaming.
 - Managed skills (installed under `.agents/skills/`):
   - `trello-work-orchestrator`
   - `trello-work-design`

@@ -10,13 +10,13 @@
     "id": "6a74e91ddc2d6a821b986521",
     "name": "Next.js Todo List Example"
   },
-  "refreshedAt": "2026-08-06T20:31:51Z",
-  "refreshedBy": "manual-bootstrap",
+  "refreshedAt": "2026-08-06T20:39:21Z",
+  "refreshedBy": "manual-refresh-after-title-prefix",
   "units": {
     "WU-1": {
       "id": "WU-1",
       "trelloCardId": "6a74ecdd307da8cc6f7838e7",
-      "title": "Complete platform scaffolding",
+      "title": "WU-1: Complete platform scaffolding",
       "type": "task",
       "status": "inbox",
       "priority": "high",
@@ -30,14 +30,14 @@
       "shortUrl": "https://trello.com/c/SLOPsm65",
       "idShort": 1,
       "listId": "6a74e91ddc2d6a821b98651a",
-      "version": "2026-08-06T20:22:44.078Z",
+      "version": "2026-08-06T20:38:34.056Z",
       "createdAt": "2026-08-06T20:21:49.321Z",
-      "updatedAt": "2026-08-06T20:22:44.258Z"
+      "updatedAt": "2026-08-06T20:38:34.172Z"
     },
     "WU-2": {
       "id": "WU-2",
       "trelloCardId": "6a74ecf5ebd59bd921fe205f",
-      "title": "Add Better Auth seat (email/password + magic link)",
+      "title": "WU-2: Add Better Auth seat (email/password + magic link)",
       "type": "task",
       "status": "inbox",
       "priority": "high",
@@ -51,14 +51,14 @@
       "shortUrl": "https://trello.com/c/3dJwOxvb",
       "idShort": 2,
       "listId": "6a74e91ddc2d6a821b98651a",
-      "version": "2026-08-06T20:22:14.675Z",
+      "version": "2026-08-06T20:38:36.806Z",
       "createdAt": "2026-08-06T20:22:13.764Z",
-      "updatedAt": "2026-08-06T20:22:14.219Z"
+      "updatedAt": "2026-08-06T20:38:36.909Z"
     },
     "WU-3": {
       "id": "WU-3",
       "trelloCardId": "6a74ecf8c12958e72124ec7c",
-      "title": "Add Sanity seat + landing document type",
+      "title": "WU-3: Add Sanity seat + landing document type",
       "type": "task",
       "status": "inbox",
       "priority": "high",
@@ -72,14 +72,14 @@
       "shortUrl": "https://trello.com/c/bxJ0SwKv",
       "idShort": 3,
       "listId": "6a74e91ddc2d6a821b98651a",
-      "version": "2026-08-06T20:22:17.301Z",
+      "version": "2026-08-06T20:38:39.586Z",
       "createdAt": "2026-08-06T20:22:16.576Z",
-      "updatedAt": "2026-08-06T20:22:16.946Z"
+      "updatedAt": "2026-08-06T20:38:39.710Z"
     },
     "WU-4": {
       "id": "WU-4",
       "trelloCardId": "6a74ecfb80a7483d227a47e9",
-      "title": "Scaffold module bowl dirs with gitkeep",
+      "title": "WU-4: Scaffold module bowl dirs with gitkeep",
       "type": "chore",
       "status": "inbox",
       "priority": "normal",
@@ -93,9 +93,9 @@
       "shortUrl": "https://trello.com/c/7qyYKr6K",
       "idShort": 4,
       "listId": "6a74e91ddc2d6a821b98651a",
-      "version": "2026-08-06T20:22:19.860Z",
+      "version": "2026-08-06T20:38:42.636Z",
       "createdAt": "2026-08-06T20:22:19.134Z",
-      "updatedAt": "2026-08-06T20:22:19.539Z"
+      "updatedAt": "2026-08-06T20:38:42.655Z"
     }
   },
   "annotations": {
