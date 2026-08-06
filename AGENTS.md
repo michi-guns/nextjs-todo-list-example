@@ -25,6 +25,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Canonical lists: Inbox, In Design, Ready, In Progress, Review, Blocked, Done.
 - Prefer `jz-trello-flow docs` as command syntax authority.
 - Do not archive Done cards unless a human asks.
+- Experimental board cache: [`.jz-trello/board-cache.json`](.jz-trello/board-cache.json) (schema: [`board-cache.schema.json`](.jz-trello/board-cache.schema.json)). Projection + soft sequence only; **Trello wins** on status/identity. Refresh via `list` before relying on it after remote changes. See [`.jz-trello/README.md`](.jz-trello/README.md).
 
 ## Git strategy (simple / flexible)
 

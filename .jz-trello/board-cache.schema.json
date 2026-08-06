@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.jz-trello/board-cache.schema.json",
+  "title": "JZ Trello board cache",
+  "description": "Local projection of a Trello Work Unit board plus optional soft-sequence annotations. Trello remains source of truth for identity, status, parent, blocked_by, and card body.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "board", "refreshedAt", "units", "annotations"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional pointer to this schema for editor tooling."
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Cache document version. Bump only with a coordinated schema change."
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sourceOfTruth": {
+          "type": "string",
+          "const": "trello"
+        },
+        "cacheRole": {
+          "type": "string",
+          "enum": [
+            "local-projection-and-soft-sequence",
+            "local-projection-only"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "board": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Trello board id."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Exact Trello board name for --board selectors."
+        }
+      }
+    },
+    "refreshedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp of last successful projection refresh."
+    },
+    "refreshedBy": {
+      "type": ["string", "null"],
+      "description": "Actor or tool that wrote the projection (e.g. manual-bootstrap, jz-trello-flow list)."
+    },
+    "units": {
+      "type": "object",
+      "description": "Map of Work Unit id (WU-N) to projected card fields.",
+      "additionalProperties": { "$ref": "#/$defs/workUnitProjection" },
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^WU-[1-9][0-9]*$"
+      }
+    },
+    "annotations": {
+      "$ref": "#/$defs/annotations"
+    }
+  },
+  "$defs": {
+    "workUnitId": {
+      "type": "string",
+      "pattern": "^WU-[1-9][0-9]*$",
+      "description": "Canonical Work Unit id."
+    },
+    "workUnitIdOrNull": {
+      "oneOf": [{ "$ref": "#/$defs/workUnitId" }, { "type": "null" }]
+    },
+    "workUnitStatus": {
+      "type": "string",
+      "enum": [
+        "inbox",
+        "in_design",
+        "ready",
+        "in_progress",
+        "review",
+        "blocked",
+        "done"
+      ]
+    },
+    "workUnitType": {
+      "type": "string",
+      "enum": ["chore", "task", "slice"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "normal", "low"]
+    },
+    "triStateScale": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "engineeringDepth": {
+      "type": "string",
+      "enum": ["exploratory", "production-pragmatic", "hardened"]
+    },
+    "workUnitProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "status"],
+      "properties": {
+        "id": { "$ref": "#/$defs/workUnitId" },
+        "trelloCardId": {
+          "type": ["string", "null"]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "oneOf": [{ "$ref": "#/$defs/workUnitType" }, { "type": "null" }]
+        },
+        "status": { "$ref": "#/$defs/workUnitStatus" },
+        "priority": {
+          "oneOf": [{ "$ref": "#/$defs/priority" }, { "type": "null" }]
+        },
+        "complexity": {
+          "oneOf": [{ "$ref": "#/$defs/triStateScale" }, { "type": "null" }]
+        },
+        "engineeringDepth": {
+          "oneOf": [{ "$ref": "#/$defs/engineeringDepth" }, { "type": "null" }]
+        },
+        "risk": {
+          "oneOf": [{ "$ref": "#/$defs/triStateScale" }, { "type": "null" }]
+        },
+        "owner": {
+          "type": ["string", "null"],
+          "description": "Execution claim owner metadata, not Trello member display name."
+        },
+        "parent": { "$ref": "#/$defs/workUnitIdOrNull" },
+        "blockedBy": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/workUnitId" },
+          "uniqueItems": true,
+          "description": "Hard prerequisites only."
+        },
+        "labels": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "shortUrl": {
+          "type": ["string", "null"],
+          "format": "uri"
+        },
+        "idShort": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "listId": {
+          "type": ["string", "null"]
+        },
+        "version": {
+          "type": ["string", "null"],
+          "description": "Optimistic concurrency token from last read (often an ISO timestamp)."
+        },
+        "createdAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Human/agent soft navigation. Never treated as Trello status authority.",
+      "properties": {
+        "doNext": {
+          "oneOf": [{ "$ref": "#/$defs/workUnitId" }, { "type": "null" }],
+          "description": "Preferred next pull among eligible work."
+        },
+        "softOrder": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/workUnitId" },
+          "uniqueItems": true,
+          "description": "Preferred tackle order. Not blocked_by."
+        },
+        "parked": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/workUnitId" },
+          "uniqueItems": true,
+          "description": "Eligible on Trello but intentionally not auto-pulled."
+        },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
