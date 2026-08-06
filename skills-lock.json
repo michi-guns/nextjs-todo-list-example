@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/impeccable/SKILL.md",
+      "computedHash": "92704fd0894a2dcb6b524bd5ef458299bf416e81d6240627cea7c956b9099b6f"
+    },
+    "neon": {
+      "source": "neondatabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/neon/SKILL.md",
+      "computedHash": "90370978156046ffe1ef631426bb61a77fe6bf50b633e445061c2821a4bc6419"
+    },
+    "neon-postgres": {
+      "source": "neondatabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/neon-postgres/SKILL.md",
+      "computedHash": "fbad97d1eb04c4cc04876852ad71698927902d1a16ebdf45a857e3632508e138"
+    },
+    "neon-postgres-branches": {
+      "source": "neondatabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/neon-postgres-branches/SKILL.md",
+      "computedHash": "7ae31e07a297a347c97c8ae0eee36341eb5afdd485c24162bc2b024cbf67be2f"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/composition-patterns/SKILL.md",
+      "computedHash": "575757e3e25761c8c562d6e395d29f0b76c98b1273c0bd72d88e6ab1bc9c7d42"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "computedHash": "ca7b0c0c6e5f2750043f7f0cd72d16ac4e2abc48f9b5500d047a4b77a2506212"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
+    },
+    "writing-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/writing-guidelines/SKILL.md",
+      "computedHash": "25aa3a33a97bddbcb1847ce4a6169106ec25e5b19b15b99c66e75ab383866ef2"
+    }
+  }
+}
