@@ -9,7 +9,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Product intent
 
-- Read [`docs/PRD.md`](docs/PRD.md) and [`docs/SPEC.md`](docs/SPEC.md) before implementing domain or stack behavior.
+- Read [`docs/index.md`](docs/index.md) and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes. Read [`docs/product/PRD.md`](docs/product/PRD.md) and [`docs/product/SPEC.md`](docs/product/SPEC.md) before implementing product or domain behavior. Read [`docs/architecture/stack.md`](docs/architecture/stack.md) before changing the technology stack or architecture-level technology choices.
+- Treat `docs/` as the project knowledge system. Update owning documents, indexes, assumptions, and ADRs according to the documentation protocol when behavior or architecture changes.
 - This repo is a standalone public example. Do not invent links to other products or private projects.
 
 ## Trello Work Units

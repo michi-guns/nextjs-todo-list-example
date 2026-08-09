@@ -4,7 +4,7 @@
 **Audience:** humans and coding agents implementing this repository  
 **Companion:** [`SPEC.md`](./SPEC.md) (build contract)
 
-This repository is a **public, standalone example** of a small multi-user todo product on a modern Next.js stack. It is intentionally simple in domain and intentionally serious in structure, auth, data split, and local quality tooling.
+This repository is a **public, standalone example** of a small multi-user todo product on a modern [Next.js stack](../architecture/stack.md). It is intentionally simple in domain and intentionally serious in structure, auth, data split, and local quality tooling.
 
 ---
 
@@ -112,8 +112,8 @@ Deployed Vercel preview is **optional**, not required for spike complete.
 
 ## 8. Success metrics (qualitative)
 
-- A new agent can implement features by reading `docs/PRD.md` + `docs/SPEC.md` without chat history.
-- Architecture seats (`src/modules/*`, `src/db`, `src/sanity`) stay obvious as the app grows slightly.
+- A new agent can implement features by reading `docs/index.md`, the documentation protocol, and the product documents without chat history.
+- Architecture seats (`src/modules/*`, `db`, `src/sanity`) stay obvious as the app grows slightly.
 - Domain remains boring; structure and stack wiring remain the point.
 
 ## 9. Open product decisions

@@ -2,7 +2,7 @@
 
 **Status:** agreed spike build contract  
 **Companion:** [`PRD.md`](./PRD.md)  
-**Stack (intended):** Next.js App Router · React · TypeScript · shadcn/ui · Zod · Better Auth · Drizzle · Neon Postgres · Sanity · Vitest · Playwright · Husky · lint-staged · pnpm
+**Stack:** See the canonical [technology stack](../architecture/stack.md). This document defines the implementation contract and stack-specific constraints for this project.
 
 This document is the implementation contract. If code disagrees with this file, either fix the code or deliberately amend this file.
 
@@ -10,7 +10,9 @@ This document is the implementation contract. If code disagrees with this file, 
 
 ## 1. Repository layout (target bowl)
 
-Follow a domain-centered modular monolith. Platform seats live under `src/`.
+Follow a domain-centered modular monolith. Application modules live under
+`src/`; the existing root `db/` and `migrations/` seats are the canonical
+database locations.
 
 ```text
 .
@@ -22,10 +24,12 @@ Follow a domain-centered modular monolith. Platform seats live under `src/`.
 ├── components/                   # shadcn/ui and generic UI chrome
 ├── e2e/                          # Playwright tests
 ├── docs/
-│   ├── PRD.md
-│   └── SPEC.md
+│   ├── product/
+│   │   ├── PRD.md
+│   │   └── SPEC.md
+├── db/                           # Drizzle client and schema
+├── migrations/                   # generated/applied Drizzle migrations
 ├── src/
-│   ├── db/                       # Drizzle client, schema, migrations seat
 │   ├── sanity/                   # Sanity config, schemas, server client (when added)
 │   ├── modules/
 │   │   ├── auth/                 # thin auth integration if needed beyond library defaults
@@ -67,7 +71,7 @@ app (routes) → module presentation / application APIs
 
 - `shared/` must not import from `modules/` or `app/`.
 - Modules must not import from `app/`.
-- Prefer `src/db` and `src/sanity` as seats; call them from module `infrastructure/`.
+- Prefer root `db/` and `src/sanity` as seats; call them from module `infrastructure/`.
 
 ### 1.3 Next.js boundaries
 
@@ -104,7 +108,7 @@ Idempotent: never create a second automatic Inbox if any list exists.
 ### 2.4 Placement
 
 - Better Auth handler routes under `app/api/auth/...` (or library convention).
-- Drizzle adapter tables live in `src/db` schema as required by Better Auth.
+- Drizzle adapter tables live in the root `db/schema` seat as required by Better Auth.
 - Optional thin `src/modules/auth` for app-facing helpers (`requireUser()`, session DTO). Avoid duplicating library internals.
 
 ---
@@ -302,7 +306,7 @@ Document exact variable names in README when wiring — not in this SPEC body if
 
 ## 12. Implementation notes vs current scaffold
 
-As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, `src/db`, Drizzle config, Vitest/Playwright/Husky). This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`.
+As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, root `db`, Drizzle config, Vitest/Playwright/Husky). This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`.
 
 ---
 
