@@ -13,7 +13,7 @@ Presentation:    how routes, actions, APIs, and UI interact with the system
 
 ## Main technologies
 
-See the [technology stack](../architecture/stack.md) for the canonical inventory and each technology’s role.
+See the supporting [technology stack](../architecture/stack.md) and the canonical technical contract in [`.dwf/SPEC.md`](../../.dwf/SPEC.md).
 
 ## Most important rule
 

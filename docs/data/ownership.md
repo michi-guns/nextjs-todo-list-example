@@ -6,7 +6,9 @@ related-adrs:
   - ADR-0003
 ---
 
-# Data Ownership
+## Data ownership
+
+The canonical product and technical ownership rules are in [`.dwf/PRD.md`](../../.dwf/PRD.md) and [`.dwf/SPEC.md`](../../.dwf/SPEC.md). This supporting note summarizes the boundary for orientation.
 
 ## Sanity owns
 

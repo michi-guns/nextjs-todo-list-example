@@ -1,6 +1,6 @@
 # D-005 Example — Task Creation and Ownership
 
-**Illustrative only.** The normative boundary is [D-005 lists and tasks](../contracts/D-005-lists-tasks.md) and [D-003 persistence ports](../contracts/D-003-persistence-ports.md).
+**Illustrative only.** The normative boundary is [`../../../SPEC.md#14-boundary-clarifications`](../../../SPEC.md#14-boundary-clarifications).
 
 ```ts
 export async function createTaskAction(

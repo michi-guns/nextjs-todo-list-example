@@ -20,5 +20,5 @@ Negative: local development requires database configuration and migration discip
 
 ## Related Documents
 
-- [PostgreSQL and Drizzle](../data/postgresql.md)
-- [Data ownership](../data/ownership.md)
+- [PostgreSQL and Drizzle](../../docs/data/postgresql.md)
+- [Data ownership](../../docs/data/ownership.md)

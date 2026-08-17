@@ -20,5 +20,5 @@ Negative: the system has a second data store and must keep ownership and failure
 
 ## Related Documents
 
-- [Sanity data rules](../data/sanity.md)
-- [Data ownership](../data/ownership.md)
+- [Sanity data rules](../../docs/data/sanity.md)
+- [Data ownership](../../docs/data/ownership.md)

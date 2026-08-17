@@ -7,9 +7,10 @@ This is a Next.js template with shadcn/ui.
 This repository is also a standalone reference example for a modern Next.js
 stack, vertical-slice architecture, and AI-assisted development.
 
-Start with [`docs/index.md`](docs/index.md). Before modifying architecture,
-domain behavior, persistence, or integrations, read
-[`docs/documentation-protocol.md`](docs/documentation-protocol.md).
+Start with the canonical [`.dwf/README.md`](.dwf/README.md). Before modifying
+product behavior, architecture, persistence, or integrations, read
+[`docs/documentation-protocol.md`](docs/documentation-protocol.md) and the
+relevant DWF artifacts.
 
 ## Adding components
 

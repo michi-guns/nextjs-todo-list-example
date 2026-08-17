@@ -9,8 +9,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Product intent
 
-- Read [`docs/index.md`](docs/index.md) and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes. Read [`docs/product/PRD.md`](docs/product/PRD.md) and [`docs/product/SPEC.md`](docs/product/SPEC.md) before implementing product or domain behavior. Read [`docs/architecture/stack.md`](docs/architecture/stack.md) before changing the technology stack or architecture-level technology choices.
-- Treat `docs/` as the project knowledge system. Update owning documents, indexes, assumptions, and ADRs according to the documentation protocol when behavior or architecture changes.
+- Read [`.dwf/README.md`](.dwf/README.md), [`.dwf/RULES.md`](.dwf/RULES.md), and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes.
+- Read [`.dwf/PRD.md`](.dwf/PRD.md) and [`.dwf/SPEC.md`](.dwf/SPEC.md) before implementing product, domain, architecture, persistence, or integration behavior.
+- Read relevant [`.dwf/ADRs/`](.dwf/ADRs/), open questions/decisions, and supporting architecture/data/domain documents.
+- Treat `.dwf/` as the canonical product/technical design authority. Delivery artifacts live outside `.dwf/` and must reference, not redefine, it.
 - This repo is a standalone public example. Do not invent links to other products or private projects.
 
 ## Trello Work Units

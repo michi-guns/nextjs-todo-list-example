@@ -20,5 +20,5 @@ Negative: module boundaries require discipline and in-process coupling can grow 
 
 ## Related Documents
 
-- [Architecture overview](../architecture/overview.md)
-- [Dependency rules](../architecture/dependency-rules.md)
+- [Architecture overview](../../docs/architecture/overview.md)
+- [Dependency rules](../../docs/architecture/dependency-rules.md)

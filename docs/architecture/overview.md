@@ -20,7 +20,7 @@ components/          generic UI and shadcn components
 
 The design borrows useful rules from Clean, Hexagonal, Onion, and Domain-Driven Design without requiring every pattern from those approaches.
 
-See the [technology stack](./stack.md) for the canonical technology inventory.
+See the supporting [technology stack](./stack.md) and the canonical technical contract in [`../../.dwf/SPEC.md`](../../.dwf/SPEC.md).
 
 ## Design goal
 

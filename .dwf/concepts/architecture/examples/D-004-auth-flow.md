@@ -1,6 +1,6 @@
 # D-004 Example — Authenticated Mutation Flow
 
-**Illustrative only.** The normative boundary is [D-004 auth session](../contracts/D-004-auth-session.md) and [D-007 presentation layout](../contracts/D-007-presentation-layout.md).
+**Illustrative only.** The normative boundary is [`../../../SPEC.md#14-boundary-clarifications`](../../../SPEC.md#14-boundary-clarifications).
 
 A list action should conceptually look like this:
 

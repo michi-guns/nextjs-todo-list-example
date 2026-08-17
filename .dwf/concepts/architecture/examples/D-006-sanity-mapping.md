@@ -1,6 +1,6 @@
 # D-006 Example — Sanity Payload Mapping
 
-**Illustrative only.** The normative boundary is [D-006 landing and Sanity](../contracts/D-006-landing-sanity.md).
+**Illustrative only.** The normative boundary is [`../../../SPEC.md#14-boundary-clarifications`](../../../SPEC.md#14-boundary-clarifications).
 
 The route never sees a Sanity document:
 

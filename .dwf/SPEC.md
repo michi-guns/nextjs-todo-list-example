@@ -2,7 +2,7 @@
 
 **Status:** agreed spike build contract  
 **Companion:** [`PRD.md`](./PRD.md)  
-**Stack:** See the canonical [technology stack](../architecture/stack.md). This document defines the implementation contract and stack-specific constraints for this project.
+**Stack:** See the canonical [technology stack](../docs/architecture/stack.md). This document defines the stack-specific technical contract for this project.
 
 This document is the implementation contract. If code disagrees with this file, either fix the code or deliberately amend this file.
 
@@ -23,10 +23,7 @@ database locations.
 │   └── api/                      # JSON Route Handlers (+ Better Auth handler routes as required)
 ├── components/                   # shadcn/ui and generic UI chrome
 ├── e2e/                          # Playwright tests
-├── docs/
-│   ├── product/
-│   │   ├── PRD.md
-│   │   └── SPEC.md
+├── .dwf/                         # canonical product/technical design authority
 ├── db/                           # Drizzle client and schema
 ├── migrations/                   # generated/applied Drizzle migrations
 ├── src/
@@ -306,7 +303,7 @@ Document exact variable names in README when wiring — not in this SPEC body if
 
 ## 12. Implementation notes vs current scaffold
 
-As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, root `db`, Drizzle config, Vitest/Playwright/Husky). This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`.
+As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, root `db`, Drizzle config, Vitest/Playwright/Husky). This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`. The canonical design authority is `.dwf/`; Delivery artifacts, when created, belong outside `.dwf/`.
 
 ---
 
@@ -325,3 +322,157 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Playwright happy paths green locally
 - [ ] Husky + lint-staged active
 - [ ] README explains setup without referencing unrelated products
+
+---
+
+## 14. Boundary clarifications
+
+These clarifications preserve the accepted architecture decisions without prescribing unnecessary physical source shape.
+
+### 14.1 Capability ownership
+
+The first-class capabilities are `auth`, `landing`, `lists`, and `tasks`. `src/shared/` remains small. Root `db/` and `src/sanity/` are infrastructure seats, not additional business modules.
+
+### 14.2 Persistence boundary
+
+Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. `ensureDefaultInbox` must be atomic under concurrent first-use requests; list deletion relies on the database cascade contract.
+
+### 14.3 Authentication boundary
+
+The auth module exposes server-only application helpers equivalent to:
+
+```ts
+type CurrentUser = {
+  id: string
+  email: string
+  name: string | null
+}
+
+getCurrentUser(): Promise<CurrentUser | null>
+requireUser(): Promise<CurrentUser>
+```
+
+Pages, Server Actions, and Route Handlers do not expose Better Auth records or trust a client-provided owner id. Middleware redirects may improve UX but do not replace authorization at private operation boundaries.
+
+### 14.4 Lists and tasks application boundary
+
+Use cases receive the authenticated user id from the server boundary and enforce ownership:
+
+```ts
+ensureDefaultInbox(userId): Promise<List>
+listLists(userId): Promise<readonly List[]>
+createList(userId, input): Promise<List>
+renameList(userId, listId, input): Promise<List>
+deleteList(userId, listId): Promise<void>
+
+listTasks(userId, listId, options): Promise<readonly Task[]>
+createTask(userId, listId, input): Promise<Task>
+updateTask(userId, taskId, input): Promise<Task>
+deleteTask(userId, taskId): Promise<void>
+```
+
+The exact implementation may group or split these functions while preserving their ownership and observable behavior. Tasks remain in one list; new tasks default to `todo`; completed tasks remain stored and may be filtered from reads.
+
+### 14.5 Landing/Sanity boundary
+
+The landing module exposes a plain landing view model and repository/application read path. Sanity client setup, GROQ, external payload validation, and mapping remain infrastructure details. Raw CMS documents do not cross into application or presentation code. Once the real CMS read path works, missing/invalid required content is an explicit integration failure rather than an invisible permanent hardcoded fallback.
+
+### 14.6 Presentation boundary
+
+`app/` is composition-only. Module presentation owns Server Actions, JSON handler adapters, Zod input schemas, view models, error mapping, and capability-owned UI. Actions and handlers follow:
+
+```text
+authenticate → validate → application use case → map result/error → revalidate/respond
+```
+
+### 14.7 Verification boundary
+
+The implementation must prove domain invariants, application use cases with ports/fakes, Zod/auth boundary behavior, non-trivial adapter mappings, and the core Playwright journey. A complete React component unit matrix is not required.
+
+### 14.8 Delivery boundary
+
+The Delivery System consumes this SPEC and the PRD. It owns Roadmap, Milestones, Phases, dependencies, readiness, lifecycle, acceptance, verification, evidence, and implementation handoff. It must not add task-level decomposition or rewrite this technical contract.
+
+### 14.9 Boundary type sketches
+
+These sketches are normative at the semantic boundary; implementation may choose equivalent file grouping and concrete error plumbing.
+
+```ts
+type UserId = string
+type ListId = string
+type TaskId = string
+type TaskStatus = "todo" | "in_progress" | "done"
+
+interface List {
+  id: ListId
+  userId: UserId
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+interface Task {
+  id: TaskId
+  listId: ListId
+  userId: UserId
+  title: string
+  notes: string | null
+  status: TaskStatus
+  createdAt: Date
+  updatedAt: Date
+}
+
+interface ListRepository {
+  listByUser(userId: UserId): Promise<readonly List[]>
+  findByIdForUser(userId: UserId, listId: ListId): Promise<List | null>
+  ensureDefaultInbox(userId: UserId, now: Date): Promise<List>
+  insert(input: {
+    id: ListId
+    userId: UserId
+    name: string
+    now: Date
+  }): Promise<List>
+  rename(
+    userId: UserId,
+    listId: ListId,
+    name: string,
+    now: Date
+  ): Promise<List | null>
+  delete(userId: UserId, listId: ListId): Promise<boolean>
+}
+
+interface TaskRepository {
+  listByOwnedList(
+    userId: UserId,
+    listId: ListId,
+    options: { includeCompleted: boolean }
+  ): Promise<readonly Task[]>
+  insert(input: {
+    id: TaskId
+    userId: UserId
+    listId: ListId
+    title: string
+    notes: string | null
+    status: TaskStatus
+    now: Date
+  }): Promise<Task | "list_not_found">
+  findByIdForUser(userId: UserId, taskId: TaskId): Promise<Task | null>
+  updateForUser(
+    userId: UserId,
+    taskId: TaskId,
+    patch: {
+      title?: string
+      notes?: string | null
+      status?: TaskStatus
+    },
+    now: Date
+  ): Promise<Task | null>
+  deleteForUser(userId: UserId, taskId: TaskId): Promise<boolean>
+}
+```
+
+Adapters keep Drizzle row types private. Repository methods enforce ownership through their query boundary; presentation does not coordinate raw table reads.
+
+### 14.10 Unresolved implementation choices
+
+The default for `includeCompleted`, not-found privacy status, local magic-link test delivery, and exact API path spelling remain tracked in [`.dwf/OPEN-DECISIONS.md`](./OPEN-DECISIONS.md). They are not silently resolved by this SPEC augmentation.
