@@ -1,0 +1,16 @@
+{
+  "features": [
+    {
+      "id": 1,
+      "slug": "todo-architecture",
+      "status": "in-progress",
+      "phase": "design",
+      "focusPath": null,
+      "lastUpdated": "2026-08-17T09:03:00.097Z",
+      "finalStatus": null
+    }
+  ],
+  "lastUpdated": "2026-08-17T09:03:00.097Z",
+  "nextFeatureId": 2,
+  "version": "2"
+}
