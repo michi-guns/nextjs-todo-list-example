@@ -5,7 +5,7 @@ owner: engineering
 
 # Technology Stack
 
-This is a supporting inventory of technologies used by the example. The canonical technical contract is [`.dwf/SPEC.md`](../../.dwf/SPEC.md); this document provides role-level orientation without overriding it.
+This is a supporting inventory of technologies used by the example. The canonical technical contract is [`../../.dwf/output/agent/SPEC.md`](../../.dwf/output/agent/SPEC.md); this document provides role-level orientation without overriding it.
 
 ## Application
 

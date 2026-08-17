@@ -1,31 +1,57 @@
-# Project Design Rules
+# Project Rules
 
-These are mandatory project constraints. They constrain both the product and technical contract; they do not prescribe executor-internal coding tasks.
+Mandatory project-specific constraints. Framework rules live in [`.framework/PROTOCOL.md`](.framework/PROTOCOL.md) and its Skills; this file contains only this repository's constraints.
 
-## Product and architecture
+<a id="rule-001"></a>
 
-- This repository remains a standalone public example. Do not invent links to unrelated or private products.
-- Keep the domain intentionally small: authenticated personal lists and tasks plus editorial landing content.
-- Users own only their own lists and tasks. Do not introduce teams, organizations, shared lists, or a parallel tenant model without an explicit product decision.
-- PostgreSQL/Drizzle owns Better Auth records, lists, tasks, ownership, status, timestamps, and relational integrity.
-- Sanity owns landing editorial content only. Todos never live in Sanity.
-- Keep domain rules independent of Next.js, React, Drizzle, Sanity, HTTP, and browser APIs.
-- Keep framework/provider details behind infrastructure adapters and validate untrusted inputs with Zod at server boundaries.
-- Prefer existing repository extension points. Do not reshape source code merely to mirror conceptual design nouns.
+## RULE-001 — Standalone public example
 
-## Repository and safety
+Keep this repository a standalone public example. Do not invent links to unrelated or private products.
 
-- Package manager: pnpm.
-- Read the relevant Next.js guide under `node_modules/next/dist/docs/` before writing code because this repository uses a breaking-change-sensitive Next.js version.
-- Do not commit secrets, `.env*` values, tokens, or credentials.
-- Keep commits coherent and avoid rewriting shared history or force-pushing `main`.
-- Husky/lint-staged and the scripts in `package.json` are the local quality baseline.
+<a id="rule-002"></a>
 
-## Design and Delivery separation
+## RULE-002 — Intentionally small personal domain
 
-- `.dwf/` is canonical product/technical design authority.
-- Delivery state belongs outside `.dwf/` in the Delivery System's Roadmap → Milestone → Phase artifacts.
-- Delivery must not create a task hierarchy beneath Phase or prescribe file-by-file implementation decomposition.
-- Code Factory/implementation execution owns tasks, coding strategy, branches/worktrees, and internal test sequencing.
-- Trello artifacts, when used, are operational/projection state and must not silently become canonical design or Delivery truth.
-- Genuine product/technical gaps must return to `.dwf/`; Delivery must not resolve them by assumption.
+Keep the domain to authenticated personal lists and tasks plus editorial landing content. Do not introduce teams, organizations, shared lists, or a parallel tenant model without an explicit Product Decision.
+
+<a id="rule-003"></a>
+
+## RULE-003 — PostgreSQL owns transactional truth
+
+PostgreSQL/Drizzle owns Better Auth records, lists, tasks, ownership, status, timestamps, and relational integrity. Do not store todo data in Sanity or create a parallel user table outside the Better Auth adapter schema.
+
+<a id="rule-004"></a>
+
+## RULE-004 — Sanity owns landing editorial content only
+
+Sanity may own editable landing headline, blurb, and CTA content. Todos never live in Sanity.
+
+<a id="rule-005"></a>
+
+## RULE-005 — Framework-independent domain
+
+Keep domain rules independent of Next.js, React, Drizzle, Sanity, HTTP, and browser APIs.
+
+<a id="rule-006"></a>
+
+## RULE-006 — Validate and isolate untrusted boundaries
+
+Validate untrusted server inputs with Zod. Keep framework/provider details behind infrastructure adapters. Server Actions and Route Handlers must share the authenticated application path.
+
+<a id="rule-007"></a>
+
+## RULE-007 — Prefer existing repository extension points
+
+Do not reshape source code merely to mirror conceptual design nouns. Add structure only when a real responsibility or accepted technical contract requires it.
+
+<a id="rule-008"></a>
+
+## RULE-008 — Local quality baseline
+
+Use pnpm. Preserve the repository's typecheck, lint, test, Playwright, Husky, and lint-staged conventions. CI is not required for spike completion.
+
+<a id="rule-009"></a>
+
+## RULE-009 — Keep secrets out of the repository
+
+Do not commit `.env*` values, tokens, credentials, or provider secrets.

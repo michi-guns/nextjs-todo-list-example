@@ -1,0 +1,71 @@
+# Human Technical Guide — Next.js Todo List Example
+
+This is a human-oriented projection of the validated [Agent SPEC](../agent/SPEC.md). It explains the implementation shape without becoming a second technical contract. Durable choices live in [`../../decisions/TECHNICAL.md`](../../decisions/TECHNICAL.md); product behavior remains owned by [`../agent/PRD.md`](../agent/PRD.md).
+
+## System shape
+
+The application is one Next.js deployable organized as a domain-centered modular monolith:
+
+```text
+app routes
+  → module presentation
+    → application use cases
+      → domain rules and repository ports
+        → Drizzle / Better Auth / Sanity adapters
+```
+
+The first-class capabilities are `auth`, `landing`, `lists`, and `tasks`. Root `db/`, `migrations/`, and `src/sanity/` are infrastructure seats. `src/shared/` stays small.
+
+## Layer responsibilities
+
+- **Domain:** plain entities, invariants, errors, and contracts; no framework/provider imports.
+- **Application:** use cases, DTOs, and ports; no SQL, GROQ, JSX, or raw provider records.
+- **Infrastructure:** Drizzle repositories, Better Auth integration, Sanity adapters, validation/mapping.
+- **Presentation:** Server Actions, JSON Route Handler adapters, Zod input schemas, view models, error mapping, and capability-owned UI.
+- **`app/`:** Next.js routing and composition only.
+
+Server Actions and Route Handlers use the same boundary sequence:
+
+```text
+authenticate → authorize → validate with Zod → call use case → map result/error → revalidate/respond
+```
+
+## Identity and persistence
+
+Better Auth remains behind a server-only application boundary exposing current-user helpers. Private reads and writes require the session user; client-provided owner IDs are never trusted.
+
+PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownership, status, timestamps, and relational integrity. Lists and tasks own their repository ports. Drizzle row types stay inside infrastructure. List deletion uses a database cascade, and default `Inbox` creation is atomic and idempotent.
+
+## Sanity boundary
+
+Sanity is used only for landing content. Infrastructure validates unknown CMS payloads and maps them to a plain landing view model. GROQ, client setup, and raw Sanity documents must not cross into application or page code. After the real CMS path is wired, required-content failures are explicit integration failures rather than a permanent silent fallback.
+
+## Required application behavior
+
+The minimum application APIs cover:
+
+- `ensureDefaultInbox`, list listing/creation/rename/deletion;
+- task listing/creation/update/deletion;
+- task statuses `todo`, `in_progress`, and `done`;
+- completed-task filtering;
+- ownership checks at use-case and repository boundaries;
+- consistent action and JSON error mapping.
+
+Exact signatures and data contracts are in the [Agent SPEC](../agent/SPEC.md).
+
+## Verification
+
+Use layered proof:
+
+- domain invariant tests;
+- application tests with repository ports/fakes;
+- Zod and auth/presentation boundary tests;
+- non-trivial adapter mapping tests;
+- the Playwright sign-in → list → task → status → sign-out journey;
+- pnpm typecheck, lint, tests, and local commit hooks.
+
+A full React component unit-test matrix is not required for the spike.
+
+## Unresolved state
+
+The default completed-task query value, privacy error mapping, local magic-link test delivery, exact API paths, Sanity integration evidence, and database migration/application state remain explicitly tracked in the decision ledgers. The implementation must not silently choose answers that change the contract.

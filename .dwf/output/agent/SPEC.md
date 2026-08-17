@@ -1,10 +1,13 @@
 # Technical Specification — Next.js Todo List Example
 
-**Status:** agreed spike build contract  
-**Companion:** [`PRD.md`](./PRD.md)  
-**Stack:** See the canonical [technology stack](../docs/architecture/stack.md). This document defines the stack-specific technical contract for this project.
+**Status:** generated Agent technical projection
+**Authority:** [`../../RULES.md`](../../RULES.md), [`../../CONTEXT.md`](../../CONTEXT.md), [`../../decisions/PRODUCT.md`](../../decisions/PRODUCT.md), [`../../decisions/TECHNICAL.md`](../../decisions/TECHNICAL.md), [`../../decisions/EDGE-CASES.md`](../../decisions/EDGE-CASES.md), and [`PRD.md`](./PRD.md)
+**Companion:** [`PRD.md`](./PRD.md) (generated product projection)
+**Stack orientation:** See the supporting [technology stack](../../../docs/architecture/stack.md).
 
-This document is the implementation contract. If code disagrees with this file, either fix the code or deliberately amend this file.
+This projection is generated from the durable DWF Workspace. It is subordinate to the Agent PRD and does not own technical-decision rationale.
+
+This document is the implementation contract. If code disagrees with it, either update the code or deliberately amend the owning Workspace state and regenerate projections.
 
 ---
 
@@ -475,4 +478,4 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 
 ### 14.10 Unresolved implementation choices
 
-The default for `includeCompleted`, not-found privacy status, local magic-link test delivery, and exact API path spelling remain tracked in [`.dwf/OPEN-DECISIONS.md`](./OPEN-DECISIONS.md). They are not silently resolved by this SPEC augmentation.
+The default for `includeCompleted`, not-found privacy status, local magic-link test delivery, and exact API path spelling remain tracked in [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Factual integration gaps remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); they are not silently resolved by this SPEC projection.

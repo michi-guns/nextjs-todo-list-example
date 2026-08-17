@@ -1,8 +1,8 @@
 ---
 status: active
 owner: content-and-engineering
-related-adrs:
-  - ADR-0002
+related-decisions:
+  - TD-007
 ---
 
 # Sanity

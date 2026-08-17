@@ -1,6 +1,6 @@
 # Architecture Concept — Capability Boundaries
 
-**Derived explanation.** Normative behavior lives in [`../../PRD.md`](../../PRD.md), [`../../SPEC.md`](../../SPEC.md), and [`../../DECISIONS.md`](../../DECISIONS.md). This document exists to reload the mental model quickly; it does not add requirements.
+**Derived explanation.** Normative behavior lives in [`../../output/agent/PRD.md`](../../output/agent/PRD.md) and [`../../output/agent/SPEC.md`](../../output/agent/SPEC.md). Durable rationale and unresolved state live in [`../../decisions/PRODUCT.md`](../../decisions/PRODUCT.md), [`../../decisions/TECHNICAL.md`](../../decisions/TECHNICAL.md), [`../../decisions/EDGE-CASES.md`](../../decisions/EDGE-CASES.md), [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md), and [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). This document exists to reload the mental model quickly; it does not add requirements.
 
 ## Quick reload
 
@@ -36,13 +36,13 @@ request/form data
 
 A client-provided `userId` is never the owner of a mutation. The server session is the ownership source.
 
-See [`examples/D-004-auth-flow.md`](./examples/D-004-auth-flow.md) for an illustrative snippet.
+See [`examples/TD-004-auth-flow.md`](./examples/TD-004-auth-flow.md) for an illustrative snippet.
 
 ## Task ownership walkthrough
 
 A task operation receives the authenticated user id and list/task identifiers. The task persistence boundary verifies the list and task belong to that user before returning or mutating data. Foreign resources follow the selected privacy policy; they do not leak ownership information.
 
-See [`examples/D-005-task-create-flow.md`](./examples/D-005-task-create-flow.md) for an illustrative snippet.
+See [`examples/TD-006-task-create-flow.md`](./examples/TD-006-task-create-flow.md) for an illustrative snippet.
 
 ## Sanity boundary walkthrough
 
@@ -56,11 +56,11 @@ unknown Sanity payload
 
 GROQ, Sanity clients, and raw CMS documents stop inside infrastructure.
 
-See [`examples/D-006-sanity-mapping.md`](./examples/D-006-sanity-mapping.md) for an illustrative snippet.
+See [`examples/TD-007-sanity-mapping.md`](./examples/TD-007-sanity-mapping.md) for an illustrative snippet.
 
 ## Common traps
 
-- Treating `docs/` explanations or this concept as stronger than `.dwf/PRD.md` and `.dwf/SPEC.md`.
+- Treating `docs/` explanations or this concept as stronger than the generated Agent PRD/SPEC and decision ledgers.
 - Putting Delivery phases or coding tasks in `.dwf/`.
 - Making `app/` or generic `components/` a second domain layer.
 - Letting Sanity become a todo store.

@@ -1,6 +1,6 @@
-# D-005 Example — Task Creation and Ownership
+# TD-006 Example — Task Creation and Ownership
 
-**Illustrative only.** The normative boundary is [`../../../SPEC.md#14-boundary-clarifications`](../../../SPEC.md#14-boundary-clarifications).
+**Illustrative only.** The normative boundary is [`../../../output/agent/SPEC.md#14-boundary-clarifications`](../../../output/agent/SPEC.md#14-boundary-clarifications).
 
 ```ts
 export async function createTaskAction(

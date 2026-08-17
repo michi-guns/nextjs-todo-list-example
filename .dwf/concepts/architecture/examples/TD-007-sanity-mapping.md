@@ -1,6 +1,6 @@
-# D-006 Example — Sanity Payload Mapping
+# TD-007 Example — Sanity Payload Mapping
 
-**Illustrative only.** The normative boundary is [`../../../SPEC.md#14-boundary-clarifications`](../../../SPEC.md#14-boundary-clarifications).
+**Illustrative only.** The normative boundary is [`../../../output/agent/SPEC.md#14-boundary-clarifications`](../../../output/agent/SPEC.md#14-boundary-clarifications).
 
 The route never sees a Sanity document:
 

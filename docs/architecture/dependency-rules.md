@@ -1,8 +1,9 @@
 ---
 status: active
 owner: engineering
-related-adrs:
-  - ADR-0001
+related-decisions:
+  - TD-001
+  - TD-003
 ---
 
 # Dependency Rules

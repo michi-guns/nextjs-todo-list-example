@@ -1,14 +1,14 @@
 ---
 status: active
 owner: engineering
-related-adrs:
-  - ADR-0002
-  - ADR-0003
+related-decisions:
+  - TD-005
+  - TD-007
 ---
 
 ## Data ownership
 
-The canonical product and technical ownership rules are in [`.dwf/PRD.md`](../../.dwf/PRD.md) and [`.dwf/SPEC.md`](../../.dwf/SPEC.md). This supporting note summarizes the boundary for orientation.
+The canonical product and technical ownership rules are in [`../../.dwf/output/agent/PRD.md`](../../.dwf/output/agent/PRD.md) and [`../../.dwf/output/agent/SPEC.md`](../../.dwf/output/agent/SPEC.md). This supporting note summarizes the boundary for orientation.
 
 ## Sanity owns
 

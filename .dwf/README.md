@@ -1,40 +1,43 @@
-# Design Workspace Framework
+# Project Design Workspace — Next.js Todo List Example
 
-This directory is the project's canonical design authority. It stores durable product and technical truth; it does not store Delivery state, implementation tasks, or Code Factory orchestration.
+DWF Framework version: see [`.framework/VERSION`](.framework/VERSION).
 
-## Read order
+This repository is a standalone public Next.js teaching example for an authenticated personal todo product. The source tree is currently a scaffold; the generated Agent PRD and SPEC describe the implementation contract.
 
-1. [`RULES.md`](./RULES.md) — mandatory project constraints
-2. [`CONTEXT.md`](./CONTEXT.md) — repository and system facts
-3. [`PRD.md`](./PRD.md) — current observable product contract
-4. [`SPEC.md`](./SPEC.md) — current technical implementation contract
-5. [`DECISIONS.md`](./DECISIONS.md) — retained product/design rationale
-6. [`ADRs/`](./ADRs/) — architecture decision records
-7. [`OPEN-QUESTIONS.md`](./OPEN-QUESTIONS.md) — unresolved factual unknowns
-8. [`OPEN-DECISIONS.md`](./OPEN-DECISIONS.md) — unresolved design choices
-9. [`concepts/`](./concepts/) — derived developer explanations
+## Start here
 
-## Project scope
+Project truth:
 
-A standalone public Next.js example of a small authenticated personal todo product. The spike demonstrates a modern Next.js stack, explicit capability boundaries, Better Auth, Postgres/Drizzle, Sanity landing content, server boundaries, and local quality tooling.
+- [`CONTEXT.md`](CONTEXT.md) — verified repository and system facts
+- [`RULES.md`](RULES.md) — mandatory project-specific constraints
+- [`decisions/PRODUCT.md`](decisions/PRODUCT.md) — accepted Product Decisions (`D-*`)
+- [`decisions/TECHNICAL.md`](decisions/TECHNICAL.md) — accepted Technical Decisions (`TD-*`)
+- [`decisions/EDGE-CASES.md`](decisions/EDGE-CASES.md) — explicitly considered scenarios (`EC-*`)
+- [`decisions/OPEN-QUESTIONS.md`](decisions/OPEN-QUESTIONS.md) — unresolved facts (`OQ-*`)
+- [`decisions/OPEN-DECISIONS.md`](decisions/OPEN-DECISIONS.md) — unresolved choices (`OD-*`)
 
-## Authority rules
+Generated contracts:
 
-- `PRD.md` owns current observable product behavior.
-- `SPEC.md` owns the technical contract and is subordinate to `PRD.md`.
-- `DECISIONS.md` and `ADRs/` preserve rationale and history; accepted current behavior must also appear in PRD/SPEC.
-- `OPEN-QUESTIONS.md` and `OPEN-DECISIONS.md` are not accepted truth.
-- `concepts/` is explanatory and derived, never authoritative.
-- Repository reality is evidence. It does not silently rewrite design authority.
+- [`output/agent/PRD.md`](output/agent/PRD.md) — exact observable product contract
+- [`output/agent/SPEC.md`](output/agent/SPEC.md) — exact technical implementation contract
 
-## Delivery boundary
+Human projections:
 
-The Delivery System consumes settled implementation-facing truth from this workspace and owns a separate repository-resident Delivery tree such as `implementation/` (Roadmap → Milestones → Phases). No Delivery artifacts currently exist in this repository. Delivery must not redefine this workspace or add task-level implementation plans here.
+- [`output/human/PRD.md`](output/human/PRD.md)
+- [`output/human/SPEC.md`](output/human/SPEC.md)
 
-## Supporting documentation
+Derived explanations:
 
-The existing [`docs/`](../docs/) tree remains useful for handbook, domain, data, development, and runbook material. Its product/technical authority is subordinate to the linked `.dwf/` artifacts after this migration. `docs/index.md` explains the supporting documentation map.
+- [`concepts/`](concepts/) — reloadable mental models and illustrative examples; never a competing authority
+- [`../docs/index.md`](../docs/index.md) — supporting architecture, domain, data, development, and runbook material
 
-## Migration note
+## Ownership
 
-This workspace was migrated from the repository's existing product/technical documents and prior design artifacts with semantic ownership preserved where possible. The supplied generic DWF framework documents live outside this repository and were not modified.
+The Workspace root outside `.framework/` is project-specific design state. Product behavior is owned by the Agent PRD, technical behavior by the Agent SPEC, and rationale by the decision ledgers. Unresolved facts and choices remain visible rather than being silently inferred.
+
+## Framework machinery
+
+- [`.framework/`](.framework/) — supplied DWF machinery; read-only during ordinary project work
+- [`.framework/PROTOCOL.md`](.framework/PROTOCOL.md) — installed framework protocol
+
+Do not place Delivery Roadmaps, Milestones, Phases, or implementation task decomposition in this Workspace. Delivery artifacts, when used, live outside `.dwf/` and reference these contracts.

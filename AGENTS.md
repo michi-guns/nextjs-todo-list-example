@@ -9,9 +9,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Product intent
 
-- Read [`.dwf/README.md`](.dwf/README.md), [`.dwf/RULES.md`](.dwf/RULES.md), and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes.
-- Read [`.dwf/PRD.md`](.dwf/PRD.md) and [`.dwf/SPEC.md`](.dwf/SPEC.md) before implementing product, domain, architecture, persistence, or integration behavior.
-- Read relevant [`.dwf/ADRs/`](.dwf/ADRs/), open questions/decisions, and supporting architecture/data/domain documents.
+- Read [`.dwf/README.md`](.dwf/README.md), [`.dwf/RULES.md`](.dwf/RULES.md), [`.dwf/CONTEXT.md`](.dwf/CONTEXT.md), and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes.
+- Read the generated [Agent PRD](.dwf/output/agent/PRD.md) and [Agent SPEC](.dwf/output/agent/SPEC.md) before implementing product, domain, architecture, persistence, or integration behavior.
+- Read relevant ledgers under [`.dwf/decisions/`](.dwf/decisions/) and supporting architecture/data/domain documents.
 - Treat `.dwf/` as the canonical product/technical design authority. Delivery artifacts live outside `.dwf/` and must reference, not redefine, it.
 - This repo is a standalone public example. Do not invent links to other products or private projects.
 

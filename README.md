@@ -1,16 +1,15 @@
-# Next.js template
+# Next.js Todo List Example
 
-This is a Next.js template with shadcn/ui.
+This repository is a standalone teaching example for a modern Next.js stack, domain-centered modular architecture, and AI-assisted development. The source tree is currently a scaffold; the product contract describes the target authenticated todo journey.
 
 ## Project documentation
 
-This repository is also a standalone reference example for a modern Next.js
-stack, vertical-slice architecture, and AI-assisted development.
-
-Start with the canonical [`.dwf/README.md`](.dwf/README.md). Before modifying
-product behavior, architecture, persistence, or integrations, read
+Start with [`.dwf/README.md`](.dwf/README.md), then read the generated
+[Agent PRD](.dwf/output/agent/PRD.md), [Agent SPEC](.dwf/output/agent/SPEC.md),
+and [project documentation](docs/index.md). Before modifying product behavior,
+architecture, persistence, or integrations, read
 [`docs/documentation-protocol.md`](docs/documentation-protocol.md) and the
-relevant DWF artifacts.
+relevant DWF decision ledgers.
 
 ## Adding components
 

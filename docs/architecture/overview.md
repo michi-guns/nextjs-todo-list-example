@@ -1,8 +1,8 @@
 ---
 status: evolving
 owner: engineering
-related-adrs:
-  - ADR-0001
+related-decisions:
+  - TD-001
 ---
 
 # Architecture Overview
@@ -20,7 +20,7 @@ components/          generic UI and shadcn components
 
 The design borrows useful rules from Clean, Hexagonal, Onion, and Domain-Driven Design without requiring every pattern from those approaches.
 
-See the supporting [technology stack](./stack.md) and the canonical technical contract in [`../../.dwf/SPEC.md`](../../.dwf/SPEC.md).
+See the supporting [technology stack](./stack.md) and the canonical technical contract in [`../../.dwf/output/agent/SPEC.md`](../../.dwf/output/agent/SPEC.md).
 
 ## Design goal
 

@@ -1,8 +1,8 @@
 ---
 status: active
 owner: engineering
-related-adrs:
-  - ADR-0003
+related-decisions:
+  - TD-005
 ---
 
 # PostgreSQL and Drizzle

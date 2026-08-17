@@ -1,41 +1,43 @@
-# Glossary
+# Project Glossary
+
+Stable project/domain terminology. Framework terminology belongs in `.framework/`, not here.
 
 ## Product terms
 
-**User**: An authenticated person represented by Better Auth.
+**User:** An authenticated person represented by Better Auth.
 
-**List**: A user-owned collection of tasks. A user with no existing lists receives an `Inbox` list on first sign-in.
+**List:** A user-owned collection of tasks. A user with no existing lists receives an `Inbox` list on first authenticated use.
 
-**Task**: A user-owned item belonging to exactly one list.
+**Task:** A user-owned item belonging to exactly one list.
 
-**Task status**: One of `todo`, `in_progress`, or `done`.
+**Task status:** One of `todo`, `in_progress`, or `done`.
 
-**Landing content**: Editorial headline, blurb, and CTA copy served from Sanity. It is not transactional todo data.
+**Landing content:** Editorial headline, blurb, and CTA copy served from Sanity. It is not transactional todo data.
 
 ## Design terms
 
-**Domain rule**: A business invariant that must hold regardless of UI or persistence.
+**Domain rule:** A business invariant that must hold regardless of UI or persistence.
 
-**Application use case**: A named operation the system permits, such as `createTask` or `deleteList`.
+**Application use case:** A named operation the system permits, such as `createTask` or `deleteList`.
 
-**Adapter**: Infrastructure code that translates an external system such as Better Auth, Drizzle, or Sanity into an application-facing interface.
+**Adapter:** Infrastructure code that translates an external system such as Better Auth, Drizzle, or Sanity into an application-facing interface.
 
-**Repository port**: A module-owned interface describing the persistence/provider capability an application use case needs without exposing the adapter implementation.
+**Repository port:** A module-owned interface describing the persistence/provider capability an application use case needs without exposing adapter implementation.
 
-**View model**: A presentation-facing shape derived from an application DTO for a page, action result, or JSON response.
+**View model:** A presentation-facing shape derived from an application DTO for a page, action result, or JSON response.
 
-**Transactional truth**: Data whose correctness is owned by PostgreSQL rather than an editorial content system.
+**Transactional truth:** Data whose correctness is owned by PostgreSQL rather than editorial content systems.
 
-**Infrastructure seat**: A root location reserved for a provider client, schema, or migration concern, not a separate business capability.
+**Infrastructure seat:** A repository location reserved for a provider client, schema, or migration concern, not a separate business capability.
 
-## Delivery terms
+## Decision identifiers
 
-**Roadmap**: The overall implementation journey and scheduling orientation. It does not itself create dependency edges.
+**D-\*:** Accepted observable Product Decision.
 
-**Milestone**: An observable integrated capability or acceptance boundary above individual Phases.
+**TD-\*:** Accepted or explicitly authorized technical/architecture mechanism downstream of Product Decisions.
 
-**Phase**: The smallest externally managed implementation handoff unit. A Phase has an outcome/constraint/proof contract and no Delivery Task children.
+**EC-\*:** Explicitly considered scenario that points to an owning contract without overriding it.
 
-**Design Gap**: Evidence-backed missing or conflicting canonical product/technical truth that requires DWF authority before implementation can continue correctly.
+**OQ-\*:** Unresolved factual question.
 
-**Execution Baseline**: The content-derived identity of the exact authoritative Phase truth an active implementation must satisfy.
+**OD-\*:** Unresolved choice among understood alternatives.

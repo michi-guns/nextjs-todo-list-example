@@ -1,6 +1,6 @@
-# D-004 Example — Authenticated Mutation Flow
+# TD-004 Example — Authenticated Mutation Flow
 
-**Illustrative only.** The normative boundary is [`../../../SPEC.md#14-boundary-clarifications`](../../../SPEC.md#14-boundary-clarifications).
+**Illustrative only.** The normative boundary is [`../../../output/agent/SPEC.md#14-boundary-clarifications`](../../../output/agent/SPEC.md#14-boundary-clarifications).
 
 A list action should conceptually look like this:
 

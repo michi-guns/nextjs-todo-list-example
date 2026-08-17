@@ -1,0 +1,63 @@
+# Product Decisions
+
+Canonical durable Product Decisions (`D-*`). These decisions own accepted observable product behavior and design semantics. The generated Agent PRD is the exact projection; this ledger preserves the decisions and rationale.
+
+<a id="d-001"></a>
+
+## D-001 — Personal authenticated workspace
+
+- **Status:** ACCEPTED
+- **Source:** PRD, sections 3–4; accepted spike scope
+- **Related:** [Agent PRD](../output/agent/PRD.md#4-users-and-permissions)
+
+Anonymous visitors may view the public landing page and enter authentication flows. A signed-in user may read and mutate only that user's lists and tasks. The product has one implicit personal workspace per user; teams, organizations, roles, shared lists, and collaboration are out of scope for the spike.
+
+<a id="d-002"></a>
+
+## D-002 — Password and magic-link authentication
+
+- **Status:** ACCEPTED
+- **Source:** PRD, goals and acceptance sections
+- **Related:** [Agent PRD](../output/agent/PRD.md#4-users-and-permissions)
+
+The spike must demonstrate email/password sign-up and sign-in plus magic-link request and consumption. Sign-out is required. OAuth and social login are out of scope.
+
+<a id="d-003"></a>
+
+## D-003 — Default Inbox and list lifecycle
+
+- **Status:** ACCEPTED
+- **Source:** PRD, section 5.1
+- **Related:** [Agent PRD](../output/agent/PRD.md#51-lists)
+
+A user may own many lists. On first authenticated use, when the user has no lists, the product creates one list named `Inbox`; the behavior is idempotent. Users may create, rename, and delete lists. Deleting a list removes its tasks.
+
+<a id="d-004"></a>
+
+## D-004 — Task lifecycle and statuses
+
+- **Status:** ACCEPTED
+- **Source:** PRD, section 5.2
+- **Related:** [Agent PRD](../output/agent/PRD.md#52-tasks)
+
+Each task belongs to exactly one user-owned list. A task has a required title, optional notes, timestamps, and one of `todo`, `in_progress`, or `done`. Users may create, edit, delete, and change task status. Completed tasks remain stored and the product supports showing or hiding them.
+
+<a id="d-005"></a>
+
+## D-005 — Editorial landing content is separate from todo data
+
+- **Status:** ACCEPTED
+- **Source:** PRD, goals, data ownership, and non-goals
+- **Related:** [Agent PRD](../output/agent/PRD.md#6-data-ownership-product-view)
+
+The public landing surface contains editable headline, blurb, and CTA content. Editorial content is separate from personal lists and tasks; todo data never lives in the editorial content system.
+
+<a id="d-006"></a>
+
+## D-006 — Complete, locally verifiable spike journey
+
+- **Status:** ACCEPTED
+- **Source:** PRD, sections 2 and 7
+- **Related:** [Agent PRD](../output/agent/PRD.md#7-spike-complete-acceptance)
+
+Spike completion requires a real local journey: authenticate, obtain `Inbox`, create a list, create a task, change status, sign out, and verify private-data protection. Server-boundary validation, domain/application tests, the core Playwright path, and local commit quality hooks are part of the spike acceptance. Deployment and CI are optional.

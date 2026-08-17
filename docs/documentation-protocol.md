@@ -4,30 +4,32 @@ This is the navigation and maintenance protocol for the project's design, suppor
 
 ## Reading order
 
-1. [`.dwf/README.md`](../.dwf/README.md)
+1. [`docs/index.md`](index.md)
 2. [`.dwf/RULES.md`](../.dwf/RULES.md) and [`.dwf/CONTEXT.md`](../.dwf/CONTEXT.md), when present
-3. [`.dwf/PRD.md`](../.dwf/PRD.md) and the relevant sections of [`.dwf/SPEC.md`](../.dwf/SPEC.md)
-4. Relevant [`.dwf/DECISIONS.md`](../.dwf/DECISIONS.md), ADRs, open questions, and open decisions
-5. Supporting architecture, domain, data, development, handbook, and runbook documents under `docs/`
+3. [`.dwf/output/agent/PRD.md`](../.dwf/output/agent/PRD.md) and the relevant sections of [`.dwf/output/agent/SPEC.md`](../.dwf/output/agent/SPEC.md)
+4. Relevant [`.dwf/decisions/`](../.dwf/decisions/) ledgers and supporting architecture/domain/data documents
+5. Human projections, concepts, handbook, development, runbook, and protocol material as needed
 
 ## Authority
 
-- `.dwf/PRD.md` defines current observable product behavior.
-- `.dwf/SPEC.md` defines the current technical implementation contract and is subordinate to the PRD.
-- `.dwf/DECISIONS.md` and `.dwf/ADRs/` preserve rationale/history and must be reflected into current-state PRD/SPEC when they affect current behavior.
-- `.dwf/OPEN-QUESTIONS.md` contains unresolved facts; `.dwf/OPEN-DECISIONS.md` contains unresolved choices. Neither is accepted truth.
-- `.dwf/concepts/` and any `.dwf/artifacts/` are derived explanations/projections, never authorities.
+- `.dwf/output/agent/PRD.md` defines current observable product behavior.
+- `.dwf/output/agent/SPEC.md` defines the current technical implementation contract and is subordinate to the Agent PRD.
+- `.dwf/decisions/PRODUCT.md` and `.dwf/decisions/TECHNICAL.md` preserve accepted rationale and must be reflected into current projections when they affect behavior or implementation.
+- `.dwf/decisions/EDGE-CASES.md` records explicitly considered scenarios; `.dwf/decisions/OPEN-QUESTIONS.md` and `.dwf/decisions/OPEN-DECISIONS.md` are unresolved state, never accepted truth.
+- `.dwf/concepts/` and `.dwf/output/human/` are derived explanations/projections, never authorities.
 - `docs/` supplies supporting, operational, and explanatory material. It must not silently override `.dwf/`.
 - Conversation history and Delivery artifacts are not design authority.
 
 ## Update rules
 
-- Product behavior changes update `.dwf/PRD.md`, affected technical contracts/tests, and supporting documents.
-- Technical or architectural changes update `.dwf/SPEC.md` and add or amend an ADR when rationale is worth preserving.
+- Product behavior changes update the durable product decisions and regenerated Agent PRD, plus affected technical contracts, tests, and supporting documents.
+- Technical or architectural changes update the durable technical decisions and regenerated Agent SPEC; add or amend an ADR only when rationale is worth preserving outside the decision ledger.
 - Do not silently resolve contradictions. Preserve uncertainty and record the appropriate open question/decision.
-- Move verified facts from open questions into `.dwf/CONTEXT.md`, `.dwf/RULES.md`, PRD, or SPEC according to semantic ownership.
+- Move verified facts from open questions into `.dwf/CONTEXT.md`, `.dwf/RULES.md`, or the relevant decision/projection according to semantic ownership.
 - Keep Delivery Roadmap/Milestone/Phase state outside `.dwf/`; Delivery may reference `.dwf/` but must not redefine it.
-- Keep implementation tasks, file-level coding plans, and executor orchestration below the Delivery Phase boundary.
+
+## Maintenance
+
 - Repeated operational problems get a runbook under `docs/runbooks/`.
 - One document should own one concept or decision; prefer links over duplicated normative prose.
 - Repair navigation when canonical files move.

@@ -1,10 +1,12 @@
 # Product Requirements — Next.js Todo List Example
 
-**Status:** agreed spike intent (source: operator grilling)  
-**Audience:** humans and coding agents implementing this repository  
-**Companion:** [`SPEC.md`](./SPEC.md) (build contract)
+**Status:** generated Agent product projection
+**Authority:** [`../../decisions/PRODUCT.md`](../../decisions/PRODUCT.md), [`../../decisions/EDGE-CASES.md`](../../decisions/EDGE-CASES.md), [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md), and [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md)
+**Companion:** [`SPEC.md`](./SPEC.md) (generated technical projection)
 
-This repository is a **public, standalone example** of a small multi-user todo product on a modern [Next.js stack](../docs/architecture/stack.md). It is intentionally simple in domain and intentionally serious in structure, auth, data split, and local quality tooling.
+This projection is generated from the durable DWF Workspace. It is the precise observable product contract; it does not own decision rationale or implementation mechanisms.
+
+This repository is a **public, standalone example** of a small multi-user todo product on a modern [Next.js stack](../../../docs/architecture/stack.md). It is intentionally simple in domain and intentionally serious in structure, auth, data split, and local quality tooling.
 
 ---
 
@@ -112,10 +114,14 @@ Deployed Vercel preview is **optional**, not required for spike complete.
 
 ## 8. Success metrics (qualitative)
 
-- A new agent can implement features by reading [`.dwf/README.md`](./README.md), this PRD, [`SPEC.md`](./SPEC.md), and the supporting project documentation without chat history.
+- A new agent can implement features by reading [the supplied DWF bootstrap](../../README.md), [`../../CONTEXT.md`](../../CONTEXT.md), this generated PRD, [`SPEC.md`](./SPEC.md), the decision ledgers, and the supporting project documentation without chat history.
 - Architecture seats (`src/modules/*`, `db`, `src/sanity`) stay obvious as the app grows slightly.
 - Domain remains boring; structure and stack wiring remain the point.
 
-## 9. Open product decisions
+## 9. Open-state visibility
+
+No product behavior is silently inferred from unresolved state. Current open facts and choices remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md) and [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Technical open items are surfaced in the generated SPEC where they affect implementation completeness.
+
+## 10. Open product decisions
 
 None material for spike start. Defer polish (empty states copy, exact dashboard chrome) to implementation taste within SPEC constraints.
