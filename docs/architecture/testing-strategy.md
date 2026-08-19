@@ -27,7 +27,7 @@ Test Sanity payload validation and mapping with local fixtures, including option
 
 ## Boundary tests
 
-Test Zod acceptance/rejection and authentication/authorization behavior at Server Actions and Route Handlers.
+Keep domain and application tests as the main business-behavior suite. Test JSON Route Handlers at the request boundary for successful requests, paginated response shape, unauthenticated `401`, privacy-preserving `404`, conflict `409`, and invalid-input `422` responses. Give Server Actions a smaller adapter suite for authentication, Zod validation, successful result mapping, and expected error mapping. Do not repeat every business case across both entry paths.
 
 ## End-to-end tests
 

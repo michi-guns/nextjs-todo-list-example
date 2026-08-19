@@ -331,6 +331,13 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - These unit tests do not require PostgreSQL or Docker.
 - Not required: full React component unit matrix.
 
+#### Server entry contracts
+
+- Keep domain and application tests as the main business-behavior suite.
+- Give JSON Route Handlers request-level contract tests for successful requests, paginated response shape, unauthenticated `401`, privacy-preserving `404`, conflict `409`, and invalid-input `422` responses.
+- Give Server Actions a smaller adapter suite covering authentication, input validation, successful result mapping, and expected error mapping.
+- Do not repeat every business case across both server entry paths.
+
 ### 10.2 PostgreSQL integration
 
 - Use `@testcontainers/postgresql` with PostgreSQL 18.

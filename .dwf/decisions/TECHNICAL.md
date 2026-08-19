@@ -225,3 +225,13 @@ Keep one separate read-only smoke against the configured dedicated Sanity projec
 - **Source:** current migration verification review
 
 Versioned Drizzle migration files are the authoritative database transition path. Testcontainers applies the complete migration chain to an empty PostgreSQL database. A non-default Neon development branch created from the current default branch applies the new reviewed migrations and verifies the hosted upgrade path before the same files may be applied to the default branch. `drizzle-kit push` may support local exploration but does not count as migration verification.
+
+<a id="td-020"></a>
+
+## TD-020 — Separate contract coverage for server entry paths
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-001, D-003, D-004, D-006
+- **Source:** current server-boundary testing review
+
+Domain and application tests remain the main business-behavior suite. JSON Route Handlers receive request-level contract tests for success, pagination shape, unauthenticated `401`, privacy-preserving `404`, conflict `409`, and invalid-input `422` responses. Server Actions receive a smaller adapter suite for authentication, validation, and successful-result or expected-error mapping. Do not repeat every business case across both entry paths.
