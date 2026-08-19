@@ -554,6 +554,31 @@ Choose either `postgres.js` through `drizzle-orm/postgres-js` or `node-postgres`
 
 Use the battle-tested `node-postgres` package through `drizzle-orm/node-postgres` as the shared runtime driver. Database-backed Next.js code runs in the Node.js runtime. One bounded, module-scoped `pg.Pool` serves both the Drizzle application repositories and Better Auth integration. On Vercel, register that pool with `attachDatabasePool` from `@vercel/functions` so Fluid Compute can reuse connections across warm requests and close idle clients before suspending an instance. Application traffic uses Neon's pooled connection URL; Drizzle migrations use the direct Neon URL; local integration and Playwright tests use the harness-generated Testcontainers URL. The same Drizzle repository implementation runs in all environments. Exact pool limits, idle timeout, helper names, and conditional Vercel wiring remain implementation choices.
 
+<a id="od-023"></a>
+
+## OD-023 — Playwright browser coverage
+
+- **Status:** RESOLVED
+- **Impact:** SPEC
+- **Blocking:** NO
+- **Related:** D-006, TD-009, TD-014, TD-016, EC-023
+
+### Problem / Conflict
+
+Running the full end-to-end journey in Chromium, Firefox, and WebKit on every local test run would multiply database-backed execution time without adding equal value during this spike.
+
+### Accepted Constraints
+
+The normal Playwright path must remain quick enough for routine local use. The project should still retain an explicit way to catch browser-specific regressions before a public release or after a substantial UI change.
+
+### Decision Required
+
+Choose the required browser for routine acceptance and the role of Firefox and WebKit coverage.
+
+### Resolution
+
+Run the required Playwright acceptance journey in Chromium. Keep Firefox and WebKit in a separate, explicitly invoked cross-browser run used before a public release and after major UI changes. Firefox and WebKit are not required on every routine run and do not block ordinary spike completion. Exact Playwright project names, script names, and cross-browser invocation remain implementation choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

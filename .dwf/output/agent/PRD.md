@@ -120,7 +120,7 @@ The spike is complete when all of the following are true **locally**:
 10. Zod validates server inputs; duplicate list names and same-list task titles produce a conflict rather than creating duplicate rows.
 11. Vitest covers database-free domain rules, application use cases, and zod schemas (not a full UI unit matrix).
 12. PostgreSQL 18 Testcontainers integration tests apply the real migrations and cover the agreed persistence behavior.
-13. Playwright covers happy paths: sign-up/in → create list → create task → change status → sign-out.
+13. Playwright covers happy paths in Chromium: sign-up/in → create list → create task → change status → sign-out. Firefox and WebKit are available through a separate on-demand cross-browser run before a public release or after a major UI change.
 14. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
 15. Representative Neon development data and query-plan evidence confirm index-backed cursor reads, correct maximum-size pages, and the agreed warm-query target.
 

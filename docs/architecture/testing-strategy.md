@@ -31,6 +31,8 @@ Test Zod acceptance/rejection and authentication/authorization behavior at Serve
 
 Use Playwright for the core sign-in → create list → create task → change status → sign-out journey. For magic-link verification, explicitly enable the local/test file-backed mailbox, clear it before the test, request a link, read the captured URL, and visit it. The temporary mailbox is gitignored and unavailable outside local/test mode.
 
+Chromium is the required browser for the routine acceptance suite. Keep Firefox and WebKit in a separate on-demand cross-browser run used before a public release and after major UI changes. They are not part of every ordinary database-backed test run.
+
 One local command starts a PostgreSQL 18 Testcontainer, applies the versioned migrations, loads a small deterministic behavior seed, starts a dedicated Next.js test server against that database, runs Playwright, and tears everything down. The behavior seed includes cross-user privacy and enough records to exercise visible pagination. It remains separate from the large Neon performance seed.
 
 ## Neon verification

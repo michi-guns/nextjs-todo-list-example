@@ -237,3 +237,14 @@ Routine integration and Playwright reset or cleanup logic accepts only the conne
 - **Resolved by:** OD-022
 
 The application creates one bounded `pg.Pool` at module scope rather than one pool per request. On Vercel, the pool is registered with `attachDatabasePool` so Fluid Compute can reuse connections during warm invocations and close idle clients before suspending the function instance. Application connections still target Neon's pooled endpoint; migration commands do not use the application pool.
+
+<a id="ec-023"></a>
+
+## EC-023 — Browser-specific regression outside Chromium
+
+- **Status:** HANDLED
+- **Product decisions:** D-006
+- **Technical decisions:** TD-009, TD-014, TD-016
+- **Resolved by:** OD-023
+
+Chromium is the required routine acceptance browser, but it is not treated as proof that Firefox and WebKit behave identically. Before a public release and after a major UI change, run the separate cross-browser check. A failure there is investigated as a browser compatibility issue without making all three engines part of every ordinary database-backed run.

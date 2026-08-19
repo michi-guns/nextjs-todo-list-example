@@ -340,6 +340,8 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 ### 10.3 Playwright
 
 - Location: `e2e/`
+- Chromium is the required browser for the normal local acceptance suite.
+- Provide a separate, explicitly invoked cross-browser run for Firefox and WebKit before a public release and after major UI changes. Those engines are not part of every routine run and do not block ordinary spike completion.
 - Happy paths minimum:
   1. Sign-up (password) or seed + sign-in
   2. Sign-in
@@ -352,7 +354,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - One local test command starts PostgreSQL 18, applies the versioned migrations, loads a small deterministic behavior seed, starts a dedicated Next.js test server with the generated container URL, runs Playwright, and tears down both server and container.
 - The behavior seed includes enough records for authentication, cross-user privacy, list/task behavior, completed filtering, and visible pagination.
 - Playwright does not depend on Neon credentials or a developer's already-running application server.
-- Exact process wrapper, Playwright setup mechanism, ports, and seed-builder APIs remain implementation choices.
+- Exact process wrapper, Playwright project and script names, browser-selection mechanism, ports, and seed-builder APIs remain implementation choices.
 - CI: **not required** for spike complete.
 
 ### 10.4 Performance evidence
@@ -412,7 +414,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Module layering respected for lists/tasks/landing
 - [ ] Vitest suite green for agreed scope
 - [ ] PostgreSQL 18 Testcontainers integration suite applies the real migrations and passes the agreed persistence cases
-- [ ] Playwright happy paths run against a harness-owned migrated and seeded local PostgreSQL container
+- [ ] Playwright happy paths pass in Chromium against a harness-owned migrated and seeded local PostgreSQL container; Firefox and WebKit remain available as a separate on-demand check
 - [ ] Routine database-backed tests require no Neon credentials; destructive test cleanup refuses external database URLs
 - [ ] Husky + lint-staged active
 - [ ] README explains setup without referencing unrelated products
@@ -481,7 +483,7 @@ authenticate → validate → application use case → map result/error → reva
 
 ### 14.7 Verification boundary
 
-The implementation must prove domain invariants, application use cases with ports/fakes, Zod/auth boundary behavior, real PostgreSQL repository and constraint behavior through Testcontainers, non-trivial adapter mappings, and the core Playwright journey. A complete React component unit matrix is not required.
+The implementation must prove domain invariants, application use cases with ports/fakes, Zod/auth boundary behavior, real PostgreSQL repository and constraint behavior through Testcontainers, non-trivial adapter mappings, and the core Playwright journey in Chromium. Firefox and WebKit are separate on-demand compatibility checks. A complete React component unit matrix is not required.
 
 ### 14.8 Delivery boundary
 

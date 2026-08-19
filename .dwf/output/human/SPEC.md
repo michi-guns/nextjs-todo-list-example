@@ -71,14 +71,14 @@ Use layered proof:
 - Zod and auth/presentation boundary tests;
 - PostgreSQL 18 Testcontainers integration tests using the real migrations for repository behavior, relational constraints, ownership, pagination, and default-Inbox concurrency;
 - non-trivial adapter mapping tests;
-- the Playwright sign-in → list → task → status → sign-out journey;
+- the Playwright sign-in → list → task → status → sign-out journey in Chromium;
 - a representative Neon development seed plus `EXPLAIN ANALYZE` evidence for the core cursor queries;
 - correct maximum-size cursor pages and sub-50-ms warm database execution for a 20-record page;
 - pnpm typecheck, lint, tests, and local commit hooks.
 
 A full React component unit-test matrix and a per-commit performance benchmark are not required for the spike. The 50-ms target measures only warm database execution, not network, authentication, rendering, CMS access, or Neon compute startup.
 
-Routine repository integration and Playwright tests use a harness-owned local PostgreSQL 18 Testcontainer. The harness applies the real migrations, loads a small deterministic behavior seed, starts a dedicated application server against that container, and cleans up afterward. Those tests do not need Neon credentials. Neon keeps a separate role for migration smoke checks, cloud-driver compatibility, the heavy performance seed, query plans, and the warm-query target. Test cleanup refuses external database URLs.
+Routine repository integration and Playwright tests use a harness-owned local PostgreSQL 18 Testcontainer. The harness applies the real migrations, loads a small deterministic behavior seed, starts a dedicated application server against that container, and cleans up afterward. Chromium is the required acceptance browser. Firefox and WebKit run separately on demand before a public release and after major UI changes; they do not multiply every routine database-backed run. Those tests do not need Neon credentials. Neon keeps a separate role for migration smoke checks, cloud-driver compatibility, the heavy performance seed, query plans, and the warm-query target. Test cleanup refuses external database URLs.
 
 ## Current implementation prerequisites
 

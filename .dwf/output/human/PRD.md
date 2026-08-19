@@ -65,7 +65,7 @@ The local spike is complete when it supports:
 10. Zod-validated server inputs;
 11. database-free domain/application/Zod tests;
 12. real PostgreSQL 18 integration tests through Testcontainers using the versioned migrations;
-13. the core Playwright journey;
+13. the core Playwright journey in Chromium, with Firefox and WebKit available as a separate check before public release or after major UI changes;
 14. local typecheck, lint, Husky, and lint-staged quality checks;
 15. representative Neon seed data and lightweight evidence that the main paginated database queries use their intended indexes and meet the agreed warm-query target.
 

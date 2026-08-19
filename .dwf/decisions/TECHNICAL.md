@@ -180,3 +180,14 @@ Keep the behavior seed small and separate from the heavy performance seed. Use t
 Use `node-postgres` through `drizzle-orm/node-postgres` for Better Auth and the list/task Drizzle repositories in the Next.js Node runtime. Reuse one bounded, module-scoped `pg.Pool`. On Vercel, register the pool with `attachDatabasePool` from `@vercel/functions` so Fluid Compute can reuse connections and close idle clients before function suspension.
 
 Use Neon's pooled URL for application traffic and its direct URL for migrations. Use the Testcontainers-generated local URL for integration tests and Playwright. Keep one repository implementation across Neon and local PostgreSQL. Exact pool sizing, idle timeout, helper names, environment-variable names, and conditional Vercel registration remain implementation choices.
+
+<a id="td-016"></a>
+
+## TD-016 — Chromium-first Playwright acceptance
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-006
+- **Related resolution:** [OD-023](OPEN-DECISIONS.md#od-023)
+- **Source:** current testing architecture review
+
+Use Chromium for the required local Playwright acceptance journey. Provide a separate on-demand run for the same relevant journeys in Firefox and WebKit before a public release and after major UI changes. The routine suite does not multiply every database-backed scenario across all three engines. Exact Playwright project names, script names, and selection mechanics remain implementation choices.
