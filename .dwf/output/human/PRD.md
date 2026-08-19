@@ -33,7 +33,7 @@ A user can own many lists. List names are trimmed and contain 1–80 characters.
 Each task belongs to exactly one list and has:
 
 - a required title containing 1–200 characters after trimming;
-- optional notes;
+- optional notes containing at most 5,000 characters;
 - a status of `todo`, `in_progress`, or `done`;
 - timestamps.
 

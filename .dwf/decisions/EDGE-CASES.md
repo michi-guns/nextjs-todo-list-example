@@ -94,3 +94,14 @@ An anonymous browser or JSON caller requests private lists/tasks. The boundary r
 - **Resolved by:** OD-003
 
 The installed Better Auth version supports a `sendMagicLink` callback that receives the generated verification URL. In explicitly enabled local/test mode, that callback writes the email and URL to a temporary, gitignored, file-backed mailbox. Tests clear and read the mailbox deterministically; it is unavailable outside local/test mode.
+
+<a id="ec-010"></a>
+
+## EC-010 — Oversized task notes
+
+- **Status:** HANDLED
+- **Product decisions:** D-004
+- **Technical decisions:** TD-008
+- **Resolved by:** OD-009
+
+Task notes remain optional. When notes are present and exceed 5,000 characters, server-side Zod/application validation rejects the input; client-only validation is insufficient.

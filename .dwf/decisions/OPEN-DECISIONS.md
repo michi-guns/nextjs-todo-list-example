@@ -202,6 +202,31 @@ Choose the accepted task-title length range.
 
 After trimming, a task title must contain between 1 and 200 characters inclusive.
 
+<a id="od-009"></a>
+
+## OD-009 — Task notes length
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-004, TD-008, EC-010
+
+### Problem / Conflict
+
+Task notes were optional, but their maximum accepted length was only a recommendation.
+
+### Accepted Constraints
+
+Notes must remain optional, and the same maximum must be enforced consistently by application validation, Server Actions, and JSON Route Handlers.
+
+### Decision Required
+
+Choose the accepted maximum length for task notes.
+
+### Resolution
+
+Task notes are optional. When present, they must not exceed 5,000 characters.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.
