@@ -83,6 +83,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - Task reads are deterministic and ordered by creation time, newest first.
 - Task reads use forward cursor pagination and return items plus an opaque next cursor.
 - Task pages default to 20 records and accept at most 100; no total count or numbered-page metadata is returned.
+- The task cursor query is backed by a composite B-tree index matching authenticated user/list scope, settled order, and deterministic tie-breaking.
 - Hiding completed tasks changes the read result, not stored task state.
 - When completed-task visibility is omitted, reads include completed tasks.
 - Task persistence types do not cross into presentation or other capability contracts.
@@ -102,6 +103,7 @@ The subsystem can be verified independently of completed task presentation:
 - Status changes accept direct transitions between all settled task statuses, treat the current status as a successful no-op, and reject values outside the settled statuses.
 - Task reads return newest-created tasks first and remain deterministic when timestamps match.
 - Pagination remains scoped to the authenticated owner, selected list, and completed-task filter; cursor data never overrides that context.
+- Representative query-plan evidence confirms that paginated task reads use the intended composite index.
 - Dashboard consumers can append another page while a next cursor exists; changing the selected list or completed-task filter starts again from the first page.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
 - Completed-task filtering preserves the relative order of remaining tasks.
@@ -116,6 +118,7 @@ The implementation agent may choose:
 - Exact application DTOs, repository-port names, and internal error types.
 - Exact files and folder grouping within the task capability.
 - Drizzle query composition, provided ownership and list-membership requirements hold.
+- Exact index names, normalized uniqueness representation, and deterministic cursor tie-breaker.
 - Test doubles and the split between unit and adapter integration tests.
 - Presentation adapters and error mapping consistent with the separately settled presentation decisions.
 
@@ -128,6 +131,7 @@ The implementation agent may choose:
 - [`TD-005 — PostgreSQL/Neon with Drizzle owns transactional truth`](../../decisions/TECHNICAL.md#td-005)
 - [`TD-006 — Module-owned repository ports and ownership-aware adapters`](../../decisions/TECHNICAL.md#td-006)
 - [`TD-008 — Zod and shared mutation paths at untrusted boundaries`](../../decisions/TECHNICAL.md#td-008)
+- [`TD-010 — Query-shaped PostgreSQL index baseline`](../../decisions/TECHNICAL.md#td-010)
 - [`RULE-006 — Validate and isolate untrusted boundaries`](../../RULES.md#rule-006)
 - [Open decisions](../../decisions/OPEN-DECISIONS.md)
 - [Agent SPEC — Lists and tasks application boundary](../../output/agent/SPEC.md#144-lists-and-tasks-application-boundary)

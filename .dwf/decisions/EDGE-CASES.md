@@ -145,7 +145,7 @@ List and task reads remain deterministic when records share a `createdAt` value 
 
 - **Status:** HANDLED
 - **Product decisions:** D-003, D-004
-- **Technical decisions:** TD-005, TD-008
+- **Technical decisions:** TD-005, TD-008, TD-010
 - **Resolved by:** OD-014
 
 Creating or renaming a list conflicts when the same user already owns a list with the same trimmed name under case-insensitive comparison. Creating or retitling a task conflicts when the same list already contains the same trimmed title under case-insensitive comparison; the same title remains valid in a different list. Database constraints prevent concurrent duplicates. JSON callers receive `409` with code `conflict`, and Server Actions expose the equivalent conflict result.
@@ -171,3 +171,14 @@ A malformed cursor or one incompatible with the current read context produces th
 - **Resolved by:** OD-016
 
 An omitted page limit behaves as 20. A non-integer limit or one outside 1–100 is invalid input; JSON callers receive `422`. A `null` next cursor ends the sequence and hides the dashboard's additional-page control. Changing the selected list or completed-task filter discards loaded task pages and starts a fresh first-page read so cursors are not reused across contexts.
+
+<a id="ec-017"></a>
+
+## EC-017 — Index drift from real query shape
+
+- **Status:** HANDLED
+- **Product decisions:** D-003, D-004
+- **Technical decisions:** TD-010
+- **Resolved by:** OD-017
+
+Cursor queries must keep their authenticated equality scope and cursor ordering aligned with the required composite indexes. A query or schema change that breaks that alignment requires renewed query-plan evidence. Additional indexes are not added merely in anticipation of possible status filters, notes lookup, or search features.

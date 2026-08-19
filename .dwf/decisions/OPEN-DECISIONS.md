@@ -402,6 +402,31 @@ Choose the default and maximum page sizes and the dashboard interaction for addi
 
 List and task reads default to 20 records per page and accept an integer `limit` from 1 through 100. Responses contain only `items` and `nextCursor`; they do not include total counts or numbered-page metadata. The dashboard initially loads one page and shows `Load more` while `nextCursor` is non-null. Loading more appends the next items in the settled order. Changing the selected list or completed-task filter discards the current task pages and starts again from the first page. Exact control placement, loading indicator, and button copy capitalization remain implementation choices.
 
+<a id="od-017"></a>
+
+## OD-017 — Essential database index and constraint baseline
+
+- **Status:** RESOLVED
+- **Impact:** SPEC
+- **Blocking:** NO
+- **Related:** D-001, D-003, D-004, TD-005, TD-006, EC-014, EC-015, EC-017
+
+### Problem / Conflict
+
+The relational constraints and cursor behavior were settled, but the contract did not yet require the small set of database indexes needed to protect correctness under concurrency and support the main read paths.
+
+### Accepted Constraints
+
+Indexes must match real product queries. The design should cover the high-impact baseline without pre-optimizing unused search or filter behavior.
+
+### Decision Required
+
+Choose the database constraints and composite indexes that are required before performance tuning becomes evidence-driven.
+
+### Resolution
+
+Lists and tasks use primary keys. Tasks reference lists with a database foreign key and cascade deletion. Database-enforced case-insensitive unique keys protect list names within one `userId` and task titles within one `listId`. List cursor reads have a composite B-tree index beginning with `userId`, followed by `createdAt` and the chosen deterministic cursor tie-breaker. Task cursor reads have a composite B-tree index beginning with their equality scope (`userId`, then `listId`), followed by `createdAt` and the chosen deterministic cursor tie-breaker. Index direction must support the settled oldest-first list order and newest-first task order. The exact case-insensitive key mechanism, tie-breaker type, index names, and Drizzle syntax remain implementation choices. Do not add speculative status, notes, search, or partial indexes until measured query evidence justifies them.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

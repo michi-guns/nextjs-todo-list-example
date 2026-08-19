@@ -152,6 +152,17 @@ Conceptual model (names may match Drizzle tables closely):
 - Apply the same reviewed migration to the default branch only after verification succeeds.
 - Exact Neon branch name, lifetime, and migration-promotion command remain implementation or delivery choices.
 
+### 3.4 Required indexes and constraints
+
+- Lists and tasks have primary keys.
+- Tasks reference lists through a database foreign key with cascade deletion.
+- A database-enforced case-insensitive unique key protects list names within one `userId`.
+- A database-enforced case-insensitive unique key protects task titles within one `listId`.
+- List cursor reads use a composite B-tree index beginning with `userId`, followed by `createdAt` and the deterministic cursor tie-breaker, with direction matching oldest-first order.
+- Task cursor reads use a composite B-tree index beginning with `userId` and `listId`, followed by `createdAt` and the deterministic cursor tie-breaker, with direction matching newest-first order.
+- Do not add speculative status, notes, search, or partial indexes until measured query evidence requires them.
+- Exact normalized-key representation, tie-breaker type, index names, and Drizzle syntax remain implementation choices.
+
 ---
 
 ## 4. Domain rules
@@ -345,7 +356,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 
 - [ ] Better Auth email/password + magic link working locally
 - [ ] Session guards on actions + JSON API
-- [ ] Drizzle schema: auth tables + lists + tasks; migrations applied on Neon/dev DB
+- [ ] Drizzle schema: auth tables + lists + tasks + required constraints/indexes; migrations applied on Neon/dev DB
 - [ ] Exactly one default Inbox on every listless private workspace load, including after final-list deletion
 - [ ] List CRUD + cascade delete + case-insensitive per-user name uniqueness
 - [ ] Task CRUD + status + hide completed + case-insensitive per-list title uniqueness
@@ -371,7 +382,7 @@ The first-class capabilities are `auth`, `landing`, `lists`, and `tasks`. `src/s
 
 ### 14.2 Persistence boundary
 
-Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. Lists belong directly to users; there is no `Workspace` persistence entity. Database constraints enforce case-insensitive list-name uniqueness per user and task-title uniqueness per list. `ensureDefaultInbox` must be atomic and idempotent under concurrent listless workspace loads; list deletion relies on the database cascade contract.
+Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. Lists belong directly to users; there is no `Workspace` persistence entity. Database constraints enforce case-insensitive list-name uniqueness per user and task-title uniqueness per list. Composite B-tree indexes follow the authenticated equality scope and deterministic cursor order for list and task reads; additional indexes require measured evidence. `ensureDefaultInbox` must be atomic and idempotent under concurrent listless workspace loads; list deletion relies on the database cascade contract.
 
 ### 14.3 Authentication boundary
 

@@ -102,3 +102,16 @@ Server Actions and JSON Route Handlers follow `authenticate → authorize → va
 - **Source:** legacy D-008; current SPEC testing boundary
 
 Verify domain invariants, application use cases with ports/fakes, Zod/auth boundaries, non-trivial adapter mappings, and the core Playwright journey. A complete React component unit matrix is not required. The repository quality baseline is pnpm, Vitest, Playwright, typechecking, linting, Husky, and lint-staged; CI is not required for spike completion.
+
+<a id="td-010"></a>
+
+## TD-010 — Query-shaped PostgreSQL index baseline
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-001, D-003, D-004
+- **Related resolutions:** [OD-014](OPEN-DECISIONS.md#od-014), [OD-015](OPEN-DECISIONS.md#od-015), [OD-017](OPEN-DECISIONS.md#od-017)
+- **Source:** current performance architecture review
+
+Use database primary keys, the task-to-list cascading foreign key, and database-enforced case-insensitive unique keys for list names per user and task titles per list. Support list pagination with a composite B-tree index whose leading equality scope is `userId` and whose remaining keys match `createdAt` plus the deterministic cursor tie-breaker. Support task pagination with a composite B-tree index whose leading equality scope is `userId` and `listId` and whose remaining keys match `createdAt` plus the deterministic cursor tie-breaker. Index direction follows the settled list and task ordering.
+
+Do not add status, notes, search, partial, or other speculative indexes without measured query evidence. Exact normalized-key representation, tie-breaker, index names, and Drizzle declaration syntax remain implementation choices.
