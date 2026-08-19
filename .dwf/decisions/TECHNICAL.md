@@ -73,9 +73,10 @@ Lists and tasks own the repository ports required by their application use cases
 
 - **Status:** ACCEPTED
 - **Related product decisions:** D-005
+- **Related resolution:** [OD-005](OPEN-DECISIONS.md#od-005)
 - **Source:** ADR-0002; legacy D-006
 
-Keep the Sanity client, GROQ, external payload validation, and mapping in landing infrastructure. Map validated CMS payloads into a plain landing view model; raw CMS documents and provider types do not cross into application or presentation code. Once the real read path is wired, missing or invalid required content is an explicit integration failure rather than a permanent silent fallback. Webhooks and on-demand revalidation are out of scope.
+Use a dedicated Sanity project and dataset for this repository, containing one singleton landing document. Keep the Sanity client, GROQ, external payload validation, and mapping in landing infrastructure. Map validated CMS payloads into a plain landing view model; raw CMS documents and provider types do not cross into application or presentation code. Once the real read path is wired, missing or invalid required content is an explicit integration failure rather than a permanent silent fallback. Webhooks and on-demand revalidation are out of scope.
 
 This keeps editorial copy independently editable while making the second store's ownership and failure behavior explicit.
 

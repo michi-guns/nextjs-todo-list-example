@@ -102,6 +102,31 @@ Choose and document exact paths if an external consumer or implementation conven
 
 Use `/api/auth/*` for Better Auth; `/api/lists` for listing and creating lists; `/api/lists/:listId` for renaming and deleting one list; `/api/lists/:listId/tasks` for listing and creating tasks in a list; and `/api/tasks/:taskId` for updating and deleting one task. Supported methods and payloads remain those in the Agent SPEC.
 
+<a id="od-005"></a>
+
+## OD-005 — Dedicated Sanity resource
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO — provisioning remains an implementation prerequisite
+- **Related:** D-005, TD-007, EC-007, OQ-002
+
+### Problem / Conflict
+
+No Sanity resource is currently configured, and this standalone public example should not depend on an unrelated project's editorial content.
+
+### Accepted Constraints
+
+Sanity owns landing editorial content only. Todo data never belongs there, and the landing adapter must validate and map external documents before exposing its view model.
+
+### Decision Required
+
+Choose whether this example receives an isolated Sanity resource and whether landing content is represented by one current document.
+
+### Resolution
+
+Provision a dedicated Sanity project and dataset for this repository. Store the established headline, blurb, primary CTA, and optional secondary CTA fields in one singleton landing document. Exact project ID, dataset name, document type name, document ID, and environment-variable names remain setup or implementation choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

@@ -195,7 +195,7 @@ All use cases enforce ownership. A nonexistent private resource and one owned by
 
 ### 6.1 Content
 
-Single document type (name flexible), e.g. `landingPage`:
+The repository uses a dedicated Sanity project and dataset containing one singleton landing document. Exact provider IDs and names remain setup choices. The singleton exposes:
 
 - `headline` (string)
 - `blurb` (text)

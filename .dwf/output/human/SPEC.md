@@ -42,7 +42,7 @@ PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownershi
 
 ## Sanity boundary
 
-Sanity is used only for landing content. Infrastructure validates unknown CMS payloads and maps them to a plain landing view model. GROQ, client setup, and raw Sanity documents must not cross into application or page code. After the real CMS path is wired, required-content failures are explicit integration failures rather than a permanent silent fallback.
+Sanity is used only for landing content through a dedicated project and dataset containing one singleton landing document. Infrastructure validates unknown CMS payloads and maps them to a plain landing view model. GROQ, client setup, and raw Sanity documents must not cross into application or page code. After the real CMS path is wired, required-content failures are explicit integration failures rather than a permanent silent fallback.
 
 ## Required application behavior
 

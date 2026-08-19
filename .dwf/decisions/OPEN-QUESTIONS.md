@@ -38,7 +38,7 @@ Evidence: [Better Auth magic-link documentation](https://better-auth.com/docs/pl
 - **Status:** ANSWERED
 - **Blocking:** YES for the real landing integration — the answer is that no usable Sanity resource is currently configured
 - **Source:** repository files and local environment-key inspection on 2026-08-19
-- **Related:** D-005, TD-007, EC-007
+- **Related:** D-005, TD-007, EC-007, OD-005
 
 ### Exact Question
 
@@ -54,7 +54,7 @@ Project configuration and a non-secret local/test document shape.
 
 ### Answer
 
-No Sanity project, dataset, document type, or published landing document is currently available from this workspace. The package manifest has no Sanity dependency, the source tree has no Sanity client or schema configuration, and the local environment contains no Sanity configuration keys. A project resource must be provisioned or supplied before the real landing integration can be verified.
+No Sanity project, dataset, document type, or published landing document is currently available from this workspace. The package manifest has no Sanity dependency, the source tree has no Sanity client or schema configuration, and the local environment contains no Sanity configuration keys. A project resource must be provisioned before the real landing integration can be verified; OD-005 settles that it will be a dedicated project and dataset with one singleton landing document.
 
 <a id="oq-003"></a>
 

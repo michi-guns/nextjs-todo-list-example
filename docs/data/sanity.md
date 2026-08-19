@@ -9,6 +9,8 @@ related-decisions:
 
 Sanity is the CMS adapter for the public landing page.
 
+This repository uses a dedicated Sanity project and dataset with one singleton landing document. Exact provider IDs, dataset naming, document type naming, and document ID remain setup choices.
+
 ## Suitable data
 
 - Headline and blurb
