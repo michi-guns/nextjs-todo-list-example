@@ -25,3 +25,16 @@ This is the compact inventory of qualified Architectural Subsystems for this pro
 - **Identity:** The application's component for task lifecycle behavior inside user-owned lists.
 - **Boundary:** Exposes user-scoped task operations while keeping task persistence, ownership enforcement, list-membership checks, status behavior, and completed-task filtering behind its application-facing interface.
 - **Known consumers:** Dashboard task-panel composition, task Server Actions, private task JSON Route Handlers, status controls, and completed-task visibility controls.
+
+## Reviewed candidates not currently qualified
+
+These candidates do not receive an `AS-*` identity. They remain ordinary architecture or capability components unless a later review finds that every Architectural Subsystem qualification requirement is supported by current design evidence.
+
+### Landing Content Service
+
+- **Status:** NOT QUALIFIED
+- **Reviewed:** 2026-08-19
+- **Canonical basis:** [`D-005`](../decisions/PRODUCT.md#d-005) and [`TD-007`](../decisions/TECHNICAL.md#td-007)
+- **Finding:** The landing capability has a meaningful and independently verifiable Sanity adapter boundary, but the current design establishes only one consuming flow: rendering the public landing page. It therefore does not meet the requirement for at least two current capabilities or flows to consume its reusable core.
+- **Current treatment:** Keep it as the ordinary `landing` capability module described by the canonical architecture.
+- **Revisit when:** A second real flow, such as metadata, preview, or another marketing surface, is accepted and shares the same validated landing-content core. Do not qualify it based only on hypothetical future consumers.
