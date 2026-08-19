@@ -75,7 +75,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - Creating a task requires a list owned by the authenticated user.
 - One user cannot read or mutate another user's tasks.
 - A task title contains 1–200 characters after trimming.
-- Task notes are optional and contain at most 5,000 characters.
+- Task notes are trimmed and optional, empty notes normalize to `null`, and non-empty notes contain at most 5,000 characters after trimming.
 - New tasks begin with status `todo`.
 - Task status is one of `todo`, `in_progress`, or `done`.
 - Hiding completed tasks changes the read result, not stored task state.
@@ -91,6 +91,7 @@ The subsystem can be verified independently of completed task presentation:
 - Attempts to use another user's list or task produce the same `not_found` outcome as a nonexistent resource.
 - Task creation and title updates reject titles outside the settled 1–200 character range after trimming.
 - Task creation and notes updates reject notes longer than 5,000 characters.
+- Empty notes normalize to `null`; omitting notes from an update leaves existing notes unchanged.
 - New tasks receive status `todo`.
 - Status changes accept the settled task statuses and reject values outside them.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.

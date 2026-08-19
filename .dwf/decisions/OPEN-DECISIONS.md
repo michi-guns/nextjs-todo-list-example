@@ -227,6 +227,31 @@ Choose the accepted maximum length for task notes.
 
 Task notes are optional. When present, they must not exceed 5,000 characters.
 
+<a id="od-010"></a>
+
+## OD-010 — Task notes normalization
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-004, TD-008, EC-011
+
+### Problem / Conflict
+
+Task notes were optional, but the contract did not define whether surrounding whitespace and empty values should be preserved or normalized.
+
+### Accepted Constraints
+
+The application must represent absent notes consistently without preventing ordinary multiline text.
+
+### Decision Required
+
+Choose how task notes are normalized and cleared.
+
+### Resolution
+
+Trim leading and trailing whitespace from task notes. Normalize an omitted note during creation, an explicit `null`, an empty string, or a whitespace-only string to `null`. During an update, omitting the `notes` field leaves the existing value unchanged, while any explicit empty value clears it to `null`. Apply the 5,000-character limit after trimming.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

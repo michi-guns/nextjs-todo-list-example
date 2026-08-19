@@ -105,3 +105,14 @@ The installed Better Auth version supports a `sendMagicLink` callback that recei
 - **Resolved by:** OD-009
 
 Task notes remain optional. When notes are present and exceed 5,000 characters, server-side Zod/application validation rejects the input; client-only validation is insufficient.
+
+<a id="ec-011"></a>
+
+## EC-011 — Empty or cleared task notes
+
+- **Status:** HANDLED
+- **Product decisions:** D-004
+- **Technical decisions:** TD-008
+- **Resolved by:** OD-010
+
+Task notes are trimmed. On creation, omitted, `null`, empty, and whitespace-only notes become `null`. On update, an omitted `notes` field leaves the current notes unchanged, while an explicit `null`, empty, or whitespace-only value clears them to `null`. The 5,000-character limit is evaluated after trimming.

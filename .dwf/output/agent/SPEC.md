@@ -136,7 +136,7 @@ Conceptual model (names may match Drizzle tables closely):
 | `listId`    | uuid / text | FK → lists.id, cascade on list delete       |
 | `userId`    | uuid / text | denormalized owner for simple authz queries |
 | `title`     | text        | required, trimmed, 1–200 characters         |
-| `notes`     | text        | optional, maximum 5,000 characters          |
+| `notes`     | text        | nullable, trimmed, maximum 5,000 characters |
 | `status`    | enum/text   | `todo` \| `in_progress` \| `done`           |
 | `createdAt` | timestamptz | required                                    |
 | `updatedAt` | timestamptz | required                                    |
@@ -165,7 +165,8 @@ Conceptual model (names may match Drizzle tables closely):
 ### 4.2 Task
 
 - Title length is 1–200 characters inclusive after trimming.
-- Notes are optional and have a maximum length of 5,000 characters.
+- Notes are trimmed and optional. On creation, omitted, `null`, empty, and whitespace-only notes normalize to `null`. On update, omitting `notes` leaves the value unchanged; explicitly providing `null`, empty, or whitespace-only notes clears the value to `null`.
+- Notes have a maximum length of 5,000 characters after trimming.
 - Status only one of: `todo`, `in_progress`, `done`.
 - Create defaults status to `todo` unless specified and valid.
 - Task must belong to a list owned by the same user.
