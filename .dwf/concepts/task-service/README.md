@@ -79,6 +79,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - New tasks begin with status `todo`.
 - Task status is one of `todo`, `in_progress`, or `done`.
 - Any valid status may transition directly to any other valid status; reapplying the current status is an idempotent no-op.
+- Task reads are deterministic and ordered by creation time, newest first.
 - Hiding completed tasks changes the read result, not stored task state.
 - When completed-task visibility is omitted, reads include completed tasks.
 - Task persistence types do not cross into presentation or other capability contracts.
@@ -95,7 +96,9 @@ The subsystem can be verified independently of completed task presentation:
 - Empty notes normalize to `null`; omitting notes from an update leaves existing notes unchanged.
 - New tasks receive status `todo`.
 - Status changes accept direct transitions between all settled task statuses, treat the current status as a successful no-op, and reject values outside the settled statuses.
+- Task reads return newest-created tasks first and remain deterministic when timestamps match.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
+- Completed-task filtering preserves the relative order of remaining tasks.
 - Omitting completed-task visibility includes stored `done` tasks.
 - Application-facing task results do not expose Drizzle row types.
 

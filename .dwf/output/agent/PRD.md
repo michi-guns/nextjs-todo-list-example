@@ -71,6 +71,7 @@ Out of scope for spike complete:
 - On **first sign-in**, create a default list named **Inbox** if none exist.
 - List operations: **create**, **rename**, **delete**.
 - Deleting a list **cascade-deletes** its tasks.
+- List reads are deterministic and ordered oldest-created first. Manual reordering is out of scope.
 
 ### 5.2 Tasks
 
@@ -79,6 +80,7 @@ Out of scope for spike complete:
 - Fields: **title** (required, 1–200 characters after trimming), **notes** (optional, trimmed, empty represented as absent, maximum 5,000 characters after trimming), timestamps.
 - Operations: **create**, **edit** title/notes, **change status**, **delete**. Reapplying the current status succeeds as a no-op.
 - Completed tasks **remain on the list** and are **shown by default**; UI offers **show/hide completed**.
+- Task reads are deterministic and ordered newest-created first. Hiding completed tasks preserves the relative order of visible tasks; manual reordering is out of scope.
 
 ### 5.3 Surfaces
 

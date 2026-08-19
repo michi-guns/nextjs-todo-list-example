@@ -28,7 +28,7 @@ The example is intentionally serious about ownership, data boundaries, validatio
 
 ## Lists and tasks
 
-A user can own many lists. List names are trimmed and contain 1–80 characters. If the user has no lists on first authenticated use, the product creates an `Inbox` list. Lists can be created, renamed, and deleted; deleting a list removes its tasks.
+A user can own many lists. List names are trimmed and contain 1–80 characters. If the user has no lists on first authenticated use, the product creates an `Inbox` list. Lists can be created, renamed, and deleted; deleting a list removes its tasks. Lists are shown oldest-created first.
 
 Each task belongs to exactly one list and has:
 
@@ -40,6 +40,8 @@ Each task belongs to exactly one list and has:
 Tasks can be created, edited, deleted, and moved between statuses. Completed tasks stay stored and are shown by default, while the interface can explicitly hide or show them.
 
 New tasks begin as `todo`. After creation, a task can move directly between any two valid statuses; applying its current status again simply leaves it unchanged.
+
+Tasks are shown newest-created first. Hiding completed tasks keeps the remaining tasks in the same relative order. Manual list and task reordering is outside the spike.
 
 ## Content ownership
 

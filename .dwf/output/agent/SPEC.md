@@ -161,6 +161,7 @@ Conceptual model (names may match Drizzle tables closely):
 - Name length is 1–80 characters inclusive after trimming.
 - User can only mutate own lists.
 - Delete list is always hard delete + cascade tasks (no soft delete in spike).
+- List reads order by `createdAt` ascending. Equal timestamps use a deterministic implementation-chosen tie-breaker.
 
 ### 4.2 Task
 
@@ -172,10 +173,13 @@ Conceptual model (names may match Drizzle tables closely):
 - After creation, any valid status may transition directly to any other valid status. Reapplying the current status succeeds as an idempotent no-op.
 - Task must belong to a list owned by the same user.
 - Moving a task across lists is **out of scope** unless added later by amending this SPEC.
+- Task reads order by `createdAt` descending. Equal timestamps use a deterministic implementation-chosen tie-breaker.
+- Manual list and task reordering is out of scope.
 
 ### 4.3 Visibility filter
 
 - Application/query supports `includeCompleted: boolean`, defaulting to `true`. An omitted value returns all stored tasks; the UI initially shows completed tasks and offers a toggle that hides `done` tasks.
+- Completed-task filtering preserves the relative order of the remaining tasks.
 
 ---
 
@@ -385,7 +389,7 @@ updateTask(userId, taskId, input): Promise<Task>
 deleteTask(userId, taskId): Promise<void>
 ```
 
-The exact implementation may group or split these functions while preserving their ownership and observable behavior. Tasks remain in one list; new tasks default to `todo`; completed tasks remain stored and may be filtered from reads.
+The exact implementation may group or split these functions while preserving their ownership and observable behavior. List reads are oldest-first and task reads are newest-first, with deterministic tie-breaking. Tasks remain in one list; new tasks default to `todo`; completed tasks remain stored and may be filtered from reads without changing the relative order of remaining tasks.
 
 ### 14.5 Landing/Sanity boundary
 

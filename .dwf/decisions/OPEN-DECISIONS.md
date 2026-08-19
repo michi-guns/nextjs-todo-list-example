@@ -277,6 +277,31 @@ Choose the allowed transitions among the settled task statuses.
 
 After creation, a task may move directly from any valid status to any other valid status. No transition requires an intermediate status. Setting a task to its current status succeeds as an idempotent no-op. New tasks still always begin as `todo`.
 
+<a id="od-012"></a>
+
+## OD-012 — Default list and task ordering
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-003, D-004, TD-006, EC-013
+
+### Problem / Conflict
+
+List and task reads had no settled ordering, so the dashboard and JSON API could return the same records in different or unstable sequences.
+
+### Accepted Constraints
+
+The spike does not include manual reordering. All consumers of the same application read must receive the same deterministic order.
+
+### Decision Required
+
+Choose the default ordering for lists and tasks.
+
+### Resolution
+
+Order lists by `createdAt` ascending, oldest first. Order tasks by `createdAt` descending, newest first. Completed-task filtering preserves the relative order of the remaining tasks. Equal timestamps require a deterministic tie-breaker, but the exact tie-breaker and query implementation remain implementation choices. Manual reordering is outside this spike.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

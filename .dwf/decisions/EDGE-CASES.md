@@ -126,3 +126,14 @@ Task notes are trimmed. On creation, omitted, `null`, empty, and whitespace-only
 - **Resolved by:** OD-011
 
 A task may move directly between any two valid statuses without an intermediate step. Applying its current status again succeeds as an idempotent no-op rather than producing a transition error.
+
+<a id="ec-013"></a>
+
+## EC-013 — Equal timestamps and filtered task order
+
+- **Status:** HANDLED
+- **Product decisions:** D-003, D-004
+- **Technical decisions:** TD-006
+- **Resolved by:** OD-012
+
+List and task reads remain deterministic when records share a `createdAt` value by applying an implementation-chosen stable tie-breaker. Hiding completed tasks removes matching tasks without changing the relative order of the remaining tasks.

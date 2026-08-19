@@ -28,9 +28,9 @@ The spike must demonstrate email/password sign-up and sign-in plus magic-link re
 
 - **Status:** ACCEPTED
 - **Source:** PRD, section 5.1
-- **Related:** [OD-007](OPEN-DECISIONS.md#od-007), [Agent PRD](../output/agent/PRD.md#51-lists)
+- **Related:** [OD-007](OPEN-DECISIONS.md#od-007), [OD-012](OPEN-DECISIONS.md#od-012), [Agent PRD](../output/agent/PRD.md#51-lists)
 
-A user may own many lists. List names are trimmed and must contain 1–80 characters. On first authenticated use, when the user has no lists, the product creates one list named `Inbox`; the behavior is idempotent. Users may create, rename, and delete lists. Deleting a list removes its tasks.
+A user may own many lists. List names are trimmed and must contain 1–80 characters. On first authenticated use, when the user has no lists, the product creates one list named `Inbox`; the behavior is idempotent. Users may create, rename, and delete lists. Deleting a list removes its tasks. List reads are deterministic and show the oldest-created list first; manual reordering is outside the spike.
 
 <a id="d-004"></a>
 
@@ -38,9 +38,9 @@ A user may own many lists. List names are trimmed and must contain 1–80 charac
 
 - **Status:** ACCEPTED
 - **Source:** PRD, section 5.2
-- **Related:** [OD-001](OPEN-DECISIONS.md#od-001), [OD-008](OPEN-DECISIONS.md#od-008), [OD-009](OPEN-DECISIONS.md#od-009), [OD-010](OPEN-DECISIONS.md#od-010), [OD-011](OPEN-DECISIONS.md#od-011), [Agent PRD](../output/agent/PRD.md#52-tasks)
+- **Related:** [OD-001](OPEN-DECISIONS.md#od-001), [OD-008](OPEN-DECISIONS.md#od-008), [OD-009](OPEN-DECISIONS.md#od-009), [OD-010](OPEN-DECISIONS.md#od-010), [OD-011](OPEN-DECISIONS.md#od-011), [OD-012](OPEN-DECISIONS.md#od-012), [Agent PRD](../output/agent/PRD.md#52-tasks)
 
-Each task belongs to exactly one user-owned list. A task has a required title containing 1–200 characters after trimming, optional trimmed notes containing at most 5,000 characters, timestamps, and one of `todo`, `in_progress`, or `done`. Empty or whitespace-only notes are treated as absent. New tasks begin as `todo`; afterward, users may move a task directly between any valid statuses. Reapplying the current status succeeds without changing the status. Users may create, edit, delete, and change task status. Completed tasks remain stored and are shown by default; users may explicitly hide them without deleting them.
+Each task belongs to exactly one user-owned list. A task has a required title containing 1–200 characters after trimming, optional trimmed notes containing at most 5,000 characters, timestamps, and one of `todo`, `in_progress`, or `done`. Empty or whitespace-only notes are treated as absent. New tasks begin as `todo`; afterward, users may move a task directly between any valid statuses. Reapplying the current status succeeds without changing the status. Users may create, edit, delete, and change task status. Task reads are deterministic and show the newest-created task first. Completed tasks remain stored and are shown by default; users may explicitly hide them without deleting them or changing the relative order of visible tasks. Manual reordering is outside the spike.
 
 <a id="d-005"></a>
 
