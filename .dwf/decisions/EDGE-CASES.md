@@ -182,3 +182,14 @@ An omitted page limit behaves as 20. A non-integer limit or one outside 1–100 
 - **Resolved by:** OD-017
 
 Cursor queries must keep their authenticated equality scope and cursor ordering aligned with the required composite indexes. A query or schema change that breaks that alignment requires renewed query-plan evidence. Additional indexes are not added merely in anticipation of possible status filters, notes lookup, or search features.
+
+<a id="ec-018"></a>
+
+## EC-018 — Hidden unbounded database work
+
+- **Status:** HANDLED
+- **Product decisions:** D-003, D-004
+- **Technical decisions:** TD-011
+- **Resolved by:** OD-018
+
+A page request must not load an unbounded result merely to slice it in application code, run a count query only to determine whether another cursor page exists, create a database client per request, or issue one follow-up query per returned list/task. The query reads at most one extra row, projects only required fields, and derives `nextCursor` without a total count.

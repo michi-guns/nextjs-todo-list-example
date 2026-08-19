@@ -427,6 +427,31 @@ Choose the database constraints and composite indexes that are required before p
 
 Lists and tasks use primary keys. Tasks reference lists with a database foreign key and cascade deletion. Database-enforced case-insensitive unique keys protect list names within one `userId` and task titles within one `listId`. List cursor reads have a composite B-tree index beginning with `userId`, followed by `createdAt` and the chosen deterministic cursor tie-breaker. Task cursor reads have a composite B-tree index beginning with their equality scope (`userId`, then `listId`), followed by `createdAt` and the chosen deterministic cursor tie-breaker. Index direction must support the settled oldest-first list order and newest-first task order. The exact case-insensitive key mechanism, tie-breaker type, index names, and Drizzle syntax remain implementation choices. Do not add speculative status, notes, search, or partial indexes until measured query evidence justifies them.
 
+<a id="od-018"></a>
+
+## OD-018 — Bounded database access and connection behavior
+
+- **Status:** RESOLVED
+- **Impact:** SPEC
+- **Blocking:** NO
+- **Related:** D-003, D-004, TD-006, TD-010, EC-018
+
+### Problem / Conflict
+
+Indexes alone do not prevent over-fetching, N+1 query patterns, per-request client creation, or an unsuitable Neon connection mode.
+
+### Accepted Constraints
+
+Database access should remain simple and measurable. The spike does not need a cache layer, but its main request paths must have bounded work.
+
+### Decision Required
+
+Choose the baseline query, client-lifecycle, and Neon connection behavior for list and task reads.
+
+### Resolution
+
+Cursor queries must use predicates and ordering that match the required composite indexes. Fetch at most `limit + 1` rows to determine whether `nextCursor` exists, then return no more than `limit` items. Select only the fields required by the application result. Main list/task request paths use a small, bounded number of database queries and must not issue one additional query per returned row. The application runtime reuses one module-level Drizzle/database client rather than creating one per request. Deployed application traffic uses a pooled Neon connection, while schema migrations use a direct connection. Redis and application-level query caching are not part of the spike baseline. Exact projections, query composition, query-count assertions, and client factory names remain implementation choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

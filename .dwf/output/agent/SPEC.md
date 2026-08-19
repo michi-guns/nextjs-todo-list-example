@@ -163,6 +163,17 @@ Conceptual model (names may match Drizzle tables closely):
 - Do not add speculative status, notes, search, or partial indexes until measured query evidence requires them.
 - Exact normalized-key representation, tie-breaker type, index names, and Drizzle syntax remain implementation choices.
 
+### 3.5 Query and connection baseline
+
+- Cursor queries keep their equality predicates and ordering aligned with the required composite indexes.
+- Fetch at most `limit + 1` rows to determine whether another page exists; return at most `limit` items and derive `nextCursor` without a total-count query.
+- Select only fields required by the application-facing result.
+- Main list/task request paths use a small, bounded number of queries and do not issue one follow-up query per returned row.
+- The application runtime reuses one module-level Drizzle/database client instead of creating one per request.
+- Deployed application traffic uses a pooled Neon connection. Schema migrations use a direct Neon connection.
+- Redis and application-level query caching are not part of the spike baseline.
+- Exact query composition, projections, instrumentation, client factory names, and environment-variable names remain implementation choices.
+
 ---
 
 ## 4. Domain rules
@@ -336,7 +347,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 
 Do not commit secrets. Typical categories:
 
-- Database URL (Neon)
+- Pooled application database URL and direct migration database URL (Neon)
 - Better Auth secret + URL
 - Explicit local/test mailbox enablement and optional temporary path (non-secret)
 - Production magic-link email provider settings if deployment later requires them
@@ -362,6 +373,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Task CRUD + status + hide completed + case-insensitive per-list title uniqueness
 - [ ] Cursor-paginated list and task reads with opaque next cursors
 - [ ] Pagination defaults to 20, caps at 100, omits total counts, and is visible through dashboard `Load more`
+- [ ] Core list/task reads fetch at most `limit + 1`, avoid N+1 behavior, and use the required query-shaped indexes
 - [ ] Landing Sanity read path
 - [ ] Zod at boundaries
 - [ ] Module layering respected for lists/tasks/landing

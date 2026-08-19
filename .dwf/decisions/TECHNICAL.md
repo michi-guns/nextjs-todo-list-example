@@ -115,3 +115,16 @@ Verify domain invariants, application use cases with ports/fakes, Zod/auth bound
 Use database primary keys, the task-to-list cascading foreign key, and database-enforced case-insensitive unique keys for list names per user and task titles per list. Support list pagination with a composite B-tree index whose leading equality scope is `userId` and whose remaining keys match `createdAt` plus the deterministic cursor tie-breaker. Support task pagination with a composite B-tree index whose leading equality scope is `userId` and `listId` and whose remaining keys match `createdAt` plus the deterministic cursor tie-breaker. Index direction follows the settled list and task ordering.
 
 Do not add status, notes, search, partial, or other speculative indexes without measured query evidence. Exact normalized-key representation, tie-breaker, index names, and Drizzle declaration syntax remain implementation choices.
+
+<a id="td-011"></a>
+
+## TD-011 — Bounded queries and environment-appropriate connections
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-003, D-004
+- **Related resolutions:** [OD-015](OPEN-DECISIONS.md#od-015), [OD-016](OPEN-DECISIONS.md#od-016), [OD-018](OPEN-DECISIONS.md#od-018)
+- **Source:** current performance architecture review
+
+Cursor repositories fetch at most `limit + 1` rows, return at most `limit`, and select only fields required by their application result. Core list/task request paths use bounded query counts and avoid N+1 behavior. Queries keep their equality predicates and ordering aligned with the indexes in TD-010.
+
+Reuse one module-level Drizzle/database client in the application runtime. Deployed application traffic uses a pooled Neon connection; schema migrations use a direct Neon connection. Redis and application-level query caching are not required for this spike. Exact query composition, result projection, instrumentation, client factory naming, and environment-variable names remain implementation choices.
