@@ -33,6 +33,7 @@ Last calibrated: 2026-08-19
 - While settling DWF design authority, do not drift into Delivery Roadmaps, Milestones, Phases, or implementation task decomposition.
 - Report evidence, warnings, limitations, and remaining gaps honestly without smoothing over the scaffold's current limitations.
 - Prefer small, coherent Git commits. When an atomic piece of work is complete and verified, commit it and push the branch instead of accumulating a large working-tree diff.
+- Treat approval of the active design decision as authorization to document it, validate it, commit it, push it, and immediately begin the next design decision unless the human asks to pause.
 - Stage only the files that belong to the completed piece. Keep active or unresolved work out of otherwise complete commits.
 - Keep the working tree clean whenever practical. Uncommitted changes should normally mean that a clearly identified piece of work is still active.
 
