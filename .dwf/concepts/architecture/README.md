@@ -40,7 +40,7 @@ See [`examples/TD-004-auth-flow.md`](./examples/TD-004-auth-flow.md) for an illu
 
 ## Task ownership walkthrough
 
-A task operation receives the authenticated user id and list/task identifiers. The task persistence boundary verifies the list and task belong to that user before returning or mutating data. Foreign resources follow the selected privacy policy; they do not leak ownership information.
+A task operation receives the authenticated user id and list/task identifiers. The task persistence boundary verifies the list and task belong to that user before returning or mutating data. A foreign resource produces the same `not_found` outcome as a nonexistent resource, so ownership information is not exposed.
 
 See [`examples/TD-006-task-create-flow.md`](./examples/TD-006-task-create-flow.md) for an illustrative snippet.
 

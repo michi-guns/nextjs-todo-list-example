@@ -186,7 +186,7 @@ Conceptual model (names may match Drizzle tables closely):
 - `updateTask(userId, taskId, { title?, notes?, status? })`
 - `deleteTask(userId, taskId)`
 
-All use cases enforce ownership; return domain/application errors for not found vs forbidden (forbid may be indistinguishable as 404 for privacy — pick one policy and apply consistently; **recommended:** 404 for other users’ resources).
+All use cases enforce ownership. A nonexistent private resource and one owned by another user both return the same application-level `not_found` outcome so ownership is not disclosed.
 
 ---
 
@@ -235,7 +235,7 @@ Exact paths may vary; behavior must match.
 
 Auth routes: Better Auth defaults under `/api/auth/*` (public where appropriate).
 
-Errors: consistent JSON `{ error: { code, message } }` with 401/404/422 as applicable.
+Errors use consistent JSON `{ error: { code, message } }`: unauthenticated requests use `401`; missing and other-owned private resources both use `404` with code `not_found`; invalid input uses `422`. Private list/task handlers do not expose a distinct `403` ownership response. Server Actions map the same application outcomes without revealing resource existence.
 
 ### 7.2 Server Actions
 
@@ -478,4 +478,4 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 
 ### 14.10 Unresolved implementation choices
 
-The not-found privacy status, local magic-link test delivery, and exact API path spelling remain tracked in [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Factual integration gaps remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); they are not silently resolved by this SPEC projection.
+Local magic-link test delivery and exact API path spelling remain tracked in [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Factual integration gaps remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); they are not silently resolved by this SPEC projection.

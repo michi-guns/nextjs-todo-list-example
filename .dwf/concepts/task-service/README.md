@@ -86,7 +86,7 @@ The subsystem can be verified independently of completed task presentation:
 
 - Task creation succeeds only inside a list owned by the authenticated user.
 - Task list, update, status-change, and delete operations affect only the authenticated owner's rows.
-- Attempts to use another user's list or task produce the agreed ownership-safe outcome.
+- Attempts to use another user's list or task produce the same `not_found` outcome as a nonexistent resource.
 - New tasks receive status `todo`.
 - Status changes accept the settled task statuses and reject values outside them.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
@@ -103,8 +103,6 @@ The implementation agent may choose:
 - Drizzle query composition, provided ownership and list-membership requirements hold.
 - Test doubles and the split between unit and adapter integration tests.
 - Presentation adapters and error mapping consistent with the separately settled presentation decisions.
-
-The exact ownership-safe not-found response remains governed by the open-decision ledger until resolved.
 
 ## Canonical references
 

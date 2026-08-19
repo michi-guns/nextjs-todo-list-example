@@ -8,9 +8,9 @@ Canonical durable Product Decisions (`D-*`). These decisions own accepted observ
 
 - **Status:** ACCEPTED
 - **Source:** PRD, sections 3–4; accepted spike scope
-- **Related:** [Agent PRD](../output/agent/PRD.md#4-users-and-permissions)
+- **Related:** [OD-002](OPEN-DECISIONS.md#od-002), [Agent PRD](../output/agent/PRD.md#4-users-and-permissions)
 
-Anonymous visitors may view the public landing page and enter authentication flows. A signed-in user may read and mutate only that user's lists and tasks. The product has one implicit personal workspace per user; teams, organizations, roles, shared lists, and collaboration are out of scope for the spike.
+Anonymous visitors may view the public landing page and enter authentication flows. A signed-in user may read and mutate only that user's lists and tasks. Requests for another user's private resource do not reveal whether it exists. The product has one implicit personal workspace per user; teams, organizations, roles, shared lists, and collaboration are out of scope for the spike.
 
 <a id="d-002"></a>
 

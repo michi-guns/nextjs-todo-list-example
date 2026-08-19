@@ -36,12 +36,12 @@ Completed tasks remain stored and are included by default. An omitted `includeCo
 
 ## EC-004 — Another user's list or task identifier
 
-- **Status:** OPEN
+- **Status:** HANDLED
 - **Product decisions:** D-001
 - **Technical decisions:** TD-004, TD-006, TD-008
-- **Related open decision:** OD-002
+- **Resolved by:** OD-002
 
-A signed-in user presents an identifier owned by another user. Ownership must be checked at the application and persistence boundaries, and the response policy must be consistent. The privacy-preserving `404` recommendation remains unsettled against `403`.
+A signed-in user presents an identifier owned by another user. Ownership is checked at the application and persistence boundaries. The operation returns the same `not_found` outcome used for a nonexistent resource; JSON callers receive `404` with code `not_found`, and Server Actions expose the equivalent generic result.
 
 <a id="ec-005"></a>
 

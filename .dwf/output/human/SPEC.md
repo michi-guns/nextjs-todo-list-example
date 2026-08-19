@@ -34,6 +34,8 @@ authenticate → authorize → validate with Zod → call use case → map resul
 
 Better Auth remains behind a server-only application boundary exposing current-user helpers. Private reads and writes require the session user; client-provided owner IDs are never trusted.
 
+A missing private resource and one owned by another user produce the same application-level `not_found` outcome. JSON handlers map both to `404` with code `not_found`; Server Actions expose the equivalent generic result.
+
 PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownership, status, timestamps, and relational integrity. Lists and tasks own their repository ports. Drizzle row types stay inside infrastructure. List deletion uses a database cascade, and default `Inbox` creation is atomic and idempotent.
 
 ## Sanity boundary
@@ -68,4 +70,4 @@ A full React component unit-test matrix is not required for the spike.
 
 ## Unresolved state
 
-Privacy error mapping, local magic-link test delivery, exact API paths, Sanity integration evidence, and database migration/application state remain explicitly tracked in the decision ledgers. The implementation must not silently choose answers that change the contract.
+Local magic-link test delivery, exact API paths, Sanity integration evidence, and database migration/application state remain explicitly tracked in the decision ledgers. The implementation must not silently choose answers that change the contract.

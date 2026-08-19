@@ -60,6 +60,7 @@ Out of scope for spike complete:
 - Anyone may register.
 - There is **no** tenant/org model: one implicit personal workspace per user.
 - Authorization rule: **must be signed in** to read or write lists/tasks.
+- Requests for another user's list or task do not reveal whether that resource exists.
 
 ## 5. Product shape
 

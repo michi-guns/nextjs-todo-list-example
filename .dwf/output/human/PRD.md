@@ -22,6 +22,7 @@ The example is intentionally serious about ownership, data boundaries, validatio
 
 - Anonymous visitors can see the marketing landing page and authentication entry points.
 - Signed-in users manage only their own lists and tasks.
+- Requests for another user's private list or task do not reveal whether it exists.
 - There is one implicit personal workspace per user.
 - Teams, organizations, shared lists, collaboration, OAuth, recurring tasks, attachments, payments, offline mode, and multi-region operations are outside the spike.
 

@@ -31,18 +31,18 @@ Choose the default value for `includeCompleted`.
 
 ## OD-002 — Privacy error mapping
 
-- **Status:** OPEN
+- **Status:** RESOLVED
 - **Impact:** BOTH
 - **Blocking:** NO
 - **Related:** D-001, TD-004, TD-006, EC-004
 
 ### Problem / Conflict
 
-The contract permits `403` or privacy-preserving `404` for another user's resource.
+The contract permitted either `403` or privacy-preserving `404` for another user's resource, so one consistent external policy was required.
 
 ### Accepted Constraints
 
-Ownership checks are mandatory and must occur at private operation boundaries. The current recommendation is `404` so resource existence is not disclosed.
+Ownership checks are mandatory and must occur at private operation boundaries.
 
 ### Decision Required
 
@@ -50,7 +50,7 @@ Choose one not-found/forbidden mapping and apply it consistently across Server A
 
 ### Resolution
 
-Pending.
+For private list and task resources, a missing resource and a resource owned by another user both produce the same application-level `not_found` outcome. JSON Route Handlers map it to `404` with error code `not_found`; Server Actions expose the equivalent generic not-found result. Unauthenticated requests remain `401`. Exact user-facing wording and internal logging remain implementation choices.
 
 <a id="od-003"></a>
 
