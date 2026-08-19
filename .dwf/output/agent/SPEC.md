@@ -332,7 +332,9 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - Use `@testcontainers/postgresql` with PostgreSQL 18.
 - Start one ephemeral container for an integration suite run, apply the same versioned Drizzle migrations used by Neon, and stop it after the suite, including failure cleanup.
 - Cover Drizzle repository mappings, case-insensitive uniqueness, list-to-task cascade deletion, ownership-aware reads and mutations, cursor pagination, and concurrent default-Inbox creation.
-- Isolate database state between tests. Exact rollback, truncation, or per-worker database mechanics remain implementation choices.
+- Run repository integration tests serially by default while the suite shares one container.
+- Every test creates and owns a unique user and its mutable records, remains independent of execution order, and does not rely on data left by another test.
+- Parallel execution is allowed later only with an isolated database or schema per worker. Exact runner settings, rollback, truncation, identifier generation, and future worker-isolation mechanics remain implementation choices.
 - Docker is a stated prerequisite for database-backed tests. If unavailable, those suites fail early and clearly rather than silently skipping; unit tests remain runnable.
 - Local Testcontainers PostgreSQL is the default integration database. Routine integration tests do not require Neon credentials or network access.
 - Destructive reset and cleanup helpers accept only the connection supplied by their harness-owned local container and refuse external database URLs.
@@ -353,6 +355,8 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - The magic-link Playwright path clears the local/test mailbox, requests a link, reads the captured URL, and visits it to verify link consumption.
 - One local test command starts PostgreSQL 18, applies the versioned migrations, loads a small deterministic behavior seed, starts a dedicated Next.js test server with the generated container URL, runs Playwright, and tears down both server and container.
 - The behavior seed includes enough records for authentication, cross-user privacy, list/task behavior, completed filtering, and visible pagination.
+- Run Playwright serially by default while its scenarios share one container. Each scenario owns its user and mutable records and does not rely on scenario order.
+- Parallel Playwright workers require an isolated database or schema per worker and are not required for the spike.
 - Playwright does not depend on Neon credentials or a developer's already-running application server.
 - Exact process wrapper, Playwright project and script names, browser-selection mechanism, ports, and seed-builder APIs remain implementation choices.
 - CI: **not required** for spike complete.
@@ -415,6 +419,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Vitest suite green for agreed scope
 - [ ] PostgreSQL 18 Testcontainers integration suite applies the real migrations and passes the agreed persistence cases
 - [ ] Playwright happy paths pass in Chromium against a harness-owned migrated and seeded local PostgreSQL container; Firefox and WebKit remain available as a separate on-demand check
+- [ ] Database-backed tests run serially against shared containers, own unique users/data, and do not depend on test order
 - [ ] Routine database-backed tests require no Neon credentials; destructive test cleanup refuses external database URLs
 - [ ] Husky + lint-staged active
 - [ ] README explains setup without referencing unrelated products

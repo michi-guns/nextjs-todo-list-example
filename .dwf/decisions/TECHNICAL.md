@@ -153,7 +153,7 @@ With compute active and relevant data warm, a 20-record database query must exec
 
 Use `@testcontainers/postgresql` with a PostgreSQL 18 image for real persistence integration tests. One ephemeral container serves an integration suite run and receives the same versioned Drizzle migrations used against Neon. Database-backed tests cover repository mappings, uniqueness constraints, cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Database state is isolated between tests.
 
-Domain, application-with-fakes, and Zod unit tests remain independent of PostgreSQL and Docker. Database-backed suites require Docker and fail clearly when it is unavailable rather than silently skipping. Exact image patch tag, test-file layout, state-reset strategy, and helper names remain implementation choices.
+Domain, application-with-fakes, and Zod unit tests remain independent of PostgreSQL and Docker. Database-backed suites require Docker and fail clearly when it is unavailable rather than silently skipping. Exact image patch tag, test-file layout, serial state-reset strategy, and helper names remain implementation choices.
 
 <a id="td-014"></a>
 
@@ -191,3 +191,14 @@ Use Neon's pooled URL for application traffic and its direct URL for migrations.
 - **Source:** current testing architecture review
 
 Use Chromium for the required local Playwright acceptance journey. Provide a separate on-demand run for the same relevant journeys in Firefox and WebKit before a public release and after major UI changes. The routine suite does not multiply every database-backed scenario across all three engines. Exact Playwright project names, script names, and selection mechanics remain implementation choices.
+
+<a id="td-017"></a>
+
+## TD-017 — Serial shared-database test execution
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-006
+- **Related resolution:** [OD-024](OPEN-DECISIONS.md#od-024)
+- **Source:** current testing architecture review
+
+Run database repository integration tests and Playwright serially by default while they share one Testcontainers PostgreSQL instance. Each test owns a unique authenticated user and its mutable records and remains independent of test order. Parallel execution requires database- or schema-level isolation per worker and is a later optimization, not a spike requirement. Exact runner configuration, unique-data helpers, cleanup strategy, and worker-isolation mechanism remain implementation choices.

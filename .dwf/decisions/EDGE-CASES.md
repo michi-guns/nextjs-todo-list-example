@@ -248,3 +248,14 @@ The application creates one bounded `pg.Pool` at module scope rather than one po
 - **Resolved by:** OD-023
 
 Chromium is the required routine acceptance browser, but it is not treated as proof that Firefox and WebKit behave identically. Before a public release and after a major UI change, run the separate cross-browser check. A failure there is investigated as a browser compatibility issue without making all three engines part of every ordinary database-backed run.
+
+<a id="ec-024"></a>
+
+## EC-024 — Parallel tests collide through shared PostgreSQL state
+
+- **Status:** HANDLED
+- **Product decisions:** D-006
+- **Technical decisions:** TD-013, TD-014, TD-017
+- **Resolved by:** OD-024
+
+Database-backed suites run serially while sharing one harness-owned container. A test uses a unique user and mutable records and never assumes that another test ran first. If parallel workers are enabled later, each worker must receive an isolated database or schema before the suite is considered reliable.

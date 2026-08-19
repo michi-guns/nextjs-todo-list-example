@@ -500,7 +500,7 @@ Choose the local database mechanism, PostgreSQL version, integration-test scope,
 
 ### Resolution
 
-Use `@testcontainers/postgresql` to run PostgreSQL 18 locally for database integration tests, matching the current Neon PostgreSQL major version. Start one ephemeral container for an integration suite run, apply the same versioned Drizzle migrations used by Neon, run the suite, and stop the container afterward. Cover repository mappings, database uniqueness, list-to-task cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Keep unit tests for domain rules, application use cases with fakes, and Zod boundaries free of database and Docker requirements. Isolate database state between integration tests; the exact rollback, truncation, or per-worker database mechanism remains an implementation choice. If Docker is unavailable, database-backed suites fail early with a clear prerequisite error rather than silently skipping, while unit tests remain runnable.
+Use `@testcontainers/postgresql` to run PostgreSQL 18 locally for database integration tests, matching the current Neon PostgreSQL major version. Start one ephemeral container for an integration suite run, apply the same versioned Drizzle migrations used by Neon, run the suite, and stop the container afterward. Cover repository mappings, database uniqueness, list-to-task cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Keep unit tests for domain rules, application use cases with fakes, and Zod boundaries free of database and Docker requirements. Isolate database state between integration tests; the exact rollback or truncation mechanism remains an implementation choice. If Docker is unavailable, database-backed suites fail early with a clear prerequisite error rather than silently skipping, while unit tests remain runnable.
 
 <a id="od-021"></a>
 
@@ -578,6 +578,31 @@ Choose the required browser for routine acceptance and the role of Firefox and W
 ### Resolution
 
 Run the required Playwright acceptance journey in Chromium. Keep Firefox and WebKit in a separate, explicitly invoked cross-browser run used before a public release and after major UI changes. Firefox and WebKit are not required on every routine run and do not block ordinary spike completion. Exact Playwright project names, script names, and cross-browser invocation remain implementation choices.
+
+<a id="od-024"></a>
+
+## OD-024 — Database-backed test parallelism
+
+- **Status:** RESOLVED
+- **Impact:** SPEC
+- **Blocking:** NO
+- **Related:** D-006, TD-013, TD-014, TD-017, EC-020, EC-024
+
+### Problem / Conflict
+
+Repository integration tests and Playwright share a harness-owned PostgreSQL container. Uncoordinated parallel workers could collide through shared rows, uniqueness constraints, cleanup, or database-wide resets and produce intermittent failures.
+
+### Accepted Constraints
+
+The test suites must be deterministic and easy to debug. Individual tests must remain independent even when their execution is serial, and the design should not prevent safe parallelism later.
+
+### Decision Required
+
+Choose whether database-backed suites run serially or in parallel by default, and define the minimum isolation required before parallelism is allowed.
+
+### Resolution
+
+Run PostgreSQL repository integration tests and Playwright serially by default while a suite shares one harness-owned container. Every test creates and owns a unique user and its mutable records, cleans up through the harness where needed, and must not depend on execution order or data left by another test. Parallel database-backed execution may be introduced later only when each worker receives an isolated database or schema. Exact test-runner settings, identifier generation, cleanup mechanics, and future worker-provisioning mechanism remain implementation choices.
 
 ## Non-blocking implementation freedom
 
