@@ -34,7 +34,7 @@ Derived explanations:
 
 ## Ownership
 
-The Workspace root outside `.framework/` is project-specific design state. Product behavior is owned by the Agent PRD, technical behavior by the Agent SPEC, and rationale by the decision ledgers. Unresolved facts and choices remain visible rather than being silently inferred.
+The Workspace root outside `.framework/` is project-specific design state. Product behavior is owned by the Agent PRD, technical behavior by the Agent SPEC, and accepted results by the decision ledgers. Keep decision entries thin. Record reasoning only for rare, difficult tradeoffs. Unresolved facts and choices remain visible rather than being silently inferred.
 
 ## Framework machinery
 

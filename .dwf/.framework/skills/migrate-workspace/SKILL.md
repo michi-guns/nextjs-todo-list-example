@@ -2,7 +2,7 @@
 name: migrate-workspace
 description: Use when converting an existing project documentation set or older DWF layout into the current standard .dwf Workspace schema.
 metadata:
-  version: "0.1.0-proposal.1"
+  version: "0.1.0-proposal.1.local.2"
   maturity: "proposal"
 ---
 
@@ -26,7 +26,7 @@ The target schema is predictable. Mapping arbitrary existing documentation into 
    - `OD-*` Open Decisions;
    - derived Concepts;
    - generated PRD/SPEC projections.
-4. Preserve stable IDs, rationale, supersession history, and useful provenance where possible.
+4. Preserve current accepted decisions and stable IDs. Carry rationale or superseded entries only when current work still needs them.
 5. Split mixed-authority legacy documents when necessary.
 6. Do not silently reconcile contradictions. Promote unresolved conflicts to `OQ-*` or `OD-*` as appropriate.
 7. Normalize into the standard required file locations.

@@ -2,7 +2,7 @@
 name: generate-agent-prd
 description: Use when creating or refreshing output/agent/PRD.md from the project Workspace durable product state.
 metadata:
-  version: "0.1.0-proposal.1"
+  version: "0.1.0-proposal.1.local.2"
   maturity: "proposal"
 ---
 
@@ -32,7 +32,7 @@ Read, in this order as relevant:
 - Use compact traceability metadata/references where useful.
 - Keep unresolved blocking `OQ-*`/`OD-*` visible rather than guessing.
 - Do not make implementation mechanisms product requirements unless an accepted `D-*` requires the observable mechanism itself.
-- Do not duplicate decision-rationale ledgers wholesale.
+- Do not duplicate decision ledger entries wholesale. Include only the contract details the PRD reader needs.
 
 ## Validation
 

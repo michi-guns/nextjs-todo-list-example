@@ -46,3 +46,13 @@ This clarification does not weaken or replace any Architectural Subsystem qualif
 - Separate Identity and Boundary guidance in the Architectural Subsystem Concept template.
 - Include component identity and naming quality in review or validation guidance.
 - Add or update the stable glossary definition when the newer Framework glossary is integrated.
+
+<a id="dwf-p-002"></a>
+
+## DWF-P-002 — Keep decision ledgers thin
+
+- **Status:** ACCEPTED
+- **Integration state:** INTEGRATED in `0.1.0-proposal.1.local.2`
+- **Scope:** Product Decisions, Technical Decisions, and Open Decisions
+
+Record accepted results directly in `PRODUCT.md` or `TECHNICAL.md`. Keep `OPEN-DECISIONS.md` for unresolved choices only, and remove an open entry after recording its result. Do not require an open-decision record for routine accepted choices. Keep reasoning or superseded entries only when current work still needs them. Git retains ordinary history.

@@ -162,6 +162,17 @@ Optional durable Human/Agent communication preferences. It may affect explanatio
 
 ## 5. Durable design ledgers
 
+### Thin decision records
+
+DWF stores current accepted decisions, not routine deliberation.
+
+- Record the final product result in `PRODUCT.md` and the final technical result in `TECHNICAL.md`.
+- Keep each decision short. State the chosen behavior or mechanism and its scope. Add reasoning only when the tradeoff is unusually complex or future readers are likely to question it.
+- `OPEN-DECISIONS.md` contains unresolved choices only. An `OD-*` record is not a required step before a `D-*` or `TD-*` decision.
+- When an open choice is resolved, record the result in its owning ledger and remove the `OD-*` entry. Git keeps the ordinary decision history.
+- Do not repeat the same decision across several ledgers. Generated outputs and supporting documents include only the parts their readers need.
+- Keep a superseded entry only when current migration, compatibility, or implementation work still needs the old contract.
+
 ### `decisions/PRODUCT.md` — `D-*`
 
 Canonical durable Product Decisions.
@@ -188,7 +199,7 @@ Use stable IDs and anchors:
 Decision text.
 ```
 
-Never reuse retired IDs. Preserve superseded decisions as history; do not silently rewrite them into a different decision.
+Never reuse retired IDs. Keep the active ledger focused on current accepted truth. Git keeps routine history. Preserve a superseded entry only when current work still needs to understand the old contract.
 
 ### `decisions/TECHNICAL.md` — `TD-*`
 
@@ -313,7 +324,7 @@ Suggested shape:
 Pending.
 ```
 
-When resolved, preserve the item, create/update the owning `D-*` or `TD-*`, and regenerate affected outputs.
+When resolved, create or update the owning `D-*` or `TD-*`, remove the `OD-*` entry, and regenerate affected outputs. Preserve reasoning only for the rare cases defined by the thin decision record rule.
 
 ## 6. Generated projections
 
@@ -329,7 +340,7 @@ Given the project Workspace plus the correct Framework version/Skills, a capable
 
 Agent-oriented product contract. It is generated from verified project context, rules as constraints, accepted `D-*`, relevant `EC-*`, and unresolved-state visibility.
 
-It is optimized for exactness and low inference. It does not replace `D-*` rationale/history.
+It is optimized for exactness and low inference. It does not replace accepted `D-*` truth.
 
 Technical mechanisms from `TD-*` must not leak into the PRD as product requirements unless the mechanism itself is observably required by an accepted Product Decision.
 
@@ -432,7 +443,7 @@ Migration should:
 
 1. inventory existing documentation;
 2. classify content by semantic ownership, not filename alone;
-3. preserve established stable IDs and rationale where possible;
+3. preserve current accepted decisions and stable IDs where possible, carrying rationale only when the thin decision record rule calls for it;
 4. split mixed-authority files when needed;
 5. surface contradictions as open questions/decisions rather than guessing;
 6. repair references after moves;

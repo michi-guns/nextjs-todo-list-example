@@ -14,7 +14,7 @@ This is the navigation and maintenance protocol for the project's design, suppor
 
 - `.dwf/output/agent/PRD.md` defines current observable product behavior.
 - `.dwf/output/agent/SPEC.md` defines the current technical implementation contract and is subordinate to the Agent PRD.
-- `.dwf/decisions/PRODUCT.md` and `.dwf/decisions/TECHNICAL.md` preserve accepted rationale and must be reflected into current projections when they affect behavior or implementation.
+- `.dwf/decisions/PRODUCT.md` and `.dwf/decisions/TECHNICAL.md` contain concise accepted results and must be reflected into current projections when they affect behavior or implementation.
 - `.dwf/decisions/EDGE-CASES.md` records explicitly considered scenarios; `.dwf/decisions/OPEN-QUESTIONS.md` and `.dwf/decisions/OPEN-DECISIONS.md` are unresolved state, never accepted truth.
 - `.dwf/concepts/` and `.dwf/output/human/` are derived explanations/projections, never authorities.
 - `docs/` supplies supporting, operational, and explanatory material. It must not silently override `.dwf/`.
@@ -23,7 +23,9 @@ This is the navigation and maintenance protocol for the project's design, suppor
 ## Update rules
 
 - Product behavior changes update the durable product decisions and regenerated Agent PRD, plus affected technical contracts, tests, and supporting documents.
-- Technical or architectural changes update the durable technical decisions and regenerated Agent SPEC; add or amend an ADR only when rationale is worth preserving outside the decision ledger.
+- Technical or architectural changes update the durable technical decisions and regenerated Agent SPEC. Record reasoning only when the tradeoff is unusually complex or likely to be questioned later.
+- Keep `OPEN-DECISIONS.md` for unresolved choices only. Accepted choices may go directly into their owning decision ledger. When an open choice is resolved, record its result and remove the open entry.
+- Keep decision entries thin and avoid copying the same rule into documents whose readers do not need it.
 - Do not silently resolve contradictions. Preserve uncertainty and record the appropriate open question/decision.
 - Move verified facts from open questions into `.dwf/CONTEXT.md`, `.dwf/RULES.md`, or the relevant decision/projection according to semantic ownership.
 - Keep Delivery Roadmap/Milestone/Phase state outside `.dwf/`; Delivery may reference `.dwf/` but must not redefine it.
@@ -31,7 +33,7 @@ This is the navigation and maintenance protocol for the project's design, suppor
 ## Maintenance
 
 - Repeated operational problems get a runbook under `docs/runbooks/`.
-- One document should own one concept or decision; prefer links over duplicated normative prose.
+- One document should own one concept or decision. Prefer links over repeated normative prose.
 - Repair navigation when canonical files move.
 
 ## ADR rules

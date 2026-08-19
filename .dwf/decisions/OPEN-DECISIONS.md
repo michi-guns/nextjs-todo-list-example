@@ -1,6 +1,6 @@
 # Open Decisions
 
-Tracked choices (`OD-*`). Entries with `OPEN` status remain unresolved and recommendations are not accepted decisions. Resolved entries stay here as decision history and point to the durable contract they updated.
+This ledger is now reserved for unresolved choices. The resolved entries below predate the thin-decision rule in DWF `0.1.0-proposal.1.local.2`. Do not use them as a pattern or add new resolved entries. Their cleanup remains a separate task because removing them would delete a large amount of existing documentation.
 
 <a id="od-001"></a>
 
