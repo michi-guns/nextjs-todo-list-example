@@ -13,7 +13,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Read the generated [Agent PRD](.dwf/output/agent/PRD.md) and [Agent SPEC](.dwf/output/agent/SPEC.md) before implementing product, domain, architecture, persistence, or integration behavior.
 - Read relevant ledgers under [`.dwf/decisions/`](.dwf/decisions/) and supporting architecture/data/domain documents.
 - Treat `.dwf/` as the canonical product/technical design authority. Delivery artifacts live outside `.dwf/` and must reference, not redefine, it.
-- This repo is a standalone public example. Do not invent links to other products or private projects.
+- This repo is a standalone public, opinionated Next.js starter implemented through a complete todo reference application. Derived apps should be able to replace mostly domain and UI code while retaining or adapting the cross-cutting foundations.
+- Use current stable best practices and the simplest genuinely robust design. Add complexity only when it has a clear reusable payoff in safety, correctness, operability, maintainability, or avoided rework. Do not turn the starter into a configurable multi-stack framework.
+- Do not invent links to other products or private projects.
 
 ## Trello Work Units
 
@@ -33,7 +35,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Git strategy (simple / flexible)
 
-- **No PR requirement.** No protected-branch ceremony for this spike.
+- **No PR requirement.** No protected-branch ceremony is required for this repository's current workflow.
 - Agents and humans may:
   - commit and **push directly to `main`**, or
   - use short-lived branches and merge locally / on GitHub however is convenient.

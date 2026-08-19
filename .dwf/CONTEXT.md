@@ -1,5 +1,12 @@
 # Project Context
 
+## Product intent
+
+- The repository is an opinionated, production-minded Next.js starter implemented through a complete personal-todo reference application; it is not a toy project or temporary experiment.
+- A derived application is expected to replace mostly the domain and UI while retaining or adapting cross-cutting foundations such as authentication, persistence, CMS integration, validation, testing, documentation, and local quality tooling.
+- The starter deliberately presents one preferred stack and architecture rather than becoming a configurable multi-stack framework.
+- Design and implementation optimize for high reusable quality without excessive build time: use the simplest robust modern approach and add complexity only when it has a clear safety, correctness, operability, maintainability, or avoided-rework payoff.
+
 ## Repository landscape
 
 - One standalone Next.js repository uses the installed DWF candidate distribution `0.1.0-proposal.1` under `.dwf/.framework/`.

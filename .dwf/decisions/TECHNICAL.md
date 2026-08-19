@@ -7,7 +7,7 @@ Canonical durable Technical Decisions (`TD-*`). These choices implement the acce
 ## TD-001 — Domain-centered modular monolith
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-001, D-005, D-006
+- **Related product decisions:** D-001, D-005, D-009
 - **Source:** ADR-0001; legacy D-001
 
 Use one deployable Next.js application organized by business capability. Keep domain, application, infrastructure, and presentation responsibilities separate where useful. Prefer the existing repository extension points over reshaping source merely to mirror conceptual nouns.
@@ -29,7 +29,7 @@ The first-class capabilities are `auth`, `landing`, `lists`, and `tasks`. Keep `
 ## TD-003 — Layered dependency direction and composition-only routes
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-001, D-006
+- **Related product decisions:** D-001, D-009
 - **Source:** legacy D-007; current SPEC boundary clarifications
 
 The dependency direction is `presentation → application → domain`, with infrastructure implementing application/domain ports. `app/` owns Next.js routing and composition. Module presentation owns Server Actions, Route Handler adapters, Zod input schemas, view models, error mapping, and capability-owned UI. Domain/application code must not import Next.js, React, Drizzle, Sanity, HTTP, or browser APIs.
@@ -88,7 +88,7 @@ This keeps editorial copy independently editable while making the second store's
 ## TD-008 — Zod and shared mutation paths at untrusted boundaries
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-001, D-002, D-006
+- **Related product decisions:** D-001, D-002, D-009
 - **Related resolutions:** [OD-002](OPEN-DECISIONS.md#od-002), [OD-004](OPEN-DECISIONS.md#od-004), [OD-014](OPEN-DECISIONS.md#od-014), [OD-015](OPEN-DECISIONS.md#od-015), [OD-016](OPEN-DECISIONS.md#od-016)
 - **Source:** current SPEC presentation and validation boundaries
 
@@ -99,10 +99,10 @@ Server Actions and JSON Route Handlers follow `authenticate → authorize → va
 ## TD-009 — Layered verification and local quality gates
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-006
+- **Related product decisions:** D-009
 - **Source:** legacy D-008; current SPEC testing boundary
 
-Verify domain invariants, application use cases with ports/fakes, Zod/auth boundaries, non-trivial adapter mappings, and the core Playwright journey. A complete React component unit matrix is not required. The repository quality baseline is pnpm, Vitest, Playwright, typechecking, linting, Husky, and lint-staged; CI is not required for spike completion.
+Verify domain invariants, application use cases with ports/fakes, Zod/auth boundaries, non-trivial adapter mappings, and the core Playwright journey. A complete React component unit matrix is not required. The repository quality baseline is pnpm, Vitest, Playwright, typechecking, linting, Husky, and lint-staged; CI is not required for current starter-baseline completion.
 
 <a id="td-010"></a>
 
@@ -128,7 +128,7 @@ Do not add status, notes, search, partial, or other speculative indexes without 
 
 Cursor repositories fetch at most `limit + 1` rows, return at most `limit`, and select only fields required by their application result. Core list/task request paths use bounded query counts and avoid N+1 behavior. Queries keep their equality predicates and ordering aligned with the indexes in TD-010.
 
-Reuse one module-level Drizzle/database client in the application runtime. Deployed application traffic uses a pooled Neon connection; schema migrations use a direct Neon connection. Redis and application-level query caching are not required for this spike. Exact query composition, result projection, instrumentation, client factory naming, and environment-variable names remain implementation choices.
+Reuse one module-level Drizzle/database client in the application runtime. Deployed application traffic uses a pooled Neon connection; schema migrations use a direct Neon connection. Redis and application-level query caching are not required for the current starter baseline. Exact query composition, result projection, instrumentation, client factory naming, and environment-variable names remain implementation choices.
 
 <a id="td-012"></a>
 
@@ -148,7 +148,7 @@ With compute active and relevant data warm, a 20-record database query must exec
 ## TD-013 — PostgreSQL integration suite through Testcontainers
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-003, D-004, D-006
+- **Related product decisions:** D-003, D-004, D-009
 - **Related resolution:** [OD-020](OPEN-DECISIONS.md#od-020)
 - **Source:** current testing architecture review
 
@@ -161,7 +161,7 @@ Domain, application-with-fakes, and Zod unit tests remain independent of Postgre
 ## TD-014 — Local-first test database with Neon verification lane
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-006
+- **Related product decisions:** D-009
 - **Related resolutions:** [OD-006](OPEN-DECISIONS.md#od-006), [OD-019](OPEN-DECISIONS.md#od-019), [OD-020](OPEN-DECISIONS.md#od-020), [OD-021](OPEN-DECISIONS.md#od-021)
 - **Source:** current testing architecture review
 
@@ -187,7 +187,7 @@ Use Neon's pooled URL for application traffic and its direct URL for migrations.
 ## TD-016 — Chromium-first Playwright acceptance
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-006
+- **Related product decisions:** D-009
 - **Related resolution:** [OD-023](OPEN-DECISIONS.md#od-023)
 - **Source:** current testing architecture review
 
@@ -198,31 +198,31 @@ Use Chromium for the required local Playwright acceptance journey. Provide a sep
 ## TD-017 — Serial shared-database test execution
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-006
+- **Related product decisions:** D-009
 - **Related resolution:** [OD-024](OPEN-DECISIONS.md#od-024)
 - **Source:** current testing architecture review
 
-Run database repository integration tests and Playwright serially by default while they share one Testcontainers PostgreSQL instance. Each test owns a unique authenticated user and its mutable records and remains independent of test order. Parallel execution requires database- or schema-level isolation per worker and is a later optimization, not a spike requirement. Exact runner configuration, unique-data helpers, cleanup strategy, and worker-isolation mechanism remain implementation choices.
+Run database repository integration tests and Playwright serially by default while they share one Testcontainers PostgreSQL instance. Each test owns a unique authenticated user and its mutable records and remains independent of test order. Parallel execution requires database- or schema-level isolation per worker and is a later optimization, not a current starter-baseline requirement. Exact runner configuration, unique-data helpers, cleanup strategy, and worker-isolation mechanism remain implementation choices.
 
 <a id="td-018"></a>
 
 ## TD-018 — Local Sanity contracts with a live read smoke
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-005, D-006
+- **Related product decisions:** D-005, D-009
 - **Related resolution:** [OD-025](OPEN-DECISIONS.md#od-025)
 - **Source:** current testing architecture review
 
 Test Sanity payload validation, mapping, optional fields, and required-content failures with local fixtures. Routine Playwright receives deterministic test-only landing content through the application-facing landing contract and does not call Sanity. The test source cannot run as a deployed fallback.
 
-Keep one separate read-only smoke against the configured dedicated Sanity project and dataset. It fetches the published singleton through the real query and client path, validates the payload, and maps the landing view model. This smoke is required before spike completion and before a deployment counts as release evidence; missing configuration, content, or a valid mapping fails clearly. Exact fixtures, dependency substitution, command name, and output format remain implementation choices.
+Keep one separate read-only smoke against the configured dedicated Sanity project and dataset. It fetches the published singleton through the real query and client path, validates the payload, and maps the landing view model. This smoke is required before starter-baseline completion and before a deployment counts as release evidence; missing configuration, content, or a valid mapping fails clearly. Exact fixtures, dependency substitution, command name, and output format remain implementation choices.
 
 <a id="td-019"></a>
 
 ## TD-019 — Versioned migration chain and upgrade verification
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-003, D-004, D-006
+- **Related product decisions:** D-003, D-004, D-009
 - **Source:** current migration verification review
 
 Versioned Drizzle migration files are the authoritative database transition path. Testcontainers applies the complete migration chain to an empty PostgreSQL database. A non-default Neon development branch created from the current default branch applies the new reviewed migrations and verifies the hosted upgrade path before the same files may be applied to the default branch. `drizzle-kit push` may support local exploration but does not count as migration verification.
@@ -232,7 +232,7 @@ Versioned Drizzle migration files are the authoritative database transition path
 ## TD-020 — Separate contract coverage for server entry paths
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-001, D-003, D-004, D-006
+- **Related product decisions:** D-001, D-003, D-004, D-009
 - **Source:** current server-boundary testing review
 
 Domain and application tests remain the main business-behavior suite. JSON Route Handlers receive request-level contract tests for success, pagination shape, unauthenticated `401`, privacy-preserving `404`, conflict `409`, and invalid-input `422` responses. Server Actions receive a smaller adapter suite for authentication, validation, and successful-result or expected-error mapping. Do not repeat every business case across both entry paths.
@@ -242,7 +242,7 @@ Domain and application tests remain the main business-behavior suite. JSON Route
 ## TD-021 — Behavior-based test acceptance without a percentage gate
 
 - **Status:** ACCEPTED
-- **Related product decision:** D-006
+- **Related product decision:** D-009
 - **Source:** current test-coverage review
 
 Do not require a minimum code-coverage percentage. Every behavior required by the Agent SPEC must have suitable test evidence. Coverage reports may reveal untested code and guide review, but a percentage does not replace behavior-based acceptance.
@@ -252,7 +252,7 @@ Do not require a minimum code-coverage percentage. Every behavior required by th
 ## TD-022 — Same-origin session-authenticated JSON API baseline
 
 - **Status:** ACCEPTED
-- **Related product decisions:** D-001, D-002, D-006
+- **Related product decisions:** D-001, D-002, D-009
 - **Source:** current JSON API audience review
 
 Treat the list and task JSON Route Handlers as same-origin application endpoints authenticated by the existing Better Auth browser session. Do not enable cross-origin access or add bearer-token, API-key, JWT, or separate machine-authentication support for the baseline. Supporting external agents or third-party clients requires a later authentication and authorization decision.

@@ -24,4 +24,4 @@ See the supporting [technology stack](./stack.md) and the canonical technical co
 
 ## Design goal
 
-Keep business behavior understandable and testable even when frameworks, databases, CMSs, or providers change. Keep modules small enough for a developer or AI agent to understand in one focused context.
+Keep the todo reference behavior understandable, testable, and replaceable while cross-cutting foundations remain reusable. Isolate framework and provider details where the accepted architecture needs a boundary, but do not add generic provider-swapping abstractions. Keep modules small enough for a developer or AI agent to understand in one focused context.

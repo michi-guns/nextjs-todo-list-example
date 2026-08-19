@@ -1,6 +1,8 @@
 # System in Five Minutes
 
-This repository is a public teaching example: a small authenticated todo application built to demonstrate a modern Next.js stack, a domain-centered modular monolith, and an AI-friendly documentation system.
+This repository is a public, opinionated Next.js starter implemented as a complete authenticated todo reference application. It combines a modern stack, a domain-centered modular monolith, reusable cross-cutting foundations, and an AI-friendly documentation system. Derived applications should mainly replace domain and UI code rather than rebuild those foundations.
+
+The starter is production-minded without becoming a universal framework or turnkey SaaS. It uses the simplest robust approach and spends extra complexity only where the reusable payoff is clear.
 
 ## Responsibilities
 

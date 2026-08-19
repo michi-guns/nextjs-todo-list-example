@@ -80,6 +80,14 @@ app (routes) → module presentation / application APIs
 - **Server Actions**: authenticate → authorize → validate (Zod) → application use case → map errors → revalidate/redirect.
 - **Route Handlers**: JSON API for lists/tasks (and auth routes as Better Auth requires). Treat as untrusted entry points; same authz + zod + use case path as actions where they mutate or read private data.
 
+### 1.4 Starter architecture principles
+
+- Keep cross-cutting foundations reusable without importing todo-specific concepts into them.
+- Keep domain and UI responsibilities replaceable through the existing capability boundaries.
+- Follow the current stable and recommended APIs for the installed stack, including the repository's required local Next.js documentation check.
+- Prefer the simplest implementation that meets the accepted safety, correctness, operability, maintainability, and verification contract.
+- Add modest complexity when it prevents meaningful rework or supplies a reusable safeguard. Do not build provider-swapping abstractions, speculative extension systems, or low-leverage machinery.
+
 ---
 
 ## 2. Auth (Better Auth)
@@ -88,7 +96,7 @@ app (routes) → module presentation / application APIs
 
 - Email + password: sign-up, sign-in, sign-out.
 - Magic link: request + consume.
-- No OAuth/social providers in spike.
+- No OAuth/social providers in the current todo reference baseline.
 
 ### 2.2 Session rules
 
@@ -175,7 +183,7 @@ Conceptual model (names may match Drizzle tables closely):
 - Main list/task request paths use a small, bounded number of queries and do not issue one follow-up query per returned row.
 - The application runtime reuses one module-level Drizzle/database client instead of creating one per request.
 - Deployed application traffic uses a pooled Neon connection. Schema migrations use a direct Neon connection.
-- Redis and application-level query caching are not part of the spike baseline.
+- Redis and application-level query caching are not part of the current starter baseline.
 - Exact query composition, projections, instrumentation, client factory names, and environment-variable names remain implementation choices.
 - Use `node-postgres` through `drizzle-orm/node-postgres` as the shared runtime driver in the Next.js Node runtime.
 - Create one bounded, module-scoped `pg.Pool` and pass it to Drizzle; Better Auth and list/task repositories share that database boundary rather than creating independent pools.
@@ -191,7 +199,7 @@ Conceptual model (names may match Drizzle tables closely):
 - Name length is 1–80 characters inclusive after trimming.
 - Names are unique per `userId` under case-insensitive comparison. Preserve the accepted display value while enforcing normalized uniqueness at the database boundary.
 - User can only mutate own lists.
-- Delete list is always hard delete + cascade tasks (no soft delete in spike).
+- Delete list is always hard delete + cascade tasks (no soft delete in the current todo reference baseline).
 - List reads order by `createdAt` ascending. Equal timestamps use a deterministic implementation-chosen tie-breaker.
 
 ### 4.2 Task
@@ -273,7 +281,7 @@ No list/task documents.
 - Expose one server-only, idempotent invalidation service for that cached content.
 - Configure a Sanity webhook for relevant published singleton changes. Its Route Handler verifies the Sanity signature before trusting the event, rejects irrelevant or invalid requests, and calls the shared invalidation service.
 - Provide a separately authorized manual recovery mechanism that calls the same invalidation service. Exact route or command shape and operator-authentication mechanism remain implementation choices; provider and operator secrets never enter client bundles.
-- Deliver authenticated Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live after the webhook and manual-recovery baseline. The deferred phase reads drafts and subscribes to draft changes only for authorized preview sessions; it is not required for current spike completion.
+- Deliver authenticated Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live after the webhook and manual-recovery baseline. The deferred phase reads drafts and subscribes to draft changes only for authorized preview sessions; it is not required for current starter-baseline completion.
 - Until Sanity is wired, a temporary fallback is allowed only if clearly marked; remove fallback once CMS read works.
 
 ### 6.3 Seat
@@ -337,7 +345,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 ### 10.1 Vitest
 
 - Location: colocated `*.test.ts` next to unit-tested modules.
-- Scope for spike complete:
+- Scope for starter-baseline completion:
   - domain rules (status transitions/invariants as encoded)
   - application use cases (with mocked ports)
   - zod schema accept/reject cases
@@ -373,7 +381,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 
 - Location: `e2e/`
 - Chromium is the required browser for the normal local acceptance suite.
-- Provide a separate, explicitly invoked cross-browser run for Firefox and WebKit before a public release and after major UI changes. Those engines are not part of every routine run and do not block ordinary spike completion.
+- Provide a separate, explicitly invoked cross-browser run for Firefox and WebKit before a public release and after major UI changes. Those engines are not part of every routine run and do not block ordinary starter-baseline completion.
 - Happy paths minimum:
   1. Sign-up (password) or seed + sign-in
   2. Sign-in
@@ -386,20 +394,20 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - One local test command starts PostgreSQL 18, applies the versioned migrations, loads a small deterministic behavior seed, starts a dedicated Next.js test server with the generated container URL, runs Playwright, and tears down both server and container.
 - The behavior seed includes enough records for authentication, cross-user privacy, list/task behavior, completed filtering, and visible pagination.
 - Run Playwright serially by default while its scenarios share one container. Each scenario owns its user and mutable records and does not rely on scenario order.
-- Parallel Playwright workers require an isolated database or schema per worker and are not required for the spike.
+- Parallel Playwright workers require an isolated database or schema per worker and are not required for the current starter baseline.
 - Playwright does not depend on Neon credentials or a developer's already-running application server.
 - Routine Playwright uses deterministic test-only landing content through the application-facing landing contract and does not require Sanity credentials or network access. This source is unavailable in deployed runtime modes.
 - Exact process wrapper, Playwright project and script names, browser-selection mechanism, ports, and seed-builder APIs remain implementation choices.
-- CI: **not required** for spike complete.
+- CI: **not required** for the currently accepted starter baseline.
 
 ### 10.4 Sanity verification
 
 - Use local fixtures to test valid unknown-payload validation and mapping, optional landing fields, and missing or invalid required-content failures.
 - Test the webhook boundary with valid and invalid signatures, relevant and irrelevant document events, and duplicate delivery. Invalid requests do not invalidate, and repeated valid requests are safe.
 - Test that unauthorized manual requests cannot invalidate content and that an authorized request reaches the same invalidation service as the webhook.
-- Local spike acceptance may exercise generated signed requests directly against the Route Handler. When a deployment is presented as release evidence, also verify one real Sanity webhook delivery through the deployed endpoint.
+- Local starter-baseline acceptance may exercise generated signed requests directly against the Route Handler. When a deployment is presented as release evidence, also verify one real Sanity webhook delivery through the deployed endpoint.
 - Keep one separate read-only live smoke that uses the real Sanity client and query to fetch the published singleton from the dedicated project and dataset, validate it, and map it to the landing view model.
-- The live smoke must pass before spike completion and before a deployment counts as release evidence. Missing configuration, missing or unpublished content, query failure, validation failure, or mapping failure is reported clearly rather than skipped.
+- The live smoke must pass before starter-baseline completion and before a deployment counts as release evidence. Missing configuration, missing or unpublished content, query failure, validation failure, or mapping failure is reported clearly rather than skipped.
 - The live smoke never creates or edits Sanity content.
 - Exact fixture representation, test-source wiring, command name, and evidence format remain implementation choices.
 

@@ -53,7 +53,7 @@ A signed-in user presents an identifier owned by another user. Ownership is chec
 - **Product decisions:** D-003, D-004
 - **Technical decisions:** TD-005, TD-006
 
-Deleting an owned list hard-deletes its tasks through the relational cascade contract. The product does not use soft deletion for this spike.
+Deleting an owned list hard-deletes its tasks through the relational cascade contract. The current todo reference baseline does not use soft deletion.
 
 <a id="ec-006"></a>
 
@@ -210,7 +210,7 @@ The lightweight query target is measured only after Neon compute is active and r
 ## EC-020 — Docker unavailable or integration state leaks
 
 - **Status:** HANDLED
-- **Product decisions:** D-006
+- **Product decisions:** D-009
 - **Technical decisions:** TD-013
 - **Resolved by:** OD-020
 
@@ -221,7 +221,7 @@ When Docker is unavailable, database integration tests report the missing prereq
 ## EC-021 — Test cleanup targets an external database
 
 - **Status:** HANDLED
-- **Product decisions:** D-006
+- **Product decisions:** D-009
 - **Technical decisions:** TD-014
 - **Resolved by:** OD-021
 
@@ -243,7 +243,7 @@ The application creates one bounded `pg.Pool` at module scope rather than one po
 ## EC-023 — Browser-specific regression outside Chromium
 
 - **Status:** HANDLED
-- **Product decisions:** D-006
+- **Product decisions:** D-009
 - **Technical decisions:** TD-009, TD-014, TD-016
 - **Resolved by:** OD-023
 
@@ -254,7 +254,7 @@ Chromium is the required routine acceptance browser, but it is not treated as pr
 ## EC-024 — Parallel tests collide through shared PostgreSQL state
 
 - **Status:** HANDLED
-- **Product decisions:** D-006
+- **Product decisions:** D-009
 - **Technical decisions:** TD-013, TD-014, TD-017
 - **Resolved by:** OD-024
 
@@ -265,11 +265,11 @@ Database-backed suites run serially while sharing one harness-owned container. A
 ## EC-025 — Sanity network or editorial drift destabilizes routine tests
 
 - **Status:** HANDLED
-- **Product decisions:** D-005, D-006
+- **Product decisions:** D-005, D-009
 - **Technical decisions:** TD-018, TD-023
 - **Resolved by:** OD-025
 
-Routine unit and Playwright suites do not depend on Sanity network access or mutable editorial content. Local fixtures cover mapping and failure behavior, and deterministic test-only landing content covers the browser flow. A separate read-only live smoke detects missing configuration, an absent or unpublished singleton, schema drift, invalid required fields, query failure, or mapping failure before spike completion or release evidence. The test-only source cannot become a deployed fallback.
+Routine unit and Playwright suites do not depend on Sanity network access or mutable editorial content. Local fixtures cover mapping and failure behavior, and deterministic test-only landing content covers the browser flow. A separate read-only live smoke detects missing configuration, an absent or unpublished singleton, schema drift, invalid required fields, query failure, or mapping failure before starter-baseline completion or release evidence. The test-only source cannot become a deployed fallback.
 
 <a id="ec-026"></a>
 

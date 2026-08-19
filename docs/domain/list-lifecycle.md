@@ -13,8 +13,8 @@ owner: product-and-engineering
 - The automatic Inbox may be renamed or deleted like any other list. Deleting the final list leads to a new empty Inbox on the next private workspace load.
 - Any existing list prevents automatic Inbox creation.
 - Deleting a list permanently deletes its tasks.
-- List reads are deterministic and ordered oldest-created first. Manual reordering is outside the spike.
+- List reads are deterministic and ordered oldest-created first. Manual reordering is outside the current todo reference baseline.
 - List reads use forward cursor pagination and return items plus an opaque next cursor.
 - List pages default to 20 records, accept at most 100, and do not return total counts or numbered-page metadata.
 
-Soft deletion, shared lists, and moving tasks between users are outside the spike.
+Soft deletion, shared lists, and moving tasks between users are outside the current todo reference baseline. Derived applications may replace or extend this domain contract through new Product Decisions.

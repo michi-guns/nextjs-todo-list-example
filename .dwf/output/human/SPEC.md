@@ -16,6 +16,8 @@ app routes
 
 The first-class capabilities are `auth`, `landing`, `lists`, and `tasks`. Root `db/`, `migrations/`, and `src/sanity/` are infrastructure seats. `src/shared/` stays small.
 
+The repository is also a reusable starter. Cross-cutting foundations remain independent from todo-specific concepts, while domain and UI behavior stays replaceable through capability boundaries. Implementation follows current stable practices and chooses the simplest robust mechanism. Additional complexity needs a concrete reusable benefit; the starter does not add speculative provider-swapping or framework machinery.
+
 ## Layer responsibilities
 
 - **Domain:** plain entities, invariants, errors, and contracts; no framework/provider imports.
@@ -77,7 +79,7 @@ Use layered proof:
 - Zod and auth/presentation boundary tests;
 - PostgreSQL 18 Testcontainers integration tests using the real migrations for repository behavior, relational constraints, ownership, pagination, and default-Inbox concurrency;
 - local Sanity fixture tests for validation, mapping, optional fields, and required-content failures;
-- one separate read-only smoke that fetches, validates, and maps the real published Sanity singleton before spike completion;
+- one separate read-only smoke that fetches, validates, and maps the real published Sanity singleton before starter-baseline completion;
 - Sanity boundary tests for signature verification, event relevance, duplicate webhook delivery, manual authorization, and shared invalidation behavior;
 - one real Sanity webhook delivery smoke when a deployment is presented as release evidence, while local acceptance may call the signed handler directly;
 - the Playwright sign-in → list → task → status → sign-out journey in Chromium;
@@ -85,9 +87,9 @@ Use layered proof:
 - correct maximum-size cursor pages and sub-50-ms warm database execution for a 20-record page;
 - pnpm typecheck, lint, tests, and local commit hooks.
 
-A full React component unit-test matrix and a per-commit performance benchmark are not required for the spike. The 50-ms target measures only warm database execution, not network, authentication, rendering, CMS access, or Neon compute startup.
+A full React component unit-test matrix and a per-commit performance benchmark are not required for the current starter baseline. The 50-ms target measures only warm database execution, not network, authentication, rendering, CMS access, or Neon compute startup.
 
-Routine repository integration and Playwright tests use a harness-owned local PostgreSQL 18 Testcontainer. The harness applies the real migrations, loads a small deterministic behavior seed, starts a dedicated application server against that container, and cleans up afterward. Database-backed tests run serially while sharing a container. Each test owns a unique user and mutable records, remains independent of order, and does not rely on another test's data. Parallel workers require a separate database or schema per worker and are not required for the spike. Chromium is the required acceptance browser. Firefox and WebKit run separately on demand before a public release and after major UI changes; they do not multiply every routine database-backed run. Routine browser tests use deterministic test-only landing content and need neither Sanity nor Neon credentials. The separate live Sanity smoke uses the configured dedicated resource and is required before spike completion or release evidence. Neon keeps a separate role for migration smoke checks, cloud-driver compatibility, the heavy performance seed, query plans, and the warm-query target. Test cleanup refuses external database URLs.
+Routine repository integration and Playwright tests use a harness-owned local PostgreSQL 18 Testcontainer. The harness applies the real migrations, loads a small deterministic behavior seed, starts a dedicated application server against that container, and cleans up afterward. Database-backed tests run serially while sharing a container. Each test owns a unique user and mutable records, remains independent of order, and does not rely on another test's data. Parallel workers require a separate database or schema per worker and are not required for the current starter baseline. Chromium is the required acceptance browser. Firefox and WebKit run separately on demand before a public release and after major UI changes; they do not multiply every routine database-backed run. Routine browser tests use deterministic test-only landing content and need neither Sanity nor Neon credentials. The separate live Sanity smoke uses the configured dedicated resource and is required before starter-baseline completion or release evidence. Neon keeps a separate role for migration smoke checks, cloud-driver compatibility, the heavy performance seed, query plans, and the warm-query target. Test cleanup refuses external database URLs.
 
 ## Current implementation prerequisites
 

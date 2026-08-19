@@ -47,7 +47,7 @@ Routine Playwright receives deterministic test-only landing content through the 
 
 ## Sanity live smoke
 
-Keep one separate read-only smoke that fetches the published singleton through the real Sanity client and query, validates the unknown payload, and maps the landing view model. It must pass before spike completion and before a deployment is treated as release evidence. Missing configuration or content and query, validation, or mapping failures fail clearly. The smoke never mutates CMS content.
+Keep one separate read-only smoke that fetches the published singleton through the real Sanity client and query, validates the unknown payload, and maps the landing view model. It must pass before starter-baseline completion and before a deployment is treated as release evidence. Missing configuration or content and query, validation, or mapping failures fail clearly. The smoke never mutates CMS content.
 
 ## Neon verification
 

@@ -1,5 +1,21 @@
 # Glossary
 
+## Starter
+
+The opinionated, reusable Next.js foundation that is the repository's primary product.
+
+## Todo reference application
+
+The complete personal-todo implementation used to demonstrate and verify the starter's foundations.
+
+## Starter baseline
+
+The currently accepted local behavior, integration, verification, and quality contract required before the starter reference is considered complete.
+
+## Derived application
+
+A future application created from the starter, expected to replace mostly domain and UI code while retaining or adapting cross-cutting foundations.
+
 ## User
 
 An authenticated person represented by Better Auth.

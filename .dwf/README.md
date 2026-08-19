@@ -2,7 +2,7 @@
 
 DWF Framework version: see [`.framework/VERSION`](.framework/VERSION).
 
-This repository is a standalone public Next.js teaching example for an authenticated personal todo product. The source tree is currently a scaffold; the generated Agent PRD and SPEC describe the implementation contract.
+This repository is a standalone public, opinionated, production-minded Next.js starter implemented through a complete authenticated personal-todo reference application. A derived application should be able to replace mostly the domain and UI while retaining or adapting the cross-cutting foundations. The source tree is currently a scaffold; the generated Agent PRD and SPEC describe the target starter baseline.
 
 ## Start here
 

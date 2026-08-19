@@ -5,7 +5,7 @@ owner: engineering
 
 # Cross-System Consistency
 
-There is intentionally no transactional synchronization between Sanity and PostgreSQL in the spike.
+There is intentionally no transactional synchronization between Sanity and PostgreSQL in the current starter baseline.
 
 - Sanity changes affect landing content only.
 - PostgreSQL changes affect authentication, lists, and tasks.

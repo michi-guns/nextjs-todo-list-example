@@ -6,38 +6,50 @@
 
 This projection is generated from the durable DWF Workspace. It is the precise observable product contract; it does not own decision rationale or implementation mechanisms.
 
-This repository is a **public, standalone example** of a small multi-user todo product on a modern [Next.js stack](../../../docs/architecture/stack.md). Vercel is the intended hosting target, although deployment remains optional for spike completion. The project is intentionally simple in domain and intentionally serious in structure, auth, data split, and local quality tooling.
+This repository is a **public, standalone, opinionated Next.js starter** implemented as a complete personal-todo reference application on the selected [Next.js stack](../../../docs/architecture/stack.md). Vercel is the intended hosting target, although deployment remains optional for starter-baseline completion. The reference domain is intentionally simple; the reusable foundations are production-minded.
 
 ---
 
-## 1. Problem
+## 1. Product purpose and reuse contract
 
-People learning or scaffolding full-stack Next.js apps need a concrete reference that shows:
+- The starter itself is the product; the todo application is its complete reference implementation.
+- A derived application should be able to replace mostly domain and UI code while retaining or adapting the cross-cutting foundations.
+- The starter provides one preferred, modern stack and architecture. It is not a configurable framework for swapping infrastructure providers or architectural styles.
+- The baseline optimizes for high reusable quality without excessive implementation time: use the simplest genuinely robust design and add complexity only when it has a clear, durable payoff.
+
+### Problem
+
+Teams repeatedly spend time rebuilding and reconciling the same cross-cutting foundations before they can focus on a new application's domain and UI. This starter provides one coherent reference that includes:
 
 - authenticated personal data in Postgres
 - editorial marketing content in a CMS
-- clear module boundaries
-- tests and git hooks without pretending to be a production SaaS
+- clear, replaceable domain boundaries
+- secure server boundaries and operational recovery paths
+- layered tests, migrations, documentation, and local quality controls
 
-A todo list is a universally understood domain, so architecture stays visible.
+A todo list is a universally understood reference domain, so the architecture and reusable foundations stay visible.
 
 ## 2. Goals
 
-1. Ship a **complete spike**: a thin but real user journey, not a mock UI only.
-2. Demonstrate **Better Auth** (email/password + magic link) with session-guarded mutations.
-3. Store **lists and tasks** in **Postgres via Drizzle (Neon)**.
-4. Store **landing editorial copy** in **Sanity** (not todos), with automatic published-content revalidation and protected manual recovery.
-5. Expose writes via **Server Actions** and **simple JSON Route Handlers** (UI + future agents).
-6. Validate inputs with **Zod** at server boundaries.
-7. Use **shadcn/ui** with a **richer dashboard-style** signed-in shell (UI quality is part of the experiment).
-8. Prove **Vitest** unit coverage, real local PostgreSQL integration coverage, and **Playwright** happy paths.
-9. Use **Husky + lint-staged** for local quality; no GitHub Actions CI required for spike complete.
-10. Demonstrate that the core cursor reads are index-backed and comfortably fast on a representative Neon development dataset.
+1. Ship a complete, runnable **todo reference baseline**, not a mock UI or disposable prototype.
+2. Keep reusable foundations independent from replaceable todo-domain and UI concerns.
+3. Implement **Better Auth** (email/password + magic link) with session-guarded mutations.
+4. Store **lists and tasks** in **Postgres via Drizzle (Neon)**.
+5. Store **landing editorial copy** in **Sanity** (not todos), with automatic published-content revalidation and protected manual recovery.
+6. Expose writes via **Server Actions** and **simple JSON Route Handlers** (UI + future agents).
+7. Validate inputs with **Zod** at server boundaries.
+8. Use **shadcn/ui** with a richer dashboard-style signed-in shell that demonstrates a replaceable, high-quality product UI.
+9. Prove **Vitest** unit coverage, real local PostgreSQL integration coverage, and **Playwright** happy paths.
+10. Use **Husky + lint-staged** for local quality; no GitHub Actions CI is required for the currently accepted starter baseline.
+11. Demonstrate that the core cursor reads are index-backed and comfortably fast on a representative Neon development dataset.
+12. Prefer current stable best practices and high-leverage production safeguards without adding speculative framework machinery.
 
 ## 3. Non-goals (explicit)
 
-Out of scope for spike complete:
+Out of scope for the current todo reference baseline:
 
+- A universal generator or configurable framework for interchangeable stacks and providers
+- Turnkey production certification, application-specific compliance, or universal operational guarantees
 - Real-time / multiplayer collaboration
 - Native mobile apps
 - OAuth / social login
@@ -117,9 +129,9 @@ Out of scope for spike complete:
 
 Todos are never stored in Sanity.
 
-## 7. Spike complete (acceptance)
+## 7. Starter baseline complete (acceptance)
 
-The spike is complete when all of the following are true **locally**:
+The starter baseline is complete when all of the following are true **locally**:
 
 1. User can register and sign in with **email/password** and with **magic link**.
 2. User can sign out; signed-out users cannot access list/task data.
@@ -128,7 +140,7 @@ The spike is complete when all of the following are true **locally**:
 5. User can create/edit/delete tasks and move status among `todo` / `in_progress` / `done`.
 6. User can show/hide completed tasks.
 7. User can visibly load additional cursor-paginated lists and tasks.
-8. Landing page renders **Sanity-driven** editorial fields (not hardcoded-only forever), and a read-only live smoke proves that the published singleton can be fetched, validated, and mapped before spike completion.
+8. Landing page renders **Sanity-driven** editorial fields (not hardcoded-only forever), and a read-only live smoke proves that the published singleton can be fetched, validated, and mapped before baseline completion.
 9. Mutations available via **Server Actions** and mirrored (or subset) **JSON Route Handlers**.
 10. Zod validates server inputs; duplicate list names and same-list task titles produce a conflict rather than creating duplicate rows.
 11. Vitest covers database-free domain rules, application use cases, and zod schemas (not a full UI unit matrix).
@@ -139,13 +151,15 @@ The spike is complete when all of the following are true **locally**:
 16. Concurrent list and task edits use last-successful-write behavior without weakening ownership, validation, or uniqueness enforcement.
 17. A trusted Sanity webhook automatically refreshes published landing content, and an authorized operator can trigger the same cache invalidation for recovery.
 
-Deployed Vercel preview is **optional**, not required for spike complete.
+Deployed Vercel preview is **optional**, not required for the currently accepted starter baseline.
 
 ## 8. Success metrics (qualitative)
 
 - A new agent can implement features by reading [the supplied DWF bootstrap](../../README.md), [`../../CONTEXT.md`](../../CONTEXT.md), this generated PRD, [`SPEC.md`](./SPEC.md), the decision ledgers, and the supporting project documentation without chat history.
-- Architecture seats (`src/modules/*`, `db`, `src/sanity`) stay obvious as the app grows slightly.
-- Domain remains boring; structure and stack wiring remain the point.
+- A derived application can replace the todo capabilities and product UI without redesigning every cross-cutting foundation.
+- Reusable infrastructure and boundary code do not depend on todo-specific concepts unless the dependency is inherent.
+- Architecture seats (`src/modules/*`, `db`, `src/sanity`) stay obvious as the reference implementation grows.
+- Added complexity has a concrete, durable payoff rather than serving hypothetical flexibility.
 
 ## 9. Open-state visibility
 
@@ -153,4 +167,4 @@ No product behavior is silently inferred from unresolved state. Current open fac
 
 ## 10. Open product decisions
 
-None material for spike start. Defer polish (empty states copy, exact dashboard chrome) to implementation taste within SPEC constraints.
+None material for starter-baseline implementation. Defer low-leverage polish (empty-state wording and exact dashboard chrome) to implementation taste within SPEC constraints.

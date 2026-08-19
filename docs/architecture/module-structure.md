@@ -31,4 +31,4 @@ Drizzle repositories, Sanity adapters, external providers, mappers, and technica
 
 Server Actions, Route Handler adapters, input schemas, view models, and module-owned UI.
 
-Architectural folders are scaffolded here for learning; new feature code should keep files small and add deeper structure when it contains real code.
+Architectural folders make todo-specific code replaceable and keep reusable foundations independent from the reference domain. New feature code should keep files small and add deeper structure only when it contains a real responsibility.

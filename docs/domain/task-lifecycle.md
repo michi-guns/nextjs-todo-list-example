@@ -16,6 +16,6 @@ owner: product-and-engineering
 - Task reads are deterministic and ordered newest-created first. Hiding completed tasks preserves the relative order of remaining tasks.
 - Task reads use forward cursor pagination and return items plus an opaque next cursor.
 - Task pages default to 20 records, accept at most 100, and do not return total counts or numbered-page metadata.
-- Manual task reordering is outside the spike.
+- Manual task reordering is outside the current todo reference baseline.
 
-Recurring tasks, subtasks, tags, comments, attachments, and cross-list movement are outside the spike.
+Recurring tasks, subtasks, tags, comments, attachments, and cross-list movement are outside the current todo reference baseline. Derived applications may replace or extend this domain contract through new Product Decisions.

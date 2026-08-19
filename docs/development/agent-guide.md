@@ -2,7 +2,7 @@
 
 ## Mission
 
-Evolve this standalone example while preserving its domain boundaries, data ownership, and documentation system.
+Evolve this opinionated starter and its todo reference implementation while preserving domain boundaries, reusable foundations, data ownership, and the documentation system.
 
 ## Before coding
 
@@ -14,6 +14,8 @@ Evolve this standalone example while preserving its domain boundaries, data owne
 ## During implementation
 
 - Prefer small vertical slices.
+- Keep cross-cutting foundations independent from todo-specific concepts so derived applications can replace mostly domain and UI code.
+- Use current stable, recommended APIs and the simplest genuinely robust implementation. Add complexity only for a clear reusable benefit; do not build speculative provider-swapping abstractions.
 - Keep domain code framework-independent.
 - Validate untrusted input with Zod.
 - Keep Drizzle and Sanity behind infrastructure adapters.

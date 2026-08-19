@@ -75,7 +75,7 @@ Choose a local mailer, test hook, or equivalent supported by the installed Bette
 
 ### Resolution
 
-In explicitly enabled local/test mode, the Better Auth `sendMagicLink` callback writes the generated email address and verification URL to a temporary, gitignored, file-backed mailbox. Playwright clears the mailbox before the test, requests a link, reads the captured URL, and visits it to verify consumption. The mailbox must be unavailable outside local/test mode and must never be committed. Exact path, serialization format, helper names, and environment-variable names remain implementation choices. A production email provider is outside the local spike requirement.
+In explicitly enabled local/test mode, the Better Auth `sendMagicLink` callback writes the generated email address and verification URL to a temporary, gitignored, file-backed mailbox. Playwright clears the mailbox before the test, requests a link, reads the captured URL, and visits it to verify consumption. The mailbox must be unavailable outside local/test mode and must never be committed. Exact path, serialization format, helper names, and environment-variable names remain implementation choices. A production email provider is outside the current local starter-baseline requirement.
 
 <a id="od-004"></a>
 
@@ -84,7 +84,7 @@ In explicitly enabled local/test mode, the Better Auth `sendMagicLink` callback 
 - **Status:** RESOLVED
 - **Impact:** SPEC
 - **Blocking:** NO
-- **Related:** D-006, TD-003, TD-008
+- **Related:** D-009, TD-003, TD-008
 
 ### Problem / Conflict
 
@@ -113,7 +113,7 @@ Use `/api/auth/*` for Better Auth; `/api/lists` for listing and creating lists; 
 
 ### Problem / Conflict
 
-No Sanity resource is currently configured, and this standalone public example should not depend on an unrelated project's editorial content.
+No Sanity resource is currently configured, and this standalone public starter should not depend on an unrelated project's editorial content.
 
 ### Accepted Constraints
 
@@ -292,7 +292,7 @@ List and task reads had no settled ordering, so the dashboard and JSON API could
 
 ### Accepted Constraints
 
-The spike does not include manual reordering. All consumers of the same application read must receive the same deterministic order.
+The current todo reference baseline does not include manual reordering. All consumers of the same application read must receive the same deterministic order.
 
 ### Decision Required
 
@@ -300,7 +300,7 @@ Choose the default ordering for lists and tasks.
 
 ### Resolution
 
-Order lists by `createdAt` ascending, oldest first. Order tasks by `createdAt` descending, newest first. Completed-task filtering preserves the relative order of the remaining tasks. Equal timestamps require a deterministic tie-breaker, but the exact tie-breaker and query implementation remain implementation choices. Manual reordering is outside this spike.
+Order lists by `createdAt` ascending, oldest first. Order tasks by `createdAt` descending, newest first. Completed-task filtering preserves the relative order of the remaining tasks. Equal timestamps require a deterministic tie-breaker, but the exact tie-breaker and query implementation remain implementation choices. Manual reordering is outside the current todo reference baseline.
 
 <a id="od-013"></a>
 
@@ -392,7 +392,7 @@ Cursor pagination was selected, but the page limits, response metadata, and visi
 
 ### Accepted Constraints
 
-The spike must visibly demonstrate pagination without adding numbered-page navigation or requiring total-count queries.
+The todo reference baseline must visibly demonstrate pagination without adding numbered-page navigation or requiring total-count queries.
 
 ### Decision Required
 
@@ -442,7 +442,7 @@ Indexes alone do not prevent over-fetching, N+1 query patterns, per-request clie
 
 ### Accepted Constraints
 
-Database access should remain simple and measurable. The spike does not need a cache layer, but its main request paths must have bounded work.
+Database access should remain simple and measurable. The current starter baseline does not need an application cache layer for PostgreSQL reads, but its main request paths must have bounded work.
 
 ### Decision Required
 
@@ -450,7 +450,7 @@ Choose the baseline query, client-lifecycle, and Neon connection behavior for li
 
 ### Resolution
 
-Cursor queries must use predicates and ordering that match the required composite indexes. Fetch at most `limit + 1` rows to determine whether `nextCursor` exists, then return no more than `limit` items. Select only the fields required by the application result. Main list/task request paths use a small, bounded number of database queries and must not issue one additional query per returned row. The application runtime reuses one module-level Drizzle/database client rather than creating one per request. Deployed application traffic uses a pooled Neon connection, while schema migrations use a direct connection. Redis and application-level query caching are not part of the spike baseline. Exact projections, query composition, query-count assertions, and client factory names remain implementation choices.
+Cursor queries must use predicates and ordering that match the required composite indexes. Fetch at most `limit + 1` rows to determine whether `nextCursor` exists, then return no more than `limit` items. Select only the fields required by the application result. Main list/task request paths use a small, bounded number of database queries and must not issue one additional query per returned row. The application runtime reuses one module-level Drizzle/database client rather than creating one per request. Deployed application traffic uses a pooled Neon connection, while schema migrations use a direct connection. Redis and application-level query caching are not part of the current starter baseline. Exact projections, query composition, query-count assertions, and client factory names remain implementation choices.
 
 <a id="od-019"></a>
 
@@ -463,7 +463,7 @@ Cursor queries must use predicates and ordering that match the required composit
 
 ### Problem / Conflict
 
-The performance design required enough evidence to catch missing indexes and poor query shapes without turning the spike into a benchmarking project or adopting a production SLA.
+The performance design required enough evidence to catch missing indexes and poor query shapes without turning the starter baseline into a benchmarking project or adopting an application-specific production SLA.
 
 ### Accepted Constraints
 
@@ -471,7 +471,7 @@ Verification should use representative relational volume, exercise privacy scope
 
 ### Decision Required
 
-Choose the representative data, query-plan checks, and modest performance target required for spike completion.
+Choose the representative data, query-plan checks, and modest performance target required for starter-baseline completion.
 
 ### Resolution
 
@@ -484,7 +484,7 @@ On the non-default Neon development branch, provide a repeatable performance see
 - **Status:** RESOLVED
 - **Impact:** BOTH
 - **Blocking:** NO — Docker is required only when running database-backed tests
-- **Related:** D-003, D-004, D-006, TD-005, TD-006, TD-009, EC-020
+- **Related:** D-003, D-004, D-009, TD-005, TD-006, TD-009, EC-020
 
 ### Problem / Conflict
 
@@ -509,7 +509,7 @@ Use `@testcontainers/postgresql` to run PostgreSQL 18 locally for database integ
 - **Status:** RESOLVED
 - **Impact:** SPEC
 - **Blocking:** NO
-- **Related:** D-006, TD-009, TD-012, TD-013, EC-021
+- **Related:** D-009, TD-009, TD-012, TD-013, EC-021
 
 ### Problem / Conflict
 
@@ -561,11 +561,11 @@ Use the battle-tested `node-postgres` package through `drizzle-orm/node-postgres
 - **Status:** RESOLVED
 - **Impact:** SPEC
 - **Blocking:** NO
-- **Related:** D-006, TD-009, TD-014, TD-016, EC-023
+- **Related:** D-009, TD-009, TD-014, TD-016, EC-023
 
 ### Problem / Conflict
 
-Running the full end-to-end journey in Chromium, Firefox, and WebKit on every local test run would multiply database-backed execution time without adding equal value during this spike.
+Running the full end-to-end journey in Chromium, Firefox, and WebKit on every local test run would multiply database-backed execution time without adding equal value for the current starter baseline.
 
 ### Accepted Constraints
 
@@ -577,7 +577,7 @@ Choose the required browser for routine acceptance and the role of Firefox and W
 
 ### Resolution
 
-Run the required Playwright acceptance journey in Chromium. Keep Firefox and WebKit in a separate, explicitly invoked cross-browser run used before a public release and after major UI changes. Firefox and WebKit are not required on every routine run and do not block ordinary spike completion. Exact Playwright project names, script names, and cross-browser invocation remain implementation choices.
+Run the required Playwright acceptance journey in Chromium. Keep Firefox and WebKit in a separate, explicitly invoked cross-browser run used before a public release and after major UI changes. Firefox and WebKit are not required on every routine run and do not block ordinary starter-baseline completion. Exact Playwright project names, script names, and cross-browser invocation remain implementation choices.
 
 <a id="od-024"></a>
 
@@ -586,7 +586,7 @@ Run the required Playwright acceptance journey in Chromium. Keep Firefox and Web
 - **Status:** RESOLVED
 - **Impact:** SPEC
 - **Blocking:** NO
-- **Related:** D-006, TD-013, TD-014, TD-017, EC-020, EC-024
+- **Related:** D-009, TD-013, TD-014, TD-017, EC-020, EC-024
 
 ### Problem / Conflict
 
@@ -610,8 +610,8 @@ Run PostgreSQL repository integration tests and Playwright serially by default w
 
 - **Status:** RESOLVED
 - **Impact:** BOTH
-- **Blocking:** NO — the live smoke requires the dedicated Sanity resource before spike completion
-- **Related:** D-005, D-006, D-008, TD-009, TD-018, TD-023, EC-007, EC-025
+- **Blocking:** NO — the live smoke requires the dedicated Sanity resource before starter-baseline completion
+- **Related:** D-005, D-008, D-009, TD-009, TD-018, TD-023, EC-007, EC-025
 
 ### Problem / Conflict
 
@@ -619,7 +619,7 @@ Routine tests that depend on live Sanity content would be slower and vulnerable 
 
 ### Accepted Constraints
 
-The Sanity adapter must validate unknown external data and fail explicitly when required content is missing or invalid. Routine Playwright must remain deterministic and offline from Sanity, while spike completion still requires evidence from the real dedicated resource.
+The Sanity adapter must validate unknown external data and fail explicitly when required content is missing or invalid. Routine Playwright must remain deterministic and offline from Sanity, while starter-baseline completion still requires evidence from the real dedicated resource.
 
 ### Decision Required
 
@@ -627,7 +627,7 @@ Choose the split between local Sanity tests, routine browser tests, and live int
 
 ### Resolution
 
-Use local fixture tests to cover valid Sanity payload mapping, optional fields, and missing or invalid required-content failures. Routine Playwright uses deterministic test-only landing content through the same application-facing landing contract and requires no Sanity credentials or network access; this test source is unavailable in deployed runtime modes and is not a production fallback. Provide one separate, read-only live Sanity smoke that fetches the published singleton from the dedicated project and dataset, validates it, and maps it to the landing view model. The live smoke must pass before the spike is declared complete and before a deployment is treated as release evidence. It fails clearly when configuration, the document, validation, or mapping is unavailable and never creates or edits CMS content. Exact fixture format, test-source wiring, command name, and evidence output remain implementation choices.
+Use local fixture tests to cover valid Sanity payload mapping, optional fields, and missing or invalid required-content failures. Routine Playwright uses deterministic test-only landing content through the same application-facing landing contract and requires no Sanity credentials or network access; this test source is unavailable in deployed runtime modes and is not a production fallback. Provide one separate, read-only live Sanity smoke that fetches the published singleton from the dedicated project and dataset, validates it, and maps it to the landing view model. The live smoke must pass before the starter baseline is declared complete and before a deployment is treated as release evidence. It fails clearly when configuration, the document, validation, or mapping is unavailable and never creates or edits CMS content. Exact fixture format, test-source wiring, command name, and evidence output remain implementation choices.
 
 ## Non-blocking implementation freedom
 

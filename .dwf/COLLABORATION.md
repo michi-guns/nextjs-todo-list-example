@@ -24,11 +24,13 @@ Last calibrated: 2026-08-19
 - Preserve a clear boundary between product/architecture decisions and choices that should remain free for the implementation agent.
 - Do not create decisions merely to remove every possible implementation choice. Decide only what materially clarifies the product, architecture, boundaries, risks, or expected behavior.
 - If there is disagreement or uncertainty, say so plainly. Do not hide it behind polished wording.
+- Before a broad product-intent or context realignment, scan the repository read-only and present the conflicts and proposed replacements for approval. Do not perform a silent repository-wide wording pass.
 - Use concrete repository examples when they help, but do not lead with paths, signatures, or framework vocabulary when a simpler explanation will do.
 
 ## Working approach
 
-- Keep the product domain intentionally small and understandable; the architecture and learning value are the main point of this example.
+- Keep the todo reference domain intentionally small and understandable. The reusable, production-minded foundations are the product; teaching value is a useful consequence.
+- Favor the simplest modern design that is genuinely robust. Support a little extra complexity when it has a clear, high-leverage payoff, while protecting implementation time from speculative abstraction and low-value polish.
 - Read the installed DWF Framework and relevant Skills before mutating Workspace state. Never modify `.dwf/.framework/**` during ordinary project work.
 - While settling DWF design authority, do not drift into Delivery Roadmaps, Milestones, Phases, or implementation task decomposition.
 - Report evidence, warnings, limitations, and remaining gaps honestly without smoothing over the scaffold's current limitations.
