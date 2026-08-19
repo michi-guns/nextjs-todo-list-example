@@ -502,6 +502,33 @@ Choose the local database mechanism, PostgreSQL version, integration-test scope,
 
 Use `@testcontainers/postgresql` to run PostgreSQL 18 locally for database integration tests, matching the current Neon PostgreSQL major version. Start one ephemeral container for an integration suite run, apply the same versioned Drizzle migrations used by Neon, run the suite, and stop the container afterward. Cover repository mappings, database uniqueness, list-to-task cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Keep unit tests for domain rules, application use cases with fakes, and Zod boundaries free of database and Docker requirements. Isolate database state between integration tests; the exact rollback, truncation, or per-worker database mechanism remains an implementation choice. If Docker is unavailable, database-backed suites fail early with a clear prerequisite error rather than silently skipping, while unit tests remain runnable.
 
+<a id="od-021"></a>
+
+## OD-021 — Local and Neon database testing responsibilities
+
+- **Status:** RESOLVED
+- **Impact:** SPEC
+- **Blocking:** NO
+- **Related:** D-006, TD-009, TD-012, TD-013, EC-021
+
+### Problem / Conflict
+
+With both local Testcontainers PostgreSQL and a Neon development branch available, the contract needed to prevent duplicated test roles, remote-test fragility, unsafe cleanup, and unnecessarily large routine seeds.
+
+### Accepted Constraints
+
+Routine tests should be fast, deterministic, and independent of network credentials. Neon-specific behavior and the agreed performance evidence still need verification against Neon.
+
+### Decision Required
+
+Assign integration, end-to-end, seeding, migration-smoke, and performance responsibilities between local PostgreSQL and Neon.
+
+### Resolution
+
+Local Testcontainers PostgreSQL is the default database for repository integration tests and Playwright. One test command owns the end-to-end lifecycle: start an ephemeral PostgreSQL 18 container, apply the versioned Drizzle migrations, load a small deterministic behavior seed, start a dedicated Next.js test server with the generated container URL, run Playwright, and clean up both processes. The local seed includes enough records for authentication, privacy, list/task behavior, completed filtering, and visible pagination, including another user's records. A local development mode may keep a migrated, seeded container alive for a manual session.
+
+Keep the heavy performance seed separate. Use the non-default Neon development branch for Neon migration smoke verification, deployed-driver compatibility, the representative performance seed, `EXPLAIN ANALYZE`, and the agreed warm-query target. Routine integration and Playwright tests do not require Neon credentials or network access. Destructive test reset/cleanup operates only on a harness-owned local container and must refuse an external database URL. Exact script names, ports, seed-builder APIs, Playwright orchestration hook, and local-container persistence mechanism remain implementation choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

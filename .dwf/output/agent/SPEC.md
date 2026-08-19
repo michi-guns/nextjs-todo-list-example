@@ -330,6 +330,8 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - Cover Drizzle repository mappings, case-insensitive uniqueness, list-to-task cascade deletion, ownership-aware reads and mutations, cursor pagination, and concurrent default-Inbox creation.
 - Isolate database state between tests. Exact rollback, truncation, or per-worker database mechanics remain implementation choices.
 - Docker is a stated prerequisite for database-backed tests. If unavailable, those suites fail early and clearly rather than silently skipping; unit tests remain runnable.
+- Local Testcontainers PostgreSQL is the default integration database. Routine integration tests do not require Neon credentials or network access.
+- Destructive reset and cleanup helpers accept only the connection supplied by their harness-owned local container and refuse external database URLs.
 
 ### 10.3 Playwright
 
@@ -343,6 +345,10 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
   6. Load another task page from seeded data
   7. Sign-out
 - The magic-link Playwright path clears the local/test mailbox, requests a link, reads the captured URL, and visits it to verify link consumption.
+- One local test command starts PostgreSQL 18, applies the versioned migrations, loads a small deterministic behavior seed, starts a dedicated Next.js test server with the generated container URL, runs Playwright, and tears down both server and container.
+- The behavior seed includes enough records for authentication, cross-user privacy, list/task behavior, completed filtering, and visible pagination.
+- Playwright does not depend on Neon credentials or a developer's already-running application server.
+- Exact process wrapper, Playwright setup mechanism, ports, and seed-builder APIs remain implementation choices.
 - CI: **not required** for spike complete.
 
 ### 10.4 Performance evidence
@@ -354,6 +360,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - Verify correct item counts, ordering, continuation, and termination at the maximum 100-record page size.
 - Keep the evidence repeatable and local/manual or integration-level. Do not make the timing threshold a per-commit CI benchmark or treat it as an end-to-end production SLA.
 - Exclude network latency, authentication, rendering, CMS access, and Neon compute startup from the database execution measurement.
+- Keep this performance seed separate from the small local behavior seed. Neon remains the verification environment for this section.
 
 ### 10.5 Local quality
 
@@ -367,6 +374,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 Do not commit secrets. Typical categories:
 
 - Pooled application database URL and direct migration database URL (Neon)
+- Ephemeral local database URL supplied by the Testcontainers harness; never committed
 - Better Auth secret + URL
 - Explicit local/test mailbox enablement and optional temporary path (non-secret)
 - Production magic-link email provider settings if deployment later requires them
@@ -399,7 +407,8 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Module layering respected for lists/tasks/landing
 - [ ] Vitest suite green for agreed scope
 - [ ] PostgreSQL 18 Testcontainers integration suite applies the real migrations and passes the agreed persistence cases
-- [ ] Playwright happy paths green locally
+- [ ] Playwright happy paths run against a harness-owned migrated and seeded local PostgreSQL container
+- [ ] Routine database-backed tests require no Neon credentials; destructive test cleanup refuses external database URLs
 - [ ] Husky + lint-staged active
 - [ ] README explains setup without referencing unrelated products
 

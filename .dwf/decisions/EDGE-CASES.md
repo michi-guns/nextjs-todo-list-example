@@ -215,3 +215,14 @@ The lightweight query target is measured only after Neon compute is active and r
 - **Resolved by:** OD-020
 
 When Docker is unavailable, database integration tests report the missing prerequisite and fail rather than passing through a silent skip; database-free unit tests remain usable. An integration test must not depend on rows left by an earlier test, and failure cleanup must still stop the suite-owned container. The exact state-isolation and process-cleanup helpers remain implementation choices.
+
+<a id="ec-021"></a>
+
+## EC-021 — Test cleanup targets an external database
+
+- **Status:** HANDLED
+- **Product decisions:** D-006
+- **Technical decisions:** TD-014
+- **Resolved by:** OD-021
+
+Routine integration and Playwright reset or cleanup logic accepts only the connection supplied by its own local Testcontainers harness. It refuses Neon and other external database URLs before truncating, dropping, or resetting data. Neon verification uses its own non-destructive or explicitly scoped migration/performance commands and is not reached by ordinary test cleanup.

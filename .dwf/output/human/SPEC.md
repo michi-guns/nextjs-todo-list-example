@@ -78,6 +78,8 @@ Use layered proof:
 
 A full React component unit-test matrix and a per-commit performance benchmark are not required for the spike. The 50-ms target measures only warm database execution, not network, authentication, rendering, CMS access, or Neon compute startup.
 
+Routine repository integration and Playwright tests use a harness-owned local PostgreSQL 18 Testcontainer. The harness applies the real migrations, loads a small deterministic behavior seed, starts a dedicated application server against that container, and cleans up afterward. Those tests do not need Neon credentials. Neon keeps a separate role for migration smoke checks, cloud-driver compatibility, the heavy performance seed, query plans, and the warm-query target. Test cleanup refuses external database URLs.
+
 ## Current implementation prerequisites
 
 No tracked design choice remains open. Current-state inspection found no configured Sanity resource and confirmed that the linked Neon database contains the applied scaffold migration but not the planned `lists` or `tasks` schema. A dedicated Sanity resource and a non-default Neon development branch still need to be provisioned during implementation. These prerequisites remain visible in the factual-question ledger and project context.

@@ -23,3 +23,6 @@ The root `db/` directory is the canonical Drizzle client/schema seat. The root `
 - Do not create a parallel user table outside Better Auth’s adapter schema.
 - Develop and verify schema-changing migrations on a non-default Neon branch before applying the same reviewed migration to the default branch.
 - Apply those same versioned migrations to ephemeral local integration databases; do not maintain a test-only schema.
+- Use local Testcontainers databases for routine integration and Playwright runs; reserve the non-default Neon branch for migration smoke, cloud-driver compatibility, and performance evidence.
+- Keep local behavior data separate from the representative Neon performance seed.
+- Refuse external database URLs in destructive test reset and cleanup helpers.

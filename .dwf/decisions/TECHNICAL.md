@@ -154,3 +154,16 @@ With compute active and relevant data warm, a 20-record database query must exec
 Use `@testcontainers/postgresql` with a PostgreSQL 18 image for real persistence integration tests. One ephemeral container serves an integration suite run and receives the same versioned Drizzle migrations used against Neon. Database-backed tests cover repository mappings, uniqueness constraints, cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Database state is isolated between tests.
 
 Domain, application-with-fakes, and Zod unit tests remain independent of PostgreSQL and Docker. Database-backed suites require Docker and fail clearly when it is unavailable rather than silently skipping. Exact image patch tag, test-file layout, state-reset strategy, and helper names remain implementation choices.
+
+<a id="td-014"></a>
+
+## TD-014 — Local-first test database with Neon verification lane
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-006
+- **Related resolutions:** [OD-006](OPEN-DECISIONS.md#od-006), [OD-019](OPEN-DECISIONS.md#od-019), [OD-020](OPEN-DECISIONS.md#od-020), [OD-021](OPEN-DECISIONS.md#od-021)
+- **Source:** current testing architecture review
+
+Use local Testcontainers PostgreSQL as the default database for repository integration tests and Playwright. The end-to-end harness owns an ephemeral PostgreSQL 18 container, applies the versioned migrations, loads a small deterministic behavior seed, starts a dedicated Next.js test server against the generated container URL, runs the browser journey, and tears down its processes. A local development mode may keep a migrated and seeded container alive for a manual session.
+
+Keep the behavior seed small and separate from the heavy performance seed. Use the non-default Neon development branch for Neon migration smoke verification, deployed-driver compatibility, representative-volume performance data, query plans, and the warm-query target. Routine test suites require neither Neon credentials nor network access. Destructive reset and cleanup code accepts only a harness-owned local container connection. Exact process orchestration, script names, ports, seed APIs, and local-container persistence mechanism remain implementation choices.
