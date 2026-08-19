@@ -15,7 +15,7 @@ Last calibrated: 2026-08-19
 - Add technical detail in proportion to the problem. Do not turn an early design conversation into a technical report.
 - Prefer short, natural paragraphs. Use headings, tables, diagrams, and long lists only when they make the idea easier to understand.
 - When something is unclear, restate it directly using the real project and its actual components rather than an analogy.
-- Ask one focused alignment question at a time when a real choice needs discussion.
+- Present three straightforward, independent decisions in one batch when enough are ready. Keep each item short, numbered, and separately approvable. Use a single focused question when a decision is complex or depends on the previous answer.
 
 ## How we make design decisions
 
@@ -33,7 +33,7 @@ Last calibrated: 2026-08-19
 - While settling DWF design authority, do not drift into Delivery Roadmaps, Milestones, Phases, or implementation task decomposition.
 - Report evidence, warnings, limitations, and remaining gaps honestly without smoothing over the scaffold's current limitations.
 - Prefer small, coherent Git commits. When an atomic piece of work is complete and verified, commit it and push the branch instead of accumulating a large working-tree diff.
-- Treat approval of the active design decision as authorization to document it, validate it, commit it, push it, and immediately begin the next design decision unless the human asks to pause.
+- Treat approval of the active design decision or decision batch as authorization to document the approved items, validate them, commit and push coherent atomic changes, and immediately begin the next batch unless the human asks to pause.
 - Stage only the files that belong to the completed piece. Keep active or unresolved work out of otherwise complete commits.
 - Keep the working tree clean whenever practical. Uncommitted changes should normally mean that a clearly identified piece of work is still active.
 
