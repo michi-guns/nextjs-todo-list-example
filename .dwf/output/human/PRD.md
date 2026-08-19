@@ -16,7 +16,7 @@ anonymous visitor
   → sign out
 ```
 
-The example is intentionally serious about ownership, data boundaries, validation, tests, and local quality without becoming a production SaaS.
+The example is intentionally serious about ownership, data boundaries, validation, tests, and local quality without becoming a production SaaS. Vercel is its intended hosting target, although deployment is not required to complete the local spike.
 
 ## Product boundary
 

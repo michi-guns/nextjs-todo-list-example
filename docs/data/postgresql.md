@@ -9,7 +9,7 @@ related-decisions:
 
 The root `db/` directory is the canonical Drizzle client/schema seat. The root `migrations/` directory contains generated migration artifacts.
 
-The shared runtime driver for Neon and local Testcontainers remains open in [`OD-022`](../../.dwf/decisions/OPEN-DECISIONS.md#od-022). Do not create separate repository implementations for the two environments.
+Use node-postgres through Drizzle's node-postgres adapter as the shared runtime for Neon and local Testcontainers, as settled in [`OD-022`](../../.dwf/decisions/OPEN-DECISIONS.md#od-022). Keep one bounded module-scoped pool, register it for Vercel Fluid Compute lifecycle management, and do not create separate repository implementations for the two environments.
 
 ## Responsibilities
 

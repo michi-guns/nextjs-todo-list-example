@@ -173,7 +173,10 @@ Conceptual model (names may match Drizzle tables closely):
 - Deployed application traffic uses a pooled Neon connection. Schema migrations use a direct Neon connection.
 - Redis and application-level query caching are not part of the spike baseline.
 - Exact query composition, projections, instrumentation, client factory names, and environment-variable names remain implementation choices.
-- The shared standard-PostgreSQL runtime driver remains unresolved in [OD-022](../../decisions/OPEN-DECISIONS.md#od-022). Do not create separate Neon and Testcontainers repository implementations.
+- Use `node-postgres` through `drizzle-orm/node-postgres` as the shared runtime driver in the Next.js Node runtime.
+- Create one bounded, module-scoped `pg.Pool` and pass it to Drizzle; Better Auth and list/task repositories share that database boundary rather than creating independent pools.
+- On Vercel, register the pool with `attachDatabasePool` from `@vercel/functions` for Fluid Compute lifecycle management.
+- Use the pooled Neon URL for application traffic, the direct Neon URL for migrations, and the harness-generated local URL for Testcontainers. Do not create separate Neon and local repository implementations.
 
 ---
 
@@ -387,7 +390,7 @@ Document exact variable names in README when wiring — not in this SPEC body if
 
 ## 12. Implementation notes vs current scaffold
 
-As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, root `db`, Drizzle config, Vitest/Playwright/Husky). The current database client uses Drizzle's Neon HTTP adapter, which does not satisfy the target's shared Neon/local PostgreSQL runtime requirement; resolve OD-022 before persistence implementation. This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`. The canonical design authority is `.dwf/`; Delivery artifacts, when created, belong outside `.dwf/`.
+As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, root `db`, Drizzle config, Vitest/Playwright/Husky). The current database client uses Drizzle's Neon HTTP adapter; the target replaces it with the node-postgres boundary settled in OD-022. This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`. The canonical design authority is `.dwf/`; Delivery artifacts, when created, belong outside `.dwf/`.
 
 ---
 
@@ -396,6 +399,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Better Auth email/password + magic link working locally
 - [ ] Session guards on actions + JSON API
 - [ ] Drizzle schema: auth tables + lists + tasks + required constraints/indexes; migrations applied on Neon/dev DB
+- [ ] One module-scoped node-postgres pool backs Drizzle across Neon and Testcontainers and is registered for Vercel Fluid Compute lifecycle management
 - [ ] Exactly one default Inbox on every listless private workspace load, including after final-list deletion
 - [ ] List CRUD + cascade delete + case-insensitive per-user name uniqueness
 - [ ] Task CRUD + status + hide completed + case-insensitive per-list title uniqueness
@@ -576,4 +580,4 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 
 ### 14.10 Current factual implementation prerequisites
 
-The shared PostgreSQL runtime driver remains open in [OD-022](../../decisions/OPEN-DECISIONS.md#od-022) and must be resolved before persistence implementation. Current external-resource and deployed-schema facts remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); answered absence of a resource does not silently satisfy an implementation prerequisite.
+No tracked design choice remains open. Current external-resource and deployed-schema facts remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); answered absence of a resource does not silently satisfy an implementation prerequisite.

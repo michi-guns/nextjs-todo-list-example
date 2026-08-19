@@ -167,3 +167,16 @@ Domain, application-with-fakes, and Zod unit tests remain independent of Postgre
 Use local Testcontainers PostgreSQL as the default database for repository integration tests and Playwright. The end-to-end harness owns an ephemeral PostgreSQL 18 container, applies the versioned migrations, loads a small deterministic behavior seed, starts a dedicated Next.js test server against the generated container URL, runs the browser journey, and tears down its processes. A local development mode may keep a migrated and seeded container alive for a manual session.
 
 Keep the behavior seed small and separate from the heavy performance seed. Use the non-default Neon development branch for Neon migration smoke verification, deployed-driver compatibility, representative-volume performance data, query plans, and the warm-query target. Routine test suites require neither Neon credentials nor network access. Destructive reset and cleanup code accepts only a harness-owned local container connection. Exact process orchestration, script names, ports, seed APIs, and local-container persistence mechanism remain implementation choices.
+
+<a id="td-015"></a>
+
+## TD-015 — Shared node-postgres runtime with Vercel pool lifecycle
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-001, D-002, D-003, D-004
+- **Related resolution:** [OD-022](OPEN-DECISIONS.md#od-022)
+- **Source:** current database-driver and Vercel hosting review
+
+Use `node-postgres` through `drizzle-orm/node-postgres` for Better Auth and the list/task Drizzle repositories in the Next.js Node runtime. Reuse one bounded, module-scoped `pg.Pool`. On Vercel, register the pool with `attachDatabasePool` from `@vercel/functions` so Fluid Compute can reuse connections and close idle clients before function suspension.
+
+Use Neon's pooled URL for application traffic and its direct URL for migrations. Use the Testcontainers-generated local URL for integration tests and Playwright. Keep one repository implementation across Neon and local PostgreSQL. Exact pool sizing, idle timeout, helper names, environment-variable names, and conditional Vercel registration remain implementation choices.

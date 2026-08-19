@@ -6,7 +6,7 @@
 
 This projection is generated from the durable DWF Workspace. It is the precise observable product contract; it does not own decision rationale or implementation mechanisms.
 
-This repository is a **public, standalone example** of a small multi-user todo product on a modern [Next.js stack](../../../docs/architecture/stack.md). It is intentionally simple in domain and intentionally serious in structure, auth, data split, and local quality tooling.
+This repository is a **public, standalone example** of a small multi-user todo product on a modern [Next.js stack](../../../docs/architecture/stack.md). Vercel is the intended hosting target, although deployment remains optional for spike completion. The project is intentionally simple in domain and intentionally serious in structure, auth, data split, and local quality tooling.
 
 ---
 

@@ -19,6 +19,7 @@ This is a supporting inventory of technologies used by the example. The canonica
 - **Better Auth** — email/password, magic-link, and session handling
 - **PostgreSQL on Neon** — transactional persistence
 - **Drizzle ORM and Drizzle Kit** — typed database access, schema, and migrations
+- **node-postgres** — shared Node-runtime PostgreSQL driver for Neon and local Testcontainers, with Vercel Fluid Compute pool lifecycle management
 - **Sanity** — editable landing-page content only
 
 ## Validation and quality

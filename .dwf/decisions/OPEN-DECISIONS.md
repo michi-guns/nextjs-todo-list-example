@@ -533,10 +533,10 @@ Keep the heavy performance seed separate. Use the non-default Neon development b
 
 ## OD-022 — Shared PostgreSQL runtime driver
 
-- **Status:** OPEN
+- **Status:** RESOLVED
 - **Impact:** SPEC
-- **Blocking:** YES — resolve before implementing the shared Neon/local persistence runtime
-- **Related:** TD-005, TD-011, TD-013, TD-014
+- **Blocking:** NO
+- **Related:** TD-005, TD-011, TD-013, TD-014, TD-015, EC-022
 
 ### Problem / Conflict
 
@@ -550,11 +550,9 @@ One Drizzle repository implementation must run against both a standard local Pos
 
 Choose either `postgres.js` through `drizzle-orm/postgres-js` or `node-postgres` through `drizzle-orm/node-postgres` as the shared runtime driver.
 
-### Current Recommendation — Not Yet Accepted
+### Resolution
 
-Prefer `postgres.js`. Drizzle supports it directly; it uses the standard PostgreSQL protocol for both Neon and Testcontainers; it is actively maintained; and its ESM/TypeScript-oriented client and built-in pool fit this new Node-runtime project. Its client-side speed claims are not the deciding factor because network and query execution dominate this application's database latency. Keep protocol-level prepared statements enabled unless verified compatibility evidence requires otherwise; Neon pooling currently supports them.
-
-Choose `node-postgres` instead if first-class Vercel Fluid Compute pool lifecycle integration becomes a required deployment constraint. Deployed Vercel preview is currently optional, so that advantage does not presently outweigh the `postgres.js` fit. Exact pool size, idle timeout, and client-construction code remain implementation choices after the driver is selected.
+Use the battle-tested `node-postgres` package through `drizzle-orm/node-postgres` as the shared runtime driver. Database-backed Next.js code runs in the Node.js runtime. One bounded, module-scoped `pg.Pool` serves both the Drizzle application repositories and Better Auth integration. On Vercel, register that pool with `attachDatabasePool` from `@vercel/functions` so Fluid Compute can reuse connections across warm requests and close idle clients before suspending an instance. Application traffic uses Neon's pooled connection URL; Drizzle migrations use the direct Neon URL; local integration and Playwright tests use the harness-generated Testcontainers URL. The same Drizzle repository implementation runs in all environments. Exact pool limits, idle timeout, helper names, and conditional Vercel wiring remain implementation choices.
 
 ## Non-blocking implementation freedom
 

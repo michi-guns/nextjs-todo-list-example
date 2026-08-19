@@ -226,3 +226,14 @@ When Docker is unavailable, database integration tests report the missing prereq
 - **Resolved by:** OD-021
 
 Routine integration and Playwright reset or cleanup logic accepts only the connection supplied by its own local Testcontainers harness. It refuses Neon and other external database URLs before truncating, dropping, or resetting data. Neon verification uses its own non-destructive or explicitly scoped migration/performance commands and is not reached by ordinary test cleanup.
+
+<a id="ec-022"></a>
+
+## EC-022 — Vercel suspends a function with idle database clients
+
+- **Status:** HANDLED
+- **Product decisions:** D-001, D-002, D-003, D-004
+- **Technical decisions:** TD-011, TD-015
+- **Resolved by:** OD-022
+
+The application creates one bounded `pg.Pool` at module scope rather than one pool per request. On Vercel, the pool is registered with `attachDatabasePool` so Fluid Compute can reuse connections during warm invocations and close idle clients before suspending the function instance. Application connections still target Neon's pooled endpoint; migration commands do not use the application pool.
