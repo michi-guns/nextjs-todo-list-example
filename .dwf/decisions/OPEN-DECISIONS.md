@@ -127,6 +127,31 @@ Choose whether this example receives an isolated Sanity resource and whether lan
 
 Provision a dedicated Sanity project and dataset for this repository. Store the established headline, blurb, primary CTA, and optional secondary CTA fields in one singleton landing document. Exact project ID, dataset name, document type name, document ID, and environment-variable names remain setup or implementation choices.
 
+<a id="od-006"></a>
+
+## OD-006 — Neon branch-first schema development
+
+- **Status:** RESOLVED
+- **Impact:** SPEC
+- **Blocking:** NO — a development branch must be created before schema-changing implementation begins
+- **Related:** D-003, D-004, TD-005, TD-006, OQ-003
+
+### Problem / Conflict
+
+The workspace is linked to Neon's default `main` branch, while the planned list/task schema requires new migrations that should be tested without changing the default branch first.
+
+### Accepted Constraints
+
+Drizzle migration files remain the versioned schema authority. Migration testing must not rely on ad hoc schema changes or put the default Neon branch at unnecessary risk.
+
+### Decision Required
+
+Choose where schema-changing development and migration verification occur before the default branch receives the migration.
+
+### Resolution
+
+Create a non-default Neon development branch from the current default branch before implementing the list/task schema. Generate, apply, and verify new Drizzle migrations on that development branch first. Apply the same reviewed migration to the default branch only after verification succeeds. Exact branch name, lifetime, and promotion command remain implementation or delivery choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

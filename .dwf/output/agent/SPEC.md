@@ -145,6 +145,13 @@ Conceptual model (names may match Drizzle tables closely):
 
 **Auth tables:** per Better Auth + Drizzle adapter (users, sessions, accounts, verifications, etc.). Do not invent a parallel user table.
 
+### 3.3 Migration workflow
+
+- Before schema-changing implementation, create a non-default Neon development branch from the current default branch.
+- Generate, apply, and verify Drizzle migrations on that development branch.
+- Apply the same reviewed migration to the default branch only after verification succeeds.
+- Exact Neon branch name, lifetime, and migration-promotion command remain implementation or delivery choices.
+
 ---
 
 ## 4. Domain rules

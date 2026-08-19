@@ -30,6 +30,7 @@ The package manifest currently includes Next.js, React, Better Auth, Neon server
 - No repository-resident Delivery tree currently exists.
 - No Delivery System CLI or package script matching the supplied mental model was found in the repository.
 - A read-only inspection on 2026-08-19 verified that the workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch.
+- No non-default Neon development branch was created during design work; OD-006 requires one before schema-changing implementation.
 - The live Drizzle migration ledger contains one applied migration whose SHA-256 hash exactly matches `migrations/20260807190126_silly_vivisector/migration.sql`.
 - The live schema contains `account`, `session`, `users`, `verification`, and the scaffold `posts_table`. Planned `lists` and `tasks` tables are not present.
 - No Sanity project, dataset, or document was discoverable or contacted.

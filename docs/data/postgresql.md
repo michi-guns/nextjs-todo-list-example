@@ -20,3 +20,4 @@ The root `db/` directory is the canonical Drizzle client/schema seat. The root `
 - Keep Drizzle row types inside infrastructure.
 - Keep migrations versioned and reviewable.
 - Do not create a parallel user table outside Better Auth’s adapter schema.
+- Develop and verify schema-changing migrations on a non-default Neon branch before applying the same reviewed migration to the default branch.

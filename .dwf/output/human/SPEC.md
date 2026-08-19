@@ -38,7 +38,7 @@ Local magic-link verification uses an explicitly enabled, temporary, gitignored,
 
 A missing private resource and one owned by another user produce the same application-level `not_found` outcome. JSON handlers map both to `404` with code `not_found`; Server Actions expose the equivalent generic result.
 
-PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownership, status, timestamps, and relational integrity. Lists and tasks own their repository ports. Drizzle row types stay inside infrastructure. List deletion uses a database cascade, and default `Inbox` creation is atomic and idempotent.
+PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownership, status, timestamps, and relational integrity. Lists and tasks own their repository ports. Drizzle row types stay inside infrastructure. List deletion uses a database cascade, and default `Inbox` creation is atomic and idempotent. Schema-changing migrations are developed and verified on a non-default Neon branch before the same reviewed migration is applied to the default branch.
 
 ## Sanity boundary
 
@@ -74,4 +74,4 @@ A full React component unit-test matrix is not required for the spike.
 
 ## Current implementation prerequisites
 
-No tracked design choice remains open. Current-state inspection found no configured Sanity resource and confirmed that the linked Neon database contains the applied scaffold migration but not the planned `lists` or `tasks` schema. These implementation prerequisites remain visible in the factual-question ledger and project context.
+No tracked design choice remains open. Current-state inspection found no configured Sanity resource and confirmed that the linked Neon database contains the applied scaffold migration but not the planned `lists` or `tasks` schema. A dedicated Sanity resource and a non-default Neon development branch still need to be provisioned during implementation. These prerequisites remain visible in the factual-question ledger and project context.

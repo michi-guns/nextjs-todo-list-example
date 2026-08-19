@@ -51,9 +51,10 @@ Keep Better Auth instances, raw session records, and auth route wiring behind th
 
 - **Status:** ACCEPTED
 - **Related product decisions:** D-001, D-003, D-004
+- **Related resolution:** [OD-006](OPEN-DECISIONS.md#od-006)
 - **Source:** ADR-0003
 
-Use PostgreSQL on Neon with Drizzle for Better Auth records, lists, tasks, ownership, timestamps, status, relational integrity, and migrations. Do not create a parallel user table outside the Better Auth adapter schema. Lists and tasks require owner checks and durable relational constraints; deleting a list cascades to its tasks at the database boundary.
+Use PostgreSQL on Neon with Drizzle for Better Auth records, lists, tasks, ownership, timestamps, status, relational integrity, and migrations. Do not create a parallel user table outside the Better Auth adapter schema. Lists and tasks require owner checks and durable relational constraints; deleting a list cascades to its tasks at the database boundary. Develop and verify schema-changing migrations on a non-default Neon branch before applying the same reviewed migration to the default branch.
 
 This keeps relational constraints and TypeScript schema close together; local development consequently requires database configuration and migration discipline.
 

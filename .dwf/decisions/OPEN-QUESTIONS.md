@@ -63,7 +63,7 @@ No Sanity project, dataset, document type, or published landing document is curr
 - **Status:** ANSWERED
 - **Blocking:** NO for current-state verification — the planned list/task schema still needs implementation and migration
 - **Source:** linked Neon status, read-only `information_schema` queries, live Drizzle migration ledger, and local migration hash on 2026-08-19
-- **Related:** D-003, D-004, TD-005, TD-006
+- **Related:** D-003, D-004, TD-005, TD-006, OD-006
 
 ### Exact Question
 
@@ -81,4 +81,4 @@ A safe local/development database inspection during implementation preparation.
 
 The workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch. The live Drizzle ledger contains one applied migration. Its stored hash exactly matches the SHA-256 hash of `migrations/20260807190126_silly_vivisector/migration.sql`, confirming that the current local migration was applied.
 
-The live schema contains the Better Auth tables `account`, `session`, `users`, and `verification`, plus the scaffold `posts_table`. It does not contain the planned `lists` or `tasks` tables. No migration for those tables currently exists.
+The live schema contains the Better Auth tables `account`, `session`, `users`, and `verification`, plus the scaffold `posts_table`. It does not contain the planned `lists` or `tasks` tables. No migration for those tables currently exists. OD-006 requires that migration to be developed and verified on a non-default Neon branch before it is applied to the default branch.
