@@ -217,22 +217,22 @@ No list/task documents.
 
 ---
 
-## 7. HTTP / Action API sketch
+## 7. HTTP / Action API contract
 
-Exact paths may vary; behavior must match.
+The paths and parameter names below are stable API contracts.
 
 ### 7.1 JSON Route Handlers (session required unless noted)
 
-| Method | Path                   | Body / query                  | Result       |
-| ------ | ---------------------- | ----------------------------- | ------------ |
-| GET    | `/api/lists`           | —                             | user’s lists |
-| POST   | `/api/lists`           | `{ name }`                    | created list |
-| PATCH  | `/api/lists/:id`       | `{ name }`                    | renamed      |
-| DELETE | `/api/lists/:id`       | —                             | deleted      |
-| GET    | `/api/lists/:id/tasks` | `?includeCompleted=`          | tasks        |
-| POST   | `/api/lists/:id/tasks` | `{ title, notes? }`           | created task |
-| PATCH  | `/api/tasks/:id`       | `{ title?, notes?, status? }` | updated      |
-| DELETE | `/api/tasks/:id`       | —                             | deleted      |
+| Method | Path                       | Body / query                  | Result       |
+| ------ | -------------------------- | ----------------------------- | ------------ |
+| GET    | `/api/lists`               | —                             | user’s lists |
+| POST   | `/api/lists`               | `{ name }`                    | created list |
+| PATCH  | `/api/lists/:listId`       | `{ name }`                    | renamed      |
+| DELETE | `/api/lists/:listId`       | —                             | deleted      |
+| GET    | `/api/lists/:listId/tasks` | `?includeCompleted=`          | tasks        |
+| POST   | `/api/lists/:listId/tasks` | `{ title, notes? }`           | created task |
+| PATCH  | `/api/tasks/:taskId`       | `{ title?, notes?, status? }` | updated      |
+| DELETE | `/api/tasks/:taskId`       | —                             | deleted      |
 
 Auth routes: Better Auth defaults under `/api/auth/*` (public where appropriate).
 
@@ -478,6 +478,6 @@ interface TaskRepository {
 
 Adapters keep Drizzle row types private. Repository methods enforce ownership through their query boundary; presentation does not coordinate raw table reads.
 
-### 14.10 Unresolved implementation choices
+### 14.10 Current factual implementation prerequisites
 
-Exact API path spelling remains tracked in [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Factual integration gaps remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); they are not silently resolved by this SPEC projection.
+No tracked design choice remains open. Current external-resource and deployed-schema facts remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); answered absence of a resource does not silently satisfy an implementation prerequisite.

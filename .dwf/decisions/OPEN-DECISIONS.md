@@ -81,14 +81,14 @@ In explicitly enabled local/test mode, the Better Auth `sendMagicLink` callback 
 
 ## OD-004 — Exact API path spelling
 
-- **Status:** OPEN
+- **Status:** RESOLVED
 - **Impact:** SPEC
 - **Blocking:** NO
 - **Related:** D-006, TD-003, TD-008
 
 ### Problem / Conflict
 
-The JSON API behavior is specified, but exact route spelling remains implementation freedom until a consumer requires stable paths.
+The JSON API behavior was specified, but exact route spelling needed to become stable for consumers and verification.
 
 ### Accepted Constraints
 
@@ -100,7 +100,7 @@ Choose and document exact paths if an external consumer or implementation conven
 
 ### Resolution
 
-Pending.
+Use `/api/auth/*` for Better Auth; `/api/lists` for listing and creating lists; `/api/lists/:listId` for renaming and deleting one list; `/api/lists/:listId/tasks` for listing and creating tasks in a list; and `/api/tasks/:taskId` for updating and deleting one task. Supported methods and payloads remain those in the Agent SPEC.
 
 ## Non-blocking implementation freedom
 

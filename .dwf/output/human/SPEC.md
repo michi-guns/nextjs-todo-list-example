@@ -57,6 +57,8 @@ The minimum application APIs cover:
 
 Exact signatures and data contracts are in the [Agent SPEC](../agent/SPEC.md).
 
+The stable JSON route families are `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`. Better Auth owns `/api/auth/*`.
+
 ## Verification
 
 Use layered proof:
@@ -70,6 +72,6 @@ Use layered proof:
 
 A full React component unit-test matrix is not required for the spike.
 
-## Unresolved state
+## Current implementation prerequisites
 
-Exact API paths remain open. Current-state inspection found no configured Sanity resource and confirmed that the linked Neon database contains the applied scaffold migration but not the planned `lists` or `tasks` schema. These implementation prerequisites remain visible in the factual-question ledger and project context.
+No tracked design choice remains open. Current-state inspection found no configured Sanity resource and confirmed that the linked Neon database contains the applied scaffold migration but not the planned `lists` or `tasks` schema. These implementation prerequisites remain visible in the factual-question ledger and project context.
