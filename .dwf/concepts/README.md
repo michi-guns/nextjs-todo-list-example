@@ -4,9 +4,9 @@ Developer Concepts are derived, non-authoritative explanations that connect cano
 
 ## Architectural Subsystem Concepts
 
-- [`AS-001 — Authenticated User Boundary`](authenticated-user-boundary/README.md)
+- [`AS-001 — Authentication Service`](authentication-service/README.md)
 
-See the compact [`Architectural Subsystem inventory`](ARCHITECTURAL-SUBSYSTEMS.md) for canonical basis, boundary, and known consumers.
+See the compact [`Architectural Subsystem inventory`](ARCHITECTURAL-SUBSYSTEMS.md) for each subsystem's identity, canonical basis, boundary, and known consumers.
 
 ## Other Developer Concepts
 

@@ -1,24 +1,29 @@
-# AS-001 — Authenticated User Boundary
+# AS-001 — Authentication Service
 
 **Concept kind:** Architectural Subsystem
 
 **Architectural Subsystem:** AS-001
 
-**Derived explanation.** This Concept explains architecture already established by [`TD-004`](../../decisions/TECHNICAL.md#td-004) and the [Agent SPEC authentication boundary](../../output/agent/SPEC.md#143-authentication-boundary). It does not create product or technical truth.
+**Derived explanation.** This Concept explains the authentication capability already established by [`D-002`](../../decisions/PRODUCT.md#d-002), [`TD-002`](../../decisions/TECHNICAL.md#td-002), [`TD-004`](../../decisions/TECHNICAL.md#td-004), and the [Agent SPEC auth design](../../output/agent/SPEC.md#2-auth-better-auth). It does not create product or technical truth.
 
 ## Quick reload
 
-- This is the server-only application boundary around Better Auth session identity.
-- It translates the active session into a small application-owned `CurrentUser` representation.
-- Private pages, list flows, task flows, JSON handlers, and first-use Inbox behavior consume it.
+- This is the application's authentication component around Better Auth.
+- It supports email/password authentication, magic links, sign-out, and server-side session resolution.
+- It translates the active session into a small application-owned `CurrentUser` representation for private operations.
+- Authentication presentation, private pages, list flows, task flows, JSON handlers, and first-use Inbox behavior consume it.
 - Client-provided user IDs never determine ownership identity.
 - Better Auth records and provider details stay behind the boundary.
 
+## Identity
+
+The Authentication Service is the application's single architectural component for authentication. It gives authentication flows and private server operations one stable application-facing interface while keeping Better Auth integration details internal.
+
 ## Boundary
 
-The subsystem answers whether the current server operation has an authenticated user and, when it does, returns the application-facing identity for that user.
+The subsystem owns the application integration required to sign users up and in with email/password, request and consume magic links, sign users out, resolve sessions, and return the trusted current-user identity.
 
-Its semantic operations are equivalent to:
+Its current-user operations are semantically equivalent to:
 
 ```ts
 type CurrentUser = {
@@ -31,33 +36,40 @@ getCurrentUser(): Promise<CurrentUser | null>
 requireUser(): Promise<CurrentUser>
 ```
 
-These names and their concrete file grouping remain implementation choices. Their behavior and returned application-facing identity are the settled boundary.
+The concrete function names, Better Auth calls, and file grouping remain implementation choices. The supported authentication methods, trusted session behavior, and returned application-facing identity are the settled boundary.
 
 ## Responsibilities
 
-- Resolve the current Better Auth session at a server operation boundary.
+- Configure and integrate Better Auth for the accepted authentication methods.
+- Support email/password sign-up and sign-in.
+- Support magic-link request and consumption.
+- Support sign-out.
+- Resolve the current Better Auth session at private server operation boundaries.
 - Map authenticated identity into the application-owned `CurrentUser` shape.
-- Keep Better Auth instances, raw session records, and provider types out of consuming modules.
+- Keep Better Auth instances, raw records, provider types, and integration details out of consuming modules.
 - Ensure ownership identity comes from the trusted session rather than browser input.
-- Give private pages, Server Actions, and Route Handlers one consistent application-facing authentication boundary.
+- Give authentication flows, private pages, Server Actions, and Route Handlers one consistent application-facing authentication component.
 
 ## Non-responsibilities
 
 - Determining whether a specific list or task belongs to the current user.
 - Validating list or task input.
 - Creating the default Inbox.
-- Choosing presentation behavior such as redirects, action results, or JSON status codes.
+- Owning authentication-page UI or choosing presentation behavior such as redirects, action results, or JSON status codes.
 - Implementing list/task persistence.
-- Defining the sign-up, sign-in, sign-out, or magic-link user experience.
+- Defining product behavior for authentication methods outside email/password and magic link.
 
 ## Dependencies
 
 - Better Auth and its server-side session facilities.
 - Better Auth persistence through the repository's existing Drizzle/PostgreSQL integration.
+- An email delivery mechanism for magic links in each supported environment.
 - Server request context as required by the selected Better Auth integration.
 
 ## Known consumers
 
+- Sign-up, sign-in, magic-link, and sign-out presentation flows.
+- Better Auth Route Handler composition under the application's auth API route.
 - Authenticated app pages and dashboard composition.
 - List Server Actions and private list Route Handlers.
 - Task Server Actions and private task Route Handlers.
@@ -70,12 +82,15 @@ Consumers receive `CurrentUser` or an unauthenticated outcome. They do not recei
 - Every private read and mutation authenticates at its operation boundary.
 - Middleware may improve navigation behavior but never replaces operation-level authentication.
 - The session user ID is the ownership identity passed into list and task application use cases.
+- Email/password and magic link are the supported sign-in methods; OAuth and social login remain out of scope.
 - Raw Better Auth records and provider-specific types do not cross into list, task, or landing contracts.
 
 ## Verification
 
 The subsystem can be verified independently of completed list/task features:
 
+- Email/password sign-up, sign-in, and sign-out produce the expected authentication state changes.
+- A requested magic link can be consumed to establish the expected authenticated session.
 - An authenticated session maps to the expected application-owned `CurrentUser` fields.
 - An unauthenticated operation does not receive a `CurrentUser` from `requireUser`.
 - `getCurrentUser` represents the absence of an authenticated user as `null`.
@@ -87,8 +102,9 @@ The subsystem can be verified independently of completed list/task features:
 The implementation agent may choose:
 
 - Exact files and folder grouping inside the auth capability.
-- Functions, a service object, or equivalent internal composition.
+- Functions, objects, or equivalent internal composition; the architectural name does not require a class named `AuthenticationService`.
 - Better Auth API calls and adapter details compatible with the installed version.
+- The local email-delivery or test mechanism selected when the corresponding open decision is resolved.
 - Internal error types and test-double strategy.
 - Optional middleware for navigation convenience, provided operation-level authentication remains authoritative.
 
@@ -96,6 +112,7 @@ The implementation agent may choose:
 
 - [`D-001 — Personal authenticated workspace`](../../decisions/PRODUCT.md#d-001)
 - [`D-002 — Password and magic-link authentication`](../../decisions/PRODUCT.md#d-002)
+- [`TD-002 — Four capability modules and explicit infrastructure seats`](../../decisions/TECHNICAL.md#td-002)
 - [`TD-003 — Layered dependency direction and composition-only routes`](../../decisions/TECHNICAL.md#td-003)
 - [`TD-004 — Server-only Better Auth application boundary`](../../decisions/TECHNICAL.md#td-004)
 - [`RULE-006 — Validate and isolate untrusted boundaries`](../../RULES.md#rule-006)
