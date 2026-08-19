@@ -245,3 +245,13 @@ Domain and application tests remain the main business-behavior suite. JSON Route
 - **Source:** current test-coverage review
 
 Do not require a minimum code-coverage percentage. Every behavior required by the Agent SPEC must have suitable test evidence. Coverage reports may reveal untested code and guide review, but a percentage does not replace behavior-based acceptance.
+
+<a id="td-022"></a>
+
+## TD-022 — Same-origin session-authenticated JSON API baseline
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-001, D-002, D-006
+- **Source:** current JSON API audience review
+
+Treat the list and task JSON Route Handlers as same-origin application endpoints authenticated by the existing Better Auth browser session. Do not enable cross-origin access or add bearer-token, API-key, JWT, or separate machine-authentication support for the baseline. Supporting external agents or third-party clients requires a later authentication and authorization decision.

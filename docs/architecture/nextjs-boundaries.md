@@ -17,7 +17,7 @@ Use for UI-triggered mutations. Each action authenticates, authorizes, validates
 
 ## Route Handlers
 
-Use for JSON APIs, Better Auth handlers, callbacks, webhooks when later added, and integration boundaries. Treat them as untrusted entry points.
+Use for JSON APIs, Better Auth handlers, callbacks, webhooks, and integration boundaries. Treat them as untrusted entry points. The private list and task JSON routes remain same-origin and use the Better Auth browser session; do not add cross-origin or machine authentication without a new decision.
 
 ## Client Components
 

@@ -62,6 +62,8 @@ Exact signatures and data contracts are in the [Agent SPEC](../agent/SPEC.md).
 
 The stable JSON route families are `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`. List and task GET routes accept opaque `cursor` and `limit` query parameters and return `{ items, nextCursor }`; cursors never provide ownership identity. Omitted limits mean 20, the maximum is 100, and responses do not include total counts or numbered-page metadata. Better Auth owns `/api/auth/*`.
 
+The private JSON routes are same-origin application endpoints authenticated by the existing Better Auth browser session. The baseline does not enable cross-origin access or add bearer tokens, API keys, JWTs, or another machine-authentication flow. A future product may add external-agent access through a separate authentication and authorization decision.
+
 ## Verification
 
 Use layered proof:

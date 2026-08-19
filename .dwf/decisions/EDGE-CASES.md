@@ -270,3 +270,13 @@ Database-backed suites run serially while sharing one harness-owned container. A
 - **Resolved by:** OD-025
 
 Routine unit and Playwright suites do not depend on Sanity network access or mutable editorial content. Local fixtures cover mapping and failure behavior, and deterministic test-only landing content covers the browser flow. A separate read-only live smoke detects missing configuration, an absent or unpublished singleton, schema drift, invalid required fields, query failure, or mapping failure before spike completion or release evidence. The test-only source cannot become a deployed fallback.
+
+<a id="ec-026"></a>
+
+## EC-026 — Non-session client calls the private JSON API
+
+- **Status:** HANDLED
+- **Product decisions:** D-001, D-002
+- **Technical decisions:** TD-004, TD-022
+
+A caller presents a bearer token, API key, or cross-origin request without the application's valid Better Auth session cookie. The private list and task routes do not treat that credential as authentication and return the ordinary unauthenticated outcome. Adding machine or third-party access requires a separate decision rather than silently broadening the baseline API.

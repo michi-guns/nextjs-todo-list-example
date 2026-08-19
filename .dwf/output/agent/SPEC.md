@@ -291,6 +291,8 @@ The paths and parameter names below are stable API contracts.
 
 Auth routes: Better Auth defaults under `/api/auth/*` (public where appropriate).
 
+The private list and task JSON routes are same-origin application endpoints authenticated by the existing Better Auth browser session. Do not enable cross-origin access or accept bearer tokens, API keys, JWTs, or another machine credential for these routes. External agent or third-party access requires a later authentication and authorization decision.
+
 For paginated GET routes, omitted `limit` means 20 and accepted values are integers from 1 through 100. Responses do not include total counts or numbered-page metadata.
 
 Errors use consistent JSON `{ error: { code, message } }`: unauthenticated requests use `401`; missing and other-owned private resources both use `404` with code `not_found`; uniqueness conflicts use `409` with code `conflict`; invalid input, including malformed or context-incompatible cursors, uses `422`. Private list/task handlers do not expose a distinct `403` ownership response. Server Actions map the same application outcomes without revealing resource existence.
