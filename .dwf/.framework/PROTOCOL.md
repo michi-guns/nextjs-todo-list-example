@@ -46,11 +46,20 @@ The Framework may contain:
 .framework/
 ├── VERSION
 ├── PROTOCOL.md
+├── PROPOSALS.md   # optional local framework-enhancement ledger
 ├── skills/
 ├── templates/
 ├── schemas/       # only when implemented
 └── validators/    # only when implemented
 ```
+
+### Local framework proposals
+
+Until the Framework has a canonical distribution repository, a local installation may use `PROPOSALS.md` to preserve reusable framework improvements discovered during project work.
+
+The proposal ledger is Framework-owned and must contain only generic DWF improvements, never project-specific product or technical truth. Proposals are non-authoritative until intentionally integrated into the relevant protocol, Skill, template, glossary, schema, or validator and included in a versioned Framework revision.
+
+Use stable proposal IDs and preserve resolved entries as history. An accepted proposal may remain pending integration; acceptance records intent, while the current Framework contract remains the installed protocol and executable machinery.
 
 Do not create fake automation. If a capability is semantic-only, say so. If an executable validator/schema exists, package the real implementation.
 
