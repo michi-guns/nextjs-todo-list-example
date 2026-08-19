@@ -120,13 +120,13 @@ Conceptual model (names may match Drizzle tables closely):
 
 ### 3.1 `lists`
 
-| Column      | Type        | Notes                        |
-| ----------- | ----------- | ---------------------------- |
-| `id`        | uuid / text | PK                           |
-| `userId`    | uuid / text | owner, indexed, FK to user   |
-| `name`      | text        | required, trimmed, non-empty |
-| `createdAt` | timestamptz | required                     |
-| `updatedAt` | timestamptz | required                     |
+| Column      | Type        | Notes                              |
+| ----------- | ----------- | ---------------------------------- |
+| `id`        | uuid / text | PK                                 |
+| `userId`    | uuid / text | owner, indexed, FK to user         |
+| `name`      | text        | required, trimmed, 1–80 characters |
+| `createdAt` | timestamptz | required                           |
+| `updatedAt` | timestamptz | required                           |
 
 ### 3.2 `tasks`
 
@@ -158,7 +158,7 @@ Conceptual model (names may match Drizzle tables closely):
 
 ### 4.1 List
 
-- Name min length 1 after trim; max length recommended 80.
+- Name length is 1–80 characters inclusive after trimming.
 - User can only mutate own lists.
 - Delete list is always hard delete + cascade tasks (no soft delete in spike).
 

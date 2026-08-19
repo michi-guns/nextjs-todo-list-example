@@ -28,9 +28,9 @@ The spike must demonstrate email/password sign-up and sign-in plus magic-link re
 
 - **Status:** ACCEPTED
 - **Source:** PRD, section 5.1
-- **Related:** [Agent PRD](../output/agent/PRD.md#51-lists)
+- **Related:** [OD-007](OPEN-DECISIONS.md#od-007), [Agent PRD](../output/agent/PRD.md#51-lists)
 
-A user may own many lists. On first authenticated use, when the user has no lists, the product creates one list named `Inbox`; the behavior is idempotent. Users may create, rename, and delete lists. Deleting a list removes its tasks.
+A user may own many lists. List names are trimmed and must contain 1–80 characters. On first authenticated use, when the user has no lists, the product creates one list named `Inbox`; the behavior is idempotent. Users may create, rename, and delete lists. Deleting a list removes its tasks.
 
 <a id="d-004"></a>
 

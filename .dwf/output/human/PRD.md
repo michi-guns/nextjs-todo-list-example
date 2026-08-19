@@ -28,7 +28,7 @@ The example is intentionally serious about ownership, data boundaries, validatio
 
 ## Lists and tasks
 
-A user can own many lists. If the user has no lists on first authenticated use, the product creates an `Inbox` list. Lists can be created, renamed, and deleted; deleting a list removes its tasks.
+A user can own many lists. List names are trimmed and contain 1–80 characters. If the user has no lists on first authenticated use, the product creates an `Inbox` list. Lists can be created, renamed, and deleted; deleting a list removes its tasks.
 
 Each task belongs to exactly one list and has:
 

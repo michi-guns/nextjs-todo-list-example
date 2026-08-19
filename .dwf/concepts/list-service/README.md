@@ -72,6 +72,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 ## Important invariants
 
 - Every list read and mutation is scoped to the authenticated user ID.
+- List names are trimmed and contain 1–80 characters.
 - A user with zero lists receives exactly one automatic Inbox, including under concurrent first use.
 - An existing list of any name prevents automatic Inbox creation.
 - One user cannot read, rename, or delete another user's list.
@@ -86,6 +87,7 @@ The subsystem can be verified independently of completed task presentation:
 - Repeated or concurrent default-Inbox requests do not create duplicates.
 - A user who already has any list does not receive an automatic Inbox.
 - List create, list, rename, and delete operations affect only the authenticated owner's rows.
+- List creation and rename reject names outside the accepted 1–80 character range after trimming.
 - Attempts to operate on another user's list produce the same `not_found` outcome as a nonexistent list.
 - Deleting a list removes its tasks at the database boundary.
 - Application-facing list results do not expose Drizzle row types.

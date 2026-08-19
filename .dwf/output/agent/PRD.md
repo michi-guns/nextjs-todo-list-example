@@ -67,6 +67,7 @@ Out of scope for spike complete:
 ### 5.1 Lists
 
 - A user has **many lists**.
+- List names are trimmed and contain **1–80 characters**.
 - On **first sign-in**, create a default list named **Inbox** if none exist.
 - List operations: **create**, **rename**, **delete**.
 - Deleting a list **cascade-deletes** its tasks.

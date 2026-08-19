@@ -152,6 +152,31 @@ Choose where schema-changing development and migration verification occur before
 
 Create a non-default Neon development branch from the current default branch before implementing the list/task schema. Generate, apply, and verify new Drizzle migrations on that development branch first. Apply the same reviewed migration to the default branch only after verification succeeds. Exact branch name, lifetime, and promotion command remain implementation or delivery choices.
 
+<a id="od-007"></a>
+
+## OD-007 — List name length
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-003, TD-008, EC-002
+
+### Problem / Conflict
+
+List names were required and non-empty after trimming, but their maximum accepted length was only a recommendation.
+
+### Accepted Constraints
+
+The same limit must be enforced consistently by application validation, Server Actions, and JSON Route Handlers.
+
+### Decision Required
+
+Choose the accepted list-name length range.
+
+### Resolution
+
+After trimming, a list name must contain between 1 and 80 characters inclusive.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.
