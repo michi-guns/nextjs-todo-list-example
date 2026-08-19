@@ -529,6 +529,33 @@ Local Testcontainers PostgreSQL is the default database for repository integrati
 
 Keep the heavy performance seed separate. Use the non-default Neon development branch for Neon migration smoke verification, deployed-driver compatibility, the representative performance seed, `EXPLAIN ANALYZE`, and the agreed warm-query target. Routine integration and Playwright tests do not require Neon credentials or network access. Destructive test reset/cleanup operates only on a harness-owned local container and must refuse an external database URL. Exact script names, ports, seed-builder APIs, Playwright orchestration hook, and local-container persistence mechanism remain implementation choices.
 
+<a id="od-022"></a>
+
+## OD-022 — Shared PostgreSQL runtime driver
+
+- **Status:** OPEN
+- **Impact:** SPEC
+- **Blocking:** YES — resolve before implementing the shared Neon/local persistence runtime
+- **Related:** TD-005, TD-011, TD-013, TD-014
+
+### Problem / Conflict
+
+The current scaffold uses `@neondatabase/serverless` through Drizzle's `neon-http` adapter. That transport targets Neon and cannot serve as the shared standard PostgreSQL driver for the approved local Testcontainers environment. Maintaining separate Neon and local repository implementations would weaken test parity.
+
+### Accepted Constraints
+
+One Drizzle repository implementation must run against both a standard local PostgreSQL connection and Neon from the Next.js Node runtime. Application traffic uses the pooled Neon URL, migrations use the direct Neon URL, and tests use the harness-generated local container URL. Pool creation remains bounded and module-scoped.
+
+### Decision Required
+
+Choose either `postgres.js` through `drizzle-orm/postgres-js` or `node-postgres` through `drizzle-orm/node-postgres` as the shared runtime driver.
+
+### Current Recommendation — Not Yet Accepted
+
+Prefer `postgres.js`. Drizzle supports it directly; it uses the standard PostgreSQL protocol for both Neon and Testcontainers; it is actively maintained; and its ESM/TypeScript-oriented client and built-in pool fit this new Node-runtime project. Its client-side speed claims are not the deciding factor because network and query execution dominate this application's database latency. Keep protocol-level prepared statements enabled unless verified compatibility evidence requires otherwise; Neon pooling currently supports them.
+
+Choose `node-postgres` instead if first-class Vercel Fluid Compute pool lifecycle integration becomes a required deployment constraint. Deployed Vercel preview is currently optional, so that advantage does not presently outweigh the `postgres.js` fit. Exact pool size, idle timeout, and client-construction code remain implementation choices after the driver is selected.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

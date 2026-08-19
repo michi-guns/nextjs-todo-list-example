@@ -14,7 +14,7 @@
 
 ## Technology facts
 
-The package manifest currently includes Next.js, React, Better Auth, Neon serverless access, Drizzle, Zod, shadcn-related UI packages, Vitest, Playwright, pnpm scripts, Husky, and lint-staged. Sanity is described by the design contract but is not currently represented as a source integration/dependency. No Sanity environment keys, project configuration, dataset configuration, or landing document evidence is present in the workspace.
+The package manifest currently includes Next.js, React, Better Auth, Neon serverless access, Drizzle, Zod, shadcn-related UI packages, Vitest, Playwright, pnpm scripts, Husky, and lint-staged. The current `db/db.ts` uses `@neondatabase/serverless` through Drizzle's `neon-http` adapter; OD-022 tracks replacing that Neon-specific transport with one standard PostgreSQL runtime driver shared by Neon and local Testcontainers. Sanity is described by the design contract but is not currently represented as a source integration/dependency. No Sanity environment keys, project configuration, dataset configuration, or landing document evidence is present in the workspace.
 
 ## Documentation facts
 

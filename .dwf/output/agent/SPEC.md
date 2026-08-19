@@ -173,6 +173,7 @@ Conceptual model (names may match Drizzle tables closely):
 - Deployed application traffic uses a pooled Neon connection. Schema migrations use a direct Neon connection.
 - Redis and application-level query caching are not part of the spike baseline.
 - Exact query composition, projections, instrumentation, client factory names, and environment-variable names remain implementation choices.
+- The shared standard-PostgreSQL runtime driver remains unresolved in [OD-022](../../decisions/OPEN-DECISIONS.md#od-022). Do not create separate Neon and Testcontainers repository implementations.
 
 ---
 
@@ -386,7 +387,7 @@ Document exact variable names in README when wiring — not in this SPEC body if
 
 ## 12. Implementation notes vs current scaffold
 
-As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, root `db`, Drizzle config, Vitest/Playwright/Husky). This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`. The canonical design authority is `.dwf/`; Delivery artifacts, when created, belong outside `.dwf/`.
+As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, root `db`, Drizzle config, Vitest/Playwright/Husky). The current database client uses Drizzle's Neon HTTP adapter, which does not satisfy the target's shared Neon/local PostgreSQL runtime requirement; resolve OD-022 before persistence implementation. This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`. The canonical design authority is `.dwf/`; Delivery artifacts, when created, belong outside `.dwf/`.
 
 ---
 
@@ -575,4 +576,4 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 
 ### 14.10 Current factual implementation prerequisites
 
-No tracked design choice remains open. Current external-resource and deployed-schema facts remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); answered absence of a resource does not silently satisfy an implementation prerequisite.
+The shared PostgreSQL runtime driver remains open in [OD-022](../../decisions/OPEN-DECISIONS.md#od-022) and must be resolved before persistence implementation. Current external-resource and deployed-schema facts remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); answered absence of a resource does not silently satisfy an implementation prerequisite.
