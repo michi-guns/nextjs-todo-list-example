@@ -14,7 +14,7 @@
 
 ## Technology facts
 
-The package manifest currently includes Next.js, React, Better Auth, Neon serverless access, Drizzle, Zod, shadcn-related UI packages, Vitest, Playwright, pnpm scripts, Husky, and lint-staged. Sanity is described by the design contract but is not currently represented as a source integration/dependency.
+The package manifest currently includes Next.js, React, Better Auth, Neon serverless access, Drizzle, Zod, shadcn-related UI packages, Vitest, Playwright, pnpm scripts, Husky, and lint-staged. Sanity is described by the design contract but is not currently represented as a source integration/dependency. No Sanity environment keys, project configuration, dataset configuration, or landing document evidence is present in the workspace.
 
 ## Documentation facts
 
@@ -29,4 +29,7 @@ The package manifest currently includes Next.js, React, Better Auth, Neon server
 - `.jz-trello/` and Trello-related skills exist as project workflow/projection infrastructure.
 - No repository-resident Delivery tree currently exists.
 - No Delivery System CLI or package script matching the supplied mental model was found in the repository.
-- No external database or Sanity project was contacted during this migration.
+- A read-only inspection on 2026-08-19 verified that the workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch.
+- The live Drizzle migration ledger contains one applied migration whose SHA-256 hash exactly matches `migrations/20260807190126_silly_vivisector/migration.sql`.
+- The live schema contains `account`, `session`, `users`, `verification`, and the scaffold `posts_table`. Planned `lists` and `tasks` tables are not present.
+- No Sanity project, dataset, or document was discoverable or contacted.

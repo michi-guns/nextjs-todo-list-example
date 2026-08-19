@@ -72,4 +72,4 @@ A full React component unit-test matrix is not required for the spike.
 
 ## Unresolved state
 
-Exact API paths, Sanity integration evidence, and database migration/application state remain explicitly tracked in the decision ledgers. The implementation must not silently choose answers that change the contract.
+Exact API paths remain open. Current-state inspection found no configured Sanity resource and confirmed that the linked Neon database contains the applied scaffold migration but not the planned `lists` or `tasks` schema. These implementation prerequisites remain visible in the factual-question ledger and project context.

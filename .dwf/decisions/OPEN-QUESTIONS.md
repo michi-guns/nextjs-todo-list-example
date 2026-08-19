@@ -35,9 +35,9 @@ Evidence: [Better Auth magic-link documentation](https://better-auth.com/docs/pl
 
 ## OQ-002 — Sanity project and document evidence
 
-- **Status:** OPEN
-- **Blocking:** YES for the real landing integration
-- **Source:** existing repository inspection and PRD/SPEC
+- **Status:** ANSWERED
+- **Blocking:** YES for the real landing integration — the answer is that no usable Sanity resource is currently configured
+- **Source:** repository files and local environment-key inspection on 2026-08-19
 - **Related:** D-005, TD-007, EC-007
 
 ### Exact Question
@@ -54,15 +54,15 @@ Project configuration and a non-secret local/test document shape.
 
 ### Answer
 
-Pending.
+No Sanity project, dataset, document type, or published landing document is currently available from this workspace. The package manifest has no Sanity dependency, the source tree has no Sanity client or schema configuration, and the local environment contains no Sanity configuration keys. A project resource must be provisioned or supplied before the real landing integration can be verified.
 
 <a id="oq-003"></a>
 
 ## OQ-003 — Database migration/application state
 
-- **Status:** OPEN
-- **Blocking:** YES for persistence verification
-- **Source:** existing repository inspection
+- **Status:** ANSWERED
+- **Blocking:** NO for current-state verification — the planned list/task schema still needs implementation and migration
+- **Source:** linked Neon status, read-only `information_schema` queries, live Drizzle migration ledger, and local migration hash on 2026-08-19
 - **Related:** D-003, D-004, TD-005, TD-006
 
 ### Exact Question
@@ -71,7 +71,7 @@ Have the current Neon/development migrations been applied to the intended databa
 
 ### Why It Matters
 
-The repository contains migration artifacts, but this migration did not connect to or verify an external database.
+The repository contains migration artifacts, so the linked database and actual deployed schema needed read-only verification.
 
 ### Evidence Needed
 
@@ -79,4 +79,6 @@ A safe local/development database inspection during implementation preparation.
 
 ### Answer
 
-Pending.
+The workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch. The live Drizzle ledger contains one applied migration. Its stored hash exactly matches the SHA-256 hash of `migrations/20260807190126_silly_vivisector/migration.sql`, confirming that the current local migration was applied.
+
+The live schema contains the Better Auth tables `account`, `session`, `users`, and `verification`, plus the scaffold `posts_table`. It does not contain the planned `lists` or `tasks` tables. No migration for those tables currently exists.
