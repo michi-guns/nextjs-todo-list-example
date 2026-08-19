@@ -3,6 +3,7 @@ status: active
 owner: content-and-engineering
 related-decisions:
   - TD-007
+  - TD-018
 ---
 
 # Sanity
@@ -20,6 +21,12 @@ This repository uses a dedicated Sanity project and dataset with one singleton l
 ## Integration rule
 
 Fetch and validate Sanity documents in infrastructure, then map them to a landing view model. Raw GROQ and CMS document types must not cross into domain or application code.
+
+## Verification
+
+Use local fixtures to test unknown-payload validation, view-model mapping, optional fields, and missing or invalid required-content failures. Routine Playwright uses deterministic test-only landing content through the application-facing contract and does not call Sanity. That source is unavailable in deployed runtime modes and cannot become a production fallback.
+
+Before spike completion and before a deployment counts as release evidence, run one separate read-only smoke against the dedicated project and dataset. It fetches the published singleton through the real client and query, validates it, and maps it to the landing view model. Missing configuration or content and query, validation, or mapping failures fail clearly; the smoke never creates or edits content.
 
 ## Not authoritative for
 

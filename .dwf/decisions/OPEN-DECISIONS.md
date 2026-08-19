@@ -604,6 +604,31 @@ Choose whether database-backed suites run serially or in parallel by default, an
 
 Run PostgreSQL repository integration tests and Playwright serially by default while a suite shares one harness-owned container. Every test creates and owns a unique user and its mutable records, cleans up through the harness where needed, and must not depend on execution order or data left by another test. Parallel database-backed execution may be introduced later only when each worker receives an isolated database or schema. Exact test-runner settings, identifier generation, cleanup mechanics, and future worker-provisioning mechanism remain implementation choices.
 
+<a id="od-025"></a>
+
+## OD-025 — Sanity verification strategy
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO — the live smoke requires the dedicated Sanity resource before spike completion
+- **Related:** D-005, D-006, TD-007, TD-009, TD-018, EC-007, EC-025
+
+### Problem / Conflict
+
+Routine tests that depend on live Sanity content would be slower and vulnerable to network, credentials, and editorial changes. Local fixtures alone would not prove that the configured project, dataset, query, and published singleton work together.
+
+### Accepted Constraints
+
+The Sanity adapter must validate unknown external data and fail explicitly when required content is missing or invalid. Routine Playwright must remain deterministic and offline from Sanity, while spike completion still requires evidence from the real dedicated resource.
+
+### Decision Required
+
+Choose the split between local Sanity tests, routine browser tests, and live integration verification.
+
+### Resolution
+
+Use local fixture tests to cover valid Sanity payload mapping, optional fields, and missing or invalid required-content failures. Routine Playwright uses deterministic test-only landing content through the same application-facing landing contract and requires no Sanity credentials or network access; this test source is unavailable in deployed runtime modes and is not a production fallback. Provide one separate, read-only live Sanity smoke that fetches the published singleton from the dedicated project and dataset, validates it, and maps it to the landing view model. The live smoke must pass before the spike is declared complete and before a deployment is treated as release evidence. It fails clearly when configuration, the document, validation, or mapping is unavailable and never creates or edits CMS content. Exact fixture format, test-source wiring, command name, and evidence output remain implementation choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

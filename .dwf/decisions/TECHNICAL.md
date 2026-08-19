@@ -75,7 +75,7 @@ Lists and tasks own the repository ports required by their application use cases
 
 - **Status:** ACCEPTED
 - **Related product decisions:** D-005
-- **Related resolution:** [OD-005](OPEN-DECISIONS.md#od-005)
+- **Related resolutions:** [OD-005](OPEN-DECISIONS.md#od-005), [OD-025](OPEN-DECISIONS.md#od-025)
 - **Source:** ADR-0002; legacy D-006
 
 Use a dedicated Sanity project and dataset for this repository, containing one singleton landing document. Keep the Sanity client, GROQ, external payload validation, and mapping in landing infrastructure. Map validated CMS payloads into a plain landing view model; raw CMS documents and provider types do not cross into application or presentation code. Once the real read path is wired, missing or invalid required content is an explicit integration failure rather than a permanent silent fallback. Webhooks and on-demand revalidation are out of scope.
@@ -202,3 +202,16 @@ Use Chromium for the required local Playwright acceptance journey. Provide a sep
 - **Source:** current testing architecture review
 
 Run database repository integration tests and Playwright serially by default while they share one Testcontainers PostgreSQL instance. Each test owns a unique authenticated user and its mutable records and remains independent of test order. Parallel execution requires database- or schema-level isolation per worker and is a later optimization, not a spike requirement. Exact runner configuration, unique-data helpers, cleanup strategy, and worker-isolation mechanism remain implementation choices.
+
+<a id="td-018"></a>
+
+## TD-018 — Local Sanity contracts with a live read smoke
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-005, D-006
+- **Related resolution:** [OD-025](OPEN-DECISIONS.md#od-025)
+- **Source:** current testing architecture review
+
+Test Sanity payload validation, mapping, optional fields, and required-content failures with local fixtures. Routine Playwright receives deterministic test-only landing content through the application-facing landing contract and does not call Sanity. The test source cannot run as a deployed fallback.
+
+Keep one separate read-only smoke against the configured dedicated Sanity project and dataset. It fetches the published singleton through the real query and client path, validates the payload, and maps the landing view model. This smoke is required before spike completion and before a deployment counts as release evidence; missing configuration, content, or a valid mapping fails clearly. Exact fixtures, dependency substitution, command name, and output format remain implementation choices.

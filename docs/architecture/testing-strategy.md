@@ -23,7 +23,7 @@ Routine integration tests use only their harness-owned local container and requi
 
 Run repository integration tests serially while they share one container. Each test creates and owns a unique user and its mutable records and remains independent of execution order. Parallel workers are allowed later only when each receives an isolated database or schema.
 
-Test Sanity adapters when their translation logic is non-trivial.
+Test Sanity payload validation and mapping with local fixtures, including optional fields and missing or invalid required content.
 
 ## Boundary tests
 
@@ -38,6 +38,12 @@ Chromium is the required browser for the routine acceptance suite. Keep Firefox 
 One local command starts a PostgreSQL 18 Testcontainer, applies the versioned migrations, loads a small deterministic behavior seed, starts a dedicated Next.js test server against that database, runs Playwright, and tears everything down. The behavior seed includes cross-user privacy and enough records to exercise visible pagination. It remains separate from the large Neon performance seed.
 
 Playwright scenarios also run serially while sharing their container. Each scenario owns its identity and mutable data and does not depend on another scenario running first. Parallel Playwright execution requires a database or schema isolated per worker.
+
+Routine Playwright receives deterministic test-only landing content through the application-facing landing contract and does not call Sanity. The test source is unavailable in deployed runtime modes and is not a production fallback.
+
+## Sanity live smoke
+
+Keep one separate read-only smoke that fetches the published singleton through the real Sanity client and query, validates the unknown payload, and maps the landing view model. It must pass before spike completion and before a deployment is treated as release evidence. Missing configuration or content and query, validation, or mapping failures fail clearly. The smoke never mutates CMS content.
 
 ## Neon verification
 

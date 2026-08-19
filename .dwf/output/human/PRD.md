@@ -61,7 +61,7 @@ The local spike is complete when it supports:
 6. task CRUD and status changes;
 7. show/hide completed tasks;
 8. visible cursor pagination for lists and tasks;
-9. Sanity-driven landing content;
+9. Sanity-driven landing content plus a read-only live smoke of the published singleton before spike completion;
 10. Zod-validated server inputs;
 11. database-free domain/application/Zod tests;
 12. real PostgreSQL 18 integration tests through Testcontainers using the versioned migrations;

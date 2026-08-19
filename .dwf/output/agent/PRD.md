@@ -115,7 +115,7 @@ The spike is complete when all of the following are true **locally**:
 5. User can create/edit/delete tasks and move status among `todo` / `in_progress` / `done`.
 6. User can show/hide completed tasks.
 7. User can visibly load additional cursor-paginated lists and tasks.
-8. Landing page renders **Sanity-driven** editorial fields (not hardcoded-only forever).
+8. Landing page renders **Sanity-driven** editorial fields (not hardcoded-only forever), and a read-only live smoke proves that the published singleton can be fetched, validated, and mapped before spike completion.
 9. Mutations available via **Server Actions** and mirrored (or subset) **JSON Route Handlers**.
 10. Zod validates server inputs; duplicate list names and same-list task titles produce a conflict rather than creating duplicate rows.
 11. Vitest covers database-free domain rules, application use cases, and zod schemas (not a full UI unit matrix).

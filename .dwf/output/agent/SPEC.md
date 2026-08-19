@@ -358,10 +358,19 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - Run Playwright serially by default while its scenarios share one container. Each scenario owns its user and mutable records and does not rely on scenario order.
 - Parallel Playwright workers require an isolated database or schema per worker and are not required for the spike.
 - Playwright does not depend on Neon credentials or a developer's already-running application server.
+- Routine Playwright uses deterministic test-only landing content through the application-facing landing contract and does not require Sanity credentials or network access. This source is unavailable in deployed runtime modes.
 - Exact process wrapper, Playwright project and script names, browser-selection mechanism, ports, and seed-builder APIs remain implementation choices.
 - CI: **not required** for spike complete.
 
-### 10.4 Performance evidence
+### 10.4 Sanity verification
+
+- Use local fixtures to test valid unknown-payload validation and mapping, optional landing fields, and missing or invalid required-content failures.
+- Keep one separate read-only live smoke that uses the real Sanity client and query to fetch the published singleton from the dedicated project and dataset, validate it, and map it to the landing view model.
+- The live smoke must pass before spike completion and before a deployment counts as release evidence. Missing configuration, missing or unpublished content, query failure, validation failure, or mapping failure is reported clearly rather than skipped.
+- The live smoke never creates or edits Sanity content.
+- Exact fixture representation, test-source wiring, command name, and evidence format remain implementation choices.
+
+### 10.5 Performance evidence
 
 - Maintain a repeatable Neon development-branch performance seed with approximately 100 lists for one user, 10,000 tasks in one large list, and records for another user.
 - Run `EXPLAIN ANALYZE` for representative first-page and next-page list/task cursor queries, plus completed-task filtering when it produces a distinct query shape.
@@ -372,7 +381,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - Exclude network latency, authentication, rendering, CMS access, and Neon compute startup from the database execution measurement.
 - Keep this performance seed separate from the small local behavior seed. Neon remains the verification environment for this section.
 
-### 10.5 Local quality
+### 10.6 Local quality
 
 - Husky + lint-staged on commit (eslint/prettier as configured in `package.json`).
 - Scripts: `pnpm test`, `pnpm exec playwright test`, `pnpm typecheck`, `pnpm lint`.
@@ -413,12 +422,13 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Pagination defaults to 20, caps at 100, omits total counts, and is visible through dashboard `Load more`
 - [ ] Core list/task reads fetch at most `limit + 1`, avoid N+1 behavior, and use the required query-shaped indexes
 - [ ] Representative Neon seed and `EXPLAIN ANALYZE` evidence satisfy the agreed index-use, cursor-correctness, and warm-query baseline
-- [ ] Landing Sanity read path
+- [ ] Landing Sanity read path plus the read-only live fetch/validate/map smoke passes against the dedicated published singleton
 - [ ] Zod at boundaries
 - [ ] Module layering respected for lists/tasks/landing
 - [ ] Vitest suite green for agreed scope
 - [ ] PostgreSQL 18 Testcontainers integration suite applies the real migrations and passes the agreed persistence cases
 - [ ] Playwright happy paths pass in Chromium against a harness-owned migrated and seeded local PostgreSQL container; Firefox and WebKit remain available as a separate on-demand check
+- [ ] Routine Playwright uses deterministic test-only landing content and requires no Sanity credentials or network access
 - [ ] Database-backed tests run serially against shared containers, own unique users/data, and do not depend on test order
 - [ ] Routine database-backed tests require no Neon credentials; destructive test cleanup refuses external database URLs
 - [ ] Husky + lint-staged active
@@ -476,7 +486,7 @@ The exact implementation may group or split these functions while preserving the
 
 ### 14.5 Landing/Sanity boundary
 
-The landing module exposes a plain landing view model and repository/application read path. Sanity client setup, GROQ, external payload validation, and mapping remain infrastructure details. Raw CMS documents do not cross into application or presentation code. Once the real CMS read path works, missing/invalid required content is an explicit integration failure rather than an invisible permanent hardcoded fallback.
+The landing module exposes a plain landing view model and repository/application read path. Sanity client setup, GROQ, external payload validation, and mapping remain infrastructure details. Raw CMS documents do not cross into application or presentation code. Once the real CMS read path works, missing/invalid required content is an explicit integration failure rather than an invisible permanent hardcoded fallback. Routine Playwright may substitute deterministic test-only landing content at the application-facing contract, but that source is unavailable in deployed runtime modes.
 
 ### 14.6 Presentation boundary
 
@@ -488,7 +498,7 @@ authenticate → validate → application use case → map result/error → reva
 
 ### 14.7 Verification boundary
 
-The implementation must prove domain invariants, application use cases with ports/fakes, Zod/auth boundary behavior, real PostgreSQL repository and constraint behavior through Testcontainers, non-trivial adapter mappings, and the core Playwright journey in Chromium. Firefox and WebKit are separate on-demand compatibility checks. A complete React component unit matrix is not required.
+The implementation must prove domain invariants, application use cases with ports/fakes, Zod/auth boundary behavior, real PostgreSQL repository and constraint behavior through Testcontainers, local Sanity validation/mapping behavior, the live Sanity fetch/validate/map smoke, and the core Playwright journey in Chromium. Firefox and WebKit are separate on-demand compatibility checks. A complete React component unit matrix is not required.
 
 ### 14.8 Delivery boundary
 

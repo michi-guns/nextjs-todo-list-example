@@ -259,3 +259,14 @@ Chromium is the required routine acceptance browser, but it is not treated as pr
 - **Resolved by:** OD-024
 
 Database-backed suites run serially while sharing one harness-owned container. A test uses a unique user and mutable records and never assumes that another test ran first. If parallel workers are enabled later, each worker must receive an isolated database or schema before the suite is considered reliable.
+
+<a id="ec-025"></a>
+
+## EC-025 — Sanity network or editorial drift destabilizes routine tests
+
+- **Status:** HANDLED
+- **Product decisions:** D-005, D-006
+- **Technical decisions:** TD-007, TD-018
+- **Resolved by:** OD-025
+
+Routine unit and Playwright suites do not depend on Sanity network access or mutable editorial content. Local fixtures cover mapping and failure behavior, and deterministic test-only landing content covers the browser flow. A separate read-only live smoke detects missing configuration, an absent or unpublished singleton, schema drift, invalid required fields, query failure, or mapping failure before spike completion or release evidence. The test-only source cannot become a deployed fallback.
