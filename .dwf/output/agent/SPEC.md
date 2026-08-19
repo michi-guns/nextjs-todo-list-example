@@ -336,7 +336,17 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - The magic-link Playwright path clears the local/test mailbox, requests a link, reads the captured URL, and visits it to verify link consumption.
 - CI: **not required** for spike complete.
 
-### 10.3 Local quality
+### 10.3 Performance evidence
+
+- Maintain a repeatable Neon development-branch performance seed with approximately 100 lists for one user, 10,000 tasks in one large list, and records for another user.
+- Run `EXPLAIN ANALYZE` for representative first-page and next-page list/task cursor queries, plus completed-task filtering when it produces a distinct query shape.
+- At the representative volume, the intended composite indexes support the paginated access paths without a full sequential scan of the lists or tasks table.
+- With Neon compute active and relevant data warm, a 20-record database query executes in under 50 ms.
+- Verify correct item counts, ordering, continuation, and termination at the maximum 100-record page size.
+- Keep the evidence repeatable and local/manual or integration-level. Do not make the timing threshold a per-commit CI benchmark or treat it as an end-to-end production SLA.
+- Exclude network latency, authentication, rendering, CMS access, and Neon compute startup from the database execution measurement.
+
+### 10.4 Local quality
 
 - Husky + lint-staged on commit (eslint/prettier as configured in `package.json`).
 - Scripts: `pnpm test`, `pnpm exec playwright test`, `pnpm typecheck`, `pnpm lint`.
@@ -374,6 +384,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Cursor-paginated list and task reads with opaque next cursors
 - [ ] Pagination defaults to 20, caps at 100, omits total counts, and is visible through dashboard `Load more`
 - [ ] Core list/task reads fetch at most `limit + 1`, avoid N+1 behavior, and use the required query-shaped indexes
+- [ ] Representative Neon seed and `EXPLAIN ANALYZE` evidence satisfy the agreed index-use, cursor-correctness, and warm-query baseline
 - [ ] Landing Sanity read path
 - [ ] Zod at boundaries
 - [ ] Module layering respected for lists/tasks/landing

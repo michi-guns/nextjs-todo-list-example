@@ -71,9 +71,11 @@ Use layered proof:
 - Zod and auth/presentation boundary tests;
 - non-trivial adapter mapping tests;
 - the Playwright sign-in → list → task → status → sign-out journey;
+- a representative Neon development seed plus `EXPLAIN ANALYZE` evidence for the core cursor queries;
+- correct maximum-size cursor pages and sub-50-ms warm database execution for a 20-record page;
 - pnpm typecheck, lint, tests, and local commit hooks.
 
-A full React component unit-test matrix is not required for the spike.
+A full React component unit-test matrix and a per-commit performance benchmark are not required for the spike. The 50-ms target measures only warm database execution, not network, authentication, rendering, CMS access, or Neon compute startup.
 
 ## Current implementation prerequisites
 

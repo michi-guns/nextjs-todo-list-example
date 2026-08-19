@@ -32,6 +32,7 @@ A todo list is a universally understood domain, so architecture stays visible.
 7. Use **shadcn/ui** with a **richer dashboard-style** signed-in shell (UI quality is part of the experiment).
 8. Prove **Vitest** (domain/application/zod) and **Playwright** (happy paths) locally.
 9. Use **Husky + lint-staged** for local quality; no GitHub Actions CI required for spike complete.
+10. Demonstrate that the core cursor reads are index-backed and comfortably fast on a representative Neon development dataset.
 
 ## 3. Non-goals (explicit)
 
@@ -120,6 +121,7 @@ The spike is complete when all of the following are true **locally**:
 11. Vitest covers domain rules, application use cases, and zod schemas (not a full UI unit matrix).
 12. Playwright covers happy paths: sign-up/in → create list → create task → change status → sign-out.
 13. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
+14. Representative Neon development data and query-plan evidence confirm index-backed cursor reads, correct maximum-size pages, and the agreed warm-query target.
 
 Deployed Vercel preview is **optional**, not required for spike complete.
 

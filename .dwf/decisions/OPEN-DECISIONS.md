@@ -452,6 +452,31 @@ Choose the baseline query, client-lifecycle, and Neon connection behavior for li
 
 Cursor queries must use predicates and ordering that match the required composite indexes. Fetch at most `limit + 1` rows to determine whether `nextCursor` exists, then return no more than `limit` items. Select only the fields required by the application result. Main list/task request paths use a small, bounded number of database queries and must not issue one additional query per returned row. The application runtime reuses one module-level Drizzle/database client rather than creating one per request. Deployed application traffic uses a pooled Neon connection, while schema migrations use a direct connection. Redis and application-level query caching are not part of the spike baseline. Exact projections, query composition, query-count assertions, and client factory names remain implementation choices.
 
+<a id="od-019"></a>
+
+## OD-019 — Lightweight performance verification baseline
+
+- **Status:** RESOLVED
+- **Impact:** SPEC
+- **Blocking:** NO
+- **Related:** D-003, D-004, TD-010, TD-011, EC-019
+
+### Problem / Conflict
+
+The performance design required enough evidence to catch missing indexes and poor query shapes without turning the spike into a benchmarking project or adopting a production SLA.
+
+### Accepted Constraints
+
+Verification should use representative relational volume, exercise privacy scope and cursor limits, and distinguish database execution from network latency and Neon compute startup.
+
+### Decision Required
+
+Choose the representative data, query-plan checks, and modest performance target required for spike completion.
+
+### Resolution
+
+On the non-default Neon development branch, provide a repeatable performance seed with approximately 100 lists for one user, 10,000 tasks in one large list, and records owned by another user. Run `EXPLAIN ANALYZE` on the core first-page and next-page list/task cursor queries, including completed-task filtering where it changes the query. At that volume, the intended composite indexes must support the paginated access paths without a full sequential scan of the lists or tasks table. With the Neon compute already active and the relevant data warm, a 20-record database query should execute in under 50 ms. Also verify correct cursor behavior at the maximum 100-record page size. Record this as repeatable manual or integration evidence; it is not a flaky per-commit CI benchmark or a production end-to-end SLA. Exact seed script structure, sampled cursor positions, evidence format, and number of repeated measurements remain implementation choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

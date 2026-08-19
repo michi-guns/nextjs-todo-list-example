@@ -64,6 +64,7 @@ The local spike is complete when it supports:
 9. Sanity-driven landing content;
 10. Zod-validated server inputs;
 11. domain/application/Zod tests and the core Playwright journey;
-12. local typecheck, lint, Husky, and lint-staged quality checks.
+12. local typecheck, lint, Husky, and lint-staged quality checks;
+13. representative Neon seed data and lightweight evidence that the main paginated database queries use their intended indexes and meet the agreed warm-query target.
 
 The exact implementation contract is in the [Agent SPEC](../agent/SPEC.md). It must implement the [Agent PRD](../agent/PRD.md) and may not weaken it.

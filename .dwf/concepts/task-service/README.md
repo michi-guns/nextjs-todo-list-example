@@ -105,6 +105,7 @@ The subsystem can be verified independently of completed task presentation:
 - Task reads return newest-created tasks first and remain deterministic when timestamps match.
 - Pagination remains scoped to the authenticated owner, selected list, and completed-task filter; cursor data never overrides that context.
 - Representative query-plan evidence confirms that paginated task reads use the intended composite index.
+- On the representative Neon seed, warm 20-record task queries satisfy the agreed database-execution target without a full table scan.
 - Page reads return no more than the requested limit and derive the next cursor from at most one extra row, without a total-count query.
 - Dashboard consumers can append another page while a next cursor exists; changing the selected list or completed-task filter starts again from the first page.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
@@ -135,6 +136,7 @@ The implementation agent may choose:
 - [`TD-008 — Zod and shared mutation paths at untrusted boundaries`](../../decisions/TECHNICAL.md#td-008)
 - [`TD-010 — Query-shaped PostgreSQL index baseline`](../../decisions/TECHNICAL.md#td-010)
 - [`TD-011 — Bounded queries and environment-appropriate connections`](../../decisions/TECHNICAL.md#td-011)
+- [`TD-012 — Representative query-plan and warm-query evidence`](../../decisions/TECHNICAL.md#td-012)
 - [`RULE-006 — Validate and isolate untrusted boundaries`](../../RULES.md#rule-006)
 - [Open decisions](../../decisions/OPEN-DECISIONS.md)
 - [Agent SPEC — Lists and tasks application boundary](../../output/agent/SPEC.md#144-lists-and-tasks-application-boundary)

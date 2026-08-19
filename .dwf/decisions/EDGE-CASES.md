@@ -193,3 +193,14 @@ Cursor queries must keep their authenticated equality scope and cursor ordering 
 - **Resolved by:** OD-018
 
 A page request must not load an unbounded result merely to slice it in application code, run a count query only to determine whether another cursor page exists, create a database client per request, or issue one follow-up query per returned list/task. The query reads at most one extra row, projects only required fields, and derives `nextCursor` without a total count.
+
+<a id="ec-019"></a>
+
+## EC-019 — Misleading performance measurement
+
+- **Status:** HANDLED
+- **Product decisions:** D-003, D-004
+- **Technical decisions:** TD-012
+- **Resolved by:** OD-019
+
+The lightweight query target is measured only after Neon compute is active and relevant data is warm. It covers database execution for the paginated query, not network latency, authentication, rendering, CMS access, or compute startup. A single fast timing does not replace query-plan inspection, cross-user seed data, or cursor-correctness checks.

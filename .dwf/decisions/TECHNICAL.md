@@ -128,3 +128,16 @@ Do not add status, notes, search, partial, or other speculative indexes without 
 Cursor repositories fetch at most `limit + 1` rows, return at most `limit`, and select only fields required by their application result. Core list/task request paths use bounded query counts and avoid N+1 behavior. Queries keep their equality predicates and ordering aligned with the indexes in TD-010.
 
 Reuse one module-level Drizzle/database client in the application runtime. Deployed application traffic uses a pooled Neon connection; schema migrations use a direct Neon connection. Redis and application-level query caching are not required for this spike. Exact query composition, result projection, instrumentation, client factory naming, and environment-variable names remain implementation choices.
+
+<a id="td-012"></a>
+
+## TD-012 — Representative query-plan and warm-query evidence
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-003, D-004
+- **Related resolutions:** [OD-017](OPEN-DECISIONS.md#od-017), [OD-018](OPEN-DECISIONS.md#od-018), [OD-019](OPEN-DECISIONS.md#od-019)
+- **Source:** current performance architecture review
+
+Keep a repeatable performance seed for the non-default Neon development branch containing approximately 100 lists for one user, 10,000 tasks in one large list, and another user's records. Use `EXPLAIN ANALYZE` on representative first-page and next-page cursor queries to confirm the intended indexes support list and task access without a full table scan. Include the completed-task-filtered task shape when its SQL differs.
+
+With compute active and relevant data warm, a 20-record database query must execute in under 50 ms. Verify cursor correctness at the maximum 100-record page size. This is repeatable manual or integration evidence, not a per-commit CI benchmark or production end-to-end SLA; network time, authentication, rendering, CMS access, and Neon compute startup are outside the measurement.
