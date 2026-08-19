@@ -1,14 +1,14 @@
 # Open Questions
 
-Unresolved factual questions (`OQ-*`): what is true? Do not guess an answer merely to close an item.
+Tracked factual questions (`OQ-*`). Entries with `OPEN` status remain unresolved and must not be guessed closed. Answered entries stay here as evidence history and point to any decision that still remains.
 
 <a id="oq-001"></a>
 
 ## OQ-001 — Better Auth magic-link integration evidence
 
-- **Status:** OPEN
-- **Blocking:** YES for the magic-link acceptance path
-- **Source:** existing repository inspection and PRD/SPEC
+- **Status:** ANSWERED
+- **Blocking:** NO — the factual package question is answered; OD-003 still blocks selection of the local mechanism
+- **Source:** installed `better-auth@1.7.1`, package exports and type/runtime declarations, official Better Auth magic-link documentation
 - **Related:** D-002, TD-004, EC-009
 
 ### Exact Question
@@ -21,11 +21,15 @@ The product requires magic-link request/consume behavior, while the repository c
 
 ### Evidence Needed
 
-Installed Better Auth integration guidance, provider/test-mail configuration, and a deterministic local smoke path.
+Installed Better Auth integration guidance, plugin API evidence, and the delivery seam available for a deterministic local smoke path.
 
 ### Answer
 
-Pending.
+The installed `better-auth@1.7.1` package exports the `magicLink` server plugin and `magicLinkClient` client plugin. The server plugin requires a `sendMagicLink` callback and passes it the generated `email`, verification `url`, `token`, and optional metadata. It provides request and verification endpoints, stores verification data through Better Auth, defaults links to a five-minute lifetime, and consumes a token on its first verification attempt.
+
+Better Auth does not select or provide this project's email transport. The application must implement `sendMagicLink`, which may send the URL through a real provider or capture it through a local/test adapter. This confirms that a deterministic test-only capture mechanism is supported without changing Better Auth internals. The project-specific mechanism remains OD-003.
+
+Evidence: [Better Auth magic-link documentation](https://better-auth.com/docs/plugins/magic-link) and the installed package declarations under `node_modules/better-auth/dist/plugins/magic-link/`.
 
 <a id="oq-002"></a>
 

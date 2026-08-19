@@ -92,4 +92,4 @@ An anonymous browser or JSON caller requests private lists/tasks. The boundary r
 - **Related open question:** OQ-001
 - **Related open decision:** OD-003
 
-The product requires request/consume behavior, but the installed Better Auth version, provider configuration, and deterministic local mail/test mechanism remain unverified.
+The installed Better Auth version supports a `sendMagicLink` callback that receives the generated verification URL. The product still requires selection of the deterministic local capture or delivery mechanism tracked by OD-003.
