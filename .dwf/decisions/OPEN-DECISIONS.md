@@ -327,6 +327,31 @@ Choose the lifecycle of the automatic Inbox after it is created and the behavior
 
 After creation, the automatic Inbox is an ordinary user-owned list and may be renamed or deleted. Whenever an authenticated private workspace loads and the user has zero lists, create exactly one new list named `Inbox`. Therefore, deleting the final list leaves the user listless only until the next private workspace load, which creates a new empty Inbox. Any existing list, regardless of its name, prevents automatic Inbox creation.
 
+<a id="od-014"></a>
+
+## OD-014 — List-name and task-title uniqueness
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-001, D-003, D-004, TD-005, TD-008, EC-014
+
+### Problem / Conflict
+
+The contract settled text validation but did not define whether two lists or tasks could share the same displayed name or title.
+
+### Accepted Constraints
+
+The product has no `Workspace` hierarchy entity. Lists belong directly to a user through `userId`, and tasks belong directly to a list through `listId`. Uniqueness must remain correct under concurrent writes.
+
+### Decision Required
+
+Choose the uniqueness scope, comparison behavior, and external conflict outcome for list names and task titles.
+
+### Resolution
+
+List names are unique per `userId`. Task titles are unique per `listId`, so the same title may appear in different lists but not twice in one list. Compare trimmed values case-insensitively while preserving the accepted display text. Enforce uniqueness at the database boundary for race safety and map conflicts to the application-level `conflict` outcome. JSON Route Handlers return `409` with error code `conflict`; Server Actions expose the equivalent conflict result. The exact Postgres/Drizzle mechanism for case-insensitive uniqueness remains an implementation choice.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

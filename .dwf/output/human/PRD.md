@@ -23,21 +23,23 @@ The example is intentionally serious about ownership, data boundaries, validatio
 - Anonymous visitors can see the marketing landing page and authentication entry points.
 - Signed-in users manage only their own lists and tasks.
 - Requests for another user's private list or task do not reveal whether it exists.
-- There is one implicit personal workspace per user.
+- There is no tenant, organization, or `Workspace` entity. Lists belong directly to the signed-in user.
 - Teams, organizations, shared lists, collaboration, OAuth, recurring tasks, attachments, payments, offline mode, and multi-region operations are outside the spike.
 
 ## Lists and tasks
 
-A user can own many lists. List names are trimmed and contain 1–80 characters. Whenever the private workspace loads with no lists, the product creates exactly one `Inbox`. The automatic Inbox is an ordinary list after creation and may be renamed or deleted. If the final list is deleted, the next private workspace load creates a new empty Inbox. Any existing list prevents automatic Inbox creation. Deleting a list removes its tasks. Lists are shown oldest-created first.
+A user can own many lists. List names are trimmed, contain 1–80 characters, and are unique for that user under case-insensitive comparison. Whenever the private workspace loads with no lists, the product creates exactly one `Inbox`. The automatic Inbox is an ordinary list after creation and may be renamed or deleted. If the final list is deleted, the next private workspace load creates a new empty Inbox. Any existing list prevents automatic Inbox creation. Deleting a list removes its tasks. Lists are shown oldest-created first.
 
 Each task belongs to exactly one list and has:
 
-- a required title containing 1–200 characters after trimming;
+- a required title containing 1–200 characters after trimming, unique within that list under case-insensitive comparison;
 - optional trimmed notes containing at most 5,000 characters, with empty notes treated as absent;
 - a status of `todo`, `in_progress`, or `done`;
 - timestamps.
 
 Tasks can be created, edited, deleted, and moved between statuses. Completed tasks stay stored and are shown by default, while the interface can explicitly hide or show them.
+
+The same task title may be used in different lists, but not twice within one list.
 
 New tasks begin as `todo`. After creation, a task can move directly between any two valid statuses; applying its current status again simply leaves it unchanged.
 

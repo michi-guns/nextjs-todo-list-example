@@ -120,26 +120,26 @@ Conceptual model (names may match Drizzle tables closely):
 
 ### 3.1 `lists`
 
-| Column      | Type        | Notes                              |
-| ----------- | ----------- | ---------------------------------- |
-| `id`        | uuid / text | PK                                 |
-| `userId`    | uuid / text | owner, indexed, FK to user         |
-| `name`      | text        | required, trimmed, 1–80 characters |
-| `createdAt` | timestamptz | required                           |
-| `updatedAt` | timestamptz | required                           |
+| Column      | Type        | Notes                                                                  |
+| ----------- | ----------- | ---------------------------------------------------------------------- |
+| `id`        | uuid / text | PK                                                                     |
+| `userId`    | uuid / text | owner, indexed, FK to user                                             |
+| `name`      | text        | required, trimmed, 1–80 characters; unique per user case-insensitively |
+| `createdAt` | timestamptz | required                                                               |
+| `updatedAt` | timestamptz | required                                                               |
 
 ### 3.2 `tasks`
 
-| Column      | Type        | Notes                                       |
-| ----------- | ----------- | ------------------------------------------- |
-| `id`        | uuid / text | PK                                          |
-| `listId`    | uuid / text | FK → lists.id, cascade on list delete       |
-| `userId`    | uuid / text | denormalized owner for simple authz queries |
-| `title`     | text        | required, trimmed, 1–200 characters         |
-| `notes`     | text        | nullable, trimmed, maximum 5,000 characters |
-| `status`    | enum/text   | `todo` \| `in_progress` \| `done`           |
-| `createdAt` | timestamptz | required                                    |
-| `updatedAt` | timestamptz | required                                    |
+| Column      | Type        | Notes                                                                   |
+| ----------- | ----------- | ----------------------------------------------------------------------- |
+| `id`        | uuid / text | PK                                                                      |
+| `listId`    | uuid / text | FK → lists.id, cascade on list delete                                   |
+| `userId`    | uuid / text | denormalized owner for simple authz queries                             |
+| `title`     | text        | required, trimmed, 1–200 characters; unique per list case-insensitively |
+| `notes`     | text        | nullable, trimmed, maximum 5,000 characters                             |
+| `status`    | enum/text   | `todo` \| `in_progress` \| `done`                                       |
+| `createdAt` | timestamptz | required                                                                |
+| `updatedAt` | timestamptz | required                                                                |
 
 **Cascade:** deleting a list deletes all tasks in that list (DB-level ON DELETE CASCADE preferred).
 
@@ -159,6 +159,7 @@ Conceptual model (names may match Drizzle tables closely):
 ### 4.1 List
 
 - Name length is 1–80 characters inclusive after trimming.
+- Names are unique per `userId` under case-insensitive comparison. Preserve the accepted display value while enforcing normalized uniqueness at the database boundary.
 - User can only mutate own lists.
 - Delete list is always hard delete + cascade tasks (no soft delete in spike).
 - List reads order by `createdAt` ascending. Equal timestamps use a deterministic implementation-chosen tie-breaker.
@@ -166,6 +167,7 @@ Conceptual model (names may match Drizzle tables closely):
 ### 4.2 Task
 
 - Title length is 1–200 characters inclusive after trimming.
+- Titles are unique per `listId` under case-insensitive comparison. The same title may appear in different lists; preserve the accepted display value while enforcing normalized uniqueness at the database boundary.
 - Notes are trimmed and optional. On creation, omitted, `null`, empty, and whitespace-only notes normalize to `null`. On update, omitting `notes` leaves the value unchanged; explicitly providing `null`, empty, or whitespace-only notes clears the value to `null`.
 - Notes have a maximum length of 5,000 characters after trimming.
 - Status only one of: `todo`, `in_progress`, `done`.
@@ -249,7 +251,7 @@ The paths and parameter names below are stable API contracts.
 
 Auth routes: Better Auth defaults under `/api/auth/*` (public where appropriate).
 
-Errors use consistent JSON `{ error: { code, message } }`: unauthenticated requests use `401`; missing and other-owned private resources both use `404` with code `not_found`; invalid input uses `422`. Private list/task handlers do not expose a distinct `403` ownership response. Server Actions map the same application outcomes without revealing resource existence.
+Errors use consistent JSON `{ error: { code, message } }`: unauthenticated requests use `401`; missing and other-owned private resources both use `404` with code `not_found`; uniqueness conflicts use `409` with code `conflict`; invalid input uses `422`. Private list/task handlers do not expose a distinct `403` ownership response. Server Actions map the same application outcomes without revealing resource existence.
 
 ### 7.2 Server Actions
 
@@ -331,8 +333,8 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Session guards on actions + JSON API
 - [ ] Drizzle schema: auth tables + lists + tasks; migrations applied on Neon/dev DB
 - [ ] Exactly one default Inbox on every listless private workspace load, including after final-list deletion
-- [ ] List CRUD + cascade delete
-- [ ] Task CRUD + status + hide completed
+- [ ] List CRUD + cascade delete + case-insensitive per-user name uniqueness
+- [ ] Task CRUD + status + hide completed + case-insensitive per-list title uniqueness
 - [ ] Landing Sanity read path
 - [ ] Zod at boundaries
 - [ ] Module layering respected for lists/tasks/landing
@@ -353,7 +355,7 @@ The first-class capabilities are `auth`, `landing`, `lists`, and `tasks`. `src/s
 
 ### 14.2 Persistence boundary
 
-Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. `ensureDefaultInbox` must be atomic and idempotent under concurrent listless workspace loads; list deletion relies on the database cascade contract.
+Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. Lists belong directly to users; there is no `Workspace` persistence entity. Database constraints enforce case-insensitive list-name uniqueness per user and task-title uniqueness per list. `ensureDefaultInbox` must be atomic and idempotent under concurrent listless workspace loads; list deletion relies on the database cascade contract.
 
 ### 14.3 Authentication boundary
 

@@ -51,10 +51,10 @@ Keep Better Auth instances, raw session records, and auth route wiring behind th
 
 - **Status:** ACCEPTED
 - **Related product decisions:** D-001, D-003, D-004
-- **Related resolution:** [OD-006](OPEN-DECISIONS.md#od-006)
+- **Related resolutions:** [OD-006](OPEN-DECISIONS.md#od-006), [OD-014](OPEN-DECISIONS.md#od-014)
 - **Source:** ADR-0003
 
-Use PostgreSQL on Neon with Drizzle for Better Auth records, lists, tasks, ownership, timestamps, status, relational integrity, and migrations. Do not create a parallel user table outside the Better Auth adapter schema. Lists and tasks require owner checks and durable relational constraints; deleting a list cascades to its tasks at the database boundary. Develop and verify schema-changing migrations on a non-default Neon branch before applying the same reviewed migration to the default branch.
+Use PostgreSQL on Neon with Drizzle for Better Auth records, lists, tasks, ownership, timestamps, status, relational integrity, and migrations. Do not create a parallel user table or a `Workspace` table outside the Better Auth adapter schema. Lists reference users directly, and tasks reference lists. Lists and tasks require owner checks and durable relational constraints; deleting a list cascades to its tasks at the database boundary. Database-enforced case-insensitive uniqueness prevents duplicate list names per user and duplicate task titles per list under concurrent writes. Develop and verify schema-changing migrations on a non-default Neon branch before applying the same reviewed migration to the default branch.
 
 This keeps relational constraints and TypeScript schema close together; local development consequently requires database configuration and migration discipline.
 
@@ -87,10 +87,10 @@ This keeps editorial copy independently editable while making the second store's
 
 - **Status:** ACCEPTED
 - **Related product decisions:** D-001, D-002, D-006
-- **Related resolutions:** [OD-002](OPEN-DECISIONS.md#od-002), [OD-004](OPEN-DECISIONS.md#od-004)
+- **Related resolutions:** [OD-002](OPEN-DECISIONS.md#od-002), [OD-004](OPEN-DECISIONS.md#od-004), [OD-014](OPEN-DECISIONS.md#od-014)
 - **Source:** current SPEC presentation and validation boundaries
 
-Server Actions and JSON Route Handlers follow `authenticate → authorize → validate with Zod → call application use case → map result/error → revalidate/respond`. Actions and handlers share schemas and application use cases. A nonexistent private list/task and one owned by another user both map to the same application-level `not_found` outcome. JSON handlers return `404` with `{ error: { code: "not_found", message } }`; Server Actions expose the equivalent generic result. The stable JSON routes are `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`; Better Auth owns `/api/auth/*`.
+Server Actions and JSON Route Handlers follow `authenticate → authorize → validate with Zod → call application use case → map result/error → revalidate/respond`. Actions and handlers share schemas and application use cases. A nonexistent private list/task and one owned by another user both map to the same application-level `not_found` outcome. JSON handlers return `404` with `{ error: { code: "not_found", message } }`; Server Actions expose the equivalent generic result. Database uniqueness violations map to the application-level `conflict` outcome; JSON handlers return `409` with code `conflict`, and Server Actions expose the equivalent conflict result. The stable JSON routes are `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`; Better Auth owns `/api/auth/*`.
 
 <a id="td-009"></a>
 

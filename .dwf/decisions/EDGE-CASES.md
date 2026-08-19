@@ -138,3 +138,14 @@ A task may move directly between any two valid statuses without an intermediate 
 - **Resolved by:** OD-012
 
 List and task reads remain deterministic when records share a `createdAt` value by applying an implementation-chosen stable tie-breaker. Hiding completed tasks removes matching tasks without changing the relative order of the remaining tasks.
+
+<a id="ec-014"></a>
+
+## EC-014 — Duplicate list names and task titles
+
+- **Status:** HANDLED
+- **Product decisions:** D-003, D-004
+- **Technical decisions:** TD-005, TD-008
+- **Resolved by:** OD-014
+
+Creating or renaming a list conflicts when the same user already owns a list with the same trimmed name under case-insensitive comparison. Creating or retitling a task conflicts when the same list already contains the same trimmed title under case-insensitive comparison; the same title remains valid in a different list. Database constraints prevent concurrent duplicates. JSON callers receive `409` with code `conflict`, and Server Actions expose the equivalent conflict result.

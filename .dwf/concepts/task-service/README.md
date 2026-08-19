@@ -75,6 +75,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - Creating a task requires a list owned by the authenticated user.
 - One user cannot read or mutate another user's tasks.
 - A task title contains 1–200 characters after trimming.
+- Task titles are unique within one list under case-insensitive comparison and may repeat in different lists.
 - Task notes are trimmed and optional, empty notes normalize to `null`, and non-empty notes contain at most 5,000 characters after trimming.
 - New tasks begin with status `todo`.
 - Task status is one of `todo`, `in_progress`, or `done`.
@@ -92,6 +93,7 @@ The subsystem can be verified independently of completed task presentation:
 - Task list, update, status-change, and delete operations affect only the authenticated owner's rows.
 - Attempts to use another user's list or task produce the same `not_found` outcome as a nonexistent resource.
 - Task creation and title updates reject titles outside the settled 1–200 character range after trimming.
+- Task creation and title updates return `conflict` when that list already contains the same case-insensitive trimmed title, including under concurrent writes.
 - Task creation and notes updates reject notes longer than 5,000 characters.
 - Empty notes normalize to `null`; omitting notes from an update leaves existing notes unchanged.
 - New tasks receive status `todo`.
@@ -115,7 +117,7 @@ The implementation agent may choose:
 
 ## Canonical references
 
-- [`D-001 — Personal authenticated workspace`](../../decisions/PRODUCT.md#d-001)
+- [`D-001 — Personal authenticated area`](../../decisions/PRODUCT.md#d-001)
 - [`D-004 — Task lifecycle and statuses`](../../decisions/PRODUCT.md#d-004)
 - [`TD-002 — Four capability modules and explicit infrastructure seats`](../../decisions/TECHNICAL.md#td-002)
 - [`TD-003 — Layered dependency direction and composition-only routes`](../../decisions/TECHNICAL.md#td-003)

@@ -112,7 +112,7 @@ The implementation agent may choose:
 
 ## Canonical references
 
-- [`D-001 — Personal authenticated workspace`](../../decisions/PRODUCT.md#d-001)
+- [`D-001 — Personal authenticated area`](../../decisions/PRODUCT.md#d-001)
 - [`D-002 — Password and magic-link authentication`](../../decisions/PRODUCT.md#d-002)
 - [`TD-002 — Four capability modules and explicit infrastructure seats`](../../decisions/TECHNICAL.md#td-002)
 - [`TD-003 — Layered dependency direction and composition-only routes`](../../decisions/TECHNICAL.md#td-003)

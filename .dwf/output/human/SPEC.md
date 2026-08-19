@@ -38,7 +38,9 @@ Local magic-link verification uses an explicitly enabled, temporary, gitignored,
 
 A missing private resource and one owned by another user produce the same application-level `not_found` outcome. JSON handlers map both to `404` with code `not_found`; Server Actions expose the equivalent generic result.
 
-PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownership, status, timestamps, and relational integrity. Lists and tasks own their repository ports. Drizzle row types stay inside infrastructure. List deletion uses a database cascade, and default `Inbox` creation is atomic and idempotent whenever a private workspace loads with no lists. Schema-changing migrations are developed and verified on a non-default Neon branch before the same reviewed migration is applied to the default branch.
+Uniqueness violations produce the application-level `conflict` outcome. JSON handlers map it to `409` with code `conflict`; Server Actions expose the equivalent conflict result.
+
+PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownership, status, timestamps, uniqueness, and relational integrity. Lists belong directly to users; there is no `Workspace` persistence entity. Lists and tasks own their repository ports. Drizzle row types stay inside infrastructure. Database constraints enforce case-insensitive list-name uniqueness per user and task-title uniqueness per list. List deletion uses a database cascade, and default `Inbox` creation is atomic and idempotent whenever a private workspace loads with no lists. Schema-changing migrations are developed and verified on a non-default Neon branch before the same reviewed migration is applied to the default branch.
 
 ## Sanity boundary
 

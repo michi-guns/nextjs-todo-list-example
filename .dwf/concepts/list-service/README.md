@@ -74,6 +74,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 
 - Every list read and mutation is scoped to the authenticated user ID.
 - List names are trimmed and contain 1–80 characters.
+- List names are unique per authenticated user under case-insensitive comparison; there is no `Workspace` ownership entity.
 - List reads are deterministic and ordered by creation time, oldest first.
 - A user with zero lists receives exactly one automatic Inbox, including under concurrent private workspace loads and after final-list deletion.
 - An existing list of any name prevents automatic Inbox creation.
@@ -92,6 +93,7 @@ The subsystem can be verified independently of completed task presentation:
 - Renaming or deleting the automatic Inbox follows the same behavior as any other owned list; deleting the final list leads to a new Inbox on the next private workspace load.
 - List create, list, rename, and delete operations affect only the authenticated owner's rows.
 - List creation and rename reject names outside the accepted 1–80 character range after trimming.
+- List creation and rename return `conflict` when the authenticated user already owns the same case-insensitive trimmed name, including under concurrent writes.
 - List reads return oldest-created lists first and remain deterministic when timestamps match.
 - Attempts to operate on another user's list produce the same `not_found` outcome as a nonexistent list.
 - Deleting a list removes its tasks at the database boundary.
@@ -110,7 +112,7 @@ The implementation agent may choose:
 
 ## Canonical references
 
-- [`D-001 — Personal authenticated workspace`](../../decisions/PRODUCT.md#d-001)
+- [`D-001 — Personal authenticated area`](../../decisions/PRODUCT.md#d-001)
 - [`D-003 — Default Inbox and list lifecycle`](../../decisions/PRODUCT.md#d-003)
 - [`TD-002 — Four capability modules and explicit infrastructure seats`](../../decisions/TECHNICAL.md#td-002)
 - [`TD-003 — Layered dependency direction and composition-only routes`](../../decisions/TECHNICAL.md#td-003)

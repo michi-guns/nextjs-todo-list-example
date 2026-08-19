@@ -7,6 +7,7 @@ owner: product-and-engineering
 
 - A task belongs to exactly one list and its owning user.
 - A task title is required and contains 1–200 characters after trimming.
+- Task titles are unique within a list under case-insensitive comparison and may repeat in different lists.
 - Notes are trimmed and optional. Empty notes normalize to `null`; non-empty notes contain at most 5,000 characters after trimming.
 - Status is `todo`, `in_progress`, or `done`.
 - New tasks start as `todo`.

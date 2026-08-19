@@ -58,7 +58,7 @@ Out of scope for spike complete:
 | Signed-in | Manage only their own lists and tasks; sign out                   |
 
 - Anyone may register.
-- There is **no** tenant/org model: one implicit personal workspace per user.
+- There is **no** tenant, organization, or `Workspace` entity. Lists belong directly to the authenticated user through `userId`.
 - Authorization rule: **must be signed in** to read or write lists/tasks.
 - Requests for another user's list or task do not reveal whether that resource exists.
 
@@ -67,7 +67,7 @@ Out of scope for spike complete:
 ### 5.1 Lists
 
 - A user has **many lists**.
-- List names are trimmed and contain **1–80 characters**.
+- List names are trimmed, contain **1–80 characters**, and are unique per user under case-insensitive comparison.
 - Whenever a private workspace loads with zero lists, atomically and idempotently create one list named **Inbox**.
 - The automatic Inbox is an ordinary list after creation and may be renamed or deleted. Deleting the final list causes a new empty Inbox to appear on the next private workspace load; any existing list prevents automatic Inbox creation.
 - List operations: **create**, **rename**, **delete**.
@@ -78,7 +78,8 @@ Out of scope for spike complete:
 
 - A task belongs to exactly one list.
 - Statuses: `todo` | `in_progress` | `done`; new tasks start as `todo`, then may move directly between any statuses.
-- Fields: **title** (required, 1–200 characters after trimming), **notes** (optional, trimmed, empty represented as absent, maximum 5,000 characters after trimming), timestamps.
+- Fields: **title** (required, 1–200 characters after trimming, unique within its list under case-insensitive comparison), **notes** (optional, trimmed, empty represented as absent, maximum 5,000 characters after trimming), timestamps.
+- The same task title may appear in different lists.
 - Operations: **create**, **edit** title/notes, **change status**, **delete**. Reapplying the current status succeeds as a no-op.
 - Completed tasks **remain on the list** and are **shown by default**; UI offers **show/hide completed**.
 - Task reads are deterministic and ordered newest-created first. Hiding completed tasks preserves the relative order of visible tasks; manual reordering is out of scope.
@@ -110,7 +111,7 @@ The spike is complete when all of the following are true **locally**:
 6. User can show/hide completed tasks.
 7. Landing page renders **Sanity-driven** editorial fields (not hardcoded-only forever).
 8. Mutations available via **Server Actions** and mirrored (or subset) **JSON Route Handlers**.
-9. Zod validates server inputs.
+9. Zod validates server inputs; duplicate list names and same-list task titles produce a conflict rather than creating duplicate rows.
 10. Vitest covers domain rules, application use cases, and zod schemas (not a full UI unit matrix).
 11. Playwright covers happy paths: sign-up/in → create list → create task → change status → sign-out.
 12. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
