@@ -147,9 +147,13 @@ Conceptual model (names may match Drizzle tables closely):
 
 ### 3.3 Migration workflow
 
+- Treat versioned Drizzle migration files as the authoritative database transition path.
+- Generate and review a versioned migration for each schema change.
 - Before schema-changing implementation, create a non-default Neon development branch from the current default branch.
-- Generate, apply, and verify Drizzle migrations on that development branch.
+- Apply the complete migration chain to an empty PostgreSQL 18 Testcontainer.
+- Apply the new reviewed migrations to the Neon development branch and verify the hosted upgrade path.
 - Apply the same reviewed migration to the default branch only after verification succeeds.
+- `drizzle-kit push` may support local exploration but does not count as migration verification.
 - Exact Neon branch name, lifetime, and migration-promotion command remain implementation or delivery choices.
 
 ### 3.4 Required indexes and constraints
@@ -330,7 +334,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 ### 10.2 PostgreSQL integration
 
 - Use `@testcontainers/postgresql` with PostgreSQL 18.
-- Start one ephemeral container for an integration suite run, apply the same versioned Drizzle migrations used by Neon, and stop it after the suite, including failure cleanup.
+- Start one ephemeral container for an integration suite run, apply the complete versioned Drizzle migration chain to its empty database, and stop it after the suite, including failure cleanup.
 - Cover Drizzle repository mappings, case-insensitive uniqueness, list-to-task cascade deletion, ownership-aware reads and mutations, cursor pagination, and concurrent default-Inbox creation.
 - Run repository integration tests serially by default while the suite shares one container.
 - Every test creates and owns a unique user and its mutable records, remains independent of execution order, and does not rely on data left by another test.

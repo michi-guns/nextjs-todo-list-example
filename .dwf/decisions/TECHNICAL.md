@@ -215,3 +215,13 @@ Run database repository integration tests and Playwright serially by default whi
 Test Sanity payload validation, mapping, optional fields, and required-content failures with local fixtures. Routine Playwright receives deterministic test-only landing content through the application-facing landing contract and does not call Sanity. The test source cannot run as a deployed fallback.
 
 Keep one separate read-only smoke against the configured dedicated Sanity project and dataset. It fetches the published singleton through the real query and client path, validates the payload, and maps the landing view model. This smoke is required before spike completion and before a deployment counts as release evidence; missing configuration, content, or a valid mapping fails clearly. Exact fixtures, dependency substitution, command name, and output format remain implementation choices.
+
+<a id="td-019"></a>
+
+## TD-019 — Versioned migration chain and upgrade verification
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-003, D-004, D-006
+- **Source:** current migration verification review
+
+Versioned Drizzle migration files are the authoritative database transition path. Testcontainers applies the complete migration chain to an empty PostgreSQL database. A non-default Neon development branch created from the current default branch applies the new reviewed migrations and verifies the hosted upgrade path before the same files may be applied to the default branch. `drizzle-kit push` may support local exploration but does not count as migration verification.

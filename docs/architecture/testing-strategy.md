@@ -17,7 +17,7 @@ Domain and application unit tests do not require PostgreSQL or Docker.
 
 ## Infrastructure tests
 
-Use PostgreSQL 18 through `@testcontainers/postgresql` for Drizzle repository and migration integration tests. Apply the versioned migrations and cover database uniqueness, cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Isolate state between tests and stop the suite-owned container even after failures. Docker-backed tests fail clearly rather than silently skipping when Docker is unavailable.
+Use PostgreSQL 18 through `@testcontainers/postgresql` for Drizzle repository and migration integration tests. Apply the complete versioned migration chain to the empty database before loading test data. Cover database uniqueness, cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Isolate state between tests and stop the suite-owned container even after failures. Docker-backed tests fail clearly rather than silently skipping when Docker is unavailable.
 
 Routine integration tests use only their harness-owned local container and require no Neon credentials. Reset and cleanup helpers refuse external database URLs.
 
@@ -47,4 +47,4 @@ Keep one separate read-only smoke that fetches the published singleton through t
 
 ## Neon verification
 
-Use the non-default Neon development branch for migration smoke checks, cloud-driver compatibility, the representative performance seed, `EXPLAIN ANALYZE`, and the agreed warm-query target. Routine integration and Playwright tests do not use Neon.
+Create the non-default Neon development branch from the current default branch before schema-changing implementation. Apply and verify the new reviewed migrations there before applying the same files to the default branch. Use that development branch for migration smoke checks, cloud-driver compatibility, the representative performance seed, `EXPLAIN ANALYZE`, and the agreed warm-query target. `drizzle-kit push` may support local exploration but does not count as migration verification. Routine integration and Playwright tests do not use Neon.
