@@ -6,6 +6,7 @@ Developer Concepts are derived, non-authoritative explanations that connect cano
 
 - [`AS-001 — Authentication Service`](authentication-service/README.md)
 - [`AS-002 — List Service`](list-service/README.md)
+- [`AS-003 — Task Service`](task-service/README.md)
 
 See the compact [`Architectural Subsystem inventory`](ARCHITECTURAL-SUBSYSTEMS.md) for each subsystem's identity, canonical basis, boundary, and known consumers.
 

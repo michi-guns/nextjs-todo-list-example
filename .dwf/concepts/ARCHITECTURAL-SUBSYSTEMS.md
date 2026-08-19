@@ -17,3 +17,11 @@ This is the compact inventory of qualified Architectural Subsystems for this pro
 - **Identity:** The application's component for default-Inbox behavior and the lifecycle of user-owned lists.
 - **Boundary:** Exposes user-scoped list operations while keeping list persistence, ownership enforcement, atomic Inbox creation, and task cascade behavior behind its application-facing interface.
 - **Known consumers:** The authenticated first-use flow, dashboard and navigation composition, list Server Actions, private list JSON Route Handlers, and task-creation presentation flows.
+
+## AS-003 — Task Service
+
+- **Concept:** [`task-service/README.md`](task-service/README.md)
+- **Canonical basis:** [`D-004`](../decisions/PRODUCT.md#d-004), [`TD-005`](../decisions/TECHNICAL.md#td-005), and [`TD-006`](../decisions/TECHNICAL.md#td-006), supported by [`TD-002`](../decisions/TECHNICAL.md#td-002), [`TD-003`](../decisions/TECHNICAL.md#td-003), and [`D-001`](../decisions/PRODUCT.md#d-001)
+- **Identity:** The application's component for task lifecycle behavior inside user-owned lists.
+- **Boundary:** Exposes user-scoped task operations while keeping task persistence, ownership enforcement, list-membership checks, status behavior, and completed-task filtering behind its application-facing interface.
+- **Known consumers:** Dashboard task-panel composition, task Server Actions, private task JSON Route Handlers, status controls, and completed-task visibility controls.
