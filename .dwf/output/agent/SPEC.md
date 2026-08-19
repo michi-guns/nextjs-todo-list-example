@@ -223,6 +223,13 @@ Conceptual model (names may match Drizzle tables closely):
 - Omitted `limit` defaults to 20; accepted limits are integers from 1 through 100.
 - Page responses contain only `items` and `nextCursor`; total counts and numbered-page metadata are not part of the contract.
 
+### 4.5 Concurrent writes
+
+- List and task mutations do not require an entity version, `If-Match` precondition, or stale-write conflict.
+- Update operations patch only fields supplied by the accepted request; omitted fields remain unchanged.
+- When successfully committed mutations write the same field, later reads return the value from the last commit. Successfully committed disjoint patches may both remain visible.
+- Authentication, ownership, Zod validation, not-found privacy, and database uniqueness enforcement apply independently to every concurrent request.
+
 ---
 
 ## 5. Application use cases (minimum)
@@ -350,7 +357,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 
 - Use `@testcontainers/postgresql` with PostgreSQL 18.
 - Start one ephemeral container for an integration suite run, apply the complete versioned Drizzle migration chain to its empty database, and stop it after the suite, including failure cleanup.
-- Cover Drizzle repository mappings, case-insensitive uniqueness, list-to-task cascade deletion, ownership-aware reads and mutations, cursor pagination, and concurrent default-Inbox creation.
+- Cover Drizzle repository mappings, case-insensitive uniqueness, list-to-task cascade deletion, ownership-aware reads and mutations, cursor pagination, concurrent default-Inbox creation, and last-successful-write behavior for same-field edits.
 - Run repository integration tests serially by default while the suite shares one container.
 - Every test creates and owns a unique user and its mutable records, remains independent of execution order, and does not rely on data left by another test.
 - Parallel execution is allowed later only with an isolated database or schema per worker. Exact runner settings, rollback, truncation, identifier generation, and future worker-isolation mechanics remain implementation choices.

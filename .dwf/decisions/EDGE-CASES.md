@@ -280,3 +280,13 @@ Routine unit and Playwright suites do not depend on Sanity network access or mut
 - **Technical decisions:** TD-004, TD-022
 
 A caller presents a bearer token, API key, or cross-origin request without the application's valid Better Auth session cookie. The private list and task routes do not treat that credential as authentication and return the ordinary unauthenticated outcome. Adding machine or third-party access requires a separate decision rather than silently broadening the baseline API.
+
+<a id="ec-027"></a>
+
+## EC-027 — Concurrent edits target the same list or task
+
+- **Status:** HANDLED
+- **Product decisions:** D-007
+- **Technical decisions:** TD-005, TD-006, TD-008
+
+Two authenticated requests may edit the same owned resource without a version precondition. Each accepted patch changes only the submitted fields. If both write the same field, the last successfully committed value is returned by later reads; disjoint field changes may both persist. Ownership, input validation, not-found privacy, and uniqueness conflicts retain their ordinary outcomes.

@@ -45,6 +45,8 @@ New tasks begin as `todo`. After creation, a task can move directly between any 
 
 Tasks are shown newest-created first through forward cursor pagination, 20 at a time by default, with a visible way to load more. Hiding completed tasks keeps the remaining tasks in the same relative order and restarts pagination, as does selecting another list. Manual list and task reordering is outside the spike.
 
+Concurrent list and task edits do not show a merge prompt or reject an otherwise valid request merely because another edit completed first. Each update changes only its submitted fields. If two accepted updates change the same field, the last successfully committed value is the one later reads show; changes to different fields may both remain visible. Every request still passes the ordinary ownership, validation, and uniqueness checks.
+
 ## Content ownership
 
 PostgreSQL owns authenticated users/session records, lists, tasks, ownership, status, timestamps, and relational integrity. Sanity owns editable landing headline, blurb, and CTA content only. Todo records never live in Sanity.
@@ -68,5 +70,6 @@ The local spike is complete when it supports:
 13. the core Playwright journey in Chromium, with Firefox and WebKit available as a separate check before public release or after major UI changes;
 14. local typecheck, lint, Husky, and lint-staged quality checks;
 15. representative Neon seed data and lightweight evidence that the main paginated database queries use their intended indexes and meet the agreed warm-query target.
+16. last-successful-write behavior for concurrent list and task edits without bypassing normal safeguards.
 
 The exact implementation contract is in the [Agent SPEC](../agent/SPEC.md). It must implement the [Agent PRD](../agent/PRD.md) and may not weaken it.

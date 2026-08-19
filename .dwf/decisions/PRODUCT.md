@@ -61,3 +61,13 @@ The public landing surface contains editable headline, blurb, and CTA content. E
 - **Related:** [Agent PRD](../output/agent/PRD.md#7-spike-complete-acceptance)
 
 Spike completion requires a real local journey: authenticate, obtain `Inbox`, create a list, create a task, change status, sign out, and verify private-data protection. Server-boundary validation, database-free domain/application tests, real local PostgreSQL integration tests, the core Playwright path, and local commit quality hooks are part of the spike acceptance. Deployment and CI are optional.
+
+<a id="d-007"></a>
+
+## D-007 — Last successful write wins for concurrent edits
+
+- **Status:** ACCEPTED
+- **Source:** current concurrent-edit behavior review
+- **Related:** [Agent PRD](../output/agent/PRD.md#53-concurrent-edits)
+
+Concurrent list and task edits do not require version tokens, merge prompts, or stale-write rejection. Each accepted mutation changes only the fields it contains. When accepted mutations write the same field, the value from the last successfully committed write is the observable result; mutations of different fields may both remain visible. Existing ownership, validation, and uniqueness rules still apply.

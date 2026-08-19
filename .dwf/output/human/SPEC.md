@@ -64,6 +64,8 @@ The stable JSON route families are `/api/lists`, `/api/lists/:listId`, `/api/lis
 
 The private JSON routes are same-origin application endpoints authenticated by the existing Better Auth browser session. The baseline does not enable cross-origin access or add bearer tokens, API keys, JWTs, or another machine-authentication flow. A future product may add external-agent access through a separate authentication and authorization decision.
 
+List and task updates use patch semantics without version preconditions. Concurrent accepted writes to the same field use the last successfully committed value, while accepted patches to different fields may both persist. The application does not add stale-write errors or merge UI to this baseline; each request still enforces ownership, validation, privacy-preserving not-found behavior, and database uniqueness.
+
 ## Verification
 
 Use layered proof:

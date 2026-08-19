@@ -89,7 +89,14 @@ Out of scope for spike complete:
 - Task reads use forward cursor pagination and return an opaque next cursor when more records exist.
 - Task pages default to 20 records and accept at most 100. The dashboard exposes `Load more` while another page exists; changing the selected list or completed-task filter restarts from the first page.
 
-### 5.3 Surfaces
+### 5.3 Concurrent edits
+
+- List and task edits do not require version tokens or stale-write prompts.
+- Each accepted mutation changes only the fields it contains.
+- If accepted mutations write the same field, the last successfully committed value is the observable result. Changes to different fields may both persist.
+- Ownership, validation, and uniqueness rules still apply to every mutation.
+
+### 5.4 Surfaces
 
 1. **Public landing** — copy from Sanity (headline, blurb, CTAs).
 2. **Auth screens** — sign-up, sign-in, magic link, sign-out.
@@ -123,6 +130,7 @@ The spike is complete when all of the following are true **locally**:
 13. Playwright covers happy paths in Chromium: sign-up/in → create list → create task → change status → sign-out. Firefox and WebKit are available through a separate on-demand cross-browser run before a public release or after a major UI change.
 14. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
 15. Representative Neon development data and query-plan evidence confirm index-backed cursor reads, correct maximum-size pages, and the agreed warm-query target.
+16. Concurrent list and task edits use last-successful-write behavior without weakening ownership, validation, or uniqueness enforcement.
 
 Deployed Vercel preview is **optional**, not required for spike complete.
 
