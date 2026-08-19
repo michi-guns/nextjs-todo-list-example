@@ -28,7 +28,8 @@ Human projections:
 
 Derived explanations:
 
-- [`concepts/`](concepts/) — reloadable mental models and illustrative examples; never a competing authority
+- [`concepts/README.md`](concepts/README.md) — index of derived Developer Concepts
+- [`concepts/ARCHITECTURAL-SUBSYSTEMS.md`](concepts/ARCHITECTURAL-SUBSYSTEMS.md) — qualified Architectural Subsystem inventory
 - [`../docs/index.md`](../docs/index.md) — supporting architecture, domain, data, development, and runbook material
 
 ## Ownership
