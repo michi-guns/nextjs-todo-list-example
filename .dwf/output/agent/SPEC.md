@@ -190,6 +190,8 @@ Conceptual model (names may match Drizzle tables closely):
 - Cursor position follows the settled `createdAt` ordering plus the deterministic tie-breaker.
 - Authentication, ownership, list membership, and completed-task filtering are applied independently of cursor data on every request.
 - Malformed or context-incompatible cursors are invalid input. Exact encoding and signing remain implementation choices.
+- Omitted `limit` defaults to 20; accepted limits are integers from 1 through 100.
+- Page responses contain only `items` and `nextCursor`; total counts and numbered-page metadata are not part of the contract.
 
 ---
 
@@ -259,6 +261,8 @@ The paths and parameter names below are stable API contracts.
 
 Auth routes: Better Auth defaults under `/api/auth/*` (public where appropriate).
 
+For paginated GET routes, omitted `limit` means 20 and accepted values are integers from 1 through 100. Responses do not include total counts or numbered-page metadata.
+
 Errors use consistent JSON `{ error: { code, message } }`: unauthenticated requests use `401`; missing and other-owned private resources both use `404` with code `not_found`; uniqueness conflicts use `409` with code `conflict`; invalid input, including malformed or context-incompatible cursors, uses `422`. Private list/task handlers do not expose a distinct `403` ownership response. Server Actions map the same application outcomes without revealing resource existence.
 
 ### 7.2 Server Actions
@@ -279,7 +283,8 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 
 - **Marketing:** landing consuming Sanity view model + links to auth.
 - **Auth:** sign-up, sign-in, magic link request/consume UX sufficient for happy paths.
-- **App:** dashboard-style shell (shadcn): sidebar lists, main task panel, status controls, show/hide completed.
+- **App:** dashboard-style shell (shadcn): sidebar lists, main task panel, status controls, show/hide completed, and visible `Load more` controls for lists and tasks while `nextCursor` is non-null.
+- Loading another page appends records in the settled order. Changing the selected list or completed-task filter discards loaded task pages and starts again from the first page.
 - Prefer composition patterns; avoid turning `components/` into a second domain layer.
 
 ---
@@ -304,7 +309,8 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
   3. Create list
   4. Create task
   5. Change task status
-  6. Sign-out
+  6. Load another task page from seeded data
+  7. Sign-out
 - The magic-link Playwright path clears the local/test mailbox, requests a link, reads the captured URL, and visits it to verify link consumption.
 - CI: **not required** for spike complete.
 
@@ -344,6 +350,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] List CRUD + cascade delete + case-insensitive per-user name uniqueness
 - [ ] Task CRUD + status + hide completed + case-insensitive per-list title uniqueness
 - [ ] Cursor-paginated list and task reads with opaque next cursors
+- [ ] Pagination defaults to 20, caps at 100, omits total counts, and is visible through dashboard `Load more`
 - [ ] Landing Sanity read path
 - [ ] Zod at boundaries
 - [ ] Module layering respected for lists/tasks/landing
@@ -434,6 +441,7 @@ type TaskStatus = "todo" | "in_progress" | "done"
 
 interface PageRequest {
   cursor?: string
+  /** Defaults to 20; accepted range is 1–100. */
   limit?: number
 }
 

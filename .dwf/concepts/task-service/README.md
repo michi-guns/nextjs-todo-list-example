@@ -82,6 +82,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - Any valid status may transition directly to any other valid status; reapplying the current status is an idempotent no-op.
 - Task reads are deterministic and ordered by creation time, newest first.
 - Task reads use forward cursor pagination and return items plus an opaque next cursor.
+- Task pages default to 20 records and accept at most 100; no total count or numbered-page metadata is returned.
 - Hiding completed tasks changes the read result, not stored task state.
 - When completed-task visibility is omitted, reads include completed tasks.
 - Task persistence types do not cross into presentation or other capability contracts.
@@ -101,6 +102,7 @@ The subsystem can be verified independently of completed task presentation:
 - Status changes accept direct transitions between all settled task statuses, treat the current status as a successful no-op, and reject values outside the settled statuses.
 - Task reads return newest-created tasks first and remain deterministic when timestamps match.
 - Pagination remains scoped to the authenticated owner, selected list, and completed-task filter; cursor data never overrides that context.
+- Dashboard consumers can append another page while a next cursor exists; changing the selected list or completed-task filter starts again from the first page.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
 - Completed-task filtering preserves the relative order of remaining tasks.
 - Omitting completed-task visibility includes stored `done` tasks.

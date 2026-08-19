@@ -160,3 +160,14 @@ Creating or renaming a list conflicts when the same user already owns a list wit
 - **Resolved by:** OD-015
 
 A malformed cursor or one incompatible with the current read context produces the standard invalid-input outcome; JSON callers receive `422`. Cursor contents never supply `userId`, authorize access, bypass list ownership, or override the selected completed-task filter. The authenticated scope and filters are applied independently on every page request.
+
+<a id="ec-016"></a>
+
+## EC-016 — Pagination limit and context changes
+
+- **Status:** HANDLED
+- **Product decisions:** D-003, D-004
+- **Technical decisions:** TD-008
+- **Resolved by:** OD-016
+
+An omitted page limit behaves as 20. A non-integer limit or one outside 1–100 is invalid input; JSON callers receive `422`. A `null` next cursor ends the sequence and hides the dashboard's additional-page control. Changing the selected list or completed-task filter discards loaded task pages and starts a fresh first-page read so cursors are not reused across contexts.

@@ -77,6 +77,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - List names are unique per authenticated user under case-insensitive comparison; there is no `Workspace` ownership entity.
 - List reads are deterministic and ordered by creation time, oldest first.
 - List reads use forward cursor pagination and return items plus an opaque next cursor.
+- List pages default to 20 records and accept at most 100; no total count or numbered-page metadata is returned.
 - A user with zero lists receives exactly one automatic Inbox, including under concurrent private workspace loads and after final-list deletion.
 - An existing list of any name prevents automatic Inbox creation.
 - The automatic Inbox may be renamed or deleted like any other list.
@@ -97,6 +98,7 @@ The subsystem can be verified independently of completed task presentation:
 - List creation and rename return `conflict` when the authenticated user already owns the same case-insensitive trimmed name, including under concurrent writes.
 - List reads return oldest-created lists first and remain deterministic when timestamps match.
 - Pagination returns no duplicate or skipped records merely because earlier rows were inserted or deleted; cursor data never overrides authenticated ownership.
+- Dashboard consumers can append another page while a next cursor exists.
 - Attempts to operate on another user's list produce the same `not_found` outcome as a nonexistent list.
 - Deleting a list removes its tasks at the database boundary.
 - Application-facing list results do not expose Drizzle row types.

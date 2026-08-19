@@ -74,6 +74,7 @@ Out of scope for spike complete:
 - Deleting a list **cascade-deletes** its tasks.
 - List reads are deterministic and ordered oldest-created first. Manual reordering is out of scope.
 - List reads use forward cursor pagination and return an opaque next cursor when more records exist.
+- List pages default to 20 records and accept at most 100. The dashboard exposes `Load more` while another page exists.
 
 ### 5.2 Tasks
 
@@ -85,6 +86,7 @@ Out of scope for spike complete:
 - Completed tasks **remain on the list** and are **shown by default**; UI offers **show/hide completed**.
 - Task reads are deterministic and ordered newest-created first. Hiding completed tasks preserves the relative order of visible tasks; manual reordering is out of scope.
 - Task reads use forward cursor pagination and return an opaque next cursor when more records exist.
+- Task pages default to 20 records and accept at most 100. The dashboard exposes `Load more` while another page exists; changing the selected list or completed-task filter restarts from the first page.
 
 ### 5.3 Surfaces
 
@@ -111,12 +113,13 @@ The spike is complete when all of the following are true **locally**:
 4. User can create/rename/delete lists; delete removes tasks.
 5. User can create/edit/delete tasks and move status among `todo` / `in_progress` / `done`.
 6. User can show/hide completed tasks.
-7. Landing page renders **Sanity-driven** editorial fields (not hardcoded-only forever).
-8. Mutations available via **Server Actions** and mirrored (or subset) **JSON Route Handlers**.
-9. Zod validates server inputs; duplicate list names and same-list task titles produce a conflict rather than creating duplicate rows.
-10. Vitest covers domain rules, application use cases, and zod schemas (not a full UI unit matrix).
-11. Playwright covers happy paths: sign-up/in → create list → create task → change status → sign-out.
-12. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
+7. User can visibly load additional cursor-paginated lists and tasks.
+8. Landing page renders **Sanity-driven** editorial fields (not hardcoded-only forever).
+9. Mutations available via **Server Actions** and mirrored (or subset) **JSON Route Handlers**.
+10. Zod validates server inputs; duplicate list names and same-list task titles produce a conflict rather than creating duplicate rows.
+11. Vitest covers domain rules, application use cases, and zod schemas (not a full UI unit matrix).
+12. Playwright covers happy paths: sign-up/in → create list → create task → change status → sign-out.
+13. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
 
 Deployed Vercel preview is **optional**, not required for spike complete.
 

@@ -377,6 +377,31 @@ Choose the pagination mechanism and application-facing page contract.
 
 Use forward cursor pagination for list and task reads. A page contains `items` and an opaque `nextCursor`, which is `null` when no later page exists. The cursor represents the settled `createdAt` ordering plus the implementation-chosen deterministic tie-breaker. Ownership, list membership, and completed-task filters are applied independently of cursor data; a cursor never grants access or selects an owner. Malformed or context-incompatible cursors produce the standard invalid-input outcome. Exact cursor encoding, signing, and internal tie-breaker type remain implementation choices.
 
+<a id="od-016"></a>
+
+## OD-016 — Pagination limits and dashboard behavior
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-003, D-004, TD-008, EC-016
+
+### Problem / Conflict
+
+Cursor pagination was selected, but the page limits, response metadata, and visible dashboard interaction still needed a stable contract.
+
+### Accepted Constraints
+
+The spike must visibly demonstrate pagination without adding numbered-page navigation or requiring total-count queries.
+
+### Decision Required
+
+Choose the default and maximum page sizes and the dashboard interaction for additional pages.
+
+### Resolution
+
+List and task reads default to 20 records per page and accept an integer `limit` from 1 through 100. Responses contain only `items` and `nextCursor`; they do not include total counts or numbered-page metadata. The dashboard initially loads one page and shows `Load more` while `nextCursor` is non-null. Loading more appends the next items in the settled order. Changing the selected list or completed-task filter discards the current task pages and starts again from the first page. Exact control placement, loading indicator, and button copy capitalization remain implementation choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

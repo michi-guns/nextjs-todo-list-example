@@ -15,5 +15,6 @@ owner: product-and-engineering
 - Deleting a list permanently deletes its tasks.
 - List reads are deterministic and ordered oldest-created first. Manual reordering is outside the spike.
 - List reads use forward cursor pagination and return items plus an opaque next cursor.
+- List pages default to 20 records, accept at most 100, and do not return total counts or numbered-page metadata.
 
 Soft deletion, shared lists, and moving tasks between users are outside the spike.

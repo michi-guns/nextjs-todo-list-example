@@ -52,7 +52,7 @@ The minimum application APIs cover:
 
 - `ensureDefaultInbox`, list listing/creation/rename/deletion;
 - task listing/creation/update/deletion;
-- forward cursor pagination for list and task reads through `{ items, nextCursor }` pages;
+- forward cursor pagination for list and task reads through `{ items, nextCursor }` pages, defaulting to 20 and capped at 100 records;
 - task statuses `todo`, `in_progress`, and `done`;
 - completed-task filtering;
 - ownership checks at use-case and repository boundaries;
@@ -60,7 +60,7 @@ The minimum application APIs cover:
 
 Exact signatures and data contracts are in the [Agent SPEC](../agent/SPEC.md).
 
-The stable JSON route families are `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`. List and task GET routes accept opaque `cursor` and `limit` query parameters and return `{ items, nextCursor }`; cursors never provide ownership identity. Better Auth owns `/api/auth/*`.
+The stable JSON route families are `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`. List and task GET routes accept opaque `cursor` and `limit` query parameters and return `{ items, nextCursor }`; cursors never provide ownership identity. Omitted limits mean 20, the maximum is 100, and responses do not include total counts or numbered-page metadata. Better Auth owns `/api/auth/*`.
 
 ## Verification
 
