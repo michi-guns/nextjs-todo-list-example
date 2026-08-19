@@ -235,3 +235,13 @@ Versioned Drizzle migration files are the authoritative database transition path
 - **Source:** current server-boundary testing review
 
 Domain and application tests remain the main business-behavior suite. JSON Route Handlers receive request-level contract tests for success, pagination shape, unauthenticated `401`, privacy-preserving `404`, conflict `409`, and invalid-input `422` responses. Server Actions receive a smaller adapter suite for authentication, validation, and successful-result or expected-error mapping. Do not repeat every business case across both entry paths.
+
+<a id="td-021"></a>
+
+## TD-021 — Behavior-based test acceptance without a percentage gate
+
+- **Status:** ACCEPTED
+- **Related product decision:** D-006
+- **Source:** current test-coverage review
+
+Do not require a minimum code-coverage percentage. Every behavior required by the Agent SPEC must have suitable test evidence. Coverage reports may reveal untested code and guide review, but a percentage does not replace behavior-based acceptance.

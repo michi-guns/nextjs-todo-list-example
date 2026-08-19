@@ -338,6 +338,12 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - Give Server Actions a smaller adapter suite covering authentication, input validation, successful result mapping, and expected error mapping.
 - Do not repeat every business case across both server entry paths.
 
+#### Coverage policy
+
+- Do not impose a minimum code-coverage percentage.
+- Give every behavior required by this SPEC suitable test evidence.
+- Use coverage reports to identify possible gaps, not as a substitute for behavior-based acceptance.
+
 ### 10.2 PostgreSQL integration
 
 - Use `@testcontainers/postgresql` with PostgreSQL 18.
