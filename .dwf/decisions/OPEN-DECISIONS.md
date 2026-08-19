@@ -177,6 +177,31 @@ Choose the accepted list-name length range.
 
 After trimming, a list name must contain between 1 and 80 characters inclusive.
 
+<a id="od-008"></a>
+
+## OD-008 — Task title length
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-004, TD-008, EC-002
+
+### Problem / Conflict
+
+Task titles were required and non-empty after trimming, but their maximum accepted length was only a recommendation.
+
+### Accepted Constraints
+
+The same limit must be enforced consistently by application validation, Server Actions, and JSON Route Handlers.
+
+### Decision Required
+
+Choose the accepted task-title length range.
+
+### Resolution
+
+After trimming, a task title must contain between 1 and 200 characters inclusive.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

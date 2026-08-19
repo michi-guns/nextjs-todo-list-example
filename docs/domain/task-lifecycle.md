@@ -6,7 +6,7 @@ owner: product-and-engineering
 # Task Lifecycle
 
 - A task belongs to exactly one list and its owning user.
-- A task title is required and trimmed.
+- A task title is required and contains 1–200 characters after trimming.
 - Notes are optional.
 - Status is `todo`, `in_progress`, or `done`.
 - New tasks start as `todo`.

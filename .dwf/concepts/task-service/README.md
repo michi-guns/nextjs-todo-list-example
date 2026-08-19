@@ -74,6 +74,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - A task belongs to exactly one user-owned list.
 - Creating a task requires a list owned by the authenticated user.
 - One user cannot read or mutate another user's tasks.
+- A task title contains 1–200 characters after trimming.
 - New tasks begin with status `todo`.
 - Task status is one of `todo`, `in_progress`, or `done`.
 - Hiding completed tasks changes the read result, not stored task state.
@@ -87,6 +88,7 @@ The subsystem can be verified independently of completed task presentation:
 - Task creation succeeds only inside a list owned by the authenticated user.
 - Task list, update, status-change, and delete operations affect only the authenticated owner's rows.
 - Attempts to use another user's list or task produce the same `not_found` outcome as a nonexistent resource.
+- Task creation and title updates reject titles outside the settled 1–200 character range after trimming.
 - New tasks receive status `todo`.
 - Status changes accept the settled task statuses and reject values outside them.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.

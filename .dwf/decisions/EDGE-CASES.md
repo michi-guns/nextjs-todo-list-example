@@ -19,9 +19,9 @@ The user has no lists when private access begins. The system creates exactly one
 - **Status:** HANDLED
 - **Product decisions:** D-003, D-004
 - **Technical decisions:** TD-008
-- **Resolved by:** OD-007 for list-name length
+- **Resolved by:** OD-007 for list-name length; OD-008 for task-title length
 
-List names and task titles are trimmed and must remain non-empty after trimming. List names must not exceed 80 characters. Server-side Zod/application validation rejects invalid input; client-only validation is insufficient.
+List names and task titles are trimmed and must remain non-empty after trimming. List names must not exceed 80 characters, and task titles must not exceed 200 characters. Server-side Zod/application validation rejects invalid input; client-only validation is insufficient.
 
 <a id="ec-003"></a>
 
