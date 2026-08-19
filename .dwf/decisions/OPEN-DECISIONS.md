@@ -1,23 +1,23 @@
 # Open Decisions
 
-Unresolved choices (`OD-*`): what should we choose? Do not silently treat recommendations as accepted decisions.
+Tracked choices (`OD-*`). Entries with `OPEN` status remain unresolved and recommendations are not accepted decisions. Resolved entries stay here as decision history and point to the durable contract they updated.
 
 <a id="od-001"></a>
 
 ## OD-001 — Completed-task query default
 
-- **Status:** OPEN
+- **Status:** RESOLVED
 - **Impact:** SPEC
 - **Blocking:** NO
 - **Related:** D-004, EC-003
 
 ### Problem / Conflict
 
-The contract supports `includeCompleted: boolean` and the UI supports hiding completed tasks, but the default is not selected.
+The contract supports `includeCompleted: boolean` and the UI supports hiding completed tasks, so one consistent default was required.
 
 ### Accepted Constraints
 
-Completed tasks remain stored. The implementation must use one default consistently. The current recommendation is show all by default and let the UI hide completed tasks.
+Completed tasks remain stored. The implementation must use one default consistently.
 
 ### Decision Required
 
@@ -25,7 +25,7 @@ Choose the default value for `includeCompleted`.
 
 ### Resolution
 
-Pending.
+`includeCompleted` defaults to `true`. An omitted value returns all stored tasks, and the initial UI shows completed tasks. Users may explicitly hide completed tasks without deleting them.
 
 <a id="od-002"></a>
 

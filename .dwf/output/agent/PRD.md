@@ -76,7 +76,7 @@ Out of scope for spike complete:
 - Statuses: `todo` | `in_progress` | `done`.
 - Fields: **title** (required), **notes** (optional), timestamps.
 - Operations: **create**, **edit** title/notes, **change status**, **delete**.
-- Completed tasks **remain on the list**; UI offers **show/hide completed**.
+- Completed tasks **remain on the list** and are **shown by default**; UI offers **show/hide completed**.
 
 ### 5.3 Surfaces
 

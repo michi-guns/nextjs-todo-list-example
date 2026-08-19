@@ -38,9 +38,9 @@ A user may own many lists. On first authenticated use, when the user has no list
 
 - **Status:** ACCEPTED
 - **Source:** PRD, section 5.2
-- **Related:** [Agent PRD](../output/agent/PRD.md#52-tasks)
+- **Related:** [OD-001](OPEN-DECISIONS.md#od-001), [Agent PRD](../output/agent/PRD.md#52-tasks)
 
-Each task belongs to exactly one user-owned list. A task has a required title, optional notes, timestamps, and one of `todo`, `in_progress`, or `done`. Users may create, edit, delete, and change task status. Completed tasks remain stored and the product supports showing or hiding them.
+Each task belongs to exactly one user-owned list. A task has a required title, optional notes, timestamps, and one of `todo`, `in_progress`, or `done`. Users may create, edit, delete, and change task status. Completed tasks remain stored and are shown by default; users may explicitly hide them without deleting them.
 
 <a id="d-005"></a>
 

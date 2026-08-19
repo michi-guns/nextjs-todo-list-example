@@ -165,7 +165,7 @@ Conceptual model (names may match Drizzle tables closely):
 
 ### 4.3 Visibility filter
 
-- Application/query supports `includeCompleted: boolean` (default `true` or `false` — pick one in implementation and keep consistent; recommended default **show all**, UI toggle hides `done`).
+- Application/query supports `includeCompleted: boolean`, defaulting to `true`. An omitted value returns all stored tasks; the UI initially shows completed tasks and offers a toggle that hides `done` tasks.
 
 ---
 
@@ -478,4 +478,4 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 
 ### 14.10 Unresolved implementation choices
 
-The default for `includeCompleted`, not-found privacy status, local magic-link test delivery, and exact API path spelling remain tracked in [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Factual integration gaps remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); they are not silently resolved by this SPEC projection.
+The not-found privacy status, local magic-link test delivery, and exact API path spelling remain tracked in [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Factual integration gaps remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); they are not silently resolved by this SPEC projection.

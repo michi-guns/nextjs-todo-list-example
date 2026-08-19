@@ -68,4 +68,4 @@ A full React component unit-test matrix is not required for the spike.
 
 ## Unresolved state
 
-The default completed-task query value, privacy error mapping, local magic-link test delivery, exact API paths, Sanity integration evidence, and database migration/application state remain explicitly tracked in the decision ledgers. The implementation must not silently choose answers that change the contract.
+Privacy error mapping, local magic-link test delivery, exact API paths, Sanity integration evidence, and database migration/application state remain explicitly tracked in the decision ledgers. The implementation must not silently choose answers that change the contract.

@@ -51,7 +51,6 @@ The concrete function names, input types, result types, and file grouping remain
 - Creating, renaming, deleting, or automatically provisioning lists.
 - Owning task UI, Server Action behavior, HTTP paths, redirects, or JSON response mapping.
 - Selecting the exact Drizzle schema layout, query syntax, or source-file structure.
-- Deciding unresolved product behavior such as the default completed-task visibility.
 
 ## Dependencies
 
@@ -78,6 +77,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - New tasks begin with status `todo`.
 - Task status is one of `todo`, `in_progress`, or `done`.
 - Hiding completed tasks changes the read result, not stored task state.
+- When completed-task visibility is omitted, reads include completed tasks.
 - Task persistence types do not cross into presentation or other capability contracts.
 
 ## Verification
@@ -90,6 +90,7 @@ The subsystem can be verified independently of completed task presentation:
 - New tasks receive status `todo`.
 - Status changes accept the settled task statuses and reject values outside them.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
+- Omitting completed-task visibility includes stored `done` tasks.
 - Application-facing task results do not expose Drizzle row types.
 
 ## Implementation freedom
@@ -103,7 +104,7 @@ The implementation agent may choose:
 - Test doubles and the split between unit and adapter integration tests.
 - Presentation adapters and error mapping consistent with the separately settled presentation decisions.
 
-The default behavior when completed-task visibility is omitted and the exact ownership-safe not-found response remain governed by the open-decision ledger until resolved.
+The exact ownership-safe not-found response remains governed by the open-decision ledger until resolved.
 
 ## Canonical references
 

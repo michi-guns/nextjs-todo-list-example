@@ -26,11 +26,11 @@ List names and task titles are trimmed and must remain non-empty after trimming.
 
 ## EC-003 — Completed task visibility
 
-- **Status:** OPEN
+- **Status:** HANDLED
 - **Product decisions:** D-004
-- **Related open decision:** OD-001
+- **Resolved by:** OD-001
 
-Completed tasks remain stored. The query/UI supports showing or hiding completed tasks, but the default value of `includeCompleted` remains an open implementation choice until selected consistently.
+Completed tasks remain stored and are included by default. An omitted `includeCompleted` value behaves as `true`, and the initial UI shows completed tasks. Users may explicitly hide them without changing stored task state.
 
 <a id="ec-004"></a>
 

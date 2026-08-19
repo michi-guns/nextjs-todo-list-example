@@ -36,7 +36,7 @@ Each task belongs to exactly one list and has:
 - a status of `todo`, `in_progress`, or `done`;
 - timestamps.
 
-Tasks can be created, edited, deleted, and moved between statuses. Completed tasks stay stored, while the interface can show or hide them.
+Tasks can be created, edited, deleted, and moved between statuses. Completed tasks stay stored and are shown by default, while the interface can explicitly hide or show them.
 
 ## Content ownership
 
