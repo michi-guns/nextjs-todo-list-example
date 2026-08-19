@@ -116,3 +116,13 @@ Task notes remain optional. When notes are present and exceed 5,000 characters, 
 - **Resolved by:** OD-010
 
 Task notes are trimmed. On creation, omitted, `null`, empty, and whitespace-only notes become `null`. On update, an omitted `notes` field leaves the current notes unchanged, while an explicit `null`, empty, or whitespace-only value clears them to `null`. The 5,000-character limit is evaluated after trimming.
+
+<a id="ec-012"></a>
+
+## EC-012 — Repeated or direct task status changes
+
+- **Status:** HANDLED
+- **Product decisions:** D-004
+- **Resolved by:** OD-011
+
+A task may move directly between any two valid statuses without an intermediate step. Applying its current status again succeeds as an idempotent no-op rather than producing a transition error.

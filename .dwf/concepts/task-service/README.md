@@ -78,6 +78,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - Task notes are trimmed and optional, empty notes normalize to `null`, and non-empty notes contain at most 5,000 characters after trimming.
 - New tasks begin with status `todo`.
 - Task status is one of `todo`, `in_progress`, or `done`.
+- Any valid status may transition directly to any other valid status; reapplying the current status is an idempotent no-op.
 - Hiding completed tasks changes the read result, not stored task state.
 - When completed-task visibility is omitted, reads include completed tasks.
 - Task persistence types do not cross into presentation or other capability contracts.
@@ -93,7 +94,7 @@ The subsystem can be verified independently of completed task presentation:
 - Task creation and notes updates reject notes longer than 5,000 characters.
 - Empty notes normalize to `null`; omitting notes from an update leaves existing notes unchanged.
 - New tasks receive status `todo`.
-- Status changes accept the settled task statuses and reject values outside them.
+- Status changes accept direct transitions between all settled task statuses, treat the current status as a successful no-op, and reject values outside the settled statuses.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
 - Omitting completed-task visibility includes stored `done` tasks.
 - Application-facing task results do not expose Drizzle row types.

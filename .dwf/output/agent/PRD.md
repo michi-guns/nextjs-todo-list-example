@@ -75,9 +75,9 @@ Out of scope for spike complete:
 ### 5.2 Tasks
 
 - A task belongs to exactly one list.
-- Statuses: `todo` | `in_progress` | `done`.
+- Statuses: `todo` | `in_progress` | `done`; new tasks start as `todo`, then may move directly between any statuses.
 - Fields: **title** (required, 1–200 characters after trimming), **notes** (optional, trimmed, empty represented as absent, maximum 5,000 characters after trimming), timestamps.
-- Operations: **create**, **edit** title/notes, **change status**, **delete**.
+- Operations: **create**, **edit** title/notes, **change status**, **delete**. Reapplying the current status succeeds as a no-op.
 - Completed tasks **remain on the list** and are **shown by default**; UI offers **show/hide completed**.
 
 ### 5.3 Surfaces

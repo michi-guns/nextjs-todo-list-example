@@ -168,7 +168,8 @@ Conceptual model (names may match Drizzle tables closely):
 - Notes are trimmed and optional. On creation, omitted, `null`, empty, and whitespace-only notes normalize to `null`. On update, omitting `notes` leaves the value unchanged; explicitly providing `null`, empty, or whitespace-only notes clears the value to `null`.
 - Notes have a maximum length of 5,000 characters after trimming.
 - Status only one of: `todo`, `in_progress`, `done`.
-- Create defaults status to `todo` unless specified and valid.
+- New tasks always begin with status `todo`.
+- After creation, any valid status may transition directly to any other valid status. Reapplying the current status succeeds as an idempotent no-op.
 - Task must belong to a list owned by the same user.
 - Moving a task across lists is **out of scope** unless added later by amending this SPEC.
 

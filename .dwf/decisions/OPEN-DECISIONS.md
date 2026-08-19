@@ -252,6 +252,31 @@ Choose how task notes are normalized and cleared.
 
 Trim leading and trailing whitespace from task notes. Normalize an omitted note during creation, an explicit `null`, an empty string, or a whitespace-only string to `null`. During an update, omitting the `notes` field leaves the existing value unchanged, while any explicit empty value clears it to `null`. Apply the 5,000-character limit after trimming.
 
+<a id="od-011"></a>
+
+## OD-011 — Task status transitions
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-004, EC-012
+
+### Problem / Conflict
+
+The three task statuses were settled, but the contract did not say whether transitions form a restricted workflow or whether repeated status updates are valid.
+
+### Accepted Constraints
+
+New tasks begin as `todo`, and only `todo`, `in_progress`, and `done` are valid statuses.
+
+### Decision Required
+
+Choose the allowed transitions among the settled task statuses.
+
+### Resolution
+
+After creation, a task may move directly from any valid status to any other valid status. No transition requires an intermediate status. Setting a task to its current status succeeds as an idempotent no-op. New tasks still always begin as `todo`.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.
