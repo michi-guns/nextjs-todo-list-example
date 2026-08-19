@@ -302,6 +302,31 @@ Choose the default ordering for lists and tasks.
 
 Order lists by `createdAt` ascending, oldest first. Order tasks by `createdAt` descending, newest first. Completed-task filtering preserves the relative order of the remaining tasks. Equal timestamps require a deterministic tie-breaker, but the exact tie-breaker and query implementation remain implementation choices. Manual reordering is outside this spike.
 
+<a id="od-013"></a>
+
+## OD-013 — Automatic Inbox lifecycle
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-003, TD-006, EC-001
+
+### Problem / Conflict
+
+The product created an automatic Inbox for a new user, but it did not clearly define whether that Inbox remained special or what happened if a user later deleted every list.
+
+### Accepted Constraints
+
+Users may rename and delete lists. A listless private workspace must remain usable, and automatic Inbox creation must stay atomic and idempotent.
+
+### Decision Required
+
+Choose the lifecycle of the automatic Inbox after it is created and the behavior when a user later has zero lists.
+
+### Resolution
+
+After creation, the automatic Inbox is an ordinary user-owned list and may be renamed or deleted. Whenever an authenticated private workspace loads and the user has zero lists, create exactly one new list named `Inbox`. Therefore, deleting the final list leaves the user listless only until the next private workspace load, which creates a new empty Inbox. Any existing list, regardless of its name, prevents automatic Inbox creation.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

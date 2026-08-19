@@ -28,7 +28,7 @@ The example is intentionally serious about ownership, data boundaries, validatio
 
 ## Lists and tasks
 
-A user can own many lists. List names are trimmed and contain 1–80 characters. If the user has no lists on first authenticated use, the product creates an `Inbox` list. Lists can be created, renamed, and deleted; deleting a list removes its tasks. Lists are shown oldest-created first.
+A user can own many lists. List names are trimmed and contain 1–80 characters. Whenever the private workspace loads with no lists, the product creates exactly one `Inbox`. The automatic Inbox is an ordinary list after creation and may be renamed or deleted. If the final list is deleted, the next private workspace load creates a new empty Inbox. Any existing list prevents automatic Inbox creation. Deleting a list removes its tasks. Lists are shown oldest-created first.
 
 Each task belongs to exactly one list and has:
 
@@ -54,7 +54,7 @@ The local spike is complete when it supports:
 1. email/password registration and sign-in;
 2. magic-link request and consumption;
 3. sign-out and private-data protection;
-4. automatic `Inbox` creation;
+4. automatic `Inbox` creation whenever the private workspace has no lists;
 5. list CRUD and cascade deletion;
 6. task CRUD and status changes;
 7. show/hide completed tasks;

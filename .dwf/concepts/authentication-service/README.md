@@ -11,7 +11,7 @@
 - This is the application's authentication component around Better Auth.
 - It supports email/password authentication, magic links, sign-out, and server-side session resolution.
 - It translates the active session into a small application-owned `CurrentUser` representation for private operations.
-- Authentication presentation, private pages, list flows, task flows, JSON handlers, and first-use Inbox behavior consume it.
+- Authentication presentation, private pages, list flows, task flows, JSON handlers, and listless-workspace Inbox behavior consume it.
 - Client-provided user IDs never determine ownership identity.
 - Better Auth records and provider details stay behind the boundary.
 
@@ -73,7 +73,7 @@ The concrete function names, Better Auth calls, and file grouping remain impleme
 - Authenticated app pages and dashboard composition.
 - List Server Actions and private list Route Handlers.
 - Task Server Actions and private task Route Handlers.
-- The authenticated first-use flow that invokes `ensureDefaultInbox`.
+- The authenticated private-workspace flow that invokes `ensureDefaultInbox` when the user has no lists.
 
 Consumers receive `CurrentUser` or an unauthenticated outcome. They do not receive Better Auth session records and do not accept a browser-supplied user ID as a substitute.
 

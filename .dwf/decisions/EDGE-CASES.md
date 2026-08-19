@@ -4,13 +4,14 @@ Durable explicitly considered scenarios (`EC-*`). Edge Cases point to the owning
 
 <a id="ec-001"></a>
 
-## EC-001 — First authenticated use with no lists
+## EC-001 — Private workspace load with no lists
 
 - **Status:** HANDLED
 - **Product decisions:** D-003
 - **Technical decisions:** TD-005, TD-006
+- **Resolved by:** OD-013
 
-The user has no lists when private access begins. The system creates exactly one `Inbox`, atomically and idempotently, rather than returning an empty unusable workspace or creating duplicates under concurrent requests.
+The user has no lists when a private workspace load begins, either because the account is new or because the final list was deleted. The system creates exactly one new empty `Inbox`, atomically and idempotently, rather than returning an unusable workspace or creating duplicates under concurrent requests. The Inbox has no protected identity after creation and may be renamed or deleted like any other list. Any existing list prevents automatic Inbox creation.
 
 <a id="ec-002"></a>
 

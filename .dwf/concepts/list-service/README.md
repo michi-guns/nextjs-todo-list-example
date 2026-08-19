@@ -9,14 +9,14 @@
 ## Quick reload
 
 - This is the application's component for the lifecycle of a user's lists.
-- It creates the default Inbox on first authenticated use and keeps that operation atomic and idempotent.
+- It creates the default Inbox whenever a private workspace loads with no lists and keeps that operation atomic and idempotent.
 - It lists, creates, renames, and deletes user-owned lists.
 - Its persistence queries enforce ownership, and list deletion uses the database cascade contract for tasks.
 - Presentation code consumes list operations without coordinating Drizzle tables or queries.
 
 ## Identity
 
-The List Service is the application's single architectural component for list lifecycle behavior. It gives first-use flows and list presentation adapters a stable application-facing interface while keeping list persistence and ownership enforcement behind that interface.
+The List Service is the application's single architectural component for list lifecycle behavior. It gives listless-workspace flows and list presentation adapters a stable application-facing interface while keeping list persistence and ownership enforcement behind that interface.
 
 ## Boundary
 
@@ -36,8 +36,9 @@ The concrete function names, input types, result types, and file grouping remain
 
 ## Responsibilities
 
-- Create one list named `Inbox` when an authenticated user has no lists.
-- Keep default-Inbox creation atomic under concurrent first-use requests and idempotent after success.
+- Create one list named `Inbox` whenever an authenticated private workspace loads and the user has no lists.
+- Keep default-Inbox creation atomic under concurrent listless workspace loads and idempotent after success.
+- Treat the automatic Inbox as an ordinary list after creation, allowing it to be renamed or deleted.
 - List, create, rename, and delete lists for the authenticated owner.
 - Own the repository contracts required by list application operations.
 - Enforce list ownership in persistence queries rather than relying on presentation filtering.
@@ -61,7 +62,7 @@ The concrete function names, input types, result types, and file grouping remain
 
 ## Known consumers
 
-- The authenticated first-use flow that needs a default Inbox.
+- The authenticated private-workspace flow that needs a default Inbox when the user has no lists.
 - Dashboard and navigation composition that display the user's lists.
 - List Server Actions.
 - Private list JSON Route Handlers.
@@ -74,8 +75,9 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - Every list read and mutation is scoped to the authenticated user ID.
 - List names are trimmed and contain 1–80 characters.
 - List reads are deterministic and ordered by creation time, oldest first.
-- A user with zero lists receives exactly one automatic Inbox, including under concurrent first use.
+- A user with zero lists receives exactly one automatic Inbox, including under concurrent private workspace loads and after final-list deletion.
 - An existing list of any name prevents automatic Inbox creation.
+- The automatic Inbox may be renamed or deleted like any other list.
 - One user cannot read, rename, or delete another user's list.
 - Deleting a list removes all tasks in that list through the database cascade contract.
 - List persistence types do not cross into presentation or other capability contracts.
@@ -87,6 +89,7 @@ The subsystem can be verified independently of completed task presentation:
 - A user with no lists receives one Inbox.
 - Repeated or concurrent default-Inbox requests do not create duplicates.
 - A user who already has any list does not receive an automatic Inbox.
+- Renaming or deleting the automatic Inbox follows the same behavior as any other owned list; deleting the final list leads to a new Inbox on the next private workspace load.
 - List create, list, rename, and delete operations affect only the authenticated owner's rows.
 - List creation and rename reject names outside the accepted 1–80 character range after trimming.
 - List reads return oldest-created lists first and remain deterministic when timestamps match.

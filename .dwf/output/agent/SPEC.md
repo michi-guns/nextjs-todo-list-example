@@ -96,14 +96,14 @@ app (routes) → module presentation / application APIs
 - Signed-out users only access marketing + auth routes.
 - Each user may only access rows where `userId` matches the session user.
 
-### 2.3 First sign-in side effect
+### 2.3 Listless private workspace side effect
 
 When a signed-in user has **zero** lists, create default list:
 
 - `name`: `"Inbox"`
 - `userId`: session user id
 
-Idempotent: never create a second automatic Inbox if any list exists.
+Run this check whenever the authenticated private workspace loads. Keep it atomic and idempotent under concurrent loads: never create more than one automatic Inbox, and never create one when any list exists. After creation, the Inbox is an ordinary list and may be renamed or deleted. Deleting the final list results in a new empty Inbox on the next private workspace load.
 
 ### 2.4 Placement
 
@@ -330,7 +330,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Better Auth email/password + magic link working locally
 - [ ] Session guards on actions + JSON API
 - [ ] Drizzle schema: auth tables + lists + tasks; migrations applied on Neon/dev DB
-- [ ] Default Inbox on first list-less session
+- [ ] Exactly one default Inbox on every listless private workspace load, including after final-list deletion
 - [ ] List CRUD + cascade delete
 - [ ] Task CRUD + status + hide completed
 - [ ] Landing Sanity read path
@@ -353,7 +353,7 @@ The first-class capabilities are `auth`, `landing`, `lists`, and `tasks`. `src/s
 
 ### 14.2 Persistence boundary
 
-Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. `ensureDefaultInbox` must be atomic under concurrent first-use requests; list deletion relies on the database cascade contract.
+Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. `ensureDefaultInbox` must be atomic and idempotent under concurrent listless workspace loads; list deletion relies on the database cascade contract.
 
 ### 14.3 Authentication boundary
 

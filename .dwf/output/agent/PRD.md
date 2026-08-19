@@ -68,7 +68,8 @@ Out of scope for spike complete:
 
 - A user has **many lists**.
 - List names are trimmed and contain **1–80 characters**.
-- On **first sign-in**, create a default list named **Inbox** if none exist.
+- Whenever a private workspace loads with zero lists, atomically and idempotently create one list named **Inbox**.
+- The automatic Inbox is an ordinary list after creation and may be renamed or deleted. Deleting the final list causes a new empty Inbox to appear on the next private workspace load; any existing list prevents automatic Inbox creation.
 - List operations: **create**, **rename**, **delete**.
 - Deleting a list **cascade-deletes** its tasks.
 - List reads are deterministic and ordered oldest-created first. Manual reordering is out of scope.
@@ -103,7 +104,7 @@ The spike is complete when all of the following are true **locally**:
 
 1. User can register and sign in with **email/password** and with **magic link**.
 2. User can sign out; signed-out users cannot access list/task data.
-3. First sign-in yields an **Inbox** list.
+3. A listless private workspace load yields exactly one **Inbox** list, including after the final list was deleted.
 4. User can create/rename/delete lists; delete removes tasks.
 5. User can create/edit/delete tasks and move status among `todo` / `in_progress` / `done`.
 6. User can show/hide completed tasks.

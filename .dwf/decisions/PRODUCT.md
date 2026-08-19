@@ -28,9 +28,9 @@ The spike must demonstrate email/password sign-up and sign-in plus magic-link re
 
 - **Status:** ACCEPTED
 - **Source:** PRD, section 5.1
-- **Related:** [OD-007](OPEN-DECISIONS.md#od-007), [OD-012](OPEN-DECISIONS.md#od-012), [Agent PRD](../output/agent/PRD.md#51-lists)
+- **Related:** [OD-007](OPEN-DECISIONS.md#od-007), [OD-012](OPEN-DECISIONS.md#od-012), [OD-013](OPEN-DECISIONS.md#od-013), [Agent PRD](../output/agent/PRD.md#51-lists)
 
-A user may own many lists. List names are trimmed and must contain 1–80 characters. On first authenticated use, when the user has no lists, the product creates one list named `Inbox`; the behavior is idempotent. Users may create, rename, and delete lists. Deleting a list removes its tasks. List reads are deterministic and show the oldest-created list first; manual reordering is outside the spike.
+A user may own many lists. List names are trimmed and must contain 1–80 characters. Whenever an authenticated private workspace loads and the user has no lists, the product atomically and idempotently creates one list named `Inbox`. After creation, that Inbox is an ordinary list and may be renamed or deleted. Deleting the final list causes a new empty Inbox to be created on the next private workspace load. Any existing list prevents automatic Inbox creation. Deleting a list removes its tasks. List reads are deterministic and show the oldest-created list first; manual reordering is outside the spike.
 
 <a id="d-004"></a>
 

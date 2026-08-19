@@ -66,7 +66,7 @@ This keeps relational constraints and TypeScript schema close together; local de
 - **Related product decisions:** D-001, D-003, D-004
 - **Source:** legacy D-003; current SPEC persistence boundary
 
-Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. Repository queries enforce ownership and task/list membership at the persistence boundary. `ensureDefaultInbox` is atomic under concurrent first use.
+Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. Repository queries enforce ownership and task/list membership at the persistence boundary. `ensureDefaultInbox` is atomic and idempotent under concurrent listless workspace loads.
 
 <a id="td-007"></a>
 
