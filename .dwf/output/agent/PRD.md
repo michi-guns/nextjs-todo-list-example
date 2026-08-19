@@ -73,6 +73,7 @@ Out of scope for spike complete:
 - List operations: **create**, **rename**, **delete**.
 - Deleting a list **cascade-deletes** its tasks.
 - List reads are deterministic and ordered oldest-created first. Manual reordering is out of scope.
+- List reads use forward cursor pagination and return an opaque next cursor when more records exist.
 
 ### 5.2 Tasks
 
@@ -83,6 +84,7 @@ Out of scope for spike complete:
 - Operations: **create**, **edit** title/notes, **change status**, **delete**. Reapplying the current status succeeds as a no-op.
 - Completed tasks **remain on the list** and are **shown by default**; UI offers **show/hide completed**.
 - Task reads are deterministic and ordered newest-created first. Hiding completed tasks preserves the relative order of visible tasks; manual reordering is out of scope.
+- Task reads use forward cursor pagination and return an opaque next cursor when more records exist.
 
 ### 5.3 Surfaces
 

@@ -14,6 +14,7 @@ owner: product-and-engineering
 - After creation, tasks may move directly between any valid statuses; applying the current status again succeeds as a no-op.
 - Completed tasks remain stored and may be hidden by a query/UI filter.
 - Task reads are deterministic and ordered newest-created first. Hiding completed tasks preserves the relative order of remaining tasks.
+- Task reads use forward cursor pagination and return items plus an opaque next cursor.
 - Manual task reordering is outside the spike.
 
 Recurring tasks, subtasks, tags, comments, attachments, and cross-list movement are outside the spike.

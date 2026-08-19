@@ -149,3 +149,14 @@ List and task reads remain deterministic when records share a `createdAt` value 
 - **Resolved by:** OD-014
 
 Creating or renaming a list conflicts when the same user already owns a list with the same trimmed name under case-insensitive comparison. Creating or retitling a task conflicts when the same list already contains the same trimmed title under case-insensitive comparison; the same title remains valid in a different list. Database constraints prevent concurrent duplicates. JSON callers receive `409` with code `conflict`, and Server Actions expose the equivalent conflict result.
+
+<a id="ec-015"></a>
+
+## EC-015 — Malformed or cross-context cursor
+
+- **Status:** HANDLED
+- **Product decisions:** D-001, D-003, D-004
+- **Technical decisions:** TD-006, TD-008
+- **Resolved by:** OD-015
+
+A malformed cursor or one incompatible with the current read context produces the standard invalid-input outcome; JSON callers receive `422`. Cursor contents never supply `userId`, authorize access, bypass list ownership, or override the selected completed-task filter. The authenticated scope and filters are applied independently on every page request.

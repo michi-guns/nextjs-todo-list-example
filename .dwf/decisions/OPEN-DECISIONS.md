@@ -352,6 +352,31 @@ Choose the uniqueness scope, comparison behavior, and external conflict outcome 
 
 List names are unique per `userId`. Task titles are unique per `listId`, so the same title may appear in different lists but not twice in one list. Compare trimmed values case-insensitively while preserving the accepted display text. Enforce uniqueness at the database boundary for race safety and map conflicts to the application-level `conflict` outcome. JSON Route Handlers return `409` with error code `conflict`; Server Actions expose the equivalent conflict result. The exact Postgres/Drizzle mechanism for case-insensitive uniqueness remains an implementation choice.
 
+<a id="od-015"></a>
+
+## OD-015 — Cursor pagination mechanism
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO
+- **Related:** D-003, D-004, TD-006, TD-008, EC-015
+
+### Problem / Conflict
+
+List and task reads needed pagination, but the contract did not select a pagination model or define how pagination interacts with ownership and deterministic ordering.
+
+### Accepted Constraints
+
+Pagination must preserve the settled list and task ordering, remain stable while records are added or deleted, and never treat cursor data as ownership authority.
+
+### Decision Required
+
+Choose the pagination mechanism and application-facing page contract.
+
+### Resolution
+
+Use forward cursor pagination for list and task reads. A page contains `items` and an opaque `nextCursor`, which is `null` when no later page exists. The cursor represents the settled `createdAt` ordering plus the implementation-chosen deterministic tie-breaker. Ownership, list membership, and completed-task filters are applied independently of cursor data; a cursor never grants access or selects an owner. Malformed or context-incompatible cursors produce the standard invalid-input outcome. Exact cursor encoding, signing, and internal tie-breaker type remain implementation choices.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

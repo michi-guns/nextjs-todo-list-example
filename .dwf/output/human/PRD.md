@@ -28,7 +28,7 @@ The example is intentionally serious about ownership, data boundaries, validatio
 
 ## Lists and tasks
 
-A user can own many lists. List names are trimmed, contain 1–80 characters, and are unique for that user under case-insensitive comparison. Whenever the private workspace loads with no lists, the product creates exactly one `Inbox`. The automatic Inbox is an ordinary list after creation and may be renamed or deleted. If the final list is deleted, the next private workspace load creates a new empty Inbox. Any existing list prevents automatic Inbox creation. Deleting a list removes its tasks. Lists are shown oldest-created first.
+A user can own many lists. List names are trimmed, contain 1–80 characters, and are unique for that user under case-insensitive comparison. Whenever the private workspace loads with no lists, the product creates exactly one `Inbox`. The automatic Inbox is an ordinary list after creation and may be renamed or deleted. If the final list is deleted, the next private workspace load creates a new empty Inbox. Any existing list prevents automatic Inbox creation. Deleting a list removes its tasks. Lists are shown oldest-created first through forward cursor pagination.
 
 Each task belongs to exactly one list and has:
 
@@ -43,7 +43,7 @@ The same task title may be used in different lists, but not twice within one lis
 
 New tasks begin as `todo`. After creation, a task can move directly between any two valid statuses; applying its current status again simply leaves it unchanged.
 
-Tasks are shown newest-created first. Hiding completed tasks keeps the remaining tasks in the same relative order. Manual list and task reordering is outside the spike.
+Tasks are shown newest-created first through forward cursor pagination. Hiding completed tasks keeps the remaining tasks in the same relative order. Manual list and task reordering is outside the spike.
 
 ## Content ownership
 

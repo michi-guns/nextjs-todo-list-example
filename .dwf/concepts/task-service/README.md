@@ -25,7 +25,7 @@ The subsystem owns task operations inside a user-owned list. It receives the tru
 Its semantic operations are equivalent to:
 
 ```ts
-listTasks(userId, listId, options): Promise<readonly Task[]>
+listTasks(userId, listId, options): Promise<Page<Task>>
 createTask(userId, listId, input): Promise<Task>
 updateTask(userId, taskId, input): Promise<Task>
 deleteTask(userId, taskId): Promise<void>
@@ -81,6 +81,7 @@ Consumers provide trusted ownership identity and application inputs. They do not
 - Task status is one of `todo`, `in_progress`, or `done`.
 - Any valid status may transition directly to any other valid status; reapplying the current status is an idempotent no-op.
 - Task reads are deterministic and ordered by creation time, newest first.
+- Task reads use forward cursor pagination and return items plus an opaque next cursor.
 - Hiding completed tasks changes the read result, not stored task state.
 - When completed-task visibility is omitted, reads include completed tasks.
 - Task persistence types do not cross into presentation or other capability contracts.
@@ -99,6 +100,7 @@ The subsystem can be verified independently of completed task presentation:
 - New tasks receive status `todo`.
 - Status changes accept direct transitions between all settled task statuses, treat the current status as a successful no-op, and reject values outside the settled statuses.
 - Task reads return newest-created tasks first and remain deterministic when timestamps match.
+- Pagination remains scoped to the authenticated owner, selected list, and completed-task filter; cursor data never overrides that context.
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
 - Completed-task filtering preserves the relative order of remaining tasks.
 - Omitting completed-task visibility includes stored `done` tasks.

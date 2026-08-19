@@ -183,6 +183,14 @@ Conceptual model (names may match Drizzle tables closely):
 - Application/query supports `includeCompleted: boolean`, defaulting to `true`. An omitted value returns all stored tasks; the UI initially shows completed tasks and offers a toggle that hides `done` tasks.
 - Completed-task filtering preserves the relative order of the remaining tasks.
 
+### 4.4 Cursor pagination
+
+- List and task reads use forward cursor pagination and return `{ items, nextCursor }`.
+- `nextCursor` is opaque and is `null` when no later page exists.
+- Cursor position follows the settled `createdAt` ordering plus the deterministic tie-breaker.
+- Authentication, ownership, list membership, and completed-task filtering are applied independently of cursor data on every request.
+- Malformed or context-incompatible cursors are invalid input. Exact encoding and signing remain implementation choices.
+
 ---
 
 ## 5. Application use cases (minimum)
@@ -190,14 +198,14 @@ Conceptual model (names may match Drizzle tables closely):
 ### Lists
 
 - `ensureDefaultInbox(userId)`
-- `listLists(userId)`
+- `listLists(userId, { cursor?, limit? })`
 - `createList(userId, { name })`
 - `renameList(userId, listId, { name })`
 - `deleteList(userId, listId)`
 
 ### Tasks
 
-- `listTasks(userId, listId, { includeCompleted })`
+- `listTasks(userId, listId, { includeCompleted, cursor?, limit? })`
 - `createTask(userId, listId, { title, notes? })`
 - `updateTask(userId, taskId, { title?, notes?, status? })`
 - `deleteTask(userId, taskId)`
@@ -238,20 +246,20 @@ The paths and parameter names below are stable API contracts.
 
 ### 7.1 JSON Route Handlers (session required unless noted)
 
-| Method | Path                       | Body / query                  | Result       |
-| ------ | -------------------------- | ----------------------------- | ------------ |
-| GET    | `/api/lists`               | —                             | user’s lists |
-| POST   | `/api/lists`               | `{ name }`                    | created list |
-| PATCH  | `/api/lists/:listId`       | `{ name }`                    | renamed      |
-| DELETE | `/api/lists/:listId`       | —                             | deleted      |
-| GET    | `/api/lists/:listId/tasks` | `?includeCompleted=`          | tasks        |
-| POST   | `/api/lists/:listId/tasks` | `{ title, notes? }`           | created task |
-| PATCH  | `/api/tasks/:taskId`       | `{ title?, notes?, status? }` | updated      |
-| DELETE | `/api/tasks/:taskId`       | —                             | deleted      |
+| Method | Path                       | Body / query                        | Result                       |
+| ------ | -------------------------- | ----------------------------------- | ---------------------------- |
+| GET    | `/api/lists`               | `?cursor=&limit=`                   | `{ items, nextCursor }` page |
+| POST   | `/api/lists`               | `{ name }`                          | created list                 |
+| PATCH  | `/api/lists/:listId`       | `{ name }`                          | renamed                      |
+| DELETE | `/api/lists/:listId`       | —                                   | deleted                      |
+| GET    | `/api/lists/:listId/tasks` | `?includeCompleted=&cursor=&limit=` | `{ items, nextCursor }` page |
+| POST   | `/api/lists/:listId/tasks` | `{ title, notes? }`                 | created task                 |
+| PATCH  | `/api/tasks/:taskId`       | `{ title?, notes?, status? }`       | updated                      |
+| DELETE | `/api/tasks/:taskId`       | —                                   | deleted                      |
 
 Auth routes: Better Auth defaults under `/api/auth/*` (public where appropriate).
 
-Errors use consistent JSON `{ error: { code, message } }`: unauthenticated requests use `401`; missing and other-owned private resources both use `404` with code `not_found`; uniqueness conflicts use `409` with code `conflict`; invalid input uses `422`. Private list/task handlers do not expose a distinct `403` ownership response. Server Actions map the same application outcomes without revealing resource existence.
+Errors use consistent JSON `{ error: { code, message } }`: unauthenticated requests use `401`; missing and other-owned private resources both use `404` with code `not_found`; uniqueness conflicts use `409` with code `conflict`; invalid input, including malformed or context-incompatible cursors, uses `422`. Private list/task handlers do not expose a distinct `403` ownership response. Server Actions map the same application outcomes without revealing resource existence.
 
 ### 7.2 Server Actions
 
@@ -335,6 +343,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Exactly one default Inbox on every listless private workspace load, including after final-list deletion
 - [ ] List CRUD + cascade delete + case-insensitive per-user name uniqueness
 - [ ] Task CRUD + status + hide completed + case-insensitive per-list title uniqueness
+- [ ] Cursor-paginated list and task reads with opaque next cursors
 - [ ] Landing Sanity read path
 - [ ] Zod at boundaries
 - [ ] Module layering respected for lists/tasks/landing
@@ -380,18 +389,18 @@ Use cases receive the authenticated user id from the server boundary and enforce
 
 ```ts
 ensureDefaultInbox(userId): Promise<List>
-listLists(userId): Promise<readonly List[]>
+listLists(userId, page): Promise<Page<List>>
 createList(userId, input): Promise<List>
 renameList(userId, listId, input): Promise<List>
 deleteList(userId, listId): Promise<void>
 
-listTasks(userId, listId, options): Promise<readonly Task[]>
+listTasks(userId, listId, options): Promise<Page<Task>>
 createTask(userId, listId, input): Promise<Task>
 updateTask(userId, taskId, input): Promise<Task>
 deleteTask(userId, taskId): Promise<void>
 ```
 
-The exact implementation may group or split these functions while preserving their ownership and observable behavior. List reads are oldest-first and task reads are newest-first, with deterministic tie-breaking. Tasks remain in one list; new tasks default to `todo`; completed tasks remain stored and may be filtered from reads without changing the relative order of remaining tasks.
+The exact implementation may group or split these functions while preserving their ownership and observable behavior. List and task reads return forward cursor pages. List reads are oldest-first and task reads are newest-first, with deterministic tie-breaking. Tasks remain in one list; new tasks default to `todo`; completed tasks remain stored and may be filtered from reads without changing the relative order of remaining tasks. Cursor data does not carry ownership authority.
 
 ### 14.5 Landing/Sanity boundary
 
@@ -423,6 +432,16 @@ type ListId = string
 type TaskId = string
 type TaskStatus = "todo" | "in_progress" | "done"
 
+interface PageRequest {
+  cursor?: string
+  limit?: number
+}
+
+interface Page<T> {
+  items: readonly T[]
+  nextCursor: string | null
+}
+
 interface List {
   id: ListId
   userId: UserId
@@ -443,7 +462,7 @@ interface Task {
 }
 
 interface ListRepository {
-  listByUser(userId: UserId): Promise<readonly List[]>
+  listByUser(userId: UserId, page: PageRequest): Promise<Page<List>>
   findByIdForUser(userId: UserId, listId: ListId): Promise<List | null>
   ensureDefaultInbox(userId: UserId, now: Date): Promise<List>
   insert(input: {
@@ -465,8 +484,8 @@ interface TaskRepository {
   listByOwnedList(
     userId: UserId,
     listId: ListId,
-    options: { includeCompleted: boolean }
-  ): Promise<readonly Task[]>
+    options: PageRequest & { includeCompleted: boolean }
+  ): Promise<Page<Task>>
   insert(input: {
     id: TaskId
     userId: UserId

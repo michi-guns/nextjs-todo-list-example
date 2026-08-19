@@ -14,5 +14,6 @@ owner: product-and-engineering
 - Any existing list prevents automatic Inbox creation.
 - Deleting a list permanently deletes its tasks.
 - List reads are deterministic and ordered oldest-created first. Manual reordering is outside the spike.
+- List reads use forward cursor pagination and return items plus an opaque next cursor.
 
 Soft deletion, shared lists, and moving tasks between users are outside the spike.

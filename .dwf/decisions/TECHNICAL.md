@@ -64,9 +64,10 @@ This keeps relational constraints and TypeScript schema close together; local de
 
 - **Status:** ACCEPTED
 - **Related product decisions:** D-001, D-003, D-004
+- **Related resolution:** [OD-015](OPEN-DECISIONS.md#od-015)
 - **Source:** legacy D-003; current SPEC persistence boundary
 
-Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. Repository queries enforce ownership and task/list membership at the persistence boundary. `ensureDefaultInbox` is atomic and idempotent under concurrent listless workspace loads.
+Lists and tasks own the repository ports required by their application use cases. Drizzle adapters implement those ports inside the owning capability's infrastructure boundary. Domain/application code consumes module types and outcomes, never Drizzle row types. Repository queries enforce ownership and task/list membership at the persistence boundary. List and task reads return forward cursor pages using the settled `createdAt` ordering and a deterministic tie-breaker. Cursor data never supplies ownership identity or bypasses filters. `ensureDefaultInbox` is atomic and idempotent under concurrent listless workspace loads.
 
 <a id="td-007"></a>
 
@@ -87,10 +88,10 @@ This keeps editorial copy independently editable while making the second store's
 
 - **Status:** ACCEPTED
 - **Related product decisions:** D-001, D-002, D-006
-- **Related resolutions:** [OD-002](OPEN-DECISIONS.md#od-002), [OD-004](OPEN-DECISIONS.md#od-004), [OD-014](OPEN-DECISIONS.md#od-014)
+- **Related resolutions:** [OD-002](OPEN-DECISIONS.md#od-002), [OD-004](OPEN-DECISIONS.md#od-004), [OD-014](OPEN-DECISIONS.md#od-014), [OD-015](OPEN-DECISIONS.md#od-015)
 - **Source:** current SPEC presentation and validation boundaries
 
-Server Actions and JSON Route Handlers follow `authenticate → authorize → validate with Zod → call application use case → map result/error → revalidate/respond`. Actions and handlers share schemas and application use cases. A nonexistent private list/task and one owned by another user both map to the same application-level `not_found` outcome. JSON handlers return `404` with `{ error: { code: "not_found", message } }`; Server Actions expose the equivalent generic result. Database uniqueness violations map to the application-level `conflict` outcome; JSON handlers return `409` with code `conflict`, and Server Actions expose the equivalent conflict result. The stable JSON routes are `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`; Better Auth owns `/api/auth/*`.
+Server Actions and JSON Route Handlers follow `authenticate → authorize → validate with Zod → call application use case → map result/error → revalidate/respond`. Actions and handlers share schemas and application use cases. A nonexistent private list/task and one owned by another user both map to the same application-level `not_found` outcome. JSON handlers return `404` with `{ error: { code: "not_found", message } }`; Server Actions expose the equivalent generic result. Database uniqueness violations map to the application-level `conflict` outcome; JSON handlers return `409` with code `conflict`, and Server Actions expose the equivalent conflict result. Pagination cursors and limits are untrusted inputs validated at the presentation boundary; malformed or incompatible cursors map to invalid input. The stable JSON routes are `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`; Better Auth owns `/api/auth/*`.
 
 <a id="td-009"></a>
 
