@@ -320,9 +320,18 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
   - domain rules (status transitions/invariants as encoded)
   - application use cases (with mocked ports)
   - zod schema accept/reject cases
+- These unit tests do not require PostgreSQL or Docker.
 - Not required: full React component unit matrix.
 
-### 10.2 Playwright
+### 10.2 PostgreSQL integration
+
+- Use `@testcontainers/postgresql` with PostgreSQL 18.
+- Start one ephemeral container for an integration suite run, apply the same versioned Drizzle migrations used by Neon, and stop it after the suite, including failure cleanup.
+- Cover Drizzle repository mappings, case-insensitive uniqueness, list-to-task cascade deletion, ownership-aware reads and mutations, cursor pagination, and concurrent default-Inbox creation.
+- Isolate database state between tests. Exact rollback, truncation, or per-worker database mechanics remain implementation choices.
+- Docker is a stated prerequisite for database-backed tests. If unavailable, those suites fail early and clearly rather than silently skipping; unit tests remain runnable.
+
+### 10.3 Playwright
 
 - Location: `e2e/`
 - Happy paths minimum:
@@ -336,7 +345,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - The magic-link Playwright path clears the local/test mailbox, requests a link, reads the captured URL, and visits it to verify link consumption.
 - CI: **not required** for spike complete.
 
-### 10.3 Performance evidence
+### 10.4 Performance evidence
 
 - Maintain a repeatable Neon development-branch performance seed with approximately 100 lists for one user, 10,000 tasks in one large list, and records for another user.
 - Run `EXPLAIN ANALYZE` for representative first-page and next-page list/task cursor queries, plus completed-task filtering when it produces a distinct query shape.
@@ -346,7 +355,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 - Keep the evidence repeatable and local/manual or integration-level. Do not make the timing threshold a per-commit CI benchmark or treat it as an end-to-end production SLA.
 - Exclude network latency, authentication, rendering, CMS access, and Neon compute startup from the database execution measurement.
 
-### 10.4 Local quality
+### 10.5 Local quality
 
 - Husky + lint-staged on commit (eslint/prettier as configured in `package.json`).
 - Scripts: `pnpm test`, `pnpm exec playwright test`, `pnpm typecheck`, `pnpm lint`.
@@ -389,6 +398,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Zod at boundaries
 - [ ] Module layering respected for lists/tasks/landing
 - [ ] Vitest suite green for agreed scope
+- [ ] PostgreSQL 18 Testcontainers integration suite applies the real migrations and passes the agreed persistence cases
 - [ ] Playwright happy paths green locally
 - [ ] Husky + lint-staged active
 - [ ] README explains setup without referencing unrelated products
@@ -457,7 +467,7 @@ authenticate → validate → application use case → map result/error → reva
 
 ### 14.7 Verification boundary
 
-The implementation must prove domain invariants, application use cases with ports/fakes, Zod/auth boundary behavior, non-trivial adapter mappings, and the core Playwright journey. A complete React component unit matrix is not required.
+The implementation must prove domain invariants, application use cases with ports/fakes, Zod/auth boundary behavior, real PostgreSQL repository and constraint behavior through Testcontainers, non-trivial adapter mappings, and the core Playwright journey. A complete React component unit matrix is not required.
 
 ### 14.8 Delivery boundary
 

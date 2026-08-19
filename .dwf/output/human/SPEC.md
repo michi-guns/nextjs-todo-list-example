@@ -69,6 +69,7 @@ Use layered proof:
 - domain invariant tests;
 - application tests with repository ports/fakes;
 - Zod and auth/presentation boundary tests;
+- PostgreSQL 18 Testcontainers integration tests using the real migrations for repository behavior, relational constraints, ownership, pagination, and default-Inbox concurrency;
 - non-trivial adapter mapping tests;
 - the Playwright sign-in → list → task → status → sign-out journey;
 - a representative Neon development seed plus `EXPLAIN ANALYZE` evidence for the core cursor queries;

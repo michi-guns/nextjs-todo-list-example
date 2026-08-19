@@ -30,7 +30,7 @@ A todo list is a universally understood domain, so architecture stays visible.
 5. Expose writes via **Server Actions** and **simple JSON Route Handlers** (UI + future agents).
 6. Validate inputs with **Zod** at server boundaries.
 7. Use **shadcn/ui** with a **richer dashboard-style** signed-in shell (UI quality is part of the experiment).
-8. Prove **Vitest** (domain/application/zod) and **Playwright** (happy paths) locally.
+8. Prove **Vitest** unit coverage, real local PostgreSQL integration coverage, and **Playwright** happy paths.
 9. Use **Husky + lint-staged** for local quality; no GitHub Actions CI required for spike complete.
 10. Demonstrate that the core cursor reads are index-backed and comfortably fast on a representative Neon development dataset.
 
@@ -118,10 +118,11 @@ The spike is complete when all of the following are true **locally**:
 8. Landing page renders **Sanity-driven** editorial fields (not hardcoded-only forever).
 9. Mutations available via **Server Actions** and mirrored (or subset) **JSON Route Handlers**.
 10. Zod validates server inputs; duplicate list names and same-list task titles produce a conflict rather than creating duplicate rows.
-11. Vitest covers domain rules, application use cases, and zod schemas (not a full UI unit matrix).
-12. Playwright covers happy paths: sign-up/in → create list → create task → change status → sign-out.
-13. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
-14. Representative Neon development data and query-plan evidence confirm index-backed cursor reads, correct maximum-size pages, and the agreed warm-query target.
+11. Vitest covers database-free domain rules, application use cases, and zod schemas (not a full UI unit matrix).
+12. PostgreSQL 18 Testcontainers integration tests apply the real migrations and cover the agreed persistence behavior.
+13. Playwright covers happy paths: sign-up/in → create list → create task → change status → sign-out.
+14. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
+15. Representative Neon development data and query-plan evidence confirm index-backed cursor reads, correct maximum-size pages, and the agreed warm-query target.
 
 Deployed Vercel preview is **optional**, not required for spike complete.
 

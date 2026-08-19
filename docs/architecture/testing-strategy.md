@@ -13,9 +13,13 @@ Test task statuses, trimming/non-empty rules, and other invariants without frame
 
 Test use cases with repository ports or fakes, especially ownership, default Inbox creation, and cascade behavior at the application boundary.
 
+Domain and application unit tests do not require PostgreSQL or Docker.
+
 ## Infrastructure tests
 
-Test Drizzle mappings and Sanity adapters when their translation logic is non-trivial.
+Use PostgreSQL 18 through `@testcontainers/postgresql` for Drizzle repository and migration integration tests. Apply the versioned migrations and cover database uniqueness, cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Isolate state between tests and stop the suite-owned container even after failures. Docker-backed tests fail clearly rather than silently skipping when Docker is unavailable.
+
+Test Sanity adapters when their translation logic is non-trivial.
 
 ## Boundary tests
 

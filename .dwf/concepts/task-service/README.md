@@ -111,6 +111,7 @@ The subsystem can be verified independently of completed task presentation:
 - Explicit completed-task filtering includes or excludes stored `done` tasks as requested.
 - Completed-task filtering preserves the relative order of remaining tasks.
 - Omitting completed-task visibility includes stored `done` tasks.
+- PostgreSQL 18 Testcontainers integration tests prove task repository mappings, per-list uniqueness, ownership and membership checks, cascade deletion, filtering, and cursor reads against the real migrations.
 - Application-facing task results do not expose Drizzle row types.
 
 ## Implementation freedom
@@ -122,7 +123,7 @@ The implementation agent may choose:
 - Exact files and folder grouping within the task capability.
 - Drizzle query composition, provided ownership and list-membership requirements hold.
 - Exact index names, normalized uniqueness representation, and deterministic cursor tie-breaker.
-- Test doubles and the split between unit and adapter integration tests.
+- Exact test doubles, integration-test file organization, and database state-reset helpers within the settled database-free unit and Testcontainers integration split.
 - Presentation adapters and error mapping consistent with the separately settled presentation decisions.
 
 ## Canonical references
@@ -137,6 +138,7 @@ The implementation agent may choose:
 - [`TD-010 — Query-shaped PostgreSQL index baseline`](../../decisions/TECHNICAL.md#td-010)
 - [`TD-011 — Bounded queries and environment-appropriate connections`](../../decisions/TECHNICAL.md#td-011)
 - [`TD-012 — Representative query-plan and warm-query evidence`](../../decisions/TECHNICAL.md#td-012)
+- [`TD-013 — PostgreSQL integration suite through Testcontainers`](../../decisions/TECHNICAL.md#td-013)
 - [`RULE-006 — Validate and isolate untrusted boundaries`](../../RULES.md#rule-006)
 - [Open decisions](../../decisions/OPEN-DECISIONS.md)
 - [Agent SPEC — Lists and tasks application boundary](../../output/agent/SPEC.md#144-lists-and-tasks-application-boundary)

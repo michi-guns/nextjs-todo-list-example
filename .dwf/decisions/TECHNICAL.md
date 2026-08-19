@@ -141,3 +141,16 @@ Reuse one module-level Drizzle/database client in the application runtime. Deplo
 Keep a repeatable performance seed for the non-default Neon development branch containing approximately 100 lists for one user, 10,000 tasks in one large list, and another user's records. Use `EXPLAIN ANALYZE` on representative first-page and next-page cursor queries to confirm the intended indexes support list and task access without a full table scan. Include the completed-task-filtered task shape when its SQL differs.
 
 With compute active and relevant data warm, a 20-record database query must execute in under 50 ms. Verify cursor correctness at the maximum 100-record page size. This is repeatable manual or integration evidence, not a per-commit CI benchmark or production end-to-end SLA; network time, authentication, rendering, CMS access, and Neon compute startup are outside the measurement.
+
+<a id="td-013"></a>
+
+## TD-013 — PostgreSQL integration suite through Testcontainers
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-003, D-004, D-006
+- **Related resolution:** [OD-020](OPEN-DECISIONS.md#od-020)
+- **Source:** current testing architecture review
+
+Use `@testcontainers/postgresql` with a PostgreSQL 18 image for real persistence integration tests. One ephemeral container serves an integration suite run and receives the same versioned Drizzle migrations used against Neon. Database-backed tests cover repository mappings, uniqueness constraints, cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Database state is isolated between tests.
+
+Domain, application-with-fakes, and Zod unit tests remain independent of PostgreSQL and Docker. Database-backed suites require Docker and fail clearly when it is unavailable rather than silently skipping. Exact image patch tag, test-file layout, state-reset strategy, and helper names remain implementation choices.

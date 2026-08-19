@@ -204,3 +204,14 @@ A page request must not load an unbounded result merely to slice it in applicati
 - **Resolved by:** OD-019
 
 The lightweight query target is measured only after Neon compute is active and relevant data is warm. It covers database execution for the paginated query, not network latency, authentication, rendering, CMS access, or compute startup. A single fast timing does not replace query-plan inspection, cross-user seed data, or cursor-correctness checks.
+
+<a id="ec-020"></a>
+
+## EC-020 — Docker unavailable or integration state leaks
+
+- **Status:** HANDLED
+- **Product decisions:** D-006
+- **Technical decisions:** TD-013
+- **Resolved by:** OD-020
+
+When Docker is unavailable, database integration tests report the missing prerequisite and fail rather than passing through a silent skip; database-free unit tests remain usable. An integration test must not depend on rows left by an earlier test, and failure cleanup must still stop the suite-owned container. The exact state-isolation and process-cleanup helpers remain implementation choices.

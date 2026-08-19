@@ -477,6 +477,31 @@ Choose the representative data, query-plan checks, and modest performance target
 
 On the non-default Neon development branch, provide a repeatable performance seed with approximately 100 lists for one user, 10,000 tasks in one large list, and records owned by another user. Run `EXPLAIN ANALYZE` on the core first-page and next-page list/task cursor queries, including completed-task filtering where it changes the query. At that volume, the intended composite indexes must support the paginated access paths without a full sequential scan of the lists or tasks table. With the Neon compute already active and the relevant data warm, a 20-record database query should execute in under 50 ms. Also verify correct cursor behavior at the maximum 100-record page size. Record this as repeatable manual or integration evidence; it is not a flaky per-commit CI benchmark or a production end-to-end SLA. Exact seed script structure, sampled cursor positions, evidence format, and number of repeated measurements remain implementation choices.
 
+<a id="od-020"></a>
+
+## OD-020 — Real PostgreSQL integration tests with Testcontainers
+
+- **Status:** RESOLVED
+- **Impact:** BOTH
+- **Blocking:** NO — Docker is required only when running database-backed tests
+- **Related:** D-003, D-004, D-006, TD-005, TD-006, TD-009, EC-020
+
+### Problem / Conflict
+
+Unit tests with repository fakes cannot prove Drizzle mappings, migrations, PostgreSQL constraints, cascade behavior, transactional concurrency, or real cursor queries.
+
+### Accepted Constraints
+
+Fast unit tests must remain database-free. Database-backed tests must use ordinary local PostgreSQL rather than depending on a remote Neon branch for every run.
+
+### Decision Required
+
+Choose the local database mechanism, PostgreSQL version, integration-test scope, and Docker behavior.
+
+### Resolution
+
+Use `@testcontainers/postgresql` to run PostgreSQL 18 locally for database integration tests, matching the current Neon PostgreSQL major version. Start one ephemeral container for an integration suite run, apply the same versioned Drizzle migrations used by Neon, run the suite, and stop the container afterward. Cover repository mappings, database uniqueness, list-to-task cascade deletion, ownership-aware queries, cursor pagination, and concurrent default-Inbox creation. Keep unit tests for domain rules, application use cases with fakes, and Zod boundaries free of database and Docker requirements. Isolate database state between integration tests; the exact rollback, truncation, or per-worker database mechanism remains an implementation choice. If Docker is unavailable, database-backed suites fail early with a clear prerequisite error rather than silently skipping, while unit tests remain runnable.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

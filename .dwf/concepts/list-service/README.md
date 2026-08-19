@@ -106,6 +106,7 @@ The subsystem can be verified independently of completed task presentation:
 - Dashboard consumers can append another page while a next cursor exists.
 - Attempts to operate on another user's list produce the same `not_found` outcome as a nonexistent list.
 - Deleting a list removes its tasks at the database boundary.
+- PostgreSQL 18 Testcontainers integration tests prove list repository mappings, per-user uniqueness, cascade deletion, ownership, cursor reads, and concurrent Inbox creation against the real migrations.
 - Application-facing list results do not expose Drizzle row types.
 
 ## Implementation freedom
@@ -117,7 +118,7 @@ The implementation agent may choose:
 - Exact files and folder grouping within the list capability.
 - Drizzle query composition and transaction or conflict-handling strategy, provided ownership and atomic-Inbox requirements hold.
 - Exact index names, normalized uniqueness representation, and deterministic cursor tie-breaker.
-- Test doubles and the split between unit and adapter integration tests.
+- Exact test doubles, integration-test file organization, and database state-reset helpers within the settled database-free unit and Testcontainers integration split.
 - Presentation adapters and error mapping consistent with the separately settled presentation decisions.
 
 ## Canonical references
@@ -132,5 +133,6 @@ The implementation agent may choose:
 - [`TD-010 — Query-shaped PostgreSQL index baseline`](../../decisions/TECHNICAL.md#td-010)
 - [`TD-011 — Bounded queries and environment-appropriate connections`](../../decisions/TECHNICAL.md#td-011)
 - [`TD-012 — Representative query-plan and warm-query evidence`](../../decisions/TECHNICAL.md#td-012)
+- [`TD-013 — PostgreSQL integration suite through Testcontainers`](../../decisions/TECHNICAL.md#td-013)
 - [`RULE-006 — Validate and isolate untrusted boundaries`](../../RULES.md#rule-006)
 - [Agent SPEC — Lists and tasks application boundary](../../output/agent/SPEC.md#144-lists-and-tasks-application-boundary)

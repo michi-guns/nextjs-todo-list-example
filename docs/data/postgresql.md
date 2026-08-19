@@ -14,6 +14,7 @@ The root `db/` directory is the canonical Drizzle client/schema seat. The root `
 - Store transactional application truth.
 - Enforce relational integrity and list/task cascade behavior.
 - Support ownership-aware queries.
+- Support local integration testing through PostgreSQL 18 Testcontainers.
 
 ## Persistence rules
 
@@ -21,3 +22,4 @@ The root `db/` directory is the canonical Drizzle client/schema seat. The root `
 - Keep migrations versioned and reviewable.
 - Do not create a parallel user table outside Better Auth’s adapter schema.
 - Develop and verify schema-changing migrations on a non-default Neon branch before applying the same reviewed migration to the default branch.
+- Apply those same versioned migrations to ephemeral local integration databases; do not maintain a test-only schema.
