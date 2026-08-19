@@ -70,8 +70,8 @@ A task creation or update references a list that is not owned by the authenticat
 ## EC-007 — Sanity unavailable or invalid
 
 - **Status:** HANDLED
-- **Product decisions:** D-005
-- **Technical decisions:** TD-007
+- **Product decisions:** D-005, D-008
+- **Technical decisions:** TD-023
 
 The landing provider returns unavailable, malformed, or incomplete content. The adapter validates and maps external data; once the real path is wired, required-content failure is explicit rather than silently becoming permanent hardcoded copy.
 
@@ -266,7 +266,7 @@ Database-backed suites run serially while sharing one harness-owned container. A
 
 - **Status:** HANDLED
 - **Product decisions:** D-005, D-006
-- **Technical decisions:** TD-007, TD-018
+- **Technical decisions:** TD-018, TD-023
 - **Resolved by:** OD-025
 
 Routine unit and Playwright suites do not depend on Sanity network access or mutable editorial content. Local fixtures cover mapping and failure behavior, and deterministic test-only landing content covers the browser flow. A separate read-only live smoke detects missing configuration, an absent or unpublished singleton, schema drift, invalid required fields, query failure, or mapping failure before spike completion or release evidence. The test-only source cannot become a deployed fallback.
@@ -290,3 +290,13 @@ A caller presents a bearer token, API key, or cross-origin request without the a
 - **Technical decisions:** TD-005, TD-006, TD-008
 
 Two authenticated requests may edit the same owned resource without a version precondition. Each accepted patch changes only the submitted fields. If both write the same field, the last successfully committed value is returned by later reads; disjoint field changes may both persist. Ownership, input validation, not-found privacy, and uniqueness conflicts retain their ordinary outcomes.
+
+<a id="ec-028"></a>
+
+## EC-028 — Sanity invalidation request is invalid, duplicated, or unavailable
+
+- **Status:** HANDLED
+- **Product decisions:** D-005, D-008
+- **Technical decisions:** TD-023
+
+An unsigned or incorrectly signed webhook, an irrelevant document event, or an unauthorized manual request does not invalidate cached content. Repeated valid events are safe because invalidation is idempotent. If automatic delivery fails, an authorized operator can invoke the same invalidation service manually; the next landing read still validates and maps the refreshed Sanity payload before presentation.

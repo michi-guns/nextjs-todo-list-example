@@ -269,7 +269,11 @@ No list/task documents.
 ### 6.2 Runtime
 
 - Server-side fetch on marketing page via `src/modules/landing` infrastructure adapter.
-- Spike complete does **not** require webhooks or on-demand revalidation.
+- Give published landing reads one stable cache identity behind the validated landing-content adapter.
+- Expose one server-only, idempotent invalidation service for that cached content.
+- Configure a Sanity webhook for relevant published singleton changes. Its Route Handler verifies the Sanity signature before trusting the event, rejects irrelevant or invalid requests, and calls the shared invalidation service.
+- Provide a separately authorized manual recovery mechanism that calls the same invalidation service. Exact route or command shape and operator-authentication mechanism remain implementation choices; provider and operator secrets never enter client bundles.
+- Deliver authenticated Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live after the webhook and manual-recovery baseline. The deferred phase reads drafts and subscribes to draft changes only for authorized preview sessions; it is not required for current spike completion.
 - Until Sanity is wired, a temporary fallback is allowed only if clearly marked; remove fallback once CMS read works.
 
 ### 6.3 Seat
@@ -391,6 +395,9 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 ### 10.4 Sanity verification
 
 - Use local fixtures to test valid unknown-payload validation and mapping, optional landing fields, and missing or invalid required-content failures.
+- Test the webhook boundary with valid and invalid signatures, relevant and irrelevant document events, and duplicate delivery. Invalid requests do not invalidate, and repeated valid requests are safe.
+- Test that unauthorized manual requests cannot invalidate content and that an authorized request reaches the same invalidation service as the webhook.
+- Local spike acceptance may exercise generated signed requests directly against the Route Handler. When a deployment is presented as release evidence, also verify one real Sanity webhook delivery through the deployed endpoint.
 - Keep one separate read-only live smoke that uses the real Sanity client and query to fetch the published singleton from the dedicated project and dataset, validate it, and map it to the landing view model.
 - The live smoke must pass before spike completion and before a deployment counts as release evidence. Missing configuration, missing or unpublished content, query failure, validation failure, or mapping failure is reported clearly rather than skipped.
 - The live smoke never creates or edits Sanity content.
@@ -423,7 +430,7 @@ Do not commit secrets. Typical categories:
 - Better Auth secret + URL
 - Explicit local/test mailbox enablement and optional temporary path (non-secret)
 - Production magic-link email provider settings if deployment later requires them
-- Sanity project id, dataset, token (server), API version
+- Sanity project id, dataset, server read token, API version, webhook signature secret, and manual-recovery authorization
 
 Document exact variable names in README when wiring — not in this SPEC body if still unstable.
 
@@ -449,6 +456,7 @@ As of writing, the repo already has partial scaffold (Next app router root `app/
 - [ ] Core list/task reads fetch at most `limit + 1`, avoid N+1 behavior, and use the required query-shaped indexes
 - [ ] Representative Neon seed and `EXPLAIN ANALYZE` evidence satisfy the agreed index-use, cursor-correctness, and warm-query baseline
 - [ ] Landing Sanity read path plus the read-only live fetch/validate/map smoke passes against the dedicated published singleton
+- [ ] Signed Sanity webhook invalidation and protected manual recovery share one idempotent cache-invalidation service
 - [ ] Zod at boundaries
 - [ ] Module layering respected for lists/tasks/landing
 - [ ] Vitest suite green for agreed scope
@@ -512,7 +520,7 @@ The exact implementation may group or split these functions while preserving the
 
 ### 14.5 Landing/Sanity boundary
 
-The landing module exposes a plain landing view model and repository/application read path. Sanity client setup, GROQ, external payload validation, and mapping remain infrastructure details. Raw CMS documents do not cross into application or presentation code. Once the real CMS read path works, missing/invalid required content is an explicit integration failure rather than an invisible permanent hardcoded fallback. Routine Playwright may substitute deterministic test-only landing content at the application-facing contract, but that source is unavailable in deployed runtime modes.
+The landing module exposes a plain landing view model and repository/application read path. Sanity client setup, GROQ, external payload validation, mapping, and published-content cache identity remain infrastructure details. Raw CMS documents do not cross into application or presentation code. A signed webhook and a separately authorized manual recovery mechanism call one server-only, idempotent invalidation service. Once the real CMS read path works, missing/invalid required content is an explicit integration failure rather than an invisible permanent hardcoded fallback. Routine Playwright may substitute deterministic test-only landing content at the application-facing contract, but that source is unavailable in deployed runtime modes. Authenticated Draft Mode, Visual Editing, and Sanity Live are deferred until after this invalidation baseline.
 
 ### 14.6 Presentation boundary
 

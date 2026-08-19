@@ -34,7 +34,7 @@ These candidates do not receive an `AS-*` identity. They remain ordinary archite
 
 - **Status:** NOT QUALIFIED
 - **Reviewed:** 2026-08-19
-- **Canonical basis:** [`D-005`](../decisions/PRODUCT.md#d-005) and [`TD-007`](../decisions/TECHNICAL.md#td-007)
-- **Finding:** The landing capability has a meaningful and independently verifiable Sanity adapter boundary, but the current design establishes only one consuming flow: rendering the public landing page. It therefore does not meet the requirement for at least two current capabilities or flows to consume its reusable core.
+- **Canonical basis:** [`D-005`](../decisions/PRODUCT.md#d-005), [`D-008`](../decisions/PRODUCT.md#d-008), and [`TD-023`](../decisions/TECHNICAL.md#td-023)
+- **Finding:** The landing capability has a meaningful and independently verifiable Sanity adapter boundary, but the current delivery phase still has only one content-consuming flow: rendering the public landing page. Webhook and manual invalidation support that flow rather than consume the content contract independently. The deferred editorial preview is not yet a current consumer.
 - **Current treatment:** Keep it as the ordinary `landing` capability module described by the canonical architecture.
-- **Revisit when:** A second real flow, such as metadata, preview, or another marketing surface, is accepted and shares the same validated landing-content core. Do not qualify it based only on hypothetical future consumers.
+- **Revisit when:** The accepted editorial preview or another real flow is delivered and shares the same validated landing-content core. Do not qualify it from deferred capability alone.

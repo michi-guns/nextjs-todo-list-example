@@ -44,7 +44,9 @@ PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownershi
 
 ## Sanity boundary
 
-Sanity is used only for landing content through a dedicated project and dataset containing one singleton landing document. Infrastructure validates unknown CMS payloads and maps them to a plain landing view model. GROQ, client setup, and raw Sanity documents must not cross into application or page code. After the real CMS path is wired, required-content failures are explicit integration failures rather than a permanent silent fallback. Routine Playwright may use deterministic test-only content through the same application-facing landing contract, but that source is unavailable in deployed runtime modes.
+Sanity is used only for landing content through a dedicated project and dataset containing one singleton landing document. Infrastructure validates unknown CMS payloads and maps them to a plain landing view model. GROQ, client setup, and raw Sanity documents must not cross into application or page code. Published landing reads have one stable cache identity. A signature-verified Sanity webhook and a separately authorized manual recovery mechanism call the same server-only, idempotent invalidation service. Provider and operator secrets remain server-side. After the real CMS path is wired, required-content failures are explicit integration failures rather than a permanent silent fallback. Routine Playwright may use deterministic test-only content through the same application-facing landing contract, but that source is unavailable in deployed runtime modes.
+
+Live draft preview is an accepted later phase. It will use authenticated Next.js Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live so editors can read drafts, click through to source fields, and see changes while editing. It is not part of the initial webhook and manual-recovery delivery.
 
 ## Required application behavior
 
@@ -76,6 +78,8 @@ Use layered proof:
 - PostgreSQL 18 Testcontainers integration tests using the real migrations for repository behavior, relational constraints, ownership, pagination, and default-Inbox concurrency;
 - local Sanity fixture tests for validation, mapping, optional fields, and required-content failures;
 - one separate read-only smoke that fetches, validates, and maps the real published Sanity singleton before spike completion;
+- Sanity boundary tests for signature verification, event relevance, duplicate webhook delivery, manual authorization, and shared invalidation behavior;
+- one real Sanity webhook delivery smoke when a deployment is presented as release evidence, while local acceptance may call the signed handler directly;
 - the Playwright sign-in → list → task → status → sign-out journey in Chromium;
 - a representative Neon development seed plus `EXPLAIN ANALYZE` evidence for the core cursor queries;
 - correct maximum-size cursor pages and sub-50-ms warm database execution for a 20-record page;

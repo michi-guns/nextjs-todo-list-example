@@ -56,7 +56,7 @@ unknown Sanity payload
 
 GROQ, Sanity clients, and raw CMS documents stop inside infrastructure.
 
-See [`examples/TD-007-sanity-mapping.md`](./examples/TD-007-sanity-mapping.md) for an illustrative snippet.
+See [`examples/TD-007-sanity-mapping.md`](./examples/TD-007-sanity-mapping.md) for the payload-mapping example retained by TD-023.
 
 ## Common traps
 

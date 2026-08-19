@@ -71,3 +71,13 @@ Spike completion requires a real local journey: authenticate, obtain `Inbox`, cr
 - **Related:** [Agent PRD](../output/agent/PRD.md#53-concurrent-edits)
 
 Concurrent list and task edits do not require version tokens, merge prompts, or stale-write rejection. Each accepted mutation changes only the fields it contains. When accepted mutations write the same field, the value from the last successfully committed write is the observable result; mutations of different fields may both remain visible. Existing ownership, validation, and uniqueness rules still apply.
+
+<a id="d-008"></a>
+
+## D-008 — Phased Sanity freshness and editorial preview
+
+- **Status:** ACCEPTED
+- **Source:** current Sanity capability and delivery-sequencing review
+- **Related:** [Agent PRD](../output/agent/PRD.md#54-editorial-publishing-and-preview)
+
+Published landing-content changes automatically invalidate the affected public cache through a trusted Sanity webhook, and an authorized operator can invoke the same invalidation as a recovery action. Live draft preview with click-to-edit visual editing is also an intended starter capability, but it is deferred until after the webhook and manual-recovery baseline. The deferred preview must let an authorized editor read drafts and see draft changes in the Sanity Presentation Tool without publishing them.

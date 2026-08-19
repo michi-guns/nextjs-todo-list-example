@@ -23,7 +23,7 @@ Routine integration tests use only their harness-owned local container and requi
 
 Run repository integration tests serially while they share one container. Each test creates and owns a unique user and its mutable records and remains independent of execution order. Parallel workers are allowed later only when each receives an isolated database or schema.
 
-Test Sanity payload validation and mapping with local fixtures, including optional fields and missing or invalid required content.
+Test Sanity payload validation and mapping with local fixtures, including optional fields and missing or invalid required content. Test signed and invalid webhook requests, irrelevant and duplicate events, manual-recovery authorization, and the shared idempotent invalidation service without depending on mutable remote content. Local acceptance may call the signed handler directly; a deployment counts as release evidence only after one real Sanity webhook delivery succeeds through the deployed endpoint.
 
 ## Boundary tests
 

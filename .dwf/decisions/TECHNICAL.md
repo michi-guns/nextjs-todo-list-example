@@ -73,7 +73,8 @@ Lists and tasks own the repository ports required by their application use cases
 
 ## TD-007 — Validated Sanity adapter for landing content
 
-- **Status:** ACCEPTED
+- **Status:** SUPERSEDED
+- **Superseded by:** TD-023
 - **Related product decisions:** D-005
 - **Related resolutions:** [OD-005](OPEN-DECISIONS.md#od-005), [OD-025](OPEN-DECISIONS.md#od-025)
 - **Source:** ADR-0002; legacy D-006
@@ -255,3 +256,18 @@ Do not require a minimum code-coverage percentage. Every behavior required by th
 - **Source:** current JSON API audience review
 
 Treat the list and task JSON Route Handlers as same-origin application endpoints authenticated by the existing Better Auth browser session. Do not enable cross-origin access or add bearer-token, API-key, JWT, or separate machine-authentication support for the baseline. Supporting external agents or third-party clients requires a later authentication and authorization decision.
+
+<a id="td-023"></a>
+
+## TD-023 — Shared Sanity invalidation first, live preview second
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-005, D-008
+- **Source:** current Sanity architecture and delivery-sequencing review
+- **Supersedes:** TD-007
+
+Keep the dedicated Sanity project, singleton landing document, server-side query, unknown-payload validation, and mapping into a plain landing view model. Raw CMS documents and provider types remain inside landing infrastructure. Published landing reads use a stable cache identity, and one server-only invalidation service expires that cached content.
+
+Deliver signed webhook invalidation and protected manual recovery first. The webhook boundary verifies Sanity's signature before trusting the event and accepts only relevant published landing changes. The manual operator mechanism requires explicit authorization. Both call the same idempotent invalidation service, and neither exposes provider or operator secrets to the client. Exact route names, tag names, and operator-authentication mechanism remain implementation choices.
+
+Defer live draft preview to a later delivery phase without removing it from the intended starter. That phase uses authenticated Next.js Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live so editors can read drafts, click through to their source fields, and see changes while editing. Live draft subscriptions run only for authorized preview sessions and do not replace webhook invalidation for published traffic.

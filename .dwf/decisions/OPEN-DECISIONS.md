@@ -109,7 +109,7 @@ Use `/api/auth/*` for Better Auth; `/api/lists` for listing and creating lists; 
 - **Status:** RESOLVED
 - **Impact:** BOTH
 - **Blocking:** NO — provisioning remains an implementation prerequisite
-- **Related:** D-005, TD-007, EC-007, OQ-002
+- **Related:** D-005, D-008, TD-023, EC-007, OQ-002
 
 ### Problem / Conflict
 
@@ -611,7 +611,7 @@ Run PostgreSQL repository integration tests and Playwright serially by default w
 - **Status:** RESOLVED
 - **Impact:** BOTH
 - **Blocking:** NO — the live smoke requires the dedicated Sanity resource before spike completion
-- **Related:** D-005, D-006, TD-007, TD-009, TD-018, EC-007, EC-025
+- **Related:** D-005, D-006, D-008, TD-009, TD-018, TD-023, EC-007, EC-025
 
 ### Problem / Conflict
 

@@ -12,4 +12,4 @@ There is intentionally no transactional synchronization between Sanity and Postg
 - A Sanity outage must not corrupt or rewrite todo data.
 - A database migration must not require copying content from Sanity.
 
-Future integrations must document ownership, freshness, failure behavior, and revalidation in an ADR.
+Sanity cache invalidation changes only the derived public landing read. It never writes PostgreSQL data. Automatic webhook and protected manual recovery use one idempotent invalidation path, so duplicate delivery does not create cross-system state.

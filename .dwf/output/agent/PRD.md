@@ -26,7 +26,7 @@ A todo list is a universally understood domain, so architecture stays visible.
 1. Ship a **complete spike**: a thin but real user journey, not a mock UI only.
 2. Demonstrate **Better Auth** (email/password + magic link) with session-guarded mutations.
 3. Store **lists and tasks** in **Postgres via Drizzle (Neon)**.
-4. Store **landing editorial copy** in **Sanity** (not todos).
+4. Store **landing editorial copy** in **Sanity** (not todos), with automatic published-content revalidation and protected manual recovery.
 5. Expose writes via **Server Actions** and **simple JSON Route Handlers** (UI + future agents).
 6. Validate inputs with **Zod** at server boundaries.
 7. Use **shadcn/ui** with a **richer dashboard-style** signed-in shell (UI quality is part of the experiment).
@@ -42,7 +42,7 @@ Out of scope for spike complete:
 - Native mobile apps
 - OAuth / social login
 - Polished email verification and password-reset product flows
-- Sanity webhooks / revalidation pipelines
+- Sanity Live draft preview and click-to-edit visual editing in the initial delivery phase; this accepted capability follows the webhook and manual-recovery baseline
 - Internationalization (English only)
 - Recurring tasks, subtasks, tags, attachments, comments
 - Payments, teams, orgs, roles beyond “user owns own data”
@@ -96,7 +96,13 @@ Out of scope for spike complete:
 - If accepted mutations write the same field, the last successfully committed value is the observable result. Changes to different fields may both persist.
 - Ownership, validation, and uniqueness rules still apply to every mutation.
 
-### 5.4 Surfaces
+### 5.4 Editorial publishing and preview
+
+- Publishing the landing singleton in Sanity automatically invalidates the affected public cache through a trusted webhook.
+- An authorized operator can force the same invalidation when automatic delivery or cache state needs recovery.
+- Authenticated live draft preview with click-to-edit visual editing is an intended capability, delivered after the webhook and manual-recovery baseline.
+
+### 5.5 Surfaces
 
 1. **Public landing** — copy from Sanity (headline, blurb, CTAs).
 2. **Auth screens** — sign-up, sign-in, magic link, sign-out.
@@ -131,6 +137,7 @@ The spike is complete when all of the following are true **locally**:
 14. Husky + lint-staged run on commit for staged lint/format (and project conventions as configured).
 15. Representative Neon development data and query-plan evidence confirm index-backed cursor reads, correct maximum-size pages, and the agreed warm-query target.
 16. Concurrent list and task edits use last-successful-write behavior without weakening ownership, validation, or uniqueness enforcement.
+17. A trusted Sanity webhook automatically refreshes published landing content, and an authorized operator can trigger the same cache invalidation for recovery.
 
 Deployed Vercel preview is **optional**, not required for spike complete.
 

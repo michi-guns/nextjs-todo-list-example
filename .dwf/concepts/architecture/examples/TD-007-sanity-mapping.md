@@ -1,4 +1,4 @@
-# TD-007 Example — Sanity Payload Mapping
+# TD-007 / TD-023 Example — Sanity Payload Mapping
 
 **Illustrative only.** The normative boundary is [`../../../output/agent/SPEC.md#14-boundary-clarifications`](../../../output/agent/SPEC.md#14-boundary-clarifications).
 

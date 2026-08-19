@@ -38,7 +38,7 @@ Evidence: [Better Auth magic-link documentation](https://better-auth.com/docs/pl
 - **Status:** ANSWERED
 - **Blocking:** YES for the real landing integration — the answer is that no usable Sanity resource is currently configured
 - **Source:** repository files and local environment-key inspection on 2026-08-19
-- **Related:** D-005, TD-007, EC-007, OD-005
+- **Related:** D-005, D-008, TD-023, EC-007, OD-005
 
 ### Exact Question
 

@@ -51,6 +51,8 @@ Concurrent list and task edits do not show a merge prompt or reject an otherwise
 
 PostgreSQL owns authenticated users/session records, lists, tasks, ownership, status, timestamps, and relational integrity. Sanity owns editable landing headline, blurb, and CTA content only. Todo records never live in Sanity.
 
+Publishing the landing document automatically invalidates its public cache through a trusted Sanity webhook. An authorized operator has a manual recovery control that performs the same invalidation. Live draft preview and click-to-edit visual editing are accepted starter capabilities, but they follow the webhook and manual-recovery baseline rather than blocking it.
+
 ## Spike acceptance
 
 The local spike is complete when it supports:
@@ -71,5 +73,6 @@ The local spike is complete when it supports:
 14. local typecheck, lint, Husky, and lint-staged quality checks;
 15. representative Neon seed data and lightweight evidence that the main paginated database queries use their intended indexes and meet the agreed warm-query target.
 16. last-successful-write behavior for concurrent list and task edits without bypassing normal safeguards.
+17. automatic published-content invalidation through a trusted Sanity webhook plus protected manual recovery.
 
 The exact implementation contract is in the [Agent SPEC](../agent/SPEC.md). It must implement the [Agent PRD](../agent/PRD.md) and may not weaken it.
