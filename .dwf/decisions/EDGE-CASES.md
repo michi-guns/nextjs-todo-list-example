@@ -87,9 +87,9 @@ An anonymous browser or JSON caller requests private lists/tasks. The boundary r
 
 ## EC-009 — Magic-link local/test delivery
 
-- **Status:** OPEN
+- **Status:** HANDLED
 - **Product decisions:** D-002
-- **Related open question:** OQ-001
-- **Related open decision:** OD-003
+- **Answered by:** OQ-001
+- **Resolved by:** OD-003
 
-The installed Better Auth version supports a `sendMagicLink` callback that receives the generated verification URL. The product still requires selection of the deterministic local capture or delivery mechanism tracked by OD-003.
+The installed Better Auth version supports a `sendMagicLink` callback that receives the generated verification URL. In explicitly enabled local/test mode, that callback writes the email and URL to a temporary, gitignored, file-backed mailbox. Tests clear and read the mailbox deterministically; it is unavailable outside local/test mode.

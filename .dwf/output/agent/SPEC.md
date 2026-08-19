@@ -110,6 +110,7 @@ Idempotent: never create a second automatic Inbox if any list exists.
 - Better Auth handler routes under `app/api/auth/...` (or library convention).
 - Drizzle adapter tables live in the root `db/schema` seat as required by Better Auth.
 - Optional thin `src/modules/auth` for app-facing helpers (`requireUser()`, session DTO). Avoid duplicating library internals.
+- In explicitly enabled local/test mode, the magic-link `sendMagicLink` adapter writes the generated email and verification URL to a temporary, gitignored, file-backed mailbox. The mailbox is unavailable outside local/test mode; exact path, format, and configuration names are implementation choices.
 
 ---
 
@@ -281,7 +282,7 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
   4. Create task
   5. Change task status
   6. Sign-out
-- Magic link may be tested with test hooks/fakes if email provider is local/test-mode.
+- The magic-link Playwright path clears the local/test mailbox, requests a link, reads the captured URL, and visits it to verify link consumption.
 - CI: **not required** for spike complete.
 
 ### 10.3 Local quality
@@ -297,7 +298,8 @@ Do not commit secrets. Typical categories:
 
 - Database URL (Neon)
 - Better Auth secret + URL
-- Magic link / email provider settings (dev)
+- Explicit local/test mailbox enablement and optional temporary path (non-secret)
+- Production magic-link email provider settings if deployment later requires them
 - Sanity project id, dataset, token (server), API version
 
 Document exact variable names in README when wiring — not in this SPEC body if still unstable.
@@ -478,4 +480,4 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 
 ### 14.10 Unresolved implementation choices
 
-Local magic-link test delivery and exact API path spelling remain tracked in [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Factual integration gaps remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); they are not silently resolved by this SPEC projection.
+Exact API path spelling remains tracked in [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md). Factual integration gaps remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); they are not silently resolved by this SPEC projection.

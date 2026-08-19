@@ -23,4 +23,4 @@ Test Zod acceptance/rejection and authentication/authorization behavior at Serve
 
 ## End-to-end tests
 
-Use Playwright for the core sign-in → create list → create task → change status → sign-out journey.
+Use Playwright for the core sign-in → create list → create task → change status → sign-out journey. For magic-link verification, explicitly enable the local/test file-backed mailbox, clear it before the test, request a link, read the captured URL, and visit it. The temporary mailbox is gitignored and unavailable outside local/test mode.

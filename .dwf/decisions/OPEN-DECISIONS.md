@@ -56,14 +56,14 @@ For private list and task resources, a missing resource and a resource owned by 
 
 ## OD-003 — Local magic-link test mechanism
 
-- **Status:** OPEN
+- **Status:** RESOLVED
 - **Impact:** SPEC
-- **Blocking:** YES for deterministic local verification
+- **Blocking:** NO
 - **Related:** D-002, TD-004, EC-009, OQ-001
 
 ### Problem / Conflict
 
-Magic-link request/consume is required, but the local mail/test delivery mechanism is not selected.
+Magic-link request/consume is required, so the local/test delivery mechanism needed to be selected.
 
 ### Accepted Constraints
 
@@ -75,7 +75,7 @@ Choose a local mailer, test hook, or equivalent supported by the installed Bette
 
 ### Resolution
 
-Pending.
+In explicitly enabled local/test mode, the Better Auth `sendMagicLink` callback writes the generated email address and verification URL to a temporary, gitignored, file-backed mailbox. Playwright clears the mailbox before the test, requests a link, reads the captured URL, and visits it to verify consumption. The mailbox must be unavailable outside local/test mode and must never be committed. Exact path, serialization format, helper names, and environment-variable names remain implementation choices. A production email provider is outside the local spike requirement.
 
 <a id="od-004"></a>
 

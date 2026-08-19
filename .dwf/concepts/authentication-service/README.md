@@ -63,7 +63,7 @@ The concrete function names, Better Auth calls, and file grouping remain impleme
 
 - Better Auth and its server-side session facilities.
 - Better Auth persistence through the repository's existing Drizzle/PostgreSQL integration.
-- An email delivery mechanism for magic links in each supported environment.
+- The temporary file-backed mailbox in explicitly enabled local/test mode, and an environment-appropriate send adapter if another deployment environment is later supported.
 - Server request context as required by the selected Better Auth integration.
 
 ## Known consumers
@@ -83,6 +83,7 @@ Consumers receive `CurrentUser` or an unauthenticated outcome. They do not recei
 - Middleware may improve navigation behavior but never replaces operation-level authentication.
 - The session user ID is the ownership identity passed into list and task application use cases.
 - Email/password and magic link are the supported sign-in methods; OAuth and social login remain out of scope.
+- The file-backed magic-link mailbox is temporary, gitignored, and unavailable outside explicitly enabled local/test mode.
 - Raw Better Auth records and provider-specific types do not cross into list, task, or landing contracts.
 
 ## Verification
@@ -91,6 +92,7 @@ The subsystem can be verified independently of completed list/task features:
 
 - Email/password sign-up, sign-in, and sign-out produce the expected authentication state changes.
 - A requested magic link can be consumed to establish the expected authenticated session.
+- The local/test path captures the generated link, reads it deterministically, and verifies it without an external email provider.
 - An authenticated session maps to the expected application-owned `CurrentUser` fields.
 - An unauthenticated operation does not receive a `CurrentUser` from `requireUser`.
 - `getCurrentUser` represents the absence of an authenticated user as `null`.
@@ -104,7 +106,7 @@ The implementation agent may choose:
 - Exact files and folder grouping inside the auth capability.
 - Functions, objects, or equivalent internal composition; the architectural name does not require a class named `AuthenticationService`.
 - Better Auth API calls and adapter details compatible with the installed version.
-- The local email-delivery or test mechanism selected when the corresponding open decision is resolved.
+- Exact local/test mailbox path, serialization format, helper names, and environment-variable names.
 - Internal error types and test-double strategy.
 - Optional middleware for navigation convenience, provided operation-level authentication remains authoritative.
 

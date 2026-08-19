@@ -40,9 +40,10 @@ The dependency direction is `presentation → application → domain`, with infr
 
 - **Status:** ACCEPTED
 - **Related product decisions:** D-001, D-002
+- **Related resolution:** [OD-003](OPEN-DECISIONS.md#od-003)
 - **Source:** legacy D-004; current SPEC authentication boundary
 
-Keep Better Auth instances, raw session records, and auth route wiring behind the auth infrastructure boundary. Expose server-only application helpers equivalent to `getCurrentUser(): Promise<CurrentUser | null>` and `requireUser(): Promise<CurrentUser>`. Private pages, Server Actions, and Route Handlers must authenticate at their operation boundary and must not trust a client-provided owner id.
+Keep Better Auth instances, raw session records, and auth route wiring behind the auth infrastructure boundary. Expose server-only application helpers equivalent to `getCurrentUser(): Promise<CurrentUser | null>` and `requireUser(): Promise<CurrentUser>`. Private pages, Server Actions, and Route Handlers must authenticate at their operation boundary and must not trust a client-provided owner id. In explicitly enabled local/test mode, the magic-link send adapter captures generated links in a temporary, gitignored, file-backed mailbox; the mailbox is unavailable in other modes.
 
 <a id="td-005"></a>
 
