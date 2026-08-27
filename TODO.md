@@ -62,14 +62,14 @@ This is a temporary delivery protocol for the current implementation run. The DW
 
 ### T-01: Create the Neon development branch
 
-- [!] Create a non-default Neon branch from `main` before any schema-changing work.
-- [ ] Point development migration verification at that branch without exposing credentials in the repository.
-- [ ] Record the branch and migration verification result in the delivery evidence.
+- [x] Create the non-default Neon `development` branch from `main` before any schema-changing work. The branch is ready and expires on 2026-09-02.
+- [x] Point development migration verification at that branch through an ephemeral CLI-derived `DATABASE_URL`; no credential is stored in the repository.
+- [x] Record the branch and migration verification result in this delivery tracker.
 
 Verification:
 
-- [ ] The complete migration chain applies to the development branch.
-- [ ] The default branch is unchanged until the reviewed migration passes development verification.
+- [x] The complete existing migration chain applied successfully to the Neon `development` branch with `pnpm exec drizzle-kit migrate`.
+- [x] The default branch was not changed; future schema migrations must still pass on `development` before promotion.
 
 Dependencies: none.
 
