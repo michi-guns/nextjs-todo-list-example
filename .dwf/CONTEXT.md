@@ -33,7 +33,6 @@ The package manifest currently includes Next.js, React, Better Auth, Neon server
 
 ## Operational facts
 
-- `.jz-trello/` and Trello-related skills exist as project workflow/projection infrastructure.
 - No repository-resident Delivery tree currently exists.
 - No Delivery System CLI or package script matching the supplied mental model was found in the repository.
 - A read-only inspection on 2026-08-19 verified that the workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch.

@@ -1,8 +1,0 @@
-{
-  "json.schemas": [
-    {
-      "fileMatch": ["/.jz-trello/board-cache.json"],
-      "url": "./.jz-trello/board-cache.schema.json"
-    }
-  ]
-}

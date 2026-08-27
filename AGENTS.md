@@ -17,21 +17,44 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Use current stable best practices and the simplest genuinely robust design. Add complexity only when it has a clear reusable payoff in safety, correctness, operability, maintainability, or avoided rework. Do not turn the starter into a configurable multi-stack framework.
 - Do not invent links to other products or private projects.
 
-## Trello Work Units
+## Engineering posture and scope
 
-- Board (exact name): `Next.js Todo List Example`
-- Always pass `--board "Next.js Todo List Example"` to `jz-trello-flow`.
-- Card titles use prefix **`WU-N: `** (example: `WU-4: Scaffold module bowl dirs with gitkeep`). Keep metadata `id` and title prefix in sync when renaming.
-- Managed skills (installed under `.agents/skills/`):
-  - `trello-work-orchestrator`
-  - `trello-work-design`
-  - `trello-work-deliver`
-  - `trello-work-recover`
-- Load the matching skill before design, delivery, orchestration, or recovery work.
-- Canonical lists: Inbox, In Design, Ready, In Progress, Review, Blocked, Done.
-- Prefer `jz-trello-flow docs` as command syntax authority.
-- Do not archive Done cards unless a human asks.
-- Experimental board cache: [`.jz-trello/board-cache.json`](.jz-trello/board-cache.json) (schema: [`board-cache.schema.json`](.jz-trello/board-cache.schema.json)). Projection + soft sequence only; **Trello wins** on status/identity. Refresh via `list` before relying on it after remote changes. See [`.jz-trello/README.md`](.jz-trello/README.md).
+- Use balanced commercial engineering. Deliver the accepted behavior, make the primary path reliable, handle common failures and realistic high-impact edge cases, preserve unrelated behavior, and stop when the required checks support the result.
+- Apply risk-proportional scope. Prioritize the task acceptance criteria and required verification, then the happy path, common failures, and plausible high-impact edge cases. Defer speculative abstractions, exhaustive theoretical testing, and unrelated cleanup.
+- Preserve the current scaffold and its accepted extension points. Do not broaden a focused task into dependency upgrades, architecture migrations, repository-wide cleanup, or speculative hardening.
+- If the requested behavior requires a change outside the task or the accepted DWF contracts, pause before expanding scope. Explain what must change, why it is required, the smallest recommended expansion, and what remains unchanged.
+- Do not reopen an accepted product or technical decision because another design appears cleaner. Raise a Design Gap only when the accepted contracts are missing, contradictory, or no longer fit the requested behavior.
+
+## Investigation and planning
+
+- Before establishing a repository convention, inspect the relevant source, manifest, tests, scripts, and documentation. Treat files as evidence of a current convention only when they are actually wired or used.
+- This repository is a greenfield starter, so do not require existing analogues where none exist. Distinguish current code from generated files, examples, and abandoned experiments. When no local pattern exists, follow the DWF contracts and the installed framework documentation.
+- For multi-step work, create one concise, code-aware plan that maps acceptance criteria to files, tests, and commands. Do not create overlapping plans or use planning to rewrite accepted product design.
+- Work task by task against the accepted plan. Keep changes coherent, preserve scope-out boundaries, and stop investigating once the evidence supports a safe implementation decision.
+
+## Task prerequisites and preflight
+
+- Before editing code or running verification, identify only the prerequisites needed for the current slice. Classify each as required to implement, required only for a named verification step, or optional.
+- Run a cheap, read-only preflight for required prerequisites such as pnpm dependencies, Docker/Testcontainers, a local database, a non-default Neon branch, Sanity configuration, Playwright browsers, or a running Next.js server.
+- If a required prerequisite is unavailable, report the failed check, the smallest user or environment action needed, and what will resume afterward. Do not begin a partial implementation or switch to another slice to avoid the blocker.
+- Do not silently install packages, change environment or credentials, start external services, switch database targets, substitute mocks for required integrations, weaken checks, or skip required verification.
+- Database-backed tests and destructive setup must target only the repository's disposable local PostgreSQL environment. Schema-changing Neon work must follow the branch-first rule in the DWF decisions.
+
+## Testing and verification
+
+- Use focused behavioral tests while changing meaningful behavior. Cover the happy path, common failures, and plausible high-impact regressions without building combinatorial tests for speculative states.
+- At completion, run every explicitly required verification clause plus one proportionate final gate for the changed surface. Reuse valid evidence for unchanged areas when the contract allows it.
+- Never claim a check passed when it was skipped or replaced with a weaker check. Report task-caused failures, pre-existing failures, unexecuted verification, blockers, and optional observations separately.
+- For meaningful Next.js runtime changes, use the repository's browser/runtime verification workflow when its prerequisites are available. A typecheck or lint pass alone does not prove visible behavior.
+
+## Git and destructive-action safety
+
+- Preserve existing dirty or untracked work and use the repository's simple branch strategy unless the user says otherwise.
+- Ask for explicit confirmation before deleting or overwriting files, removing directories, clearing generated or cached data, resetting databases, or using destructive Git operations such as reset, clean, restore, checkout that overwrites paths, rebase, amend, branch deletion, force-push, or history rewriting.
+
+## Completion reporting
+
+- Report the files changed, the behavior delivered, the exact checks run and their results, anything intentionally omitted, and any remaining concrete risk or prerequisite.
 
 ## Git strategy (simple / flexible)
 
