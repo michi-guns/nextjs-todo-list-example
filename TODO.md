@@ -75,14 +75,14 @@ Dependencies: none.
 
 ### T-02: Provision the dedicated Sanity resource
 
-- [!] Create the dedicated Sanity project and dataset.
-- [ ] Create and publish the singleton landing document with the required headline, blurb, primary CTA, and optional secondary CTA fields.
-- [ ] Configure local/server-only Sanity settings without committing secrets.
+- [x] Create the dedicated Sanity project and `production` dataset.
+- [x] Create and publish the fixed `landingPage` singleton with the required headline, blurb, primary CTA, and optional secondary CTA fields.
+- [x] Configure local Sanity project/dataset settings without committing secrets.
 
 Verification:
 
-- [ ] A read-only smoke can fetch the published singleton through the real client and query path.
-- [ ] Missing configuration or content fails clearly instead of silently becoming permanent fallback content.
+- [x] `pnpm sanity:smoke` fetches the published singleton through the real `next-sanity` client and fixed-ID GROQ query.
+- [x] Missing project/dataset configuration and missing required singleton content fail clearly; the full landing payload validation and application mapping remain in T-12.
 
 Dependencies: none.
 
