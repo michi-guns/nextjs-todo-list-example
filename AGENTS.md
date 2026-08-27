@@ -25,6 +25,22 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - If the requested behavior requires a change outside the task or the accepted DWF contracts, pause before expanding scope. Explain what must change, why it is required, the smallest recommended expansion, and what remains unchanged.
 - Do not reopen an accepted product or technical decision because another design appears cleaner. Raise a Design Gap only when the accepted contracts are missing, contradictory, or no longer fit the requested behavior.
 
+## Agent Skills
+
+Use the installed `using-agent-skills` skill as the routing layer for software-engineering work.
+
+Before starting any non-trivial engineering task:
+
+1. Consult `using-agent-skills` to determine which installed skills apply.
+2. Automatically invoke and follow the relevant skills.
+3. Chain multiple skills when appropriate.
+4. Do not require the user to explicitly name or invoke skills.
+5. Follow each selected skill's workflow and verification requirements.
+
+Existing project requirements, specifications, acceptance criteria, and architectural decisions are authoritative. Do not create competing requirements or redefine established scope.
+
+Use the smallest set of skills appropriate for the task. Do not add process or ceremony when a simpler workflow is sufficient.
+
 ## Investigation and planning
 
 - Before establishing a repository convention, inspect the relevant source, manifest, tests, scripts, and documentation. Treat files as evidence of a current convention only when they are actually wired or used.
