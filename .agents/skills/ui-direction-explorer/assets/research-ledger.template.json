@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "entries": [
+    {
+      "source": "Mobbin",
+      "product": "Example product",
+      "problem": "Scanning a high-volume transaction history",
+      "observed_pattern": "Persistent filter state with a stable record scanning region",
+      "why_relevant": "Supports frequent operators who repeatedly refine the same dataset.",
+      "transfer": "Keep filter context visible while record selection changes.",
+      "do_not_copy": "Brand styling, proprietary copy, and exact layout.",
+      "url_or_source_id": "https://example.invalid/reference"
+    }
+  ]
+}

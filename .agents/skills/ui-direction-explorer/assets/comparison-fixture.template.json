@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "id": "primary",
+  "scenario": "The operator needs to find yesterday's declined 125 EUR transaction and inspect why it failed.",
+  "representative_data": {
+    "transaction_count": 32,
+    "statuses": ["successful", "declined", "refunded"],
+    "payment_methods": ["card", "cash", "wallet"],
+    "notes": "Use realistic labels, timestamps, amounts, and mixed states in every direction."
+  },
+  "required_capabilities": [
+    "Scan transaction records",
+    "Search or otherwise locate a known transaction",
+    "Filter or narrow the dataset",
+    "Inspect transaction details"
+  ],
+  "required_states": ["normal data", "declined transaction"],
+  "viewports": {
+    "primary": "1440x900",
+    "stress": "390x844"
+  },
+  "stress_conditions": [
+    "Long merchant/customer labels",
+    "Mixed transaction statuses"
+  ]
+}

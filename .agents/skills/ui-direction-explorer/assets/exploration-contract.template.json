@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "id": "transaction-history",
+  "title": "Transaction history UI exploration",
+  "status": "framing",
+  "created_at": "ISO-8601 timestamp",
+  "updated_at": "ISO-8601 timestamp",
+  "goal": "Explore high-level UI/UX directions for transaction history.",
+  "direction_count": 4,
+  "spike_depth": "prototype",
+  "target": {
+    "surface": "transaction history",
+    "platform": "responsive-web",
+    "viewports": {
+      "primary": "1440x900",
+      "stress": "390x844"
+    }
+  },
+  "primary_user": {
+    "description": "Frequent operator who needs to find and inspect transactions quickly."
+  },
+  "critical_tasks": [
+    "Scan recent transactions",
+    "Find a specific transaction",
+    "Inspect transaction details"
+  ],
+  "constraints": {
+    "locked": [
+      "Existing API contracts",
+      "Transaction data model",
+      "Permissions and business rules"
+    ],
+    "free": [
+      "Information hierarchy",
+      "Density",
+      "Local navigation",
+      "Filtering interaction",
+      "Component composition"
+    ]
+  },
+  "assumptions": [
+    {
+      "kind": "assumed",
+      "text": "Existing backend behavior is intentional and remains unchanged."
+    }
+  ],
+  "direction_ids": [],
+  "selection": {
+    "selected_direction": null,
+    "favored_directions": [],
+    "rejected_directions": []
+  },
+  "latest_feedback": [],
+  "next_step": "Research comparable patterns and form candidate directions."
+}

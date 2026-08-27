@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "id": "operations-console",
+  "name": "Operations Console",
+  "status": "candidate",
+  "fixture_id": "primary",
+  "hypothesis": "Frequent operators benefit from persistent context and dense scanning more than progressive guidance.",
+  "optimize_for": [
+    "Scan speed",
+    "Low navigation cost",
+    "High information visibility"
+  ],
+  "tradeoff": "Higher initial cognitive load for occasional users.",
+  "axes": {
+    "information_architecture": "entity-first",
+    "workflow_model": "scan-select-act",
+    "navigation_model": "persistent-local-context",
+    "composition_model": "table-plus-inspector",
+    "content_hierarchy": "records-primary-details-contextual",
+    "density": "dense",
+    "disclosure": "persistent-primary-progressive-secondary",
+    "interaction_model": "direct-selection",
+    "search_filter_model": "persistent-filters",
+    "visual_language": "technical-utilitarian"
+  },
+  "references": [
+    {
+      "source": "Example",
+      "pattern": "Persistent contextual inspector",
+      "why_relevant": "Avoids losing list position while inspecting many records."
+    }
+  ],
+  "implementation": {
+    "path": "path/to/prototype",
+    "entrypoint": "route, story, or command used to view it",
+    "visual_validation": "not-run"
+  },
+  "evaluation": {},
+  "notes": []
+}
