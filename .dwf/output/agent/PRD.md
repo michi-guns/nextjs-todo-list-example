@@ -3,6 +3,7 @@
 **Status:** generated Agent product projection
 **Authority:** [`../../decisions/PRODUCT.md`](../../decisions/PRODUCT.md), [`../../decisions/EDGE-CASES.md`](../../decisions/EDGE-CASES.md), [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md), and [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md)
 **Companion:** [`SPEC.md`](./SPEC.md) (generated technical projection)
+**Testing companion:** [`../../decisions/TESTING.md`](../../decisions/TESTING.md) (test policy and durable test contracts)
 
 This projection is generated from the durable DWF Workspace. It is the precise observable product contract; it does not own decision rationale or implementation mechanisms.
 
@@ -155,7 +156,7 @@ Deployed Vercel preview is **optional**, not required for the currently accepted
 
 ## 8. Success metrics (qualitative)
 
-- A new agent can implement features by reading [the supplied DWF bootstrap](../../README.md), [`../../CONTEXT.md`](../../CONTEXT.md), this generated PRD, [`SPEC.md`](./SPEC.md), the decision ledgers, and the supporting project documentation without chat history.
+- A new agent can implement features by reading [the supplied DWF bootstrap](../../README.md), [`../../CONTEXT.md`](../../CONTEXT.md), this generated PRD, [`SPEC.md`](./SPEC.md), the decision ledgers including [`TESTING.md`](../../decisions/TESTING.md), and the supporting project documentation without chat history.
 - A derived application can replace the todo capabilities and product UI without redesigning every cross-cutting foundation.
 - Reusable infrastructure and boundary code do not depend on todo-specific concepts unless the dependency is inherent.
 - Architecture seats (`src/modules/*`, `db`, `src/sanity`) stay obvious as the reference implementation grows.

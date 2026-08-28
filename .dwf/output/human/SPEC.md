@@ -1,6 +1,6 @@
 # Human Technical Guide — Next.js Todo List Example
 
-This is a human-oriented projection of the validated [Agent SPEC](../agent/SPEC.md). It explains the implementation shape without becoming a second technical contract. Durable choices live in [`../../decisions/TECHNICAL.md`](../../decisions/TECHNICAL.md); product behavior remains owned by [`../agent/PRD.md`](../agent/PRD.md).
+This is a human-oriented projection of the validated [Agent SPEC](../agent/SPEC.md). It explains the implementation shape without becoming a second technical contract. Durable choices live in [`../../decisions/TECHNICAL.md`](../../decisions/TECHNICAL.md); individual testing obligations live in [`../../decisions/TESTING.md`](../../decisions/TESTING.md); product behavior remains owned by [`../agent/PRD.md`](../agent/PRD.md).
 
 ## System shape
 

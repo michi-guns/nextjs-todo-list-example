@@ -1,6 +1,6 @@
 # Human Product Guide — Next.js Todo List Example
 
-This is a human-oriented projection of the validated [Agent PRD](../agent/PRD.md) and [Agent SPEC](../agent/SPEC.md). It explains the product without changing its contract. Durable rationale lives in [`../../decisions/PRODUCT.md`](../../decisions/PRODUCT.md); unresolved state lives in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md) and [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md).
+This is a human-oriented projection of the validated [Agent PRD](../agent/PRD.md) and [Agent SPEC](../agent/SPEC.md). It explains the product without changing its contract. Durable rationale lives in [`../../decisions/PRODUCT.md`](../../decisions/PRODUCT.md); testing obligations live in [`../../decisions/TESTING.md`](../../decisions/TESTING.md); unresolved state lives in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md) and [`../../decisions/OPEN-DECISIONS.md`](../../decisions/OPEN-DECISIONS.md).
 
 ## What this project is
 

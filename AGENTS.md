@@ -41,6 +41,8 @@ Existing project requirements, specifications, acceptance criteria, and architec
 
 Use the smallest set of skills appropriate for the task. Do not add process or ceremony when a simpler workflow is sufficient.
 
+For any implementation or behavior-changing task in this repository, use the project-local `testing-first-class` skill before coding and chain it with `test-driven-development` when executable behavior or tests are changed. The testing skill owns contract discovery and evidence reconciliation; TDD owns the red/green implementation loop.
+
 ## Investigation and planning
 
 - Before establishing a repository convention, inspect the relevant source, manifest, tests, scripts, and documentation. Treat files as evidence of a current convention only when they are actually wired or used.

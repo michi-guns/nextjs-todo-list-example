@@ -1,6 +1,6 @@
 # Product Decisions
 
-Canonical durable Product Decisions (`D-*`). These decisions own accepted observable product behavior and design semantics. The generated Agent PRD is the exact projection; this ledger preserves the decisions and rationale.
+Canonical durable Product Decisions (`D-*`). These decisions own accepted observable product behavior and design semantics. The generated Agent PRD is the exact projection; this ledger preserves the decisions and rationale. See the [Testing Decisions and Test Contracts ledger](TESTING.md) for the `TST-*` obligations that verify these behaviors.
 
 <a id="d-001"></a>
 
