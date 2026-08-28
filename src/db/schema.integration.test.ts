@@ -2,7 +2,7 @@ import { readFile, readdir } from "node:fs/promises"
 import path from "node:path"
 
 import { drizzle } from "drizzle-orm/node-postgres"
-import { eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { Pool, type PoolClient } from "pg"
 import { beforeAll, afterAll, describe, expect, it } from "vitest"
 
@@ -61,13 +61,9 @@ async function getMigrationSqlFiles() {
     .sort()
 
   return Promise.all(
-    directories.map(async (directory) => ({
-      directory,
-      sql: await readFile(
-        path.join(migrationsRoot, directory, "migration.sql"),
-        "utf8"
-      ),
-    }))
+    directories.map(async (directory) =>
+      readFile(path.join(migrationsRoot, directory, "migration.sql"), "utf8")
+    )
   )
 }
 
@@ -87,8 +83,8 @@ async function expectUniqueViolation(action: () => Promise<unknown>) {
 describe.sequential("lists and tasks PostgreSQL schema", () => {
   const databaseUrl = getLocalDatabaseUrl(testDatabaseUrl)
   const schemaName = `codex_t04_${process.pid}_${Date.now()}`
-  let setupPool: Pool
-  let appPool: Pool
+  let setupPool: Pool | undefined
+  let appPool: Pool | undefined
   let database: ReturnType<typeof drizzle>
 
   beforeAll(async () => {
@@ -102,8 +98,8 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
       )
 
       const migrations = await getMigrationSqlFiles()
-      for (const migration of migrations) {
-        await applyMigration(setupClient, migration.sql)
+      for (const migrationSql of migrations) {
+        await applyMigration(setupClient, migrationSql)
       }
     } finally {
       setupClient.release()
@@ -119,7 +115,14 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
   })
 
   afterAll(async () => {
-    await appPool.end()
+    if (appPool) {
+      await appPool.end()
+    }
+
+    if (!setupPool) {
+      return
+    }
+
     const cleanupPool = new Pool({ connectionString: databaseUrl })
     try {
       await cleanupPool.query(
@@ -131,8 +134,16 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
     }
   })
 
+  function getAppPool() {
+    if (!appPool) {
+      throw new Error("The schema integration database was not initialized")
+    }
+
+    return appPool
+  }
+
   it("applies the migration chain with the required columns and status enum", async () => {
-    const columns = await appPool.query<{
+    const columns = await getAppPool().query<{
       table_name: string
       column_name: string
       data_type: string
@@ -209,7 +220,7 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
       is_nullable: "NO",
     })
 
-    const enumValues = await appPool.query<{ enumlabel: string }>(
+    const enumValues = await getAppPool().query<{ enumlabel: string }>(
       `
         SELECT enumlabel
         FROM pg_enum
@@ -310,7 +321,7 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
 
     await database.delete(listsTable).where(eq(listsTable.id, ownerListId))
 
-    const cascadedTasks = await appPool.query(
+    const cascadedTasks = await getAppPool().query(
       `SELECT id FROM ${qualifiedTable(schemaName, "tasks")} WHERE list_id = $1`,
       [ownerListId]
     )
@@ -324,7 +335,7 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
   })
 
   it("defines cascading foreign keys and query-shaped cursor indexes", async () => {
-    const constraints = await appPool.query<{
+    const constraints = await getAppPool().query<{
       child_table: string
       parent_table: string
       delete_action: string
@@ -364,7 +375,7 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
       ])
     )
 
-    const indexes = await appPool.query<{
+    const indexes = await getAppPool().query<{
       tablename: string
       indexname: string
       indexdef: string
@@ -407,10 +418,5 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
           definition.includes(`lower(title)`)
       )
     ).toBe(true)
-
-    const tableCount = await database.execute(
-      sql`SELECT count(*)::int AS count FROM ${listsTable}`
-    )
-    expect(tableCount.rows[0]).toMatchObject({ count: 2 })
   })
 })

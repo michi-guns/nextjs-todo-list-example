@@ -138,11 +138,11 @@ Dependencies: T-03.
 
 ### T-04: Add the lists and tasks schema
 
-- [~] Add `lists` and `tasks` Drizzle tables with ownership, timestamps, statuses, and nullable notes as defined by the SPEC.
-- [ ] Add the list-to-task foreign key with database-level cascade deletion.
-- [ ] Add database-enforced case-insensitive uniqueness for list names per user and task titles per list.
-- [ ] Add the required composite cursor indexes aligned with the authenticated equality scopes and ordering.
-- [ ] Retire the scaffold `posts` schema from active application code without editing the already-applied migration in place.
+- [x] Add `lists` and `tasks` Drizzle tables with ownership, timestamps, statuses, and nullable notes as defined by the SPEC.
+- [x] Add the list-to-task foreign key with database-level cascade deletion.
+- [x] Add database-enforced case-insensitive uniqueness for list names per user and task titles per list.
+- [x] Add the required composite cursor indexes aligned with the authenticated equality scopes and ordering.
+- [x] Retire the scaffold `posts` schema from active application code without editing the already-applied migration in place.
 
 Recommended AgentForge skills:
 
@@ -158,10 +158,10 @@ Recommended AgentForge skills:
 
 Verification:
 
-- [ ] A new versioned migration applies to an empty local PostgreSQL database/schema through the available integration lane.
+- [x] A new versioned migration applies to an empty local PostgreSQL database/schema through the available integration lane.
 - [!] PostgreSQL 18 Testcontainers migration evidence is blocked until the reusable T-14 harness exists; the local integration check does not replace that obligation.
-- [ ] The reviewed migration applies successfully to the Neon development branch.
-- [ ] Integration coverage proves uniqueness, cascade deletion, and required indexes/constraints.
+- [x] The reviewed migration applies successfully to the Neon development branch.
+- [x] Integration coverage proves uniqueness, cascade deletion, and required indexes/constraints.
 
 Test contracts: `TST-MIGRATION-001`, `TST-PERSISTENCE-001`.
 

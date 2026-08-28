@@ -2,7 +2,7 @@
 
 > AgentForge plan. This plan is accepted for the resumed T-04 task; `task-breakdown` reconciles its delivery metadata before implementation.
 
-**Status:** Accepted
+**Status:** Completed
 
 **Goal:** Add the PostgreSQL/Drizzle lists and tasks persistence schema, a reviewed versioned migration, and honest real-database evidence for the required constraints and query-shaped indexes without changing the applied scaffold migration.
 

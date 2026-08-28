@@ -121,9 +121,9 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | ID                                          | Contract                                                                             | Primary evidence                                       | Owner                           | Status      |
 | ------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------- | ----------- |
 | [TST-FOUNDATION-001](#tst-foundation-001)   | Shared database runtime works across local PostgreSQL and Neon                       | Unit, local integration, hosted smoke                  | T-03                            | `verified`  |
-| [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                | `specified` |
+| [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                | `partial`   |
 | [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks          | T-14, T-15                      | `specified` |
-| [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration                                 | T-04, T-06, T-07, T-14          | `specified` |
+| [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration                                 | T-04, T-06, T-07, T-14          | `partial`   |
 | [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                      | `specified` |
 | [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                      | `specified` |
 | [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                | `specified` |
@@ -166,7 +166,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-MIGRATION-001 — Versioned migration chain
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Database migration foundation
 - **Evidence layers/modes:** Infrastructure / migration integration, hosted smoke
 - **Verifies product decisions:** D-003, D-004, D-009
@@ -177,6 +177,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The complete versioned Drizzle migration chain applies to an empty PostgreSQL 18 Testcontainer and the reviewed migration applies successfully to the non-default Neon development branch before promotion.
 - **Required evidence:** Harness-owned empty-database migration run and non-destructive Neon development-branch migration smoke.
 - **Dependencies:** T-04 schema work, T-14 Testcontainers harness, and the existing T-01 Neon development branch.
+- **Current evidence:** T-04's `pnpm test:integration -- src/db/schema.integration.test.ts` applied the complete versioned chain to an isolated schema in a disposable local `postgres:18-alpine` container, and `pnpm exec drizzle-kit migrate` applied the reviewed migration successfully to the non-default Neon `development` branch. The Neon catalog inspection confirmed the `lists`/`tasks` tables, `task_status` enum, cursor/unique indexes, and cascading foreign keys.
+- **Follow-up:** T-14 must run the same chain through the reusable `@testcontainers/postgresql` harness and record its lifecycle/failure-cleanup evidence before this contract can be `verified`.
 
 <a id="tst-harness-001"></a>
 
@@ -198,7 +200,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-PERSISTENCE-001 — Relational invariants and repository mappings
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Persistence
 - **Evidence layers/modes:** Domain, application, infrastructure / unit, integration
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
@@ -209,6 +211,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Real PostgreSQL behavior preserves ownership, case-insensitive uniqueness, list-to-task cascade deletion, repository field mappings, bounded cursor reads, required indexes, and the absence of N+1 or unbounded page work.
 - **Required evidence:** PostgreSQL integration cases against the real migrations, including concurrent uniqueness and cascade behavior, plus query-shape assertions where the contract requires them.
 - **Dependencies:** T-04 schema and T-14 harness.
+- **Current evidence:** T-04's focused integration suite passed three real-database cases covering Drizzle `Date` mappings, nullable notes and native status values, owner-scoped case-insensitive list/task uniqueness, list-to-task cascade deletion, cascading foreign keys, and the required cursor-index column order/direction. It does not yet prove concurrent repository operations, bounded cursor queries, or N+1 behavior.
+- **Follow-up:** T-06/T-07 repository implementations and T-14's PostgreSQL 18 harness must add the remaining ownership, concurrent-uniqueness, cursor, and query-shape evidence.
 
 <a id="tst-auth-001"></a>
 
