@@ -26,7 +26,7 @@ This is a temporary delivery protocol for the current implementation run. The DW
 2. Select the next unchecked task whose dependencies are satisfied. `T-03A` must be complete before selecting any later implementation task.
 3. Start from the latest `main` and create `task/<task-id>-<short-slug>`, for example `task/T-06-lists-capability`.
 4. Mark the task `[~]` on that branch and keep the change limited to the task and its required verification.
-5. Use the task's recommended agent skills, including `testing-first-class` before coding and `test-driven-development` for executable behavior. Do not silently expand scope or resolve a product/technical decision in code.
+5. For multi-step work, use AgentForge `planning` first and `task-breakdown` second. Use the task's recommended agent skills, including `testing-first-class` before coding and `test-driven-development` for executable behavior. Do not silently expand scope or resolve a product/technical decision in code.
 
 ### Finish a task
 
@@ -124,7 +124,7 @@ Recommended agent skills:
 
 - `skill-creator` for the project-local skill shape and scope.
 - `documentation-and-adrs` for DWF ownership, traceability, and projection updates.
-- `planning-and-task-breakdown` for keeping the workflow small and verifiable.
+- `planning` and `task-breakdown` for a reviewed approach and small, verifiable work items.
 
 Verification:
 

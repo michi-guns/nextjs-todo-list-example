@@ -145,12 +145,6 @@
       "skillPath": "skills/performance-optimization/SKILL.md",
       "computedHash": "cd729dc7d35b5c2d17fd574dd08f765f0a2775117f01da2f65a6b25c21e879bb"
     },
-    "planning-and-task-breakdown": {
-      "source": "addyosmani/agent-skills",
-      "sourceType": "github",
-      "skillPath": "skills/planning-and-task-breakdown/SKILL.md",
-      "computedHash": "f6c2cc012101225c58e5886e847342d1efaf0336a8e150b833d617fdf092952c"
-    },
     "security-and-hardening": {
       "source": "addyosmani/agent-skills",
       "sourceType": "github",

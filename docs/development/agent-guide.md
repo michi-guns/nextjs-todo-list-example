@@ -12,6 +12,8 @@ Evolve this opinionated starter and its todo reference implementation while pres
 4. Read linked decisions and check assumptions/open questions.
 5. Inspect repository conventions and the current implementation.
 
+For multi-step work, use the AgentForge `planning` skill before `task-breakdown`. Save the plan under `docs/agentforge/plans/` and the resulting delivery tasks in `TODO.md` before coding.
+
 ## During implementation
 
 - Prefer small vertical slices.
