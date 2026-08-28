@@ -90,15 +90,15 @@ Dependencies: none.
 
 ### T-03: Replace the database runtime boundary
 
-- [ ] Replace the Neon HTTP adapter with `node-postgres` through `drizzle-orm/node-postgres`.
-- [ ] Create one bounded, module-scoped `pg.Pool` shared by Better Auth and list/task repositories.
-- [ ] Register the pool with Vercel `attachDatabasePool` when running on Vercel Fluid Compute.
-- [ ] Use pooled Neon connections for application traffic, direct connections for migrations, and the harness URL for local tests.
+- [x] Replace the Neon HTTP adapter with `node-postgres` through `drizzle-orm/node-postgres`.
+- [x] Create one bounded, module-scoped `pg.Pool` shared by Better Auth and list/task repositories.
+- [x] Register the pool with Vercel `attachDatabasePool` when running on Vercel Fluid Compute.
+- [x] Use pooled Neon connections for application traffic, direct connections for migrations, and the harness URL for local tests.
 
 Verification:
 
-- [ ] Typecheck and lint pass.
-- [ ] The same repository implementation can connect to local PostgreSQL and Neon.
+- [x] `pnpm test`, `pnpm typecheck`, and `pnpm lint` pass with no task-caused errors; lint retains one pre-existing unused `Geist` warning.
+- [x] `pnpm test:integration` passes against a disposable local PostgreSQL database, and the same repository implementation connected successfully to pooled Neon.
 
 Dependencies: T-01.
 
