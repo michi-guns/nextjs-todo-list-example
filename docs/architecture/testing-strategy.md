@@ -5,6 +5,8 @@ owner: engineering
 
 # Testing Strategy
 
+The [canonical Testing Decisions and Test Contracts ledger](../../.dwf/decisions/TESTING.md) owns individual `TST-*` obligations, statuses, dependencies, and evidence. This document explains the supporting layer strategy and does not replace or redefine those contracts.
+
 ## Domain tests
 
 Test task statuses, trimming/non-empty rules, and other invariants without framework or database setup.

@@ -2,6 +2,8 @@
 
 This file tracks implementation delivery for the starter baseline. The [DWF README](.dwf/README.md), [Agent PRD](.dwf/output/agent/PRD.md), [Agent SPEC](.dwf/output/agent/SPEC.md), and decision ledgers remain authoritative.
 
+The [Testing Decisions and Test Contracts ledger](.dwf/decisions/TESTING.md) owns test policy, `TST-*` obligations, statuses, dependencies, and evidence expectations. This file assigns those contracts to delivery tasks; it does not redefine them.
+
 Status markers:
 
 - `[ ]` Not started
@@ -20,23 +22,26 @@ This is a temporary delivery protocol for the current implementation run. The DW
 
 ### Start a task
 
-1. Select the next unchecked task whose dependencies are satisfied.
-2. Start from the latest `main` and create `task/<task-id>-<short-slug>`, for example `task/T-06-lists-capability`.
-3. Mark the task `[~]` on that branch and keep the change limited to the task and its required verification.
-4. Use the task's recommended agent skills and preserve the DWF contracts. Do not silently expand scope or resolve a product/technical decision in code.
+1. Read the relevant `TST-*` contracts before selecting implementation work. Identify evidence that is possible now and evidence that depends on later tasks or unavailable prerequisites.
+2. Select the next unchecked task whose dependencies are satisfied. `T-03A` must be complete before selecting any later implementation task.
+3. Start from the latest `main` and create `task/<task-id>-<short-slug>`, for example `task/T-06-lists-capability`.
+4. Mark the task `[~]` on that branch and keep the change limited to the task and its required verification.
+5. Use the task's recommended agent skills, including `testing-first-class` before coding and `test-driven-development` for executable behavior. Do not silently expand scope or resolve a product/technical decision in code.
 
 ### Finish a task
 
 1. Complete the task acceptance criteria and record the verification evidence in the task or its linked artifact.
-2. Run the focused checks plus the proportionate project quality gates. Do not claim a check passed when it was skipped.
-3. Mark the task `[x]`, update any checkpoint it satisfies, and commit the complete task with a descriptive message such as `feat: implement lists capability`.
-4. Push the branch with its upstream configured.
-5. Open a pull request from the task branch into `main`. The PR body must include:
+2. Reconcile every referenced `TST-*` contract. Mark it `verified`, `partial`, `blocked`, `deferred`, or `retired` with the exact evidence or a linked follow-up; never silently omit a future integration or E2E obligation.
+3. Run the focused checks plus the proportionate project quality gates. Do not claim a check passed when it was skipped.
+4. Mark the task `[x]`, update any checkpoint it satisfies, and commit the complete task with a descriptive message such as `feat: implement lists capability`.
+5. Push the branch with its upstream configured.
+6. Open a pull request from the task branch into `main`. The PR body must include:
    - a concise summary of the behavior delivered;
    - the task ID and links to the relevant DWF PRD/SPEC sections;
+   - the affected `TST-*` IDs and their status;
    - acceptance criteria and verification commands/results;
    - known limitations, follow-up tasks, and any external prerequisites.
-6. Report the terminal handoff in this format:
+7. Report the terminal handoff in this format:
 
    `T-XX | PR #N | <PR title> | <clickable GitHub URL>`
 
@@ -56,7 +61,7 @@ This is a temporary delivery protocol for the current implementation run. The DW
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
 - [x] `pnpm test` exits successfully, but currently finds no test files.
-- [ ] Meaningful test, migration, Sanity, and browser evidence exists.
+- [ ] Meaningful test, migration, Sanity, and browser evidence exists. Track the obligation set in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
 
@@ -71,6 +76,8 @@ Verification:
 - [x] The complete existing migration chain applied successfully to the Neon `development` branch with `pnpm exec drizzle-kit migrate`.
 - [x] The default branch was not changed; future schema migrations must still pass on `development` before promotion.
 
+Test contracts: `TST-MIGRATION-001`, `TST-PERFORMANCE-001`.
+
 Dependencies: none.
 
 ### T-02: Provision the dedicated Sanity resource
@@ -83,6 +90,8 @@ Verification:
 
 - [x] `pnpm sanity:smoke` fetches the published singleton through the real `next-sanity` client and fixed-ID GROQ query.
 - [x] Missing project/dataset configuration and missing required singleton content fail clearly; the full landing payload validation and application mapping remain in T-12.
+
+Test contracts: `TST-LANDING-002` (the live application mapping remains owned by T-12).
 
 Dependencies: none.
 
@@ -100,7 +109,32 @@ Verification:
 - [x] `pnpm test`, `pnpm typecheck`, and `pnpm lint` pass with no task-caused errors; lint retains one pre-existing unused `Geist` warning.
 - [x] `pnpm test:integration` passes against a disposable local PostgreSQL database, and the same repository implementation connected successfully to pooled Neon.
 
+Test contracts: `TST-FOUNDATION-001`.
+
 Dependencies: T-01.
+
+### T-03A: Establish first-class testing design and agent workflow
+
+- [x] Create the canonical testing decision ledger with stable `TSD-*` policy IDs and `TST-*` behavior contracts.
+- [x] Record the current baseline's important unit, application, infrastructure, boundary, UI, Sanity, integration, performance, and end-to-end obligations, including dependencies that are not ready yet.
+- [x] Add the thin project-local `testing-first-class` skill and route it before TDD for implementation and behavior-changing test work.
+- [x] Propagate test-contract references into the Agent SPEC, delivery tracker, DWF navigation, and supporting agent guidance.
+
+Recommended agent skills:
+
+- `skill-creator` for the project-local skill shape and scope.
+- `documentation-and-adrs` for DWF ownership, traceability, and projection updates.
+- `planning-and-task-breakdown` for keeping the workflow small and verifiable.
+
+Verification:
+
+- [x] Every active baseline test obligation has a stable `TST-*` record, an owning task, required evidence, and a status.
+- [x] The skill and documentation explain how to reconcile partial, blocked, deferred, and verified evidence without silently weakening the obligation.
+- [x] The skill validator, DWF checks if available, and repository quality gates pass without task-caused failures.
+
+Testing contracts: This task establishes the `TSD-*` policy and `TST-*` contract system in [`.dwf/decisions/TESTING.md`](.dwf/decisions/TESTING.md); it does not implement product behavior.
+
+Dependencies: T-03.
 
 ### T-04: Add the lists and tasks schema
 
@@ -116,7 +150,9 @@ Verification:
 - [ ] The reviewed migration applies successfully to the Neon development branch.
 - [ ] Integration coverage proves uniqueness, cascade deletion, and required indexes/constraints.
 
-Dependencies: T-01, T-03.
+Test contracts: `TST-MIGRATION-001`, `TST-PERSISTENCE-001`.
+
+Dependencies: T-01, T-03, T-03A.
 
 ### T-05: Complete the Better Auth boundary
 
@@ -132,7 +168,9 @@ Verification:
 - [ ] The local/test mailbox flow can request, read, and consume one magic link.
 - [ ] Authenticated code never accepts a client-provided owner id.
 
-Dependencies: T-03.
+Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`.
+
+Dependencies: T-03, T-03A.
 
 ## Checkpoint: foundations
 
@@ -155,6 +193,8 @@ Verification:
 - [ ] Unit tests cover normalization, ownership, Inbox lifecycle, and expected application outcomes.
 - [ ] Integration tests cover concurrent Inbox creation, duplicate names, cursor ordering, and cascade behavior.
 
+Test contracts: `TST-LISTS-001`, `TST-LISTS-002`, `TST-LISTS-003`, `TST-CONCURRENCY-001`.
+
 Dependencies: T-04, T-05.
 
 ### T-07: Implement the tasks capability
@@ -169,6 +209,8 @@ Verification:
 - [ ] Unit tests cover status transitions, trimming, note clearing, validation, and concurrent patch semantics.
 - [ ] Integration tests cover ownership, duplicate titles, pagination, completed filtering, cascade deletion, and last-successful-write behavior.
 
+Test contracts: `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, `TST-CONCURRENCY-001`.
+
 Dependencies: T-04, T-05, T-06.
 
 ### T-08: Add shared pagination and error contracts
@@ -182,6 +224,8 @@ Verification:
 
 - [ ] Unit and boundary tests cover malformed/cross-context cursors, limit errors, response shape, and privacy-preserving `404` behavior.
 - [ ] Query tests prove the required ordering and continuation behavior at the maximum page size.
+
+Test contracts: `TST-LISTS-003`, `TST-TASKS-003`, `TST-BOUNDARY-001`.
 
 Dependencies: T-06, T-07.
 
@@ -198,6 +242,8 @@ Verification:
 
 - [ ] Route Handler contract tests cover success, pagination, `401`, privacy-preserving `404`, `409`, and `422` responses.
 - [ ] Server Action tests cover authentication, validation, successful mapping, and expected errors.
+
+Test contracts: `TST-AUTH-003`, `TST-BOUNDARY-001`.
 
 Dependencies: T-05, T-06, T-07, T-08.
 
@@ -219,6 +265,8 @@ Verification:
 - [ ] All directions use the same primary scenario, data burden, required capabilities, and target viewport.
 - [ ] The exploration handoff states any visual-inspection limitation instead of claiming unperformed validation.
 
+Test contracts: `TST-UI-001`.
+
 Dependencies: T-08.
 
 ### T-09B: Select and hand off the UI direction
@@ -238,6 +286,8 @@ Verification:
 - [ ] The chosen direction has a clear reason for winning and a documented trade-off.
 - [ ] T-10 and T-11 can be implemented from the handoff without inventing a competing UI direction.
 - [ ] The handoff includes the empty, loading, error, focus, narrow-viewport, and long-content states needed by the product.
+
+Test contracts: `TST-UI-001`.
 
 Dependencies: T-09A.
 
@@ -262,6 +312,8 @@ Verification:
 - [ ] A manual runtime check confirms list/task pagination, filtering, and mutation feedback.
 - [ ] The UI works at 320px, 768px, 1024px, and 1440px with keyboard-accessible interactions and visible focus.
 
+Test contracts: `TST-LISTS-003`, `TST-TASKS-003`, `TST-UI-001`, `TST-E2E-003`.
+
 Dependencies: T-09, T-09B.
 
 ### T-11: Build the public landing and auth screens
@@ -284,6 +336,8 @@ Verification:
 - [ ] Auth screens work against the local test database and show stable expected errors.
 - [ ] Forms are keyboard accessible, labels and focus states are clear, and layouts work at the agreed responsive breakpoints.
 
+Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`.
+
 Dependencies: T-02, T-05, T-09B.
 
 ### T-12: Add the Sanity landing read path
@@ -298,7 +352,9 @@ Verification:
 - [ ] Fixture tests cover valid payloads, optional fields, malformed content, and missing required content.
 - [ ] The separate live read smoke fetches, validates, and maps the published singleton.
 
-Dependencies: T-02.
+Test contracts: `TST-LANDING-001`, `TST-LANDING-002`.
+
+Dependencies: T-02, T-03A.
 
 ### T-13: Add Sanity freshness and recovery
 
@@ -311,6 +367,8 @@ Verification:
 
 - [ ] Tests cover valid/invalid signatures, relevance filtering, duplicate delivery, and manual authorization.
 - [ ] A deployed release candidate receives one real Sanity webhook successfully.
+
+Test contracts: `TST-LANDING-003`.
 
 Dependencies: T-12.
 
@@ -332,6 +390,8 @@ Verification:
 - [ ] The review produces concrete file/line findings or records that no actionable findings remain.
 - [ ] The UI has no new console errors, obvious overflow, inaccessible controls, missing labels, or color-only critical state cues.
 - [ ] The selected direction remains recognizable after implementation and the core product flow remains unchanged.
+
+Test contracts: `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`.
 
 Dependencies: T-10, T-11, T-12, T-13.
 
@@ -356,6 +416,8 @@ Verification:
 - [ ] Docker-backed tests fail clearly when Docker is unavailable rather than silently skipping.
 - [ ] The full repository integration suite passes against the harness-owned database.
 
+Test contracts: `TST-HARNESS-001`, `TST-MIGRATION-001`, `TST-PERSISTENCE-001`, `TST-LISTS-001`, `TST-LISTS-002`, `TST-LISTS-003`, `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, `TST-CONCURRENCY-001`.
+
 Dependencies: T-04, T-06, T-07, T-08.
 
 ### T-15: Replace the example Playwright suite
@@ -370,6 +432,8 @@ Verification:
 - [ ] `pnpm exec playwright test` passes against the harness-owned local database in Chromium.
 - [ ] Cross-browser checks remain available separately for release or major UI changes.
 
+Test contracts: `TST-HARNESS-001`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`.
+
 Dependencies: T-05, T-09, T-10, T-11, T-14.
 
 ### T-16: Produce Neon performance evidence
@@ -382,6 +446,8 @@ Verification:
 
 - [ ] Query plans use the intended composite indexes without a full sequential scan of the lists or tasks table.
 - [ ] Evidence records database execution separately from network, authentication, rendering, CMS access, and compute startup.
+
+Test contracts: `TST-PERFORMANCE-001`.
 
 Dependencies: T-01, T-04, T-08.
 
@@ -396,6 +462,8 @@ Verification:
 
 - [ ] All required local acceptance items have evidence.
 - [ ] Skipped checks, pre-existing warnings, and remaining risks are recorded.
+
+Test contracts: reconcile every active baseline contract in [`TESTING.md`](.dwf/decisions/TESTING.md) before closing this task.
 
 Dependencies: T-12A, T-14, T-15, T-16.
 

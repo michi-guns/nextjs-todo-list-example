@@ -3,6 +3,7 @@
 **Status:** generated Agent technical projection
 **Authority:** [`../../RULES.md`](../../RULES.md), [`../../CONTEXT.md`](../../CONTEXT.md), [`../../decisions/PRODUCT.md`](../../decisions/PRODUCT.md), [`../../decisions/TECHNICAL.md`](../../decisions/TECHNICAL.md), [`../../decisions/EDGE-CASES.md`](../../decisions/EDGE-CASES.md), and [`PRD.md`](./PRD.md)
 **Companion:** [`PRD.md`](./PRD.md) (generated product projection)
+**Testing companion:** [`../../decisions/TESTING.md`](../../decisions/TESTING.md) (test policy and durable test contracts)
 **Stack orientation:** See the supporting [technology stack](../../../docs/architecture/stack.md).
 
 This projection is generated from the durable DWF Workspace. It is subordinate to the Agent PRD and does not own technical-decision rationale.
@@ -341,6 +342,18 @@ Parallel mutations for the dashboard UI (create/rename/delete list; create/updat
 ---
 
 ## 10. Testing
+
+The individual test obligations for this contract are owned by the [Testing Decisions and Test Contracts ledger](../../decisions/TESTING.md). Every implementation task must carry the relevant `TST-*` IDs and reconcile their evidence; the table below is a navigation map, not a duplicate test specification.
+
+| SPEC area                               | Test contracts                                                                          |
+| --------------------------------------- | --------------------------------------------------------------------------------------- |
+| Auth and session rules                  | `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`                                          |
+| Data model, migrations, and connections | `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-PERSISTENCE-001`     |
+| Domain and application behavior         | `TST-LISTS-001`–`TST-LISTS-003`, `TST-TASKS-001`–`TST-TASKS-003`, `TST-CONCURRENCY-001` |
+| Server boundaries and validation        | `TST-BOUNDARY-001`                                                                      |
+| Sanity landing behavior                 | `TST-LANDING-001`–`TST-LANDING-003`                                                     |
+| UI and browser acceptance               | `TST-UI-001`, `TST-E2E-001`–`TST-E2E-003`                                               |
+| Neon performance                        | `TST-PERFORMANCE-001`                                                                   |
 
 ### 10.1 Vitest
 

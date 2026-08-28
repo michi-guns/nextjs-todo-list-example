@@ -12,6 +12,7 @@ Project truth:
 - [`RULES.md`](RULES.md) — mandatory project-specific constraints
 - [`decisions/PRODUCT.md`](decisions/PRODUCT.md) — accepted Product Decisions (`D-*`)
 - [`decisions/TECHNICAL.md`](decisions/TECHNICAL.md) — accepted Technical Decisions (`TD-*`)
+- [`decisions/TESTING.md`](decisions/TESTING.md) — accepted Testing Decisions (`TSD-*`) and durable test contracts (`TST-*`)
 - [`decisions/EDGE-CASES.md`](decisions/EDGE-CASES.md) — explicitly considered scenarios (`EC-*`)
 - [`decisions/OPEN-QUESTIONS.md`](decisions/OPEN-QUESTIONS.md) — unresolved facts (`OQ-*`)
 - [`decisions/OPEN-DECISIONS.md`](decisions/OPEN-DECISIONS.md) — unresolved choices (`OD-*`)
@@ -34,7 +35,7 @@ Derived explanations:
 
 ## Ownership
 
-The Workspace root outside `.framework/` is project-specific design state. Product behavior is owned by the Agent PRD, technical behavior by the Agent SPEC, and accepted results by the decision ledgers. Keep decision entries thin. Record reasoning only for rare, difficult tradeoffs. Unresolved facts and choices remain visible rather than being silently inferred.
+The Workspace root outside `.framework/` is project-specific design state. Product behavior is owned by the Agent PRD, technical behavior by the Agent SPEC, and accepted results by the decision ledgers. Testing policy and test-contract traceability are owned by `decisions/TESTING.md`; it supplements but does not override the Product or Technical Decisions. Keep decision entries thin. Record reasoning only for rare, difficult tradeoffs. Unresolved facts and choices remain visible rather than being silently inferred.
 
 ## Framework machinery
 

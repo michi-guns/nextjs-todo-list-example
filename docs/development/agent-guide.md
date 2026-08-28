@@ -8,8 +8,9 @@ Evolve this opinionated starter and its todo reference implementation while pres
 
 1. Read `docs/index.md` and `docs/documentation-protocol.md`.
 2. Read the relevant product, architecture, domain, and data documents.
-3. Read linked ADRs and check assumptions/open questions.
-4. Inspect repository conventions and the current implementation.
+3. Read [`.dwf/decisions/TESTING.md`](../../.dwf/decisions/TESTING.md) and identify the affected `TST-*` contracts.
+4. Read linked decisions and check assumptions/open questions.
+5. Inspect repository conventions and the current implementation.
 
 ## During implementation
 
@@ -21,6 +22,7 @@ Evolve this opinionated starter and its todo reference implementation while pres
 - Keep Drizzle and Sanity behind infrastructure adapters.
 - Keep Server Components for direct reads and Server Actions for UI mutations.
 - Record new uncertainty as an assumption.
+- Use the `testing-first-class` skill before implementation and the `test-driven-development` skill for executable behavior. Reconcile every affected `TST-*` contract before completion.
 
 ## Before completion
 

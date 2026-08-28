@@ -1,6 +1,6 @@
 # Technical Decisions
 
-Canonical durable Technical Decisions (`TD-*`). These choices implement the accepted Product Decisions without overriding them. The generated Agent SPEC is the precise technical projection; this ledger preserves the durable mechanism and rationale.
+Canonical durable Technical Decisions (`TD-*`). These choices implement the accepted Product Decisions without overriding them. The generated Agent SPEC is the precise technical projection; this ledger preserves the durable mechanism and rationale. See the [Testing Decisions and Test Contracts ledger](TESTING.md) for the `TST-*` obligations that verify these mechanisms and boundaries.
 
 <a id="td-001"></a>
 

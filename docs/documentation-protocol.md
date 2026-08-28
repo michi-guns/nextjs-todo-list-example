@@ -7,7 +7,7 @@ This is the navigation and maintenance protocol for the project's design, suppor
 1. [`docs/index.md`](index.md)
 2. [`.dwf/RULES.md`](../.dwf/RULES.md) and [`.dwf/CONTEXT.md`](../.dwf/CONTEXT.md), when present
 3. [`.dwf/output/agent/PRD.md`](../.dwf/output/agent/PRD.md) and the relevant sections of [`.dwf/output/agent/SPEC.md`](../.dwf/output/agent/SPEC.md)
-4. Relevant [`.dwf/decisions/`](../.dwf/decisions/) ledgers and supporting architecture/domain/data documents
+4. Relevant [`.dwf/decisions/`](../.dwf/decisions/) ledgers, including [`TESTING.md`](../.dwf/decisions/TESTING.md) for affected behavior, and supporting architecture/domain/data documents
 5. Human projections, concepts, handbook, development, runbook, and protocol material as needed
 
 ## Authority
@@ -15,6 +15,7 @@ This is the navigation and maintenance protocol for the project's design, suppor
 - `.dwf/output/agent/PRD.md` defines current observable product behavior.
 - `.dwf/output/agent/SPEC.md` defines the current technical implementation contract and is subordinate to the Agent PRD.
 - `.dwf/decisions/PRODUCT.md` and `.dwf/decisions/TECHNICAL.md` contain concise accepted results and must be reflected into current projections when they affect behavior or implementation.
+- `.dwf/decisions/TESTING.md` owns testing policy and durable `TST-*` test contracts. It links those contracts to Product Decisions, Technical Decisions, Edge Cases, SPEC areas, delivery tasks, and evidence without overriding the other ledgers.
 - `.dwf/decisions/EDGE-CASES.md` records explicitly considered scenarios; `.dwf/decisions/OPEN-QUESTIONS.md` and `.dwf/decisions/OPEN-DECISIONS.md` are unresolved state, never accepted truth.
 - `.dwf/concepts/` and `.dwf/output/human/` are derived explanations/projections, never authorities.
 - `docs/` supplies supporting, operational, and explanatory material. It must not silently override `.dwf/`.
@@ -24,6 +25,7 @@ This is the navigation and maintenance protocol for the project's design, suppor
 
 - Product behavior changes update the durable product decisions and regenerated Agent PRD, plus affected technical contracts, tests, and supporting documents.
 - Technical or architectural changes update the durable technical decisions and regenerated Agent SPEC. Record reasoning only when the tradeoff is unusually complex or likely to be questioned later.
+- Behavior changes update the affected `TST-*` contracts and delivery-task references. Test implementation and run evidence should follow the contract; they must not silently become a second source of requirements.
 - Keep `OPEN-DECISIONS.md` for unresolved choices only. Accepted choices may go directly into their owning decision ledger. When an open choice is resolved, record its result and remove the open entry.
 - Keep decision entries thin and avoid copying the same rule into documents whose readers do not need it.
 - Do not silently resolve contradictions. Preserve uncertainty and record the appropriate open question/decision.
