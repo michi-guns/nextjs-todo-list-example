@@ -158,6 +158,12 @@ Conceptual model (names may match Drizzle tables closely):
 
 - Treat versioned Drizzle migration files as the authoritative database transition path.
 - Generate and review a versioned migration for each schema change.
+- Before choosing migration history shape, classify the current targets as
+  scaffolding-only, shared development, production, or unknown. While history
+  exists only in safely recreatable pre-release targets, consolidate unreleased
+  changes into one coherent migration and regenerate/commit the Drizzle
+  snapshot metadata; once shared development or production adopts the history,
+  keep applied migrations immutable and add a forward migration.
 - Before schema-changing implementation, create a non-default Neon development branch from the current default branch.
 - Apply the complete migration chain to an empty PostgreSQL 18 Testcontainer.
 - Apply the new reviewed migrations to the Neon development branch and verify the hosted upgrade path.

@@ -1,6 +1,6 @@
 CREATE TYPE "task_status" AS ENUM('todo', 'in_progress', 'done');--> statement-breakpoint
 CREATE TABLE "lists" (
-	"id" text PRIMARY KEY,
+	"id" uuid PRIMARY KEY DEFAULT uuidv7(),
 	"user_id" text NOT NULL,
 	"name" text NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -8,8 +8,8 @@ CREATE TABLE "lists" (
 );
 --> statement-breakpoint
 CREATE TABLE "tasks" (
-	"id" text PRIMARY KEY,
-	"list_id" text NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT uuidv7(),
+	"list_id" uuid NOT NULL,
 	"user_id" text NOT NULL,
 	"title" text NOT NULL,
 	"notes" text,

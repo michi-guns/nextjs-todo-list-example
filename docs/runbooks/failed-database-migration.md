@@ -24,3 +24,9 @@ Run the migration check, typecheck, relevant tests, and a focused application sm
 ## Safety
 
 Never delete or rewrite applied migration history casually. Create a corrective migration or record an ADR when the decision changes.
+
+The repository's environment-gated migration workflow is the narrow exception:
+before release, if read-only evidence confirms that the history exists only in
+agent-owned, disposable, safely recreatable targets, an explicitly authorized
+consolidation may rewrite unreleased migration files and regenerate their
+metadata. Any shared development or production target remains append-only.

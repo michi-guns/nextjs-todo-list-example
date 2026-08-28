@@ -142,13 +142,13 @@ Dependencies: T-03.
 - [x] Add the list-to-task foreign key with database-level cascade deletion.
 - [x] Add database-enforced case-insensitive uniqueness for list names per user and task titles per list.
 - [x] Add the required composite cursor indexes aligned with the authenticated equality scopes and ordering.
-- [x] Retire the scaffold `posts` schema from active application code without editing the already-applied migration in place.
+- [x] Retire the scaffold `posts` schema from active application code without editing the already-applied scaffold migration in place.
 
 Design amendment — native UUID identifiers:
 
 - [x] Use native PostgreSQL `uuid` IDs for lists and tasks, native UUID `listId` task FKs, and database-generated UUIDv7 defaults while preserving text Better Auth owner FKs.
-- [x] Add a forward versioned migration that converts the already-applied T-04 text key columns without rewriting an applied migration.
-- [x] Extend integration and Neon catalog evidence to prove native UUID types, UUIDv7 defaults, generated IDs, and preserved constraints/indexes.
+- [x] Consolidate the native UUID key columns and UUIDv7 defaults into the pre-release T-04 migration; do not retain a separate conversion migration before shared environments exist.
+- [x] Extend integration and local catalog evidence to prove native UUID types, UUIDv7 defaults, generated IDs, and preserved constraints/indexes; retain the prior Neon smoke result as historical evidence for the pre-consolidation chain only.
 
 Recommended AgentForge skills:
 
@@ -160,16 +160,17 @@ Recommended AgentForge skills:
 - `source-driven-development` to verify the installed Drizzle v1 RC index, enum, and timestamp APIs.
 - `incremental-implementation` to land schema, migration, and evidence in reviewable slices.
 - `neon-postgres` and `neon-postgres-branches` for pooled/direct connection boundaries and non-default migration verification.
-- `documentation-and-adrs` and `deprecation-and-migration` to record the reopened key-type decision and its forward schema transition.
+- `postgresql-migration-workflow` to classify the environment before consolidating or appending migration history.
+- `documentation-and-adrs` and `deprecation-and-migration` to record the reopened key-type decision and migration-history policy.
 - `git-workflow-and-versioning` and `code-review-and-quality` for the task branch, commit, and final review.
 
 Verification:
 
 - [x] A new versioned migration applies to an empty local PostgreSQL database/schema through the available integration lane.
 - [!] PostgreSQL 18 Testcontainers migration evidence is blocked until the reusable T-14 harness exists; the local integration check does not replace that obligation.
-- [x] The reviewed migration applies successfully to the Neon development branch.
+- [!] The prior two-step migration chain remains recorded on the agent-owned Neon development branch; the consolidated files were verified on a fresh local PostgreSQL database, and the cloud branch was not destructively reset.
 - [x] Integration coverage proves uniqueness, cascade deletion, and required indexes/constraints.
-- [x] The native UUID conversion migration applies successfully to the Neon development branch and the final catalog exposes UUIDv7 defaults.
+- [!] The consolidated migration's final catalog exposes UUIDv7 defaults on the fresh local PostgreSQL database; applying this rewritten history to Neon requires a separately approved branch realignment.
 - [x] Integration coverage proves database-generated native UUID IDs while preserving uniqueness, cascade deletion, and required indexes/constraints.
 
 Test contracts: `TST-MIGRATION-001`, `TST-PERSISTENCE-001`.

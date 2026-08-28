@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "3c537e53-59e7-4f1b-b6bf-d804c7783178",
+  "id": "c490b97d-87fd-4386-b909-10bbe2d7d70c",
   "prevIds": ["20a231ed-a199-4f7b-ae92-a95716cc42bb"],
   "ddl": [
     {
@@ -489,11 +489,11 @@
       "table": "verification"
     },
     {
-      "type": "text",
+      "type": "uuid",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
-      "default": null,
+      "default": "uuidv7()",
       "generated": null,
       "identity": null,
       "name": "id",
@@ -554,11 +554,11 @@
       "table": "lists"
     },
     {
-      "type": "text",
+      "type": "uuid",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
-      "default": null,
+      "default": "uuidv7()",
       "generated": null,
       "identity": null,
       "name": "id",
@@ -567,7 +567,7 @@
       "table": "tasks"
     },
     {
-      "type": "text",
+      "type": "uuid",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,

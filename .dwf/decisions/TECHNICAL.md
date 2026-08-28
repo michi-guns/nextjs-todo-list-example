@@ -283,6 +283,30 @@ Defer live draft preview to a later delivery phase without removing it from the 
 
 Use PostgreSQL's native `uuid` type for `lists.id`, `tasks.id`, and `tasks.list_id`. Let PostgreSQL 18 generate list and task primary keys with the `uuidv7()` default. Keep `lists.user_id` and `tasks.user_id` as `text` because Better Auth's existing `users.id` is text. Native UUIDs give the list/task boundary a strongly typed identifier without making public route IDs predictable numeric sequences; UUIDv7's time-ordered layout also gives the primary-key indexes a locality-friendly default.
 
-This is a deliberate choice rather than a requirement of Better Auth: Better Auth constrains the owner foreign-key type, not the list/task primary-key type. The first T-04 migration already applied to Neon development remains immutable. A new forward migration converts its text list/task keys to UUID and adds the UUIDv7 defaults; invalid pre-existing key strings fail the migration instead of being silently changed. PostgreSQL 18 is now the required database floor for the shared migration/test path.
+This is a deliberate choice rather than a requirement of Better Auth: Better Auth constrains the owner foreign-key type, not the list/task primary-key type. The pre-release T-04 migration creates the native UUID list/task keys and UUIDv7 defaults directly. The earlier text-key/conversion sequence was not released to a shared or production environment and is consolidated in place under TD-025; no production migration history is rewritten. PostgreSQL 18 is now the required database floor for the shared migration/test path.
 
 Alternatives considered: application-generated arbitrary `text` IDs were rejected because the database could not validate their shape; `bigint GENERATED ALWAYS AS IDENTITY` was rejected for these route-facing resources because sequential values are predictable and would require a numeric public-ID contract. UUIDv4 remains a possible later choice if timestamp visibility becomes a privacy concern.
+
+<a id="td-025"></a>
+
+## TD-025 — Environment-gated migration history policy
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-001, D-003, D-004
+- **Related resolutions:** [OD-006](OPEN-DECISIONS.md#od-006), [OD-021](OPEN-DECISIONS.md#od-021)
+- **Source:** resumed T-04 migration review; pre-release workflow decision
+
+Before creating or changing a database migration, inspect the repository and
+relevant database targets to classify the project as scaffolding-only, shared
+development, production, or unknown. While migration history exists only in
+fresh, agent-owned, ephemeral, or otherwise safely recreatable targets, prefer
+one coherent initial migration and consolidate unreleased changes in place.
+Regenerate and commit the Drizzle snapshot/chain metadata with that migration.
+
+Once a shared development or production target, non-disposable data, or real
+users/stakeholders depend on the history, treat applied migrations as
+immutable, add the smallest forward migration, and verify it through the
+branch-first Neon workflow before promotion. If the state is unknown or
+contradictory, stop and resolve it with the owner rather than guessing. This
+policy does not authorize destructive file or database operations; explicit
+confirmation remains required before rewriting files or realigning targets.

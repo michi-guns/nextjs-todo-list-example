@@ -4,7 +4,7 @@
 
 **Status:** Completed
 
-**Goal:** Add the PostgreSQL/Drizzle lists and tasks persistence schema, a reviewed versioned migration, and honest real-database evidence for the required constraints and query-shaped indexes without changing the applied scaffold migration.
+**Goal:** Add the PostgreSQL/Drizzle lists and tasks persistence schema, one coherent reviewed versioned migration, and honest real-database evidence for the required constraints and query-shaped indexes without changing the applied scaffold migration.
 
 **Spec and decisions:** [Agent SPEC, data model and migration workflow](../../.dwf/output/agent/SPEC.md#3-data-model-postgres), [required indexes and constraints](../../.dwf/output/agent/SPEC.md#34-required-indexes-and-constraints), [TD-005](../../.dwf/decisions/TECHNICAL.md#td-005), [TD-010](../../.dwf/decisions/TECHNICAL.md#td-010), [TD-013](../../.dwf/decisions/TECHNICAL.md#td-013), [TD-014](../../.dwf/decisions/TECHNICAL.md#td-014), [TD-024](../../.dwf/decisions/TECHNICAL.md#td-024), [TST-MIGRATION-001](../../.dwf/decisions/TESTING.md#tst-migration-001), and [TST-PERSISTENCE-001](../../.dwf/decisions/TESTING.md#tst-persistence-001).
 
@@ -12,7 +12,7 @@
 
 ## Design amendment — native UUID identifiers
 
-The resumed design review selected native UUIDs for list/task identifiers. `lists.id`, `tasks.id`, and `tasks.listId` use PostgreSQL's native `uuid` type; `lists.userId` and `tasks.userId` remain `text` because they reference Better Auth's `users.id`. Both list/task primary-key UUIDs default to `uuidv7()`, which is available on the verified Neon PostgreSQL 18.6 development branch and the PostgreSQL 18 Testcontainers target. The existing T-04 migration was already applied to Neon development and remains immutable, so this amendment adds a forward type-conversion migration rather than rewriting that file.
+The resumed design review selected native UUIDs for list/task identifiers. `lists.id`, `tasks.id`, and `tasks.listId` use PostgreSQL's native `uuid` type; `lists.userId` and `tasks.userId` remain `text` because they reference Better Auth's `users.id`. Both list/task primary-key UUIDs default to `uuidv7()`, which is available on the verified Neon PostgreSQL 18.6 development branch and the PostgreSQL 18 target. The Neon development branch is agent-owned migration smoke infrastructure with no real users or list/task consumers, so the pre-release migration history is consolidated: the original T-04 migration creates the final native-UUID schema directly and no separate conversion migration remains.
 
 **Global constraints:** Do not edit `migrations/20260807190126_silly_vivisector/`. Do not add list/task use cases, repositories, actions, routes, UI, or the T-14 Testcontainers harness in this task. Keep the legacy `test.ts` file present but inactive rather than deleting it. Use one schema source for Neon and local PostgreSQL. Keep secrets out of source, logs, migration evidence, and commits.
 
@@ -23,7 +23,7 @@ The resumed design review selected native UUIDs for list/task identifiers. `list
 - `db/index.ts` currently exports the scaffold schema and must switch to the active schema barrel.
 - `drizzle.config.ts` currently scans the whole schema directory; it must target `db/schema/index.ts` so inactive examples cannot enter future migrations.
 - `migrations/20260807190126_silly_vivisector/` is the applied baseline and is immutable for this task.
-- `migrations/<new-version>/migration.sql` and its Drizzle snapshot are the reviewed transition adding the enum, tables, foreign keys, unique functional indexes, and cursor indexes; a second generated migration converts the already-applied T-04 list/task key columns from text to native UUID and adds the UUIDv7 defaults.
+- `migrations/20260828143746_lists-tasks-schema/` and its Drizzle snapshot are the single reviewed transition adding the enum, native-UUID tables, foreign keys, unique functional indexes, and cursor indexes. The obsolete native-UUID conversion migration is intentionally absent because it was never released to a shared environment.
 - `src/db/schema.integration.test.ts` will use the existing local-only `TEST_DATABASE_URL` contract and an isolated temporary PostgreSQL schema to apply the complete migration chain and prove table shape, foreign keys, uniqueness, cascade deletion, and index definitions. It must refuse non-local URLs before any setup or cleanup. Full PostgreSQL 18 Testcontainers lifecycle evidence remains owned by T-14 and is recorded as deferred/blocked rather than represented by this local-schema test.
 
 ## Dependencies and work order
@@ -31,23 +31,23 @@ The resumed design review selected native UUIDs for list/task identifiers. `list
 1. Confirm the synchronized `main` branch, the existing non-default Neon `development` branch, Docker availability, and the local-only integration URL boundary (complete during preflight).
 2. Update the canonical technical decision and Agent SPEC to settle native UUID list/task identifiers while keeping Better Auth owner keys as text.
 3. Add the active schema modules/barrel and Drizzle config boundary with UUIDv7 defaults; run typecheck and schema generation to expose API or naming mistakes.
-4. Generate and inspect a new forward migration for the already-applied T-04 text-key transition. Verify no applied migration is edited and no `posts_table` is recreated.
+4. Consolidate the final native-UUID schema into the pre-release T-04 migration, regenerate its snapshot metadata, and remove the obsolete conversion migration. Verify no scaffold migration is edited and no `posts_table` is recreated.
 5. Extend the focused local PostgreSQL integration test first for the available evidence, then run it against a disposable local database/schema. Keep the test serial and isolated; do not add a second application pool.
-6. Apply the complete migration chain plus the UUID conversion migration to the Neon `development` branch using the direct migration URL, inspect the resulting table/index/constraint catalog, and record hosted evidence without touching the default branch.
+6. Apply the complete consolidated migration chain to a fresh disposable PostgreSQL database using the direct migration URL, inspect the resulting table/index/constraint catalog, and leave the old agent-owned Neon development ledger untouched unless a separately approved realignment is requested.
 7. Reconcile the two affected `TST-*` contracts and T-04 metadata, run the proportionate quality gates, review the diff, commit, push, and update the open PR.
 
 ## Verification strategy
 
-- **TST-MIGRATION-001:** Run the complete migration chain against a disposable local PostgreSQL database/schema and the reviewed UUID conversion migration against the non-default Neon `development` branch. Mark the locally available migration evidence `partial` until T-14 supplies the required PostgreSQL 18 Testcontainers harness; record the exact unblock condition and follow-up instead of claiming Testcontainer coverage.
+- **TST-MIGRATION-001:** Run the complete consolidated migration chain against a fresh disposable local PostgreSQL database/schema. The existing Neon development branch retains the pre-consolidation agent-owned ledger and is not reset in this slice; mark the locally available migration evidence `partial` until T-14 supplies the required PostgreSQL 18 Testcontainers harness and a future approved branch realignment supplies hosted evidence for this exact chain.
 - **TST-PERSISTENCE-001:** The focused integration test asserts the real PostgreSQL table columns/types/nullability/defaults, database-generated native UUID IDs, native status values, owner/list foreign keys, `ON DELETE CASCADE`, case-insensitive unique indexes, and required cursor-index column order/direction. Repository mapping, bounded cursor query behavior, and concurrent application operations remain partial/future evidence for T-06, T-07, and T-14.
-- Focused commands: `pnpm exec drizzle-kit generate --name lists-tasks-schema` (or the repository-equivalent name), `pnpm test:integration -- ...` with a local `TEST_DATABASE_URL`, `pnpm exec drizzle-kit migrate` against the Neon development branch, `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `git diff --check`.
+- Focused commands: `pnpm exec drizzle-kit check`, `pnpm test:integration` with a fresh local `TEST_DATABASE_URL`, `pnpm exec drizzle-kit migrate` against a fresh local migration database, `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `git diff --check`.
 - Catalog checks use PostgreSQL system catalogs (`pg_constraint`, `pg_indexes`, `information_schema`) and behavior probes rather than Drizzle implementation-detail assertions. No test cleanup may accept a Neon or other external URL.
 - Docker is available, but the repository has no `@testcontainers/postgresql` dependency or T-14 harness yet. The plan deliberately preserves that required future evidence rather than silently substituting a weaker test.
 
 ## Risks and assumptions
 
 - **Identifiers:** native UUID primary keys are chosen for opaque, strongly typed list/task IDs and database-side UUIDv7 generation. Better Auth's owner key remains text, so the schema intentionally has text owner FKs and UUID list/task FKs. PostgreSQL 18 is a prerequisite for the `uuidv7()` default; the verified Neon development branch is PostgreSQL 18.6.
-- **Migration safety:** the first T-04 migration is already applied to Neon development and cannot be rewritten. The amendment therefore adds a forward `text`→`uuid` conversion migration; it will fail loudly if any pre-existing list/task IDs are not valid UUID strings rather than silently losing identity data. The branch has no repository implementation or production list/task consumers yet.
+- **Migration safety:** the T-04 migration was applied only to agent-owned pre-release verification targets. Under the environment-state gate, its final native-UUID definitions replace the unreleased text-key version in place; no shared or production migration history is rewritten. The existing Neon development ledger still records the superseded two-step chain and must be recreated or explicitly realigned before this consolidated history is applied there.
 - **Time:** timestamp-with-time-zone columns honor the SPEC's `timestamptz` model and Drizzle's `Date` mapping; this is equivalent at the application boundary even though existing Better Auth tables use the older timestamp form.
 - **Status:** a native PostgreSQL enum gives the database a durable allowed-value constraint; the application still owns transition semantics in later tasks.
 - **Case folding:** `lower(...)` functional unique indexes are the documented PostgreSQL/Drizzle mechanism and preserve the original display value. The application must trim before insert/update in later tasks.
@@ -56,4 +56,4 @@ The resumed design review selected native UUIDs for list/task identifiers. `list
 
 ## Handoff to task breakdown
 
-Turn this amendment into one T-04 delivery task with the following independently verifiable slices: (a) canonical decision/SPEC projection for native UUID identifiers, (b) active schema/config barrel with UUIDv7 defaults, (c) generated forward conversion migration review, and (d) focused real-PostgreSQL UUID/constraint/index evidence. Keep the task's acceptance criteria and verification explicit, preserve the **Recommended AgentForge skills** subsection, and reference `TST-MIGRATION-001` and `TST-PERSISTENCE-001` with their partial/future evidence boundaries. Do not add implementation tasks for T-14's reusable Testcontainers harness or later list/task application behavior.
+Turn this amendment into one T-04 delivery task with the following independently verifiable slices: (a) canonical decision/SPEC projection for native UUID identifiers, (b) active schema/config barrel with UUIDv7 defaults, (c) consolidated migration and generated snapshot review, and (d) focused real-PostgreSQL UUID/constraint/index evidence. Keep the task's acceptance criteria and verification explicit, preserve the **Recommended AgentForge skills** subsection, and reference `TST-MIGRATION-001` and `TST-PERSISTENCE-001` with their partial/future evidence boundaries. Do not add implementation tasks for T-14's reusable Testcontainers harness or later list/task application behavior.
