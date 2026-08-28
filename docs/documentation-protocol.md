@@ -5,10 +5,11 @@ This is the navigation and maintenance protocol for the project's design, suppor
 ## Reading order
 
 1. [`docs/index.md`](index.md)
-2. [`.dwf/RULES.md`](../.dwf/RULES.md) and [`.dwf/CONTEXT.md`](../.dwf/CONTEXT.md), when present
-3. [`.dwf/output/agent/PRD.md`](../.dwf/output/agent/PRD.md) and the relevant sections of [`.dwf/output/agent/SPEC.md`](../.dwf/output/agent/SPEC.md)
-4. Relevant [`.dwf/decisions/`](../.dwf/decisions/) ledgers, including [`TESTING.md`](../.dwf/decisions/TESTING.md) for affected behavior, and supporting architecture/domain/data documents
-5. Human projections, concepts, handbook, development, runbook, and protocol material as needed
+2. [Project glossary](glossary.md), when project-specific terminology is involved
+3. [`.dwf/RULES.md`](../.dwf/RULES.md) and [`.dwf/CONTEXT.md`](../.dwf/CONTEXT.md), when present
+4. [`.dwf/output/agent/PRD.md`](../.dwf/output/agent/PRD.md) and the relevant sections of [`.dwf/output/agent/SPEC.md`](../.dwf/output/agent/SPEC.md)
+5. Relevant [`.dwf/decisions/`](../.dwf/decisions/) ledgers, including [`TESTING.md`](../.dwf/decisions/TESTING.md) for affected behavior, and supporting architecture/domain/data documents
+6. Human projections, concepts, handbook, development, runbook, and protocol material as needed
 
 ## Authority
 

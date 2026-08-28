@@ -12,6 +12,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Read [`.dwf/README.md`](.dwf/README.md), [`.dwf/RULES.md`](.dwf/RULES.md), [`.dwf/CONTEXT.md`](.dwf/CONTEXT.md), and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes.
 - Read the generated [Agent PRD](.dwf/output/agent/PRD.md) and [Agent SPEC](.dwf/output/agent/SPEC.md) before implementing product, domain, architecture, persistence, or integration behavior.
 - Read relevant ledgers under [`.dwf/decisions/`](.dwf/decisions/) and supporting architecture/data/domain documents.
+- Read the [project glossary](docs/glossary.md) when a project-specific term is unclear. It defines vocabulary used by this repository and its agents.
 - Treat `.dwf/` as the canonical product/technical design authority. Delivery artifacts live outside `.dwf/` and must reference, not redefine, it.
 - This repo is a standalone public, opinionated Next.js starter implemented through a complete todo reference application. Derived apps should be able to replace mostly domain and UI code while retaining or adapting the cross-cutting foundations.
 - Use current stable best practices and the simplest genuinely robust design. Add complexity only when it has a clear reusable payoff in safety, correctness, operability, maintainability, or avoided rework. Do not turn the starter into a configurable multi-stack framework.
@@ -25,9 +26,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - If the requested behavior requires a change outside the task or the accepted DWF contracts, pause before expanding scope. Explain what must change, why it is required, the smallest recommended expansion, and what remains unchanged.
 - Do not reopen an accepted product or technical decision because another design appears cleaner. Raise a Design Gap only when the accepted contracts are missing, contradictory, or no longer fit the requested behavior.
 
-## Agent Skills
+## AgentForge
 
-Use the installed `using-agent-skills` skill as the routing layer for software-engineering work.
+This repository uses **AgentForge**, its project-local software development framework. AgentForge is rooted at `.agents/skills/` and uses the installed `using-agent-skills` skill as its routing layer for software-engineering work.
+
+Use only AgentForge for work in this repository. Do not use user-scoped Superpowers skills, Superpowers plans, or Superpowers conventions here. If a user-scoped skill conflicts with AgentForge, follow AgentForge and the repository's DWF instructions. If an applicable capability is missing from AgentForge, stop and surface the gap rather than silently switching frameworks.
 
 Before starting any non-trivial engineering task:
 

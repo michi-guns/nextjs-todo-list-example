@@ -5,6 +5,7 @@ This directory is the knowledge system for the Next.js Todo List Example.
 ## Start here
 
 - [DWF design authority](../.dwf/README.md)
+- [Project glossary](./glossary.md)
 - [Testing decisions and test contracts](../.dwf/decisions/TESTING.md)
 - [System in five minutes](./handbook/system-in-five-minutes.md)
 - [Documentation protocol](./documentation-protocol.md)
