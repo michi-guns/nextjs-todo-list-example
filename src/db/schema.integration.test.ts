@@ -11,6 +11,8 @@ import { tasksTable } from "../../db/schema/tasks"
 import { usersTable } from "../../db/schema/auth"
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL?.trim()
+const uuidV7Pattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 if (!testDatabaseUrl) {
   throw new Error(
@@ -170,9 +172,10 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
     }
 
     expect(findColumn("lists", "id")).toMatchObject({
-      data_type: "text",
+      data_type: "uuid",
       is_nullable: "NO",
     })
+    expect(findColumn("lists", "id").column_default).toContain("uuidv7()")
     expect(findColumn("lists", "user_id")).toMatchObject({
       data_type: "text",
       is_nullable: "NO",
@@ -190,8 +193,13 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
       is_nullable: "NO",
     })
 
+    expect(findColumn("tasks", "id")).toMatchObject({
+      data_type: "uuid",
+      is_nullable: "NO",
+    })
+    expect(findColumn("tasks", "id").column_default).toContain("uuidv7()")
     expect(findColumn("tasks", "list_id")).toMatchObject({
-      data_type: "text",
+      data_type: "uuid",
       is_nullable: "NO",
     })
     expect(findColumn("tasks", "user_id")).toMatchObject({
@@ -254,57 +262,97 @@ describe.sequential("lists and tasks PostgreSQL schema", () => {
       },
     ])
 
-    const ownerListId = "t04-list-owner"
-    const otherOwnerListId = "t04-list-other-owner"
-    const secondOwnerListId = "t04-list-second"
-    await database.insert(listsTable).values([
-      {
-        id: ownerListId,
-        userId: ownerId,
-        name: "Inbox",
-      },
-      {
-        id: otherOwnerListId,
-        userId: otherOwnerId,
-        name: "INBOX",
-      },
-      {
-        id: secondOwnerListId,
-        userId: ownerId,
-        name: "Projects",
-      },
-    ])
+    const insertedLists = await database
+      .insert(listsTable)
+      .values([
+        {
+          userId: ownerId,
+          name: "Inbox",
+        },
+        {
+          userId: otherOwnerId,
+          name: "INBOX",
+        },
+        {
+          userId: ownerId,
+          name: "Projects",
+        },
+      ])
+      .returning({
+        id: listsTable.id,
+        userId: listsTable.userId,
+        name: listsTable.name,
+      })
+    expect(insertedLists).toHaveLength(3)
+
+    const findInsertedList = (userId: string, name: string) => {
+      const list = insertedLists.find(
+        (row) => row.userId === userId && row.name === name
+      )
+      expect(list).toBeDefined()
+      return list!
+    }
+
+    const ownerList = findInsertedList(ownerId, "Inbox")
+    const otherOwnerList = findInsertedList(otherOwnerId, "INBOX")
+    const secondOwnerList = findInsertedList(ownerId, "Projects")
+    const ownerListId = ownerList.id
+    const otherOwnerListId = otherOwnerList.id
+    const secondOwnerListId = secondOwnerList.id
+    expect(ownerListId).toMatch(uuidV7Pattern)
+    expect(otherOwnerListId).toMatch(uuidV7Pattern)
+    expect(secondOwnerListId).toMatch(uuidV7Pattern)
 
     await expectUniqueViolation(() =>
       database.insert(listsTable).values({
-        id: "t04-list-duplicate",
         userId: ownerId,
         name: "inBOX",
       })
     )
 
-    const ownerTaskId = "t04-task-owner"
-    const otherListTaskId = "t04-task-other-list"
-    await database.insert(tasksTable).values([
-      {
-        id: ownerTaskId,
-        listId: ownerListId,
-        userId: ownerId,
-        title: "Ship schema",
-        status: "todo",
-      },
-      {
-        id: otherListTaskId,
-        listId: secondOwnerListId,
-        userId: ownerId,
-        title: "SHIP SCHEMA",
-        status: "done",
-      },
-    ])
+    const insertedTasks = await database
+      .insert(tasksTable)
+      .values([
+        {
+          listId: ownerListId,
+          userId: ownerId,
+          title: "Ship schema",
+          status: "todo",
+        },
+        {
+          listId: secondOwnerListId,
+          userId: ownerId,
+          title: "SHIP SCHEMA",
+          status: "done",
+        },
+      ])
+      .returning({
+        id: tasksTable.id,
+        listId: tasksTable.listId,
+        title: tasksTable.title,
+      })
+    expect(insertedTasks).toHaveLength(2)
+
+    const findInsertedTask = (listId: string, title: string) => {
+      const task = insertedTasks.find(
+        (row) => row.listId === listId && row.title === title
+      )
+      expect(task).toBeDefined()
+      return task!
+    }
+
+    const ownerTaskInsert = findInsertedTask(ownerListId, "Ship schema")
+    const otherListTaskInsert = findInsertedTask(
+      secondOwnerListId,
+      "SHIP SCHEMA"
+    )
+    const ownerTaskId = ownerTaskInsert.id
+    const otherListTaskId = otherListTaskInsert.id
+    expect(ownerTaskId).toMatch(uuidV7Pattern)
+    expect(otherListTaskId).toMatch(uuidV7Pattern)
 
     await expectUniqueViolation(() =>
       database.insert(tasksTable).values({
-        id: "t04-task-duplicate",
         listId: ownerListId,
         userId: ownerId,
         title: "ship schema",

@@ -3,6 +3,7 @@ status: active
 owner: engineering
 related-decisions:
   - TD-005
+  - TD-024
   - TD-023
 ---
 

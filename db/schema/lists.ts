@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core"
 
 import { usersTable } from "./auth"
@@ -12,7 +13,9 @@ import { usersTable } from "./auth"
 export const listsTable = pgTable(
   "lists",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id")
+      .default(sql`uuidv7()`)
+      .primaryKey(),
     userId: text("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),

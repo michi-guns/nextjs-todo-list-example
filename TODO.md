@@ -144,6 +144,12 @@ Dependencies: T-03.
 - [x] Add the required composite cursor indexes aligned with the authenticated equality scopes and ordering.
 - [x] Retire the scaffold `posts` schema from active application code without editing the already-applied migration in place.
 
+Design amendment — native UUID identifiers:
+
+- [x] Use native PostgreSQL `uuid` IDs for lists and tasks, native UUID `listId` task FKs, and database-generated UUIDv7 defaults while preserving text Better Auth owner FKs.
+- [x] Add a forward versioned migration that converts the already-applied T-04 text key columns without rewriting an applied migration.
+- [x] Extend integration and Neon catalog evidence to prove native UUID types, UUIDv7 defaults, generated IDs, and preserved constraints/indexes.
+
 Recommended AgentForge skills:
 
 - `using-agent-skills` to route the task through the repository-local workflow.
@@ -154,6 +160,7 @@ Recommended AgentForge skills:
 - `source-driven-development` to verify the installed Drizzle v1 RC index, enum, and timestamp APIs.
 - `incremental-implementation` to land schema, migration, and evidence in reviewable slices.
 - `neon-postgres` and `neon-postgres-branches` for pooled/direct connection boundaries and non-default migration verification.
+- `documentation-and-adrs` and `deprecation-and-migration` to record the reopened key-type decision and its forward schema transition.
 - `git-workflow-and-versioning` and `code-review-and-quality` for the task branch, commit, and final review.
 
 Verification:
@@ -162,6 +169,8 @@ Verification:
 - [!] PostgreSQL 18 Testcontainers migration evidence is blocked until the reusable T-14 harness exists; the local integration check does not replace that obligation.
 - [x] The reviewed migration applies successfully to the Neon development branch.
 - [x] Integration coverage proves uniqueness, cascade deletion, and required indexes/constraints.
+- [x] The native UUID conversion migration applies successfully to the Neon development branch and the final catalog exposes UUIDv7 defaults.
+- [x] Integration coverage proves database-generated native UUID IDs while preserving uniqueness, cascade deletion, and required indexes/constraints.
 
 Test contracts: `TST-MIGRATION-001`, `TST-PERSISTENCE-001`.
 

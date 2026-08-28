@@ -6,6 +6,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core"
 
 import { usersTable } from "./auth"
@@ -20,8 +21,10 @@ export const taskStatusEnum = pgEnum("task_status", [
 export const tasksTable = pgTable(
   "tasks",
   {
-    id: text("id").primaryKey(),
-    listId: text("list_id")
+    id: uuid("id")
+      .default(sql`uuidv7()`)
+      .primaryKey(),
+    listId: uuid("list_id")
       .notNull()
       .references(() => listsTable.id, { onDelete: "cascade" }),
     userId: text("user_id")

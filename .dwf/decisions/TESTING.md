@@ -177,7 +177,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The complete versioned Drizzle migration chain applies to an empty PostgreSQL 18 Testcontainer and the reviewed migration applies successfully to the non-default Neon development branch before promotion.
 - **Required evidence:** Harness-owned empty-database migration run and non-destructive Neon development-branch migration smoke.
 - **Dependencies:** T-04 schema work, T-14 Testcontainers harness, and the existing T-01 Neon development branch.
-- **Current evidence:** T-04's `pnpm test:integration -- src/db/schema.integration.test.ts` applied the complete versioned chain to an isolated schema in a disposable local `postgres:18-alpine` container, and `pnpm exec drizzle-kit migrate` applied the reviewed migration successfully to the non-default Neon `development` branch. The Neon catalog inspection confirmed the `lists`/`tasks` tables, `task_status` enum, cursor/unique indexes, and cascading foreign keys.
+- **Current evidence:** T-04's `pnpm test:integration -- src/db/schema.integration.test.ts` applied the complete versioned chain, including the native-UUID conversion, to an isolated schema in a disposable local `postgres:18-alpine` container. `pnpm exec drizzle-kit migrate` applied the reviewed conversion migration successfully to the non-default Neon `development` branch. Local and Neon catalog inspections confirmed native UUID list/task keys with `uuidv7()` defaults, text owner FKs, the `task_status` enum, cursor/unique indexes, and cascading foreign keys.
 - **Follow-up:** T-14 must run the same chain through the reusable `@testcontainers/postgresql` harness and record its lifecycle/failure-cleanup evidence before this contract can be `verified`.
 
 <a id="tst-harness-001"></a>
@@ -211,7 +211,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Real PostgreSQL behavior preserves ownership, case-insensitive uniqueness, list-to-task cascade deletion, repository field mappings, bounded cursor reads, required indexes, and the absence of N+1 or unbounded page work.
 - **Required evidence:** PostgreSQL integration cases against the real migrations, including concurrent uniqueness and cascade behavior, plus query-shape assertions where the contract requires them.
 - **Dependencies:** T-04 schema and T-14 harness.
-- **Current evidence:** T-04's focused integration suite passed three real-database cases covering Drizzle `Date` mappings, nullable notes and native status values, owner-scoped case-insensitive list/task uniqueness, list-to-task cascade deletion, cascading foreign keys, and the required cursor-index column order/direction. It does not yet prove concurrent repository operations, bounded cursor queries, or N+1 behavior.
+- **Current evidence:** T-04's focused integration suite passed three real-database cases covering database-generated native UUID IDs, Drizzle `Date` mappings, nullable notes and native status values, owner-scoped case-insensitive list/task uniqueness, list-to-task cascade deletion, cascading foreign keys, and the required cursor-index column order/direction. It does not yet prove concurrent repository operations, bounded cursor queries, or N+1 behavior.
 - **Follow-up:** T-06/T-07 repository implementations and T-14's PostgreSQL 18 harness must add the remaining ownership, concurrent-uniqueness, cursor, and query-shape evidence.
 
 <a id="tst-auth-001"></a>

@@ -131,8 +131,8 @@ Conceptual model (names may match Drizzle tables closely):
 
 | Column      | Type        | Notes                                                                  |
 | ----------- | ----------- | ---------------------------------------------------------------------- |
-| `id`        | uuid / text | PK                                                                     |
-| `userId`    | uuid / text | owner, indexed, FK to user                                             |
+| `id`        | uuid        | PK, database-generated with PostgreSQL 18 `uuidv7()`                   |
+| `userId`    | text        | owner, indexed, FK to Better Auth user                                 |
 | `name`      | text        | required, trimmed, 1–80 characters; unique per user case-insensitively |
 | `createdAt` | timestamptz | required                                                               |
 | `updatedAt` | timestamptz | required                                                               |
@@ -141,9 +141,9 @@ Conceptual model (names may match Drizzle tables closely):
 
 | Column      | Type        | Notes                                                                   |
 | ----------- | ----------- | ----------------------------------------------------------------------- |
-| `id`        | uuid / text | PK                                                                      |
-| `listId`    | uuid / text | FK → lists.id, cascade on list delete                                   |
-| `userId`    | uuid / text | denormalized owner for simple authz queries                             |
+| `id`        | uuid        | PK, database-generated with PostgreSQL 18 `uuidv7()`                    |
+| `listId`    | uuid        | FK → lists.id, cascade on list delete                                   |
+| `userId`    | text        | denormalized owner for simple authz queries                             |
 | `title`     | text        | required, trimmed, 1–200 characters; unique per list case-insensitively |
 | `notes`     | text        | nullable, trimmed, maximum 5,000 characters                             |
 | `status`    | enum/text   | `todo` \| `in_progress` \| `done`                                       |
@@ -171,6 +171,7 @@ Conceptual model (names may match Drizzle tables closely):
 - Tasks reference lists through a database foreign key with cascade deletion.
 - A database-enforced case-insensitive unique key protects list names within one `userId`.
 - A database-enforced case-insensitive unique key protects task titles within one `listId`.
+- List and task identifiers use PostgreSQL's native `uuid` type with a `uuidv7()` default; owner foreign keys remain `text` to match Better Auth's `users.id`.
 - List cursor reads use a composite B-tree index beginning with `userId`, followed by `createdAt` and the deterministic cursor tie-breaker, with direction matching oldest-first order.
 - Task cursor reads use a composite B-tree index beginning with `userId` and `listId`, followed by `createdAt` and the deterministic cursor tie-breaker, with direction matching newest-first order.
 - Do not add speculative status, notes, search, or partial indexes until measured query evidence requires them.
