@@ -27,7 +27,7 @@ Read the testing ledger and identify affected `TST-*` contracts. The plan record
 1. Enter read-only planning mode for source code, task tracking, and design ledgers. State the scope and assumptions before filling gaps.
 2. Map the current system. List the files or modules that own each responsibility, the boundaries between them, and the existing interfaces that must remain stable.
 3. Map dependencies and prerequisites. Mark work as sequential or parallel only when the repository evidence supports that choice. Surface unavailable infrastructure and unresolved decisions.
-4. Choose thin vertical slices. Each slice should produce a coherent, testable outcome instead of completing an entire technical layer in isolation.
+4. Define coarse work packages. Group related responsibilities into coherent, testable outcomes, and leave task-level slicing, sizing, and delivery order to `task-breakdown`.
 5. Define the verification strategy. Link affected `TST-*` contracts, evidence layers, focused commands, runtime checks, and known future or blocked evidence.
 6. Write the plan to `docs/agentforge/plans/YYYY-MM-DD-<feature-name>.md`.
 7. Self-review the plan before handoff. Check specification coverage, file responsibility, dependency order, interface consistency, risk treatment, test traceability, and placeholder-free instructions.
@@ -43,7 +43,7 @@ Every plan should contain these sections, adapted to the slice:
 
 > AgentForge plan. Use `task-breakdown` after this plan is accepted.
 
-**Status:** Proposed | Accepted | Superseded
+**Status:** Proposed | Accepted | Completed | Superseded
 
 **Goal:** <one sentence describing the observable outcome>
 

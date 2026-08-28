@@ -7,9 +7,7 @@ description: Routes AgentForge workflows by discovering and invoking repository-
 
 ## Overview
 
-AgentForge is this repository's project-local software development framework. It is implemented as a collection of Agent Skills organized by development phase. This router helps agents discover and apply the right skills in the right order.
-
-Agent Skills is a collection of engineering workflow skills organized by development phase. Each skill encodes a specific process that senior engineers follow. This meta-skill helps you discover and apply the right skill for your current task.
+AgentForge is this repository's project-local software development framework. It organizes repository-local Agent Skills by development phase, and this router helps agents discover and apply the right skill for the current task.
 
 ## Skill Discovery
 

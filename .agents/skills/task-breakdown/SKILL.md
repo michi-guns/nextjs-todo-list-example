@@ -26,7 +26,7 @@ If the plan is missing, unresolved, or inconsistent with the DWF, stop and surfa
 
 1. Confirm the plan's scope, assumptions, constraints, and acceptance direction.
 2. Build the dependency graph. Put foundations and high-risk prerequisites before consumers. Mark genuinely independent work as parallel only when shared interfaces are already defined.
-3. Slice vertically. Prefer a small complete user or system outcome over separate database, API, and UI layers that cannot be verified on their own.
+3. Slice each work package into vertical delivery tasks. Prefer a small complete user or system outcome over separate database, API, and UI layers that cannot be verified on their own.
 4. Define each task as a fresh-review unit. A task should fit one focused session, touch a coherent set of files, and leave the repository in a verifiable state.
 5. Add tasks to `TODO.md` in dependency order. Preserve the repository's task IDs, status markers, testing-contract references, and recommended AgentForge skills.
 6. Add checkpoints after meaningful groups of work. Each checkpoint has concrete tests, builds, runtime checks, or review conditions.

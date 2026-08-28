@@ -2,6 +2,8 @@
 
 AgentForge is this repository's project-local software development framework. Its skills live under [`.agents/skills/`](../../.agents/skills/) and its router is [`using-agent-skills`](../../.agents/skills/using-agent-skills/SKILL.md).
 
+[`skills-lock.json`](../../skills-lock.json) records externally sourced skills installed from Git providers. Project-owned AgentForge skills are maintained directly under `.agents/skills/` and are intentionally not listed in that lock file.
+
 Use the [`planning`](../../.agents/skills/planning/SKILL.md) skill to decide and document an implementation approach. After that plan is accepted, use [`task-breakdown`](../../.agents/skills/task-breakdown/SKILL.md) to create ordered delivery tasks in [`TODO.md`](../../TODO.md).
 
 ## Plans
