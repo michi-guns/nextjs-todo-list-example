@@ -97,8 +97,8 @@ Dependencies: none.
 
 Verification:
 
-- [x] Source typecheck and lint pass; the standard commands are currently affected only by stale ignored `.next/` and `dist/` artifacts from the earlier Sanity setup.
-- [x] The same repository implementation connected successfully to local PostgreSQL and pooled Neon.
+- [x] `pnpm test`, `pnpm typecheck`, and `pnpm lint` pass with no task-caused errors; lint retains one pre-existing unused `Geist` warning.
+- [x] `pnpm test:integration` passes against a disposable local PostgreSQL database, and the same repository implementation connected successfully to pooled Neon.
 
 Dependencies: T-01.
 

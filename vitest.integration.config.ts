@@ -9,13 +9,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    passWithNoTests: true,
-    include: ["src/**/*.{test,spec}.ts", "src/**/*.{test,spec}.tsx"],
-    exclude: [
-      "**/node_modules/**",
-      "**/e2e/**",
-      "**/.playwright/**",
-      "**/*.integration.test.ts",
-    ],
+    include: ["src/**/*.integration.test.ts"],
+    exclude: ["**/node_modules/**", "**/e2e/**", "**/.playwright/**"],
   },
 })
