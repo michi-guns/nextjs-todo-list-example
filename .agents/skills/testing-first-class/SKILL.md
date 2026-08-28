@@ -1,6 +1,6 @@
 ---
 name: testing-first-class
-description: Track and implement the repository's durable TST-* test contracts during behavior changes. Use before implementation, while writing tests, and when reconciling evidence; not for unrelated prose-only edits.
+description: Track and implement the repository's durable TST-* test contracts during behavior changes. Use before implementation, while writing tests, or when maintaining the testing ledger; not for unrelated prose-only edits.
 ---
 
 # Testing First-Class
