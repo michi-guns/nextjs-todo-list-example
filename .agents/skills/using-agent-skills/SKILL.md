@@ -1,11 +1,13 @@
 ---
 name: using-agent-skills
-description: Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked.
+description: Routes AgentForge workflows by discovering and invoking repository-local Agent Skills. Use when starting a session or when you need to determine which project skill applies to the current task.
 ---
 
-# Using Agent Skills
+# AgentForge router
 
 ## Overview
+
+AgentForge is this repository's project-local software development framework. It is implemented as a collection of Agent Skills organized by development phase. This router helps agents discover and apply the right skills in the right order.
 
 Agent Skills is a collection of engineering workflow skills organized by development phase. Each skill encodes a specific process that senior engineers follow. This meta-skill helps you discover and apply the right skill for your current task.
 
@@ -19,7 +21,8 @@ Task arrives
     ├── Don't know what you want yet? ──────→ interview-me
     ├── Have a rough concept, need variants? → idea-refine
     ├── New project/feature/change? ──→ spec-driven-development
-    ├── Have a spec, need tasks? ──────→ planning-and-task-breakdown
+    ├── Have a spec, need an approach? ─→ planning
+    ├── Have an accepted plan, need tasks? → task-breakdown
     ├── Implementing code? ────────────→ testing-first-class → incremental-implementation
     │   ├── UI work? ─────────────────→ frontend-ui-engineering
     │   ├── API work? ────────────────→ api-and-interface-design
@@ -135,7 +138,7 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3. **Multiple skills can apply.** A feature implementation might involve `idea-refine` → `spec-driven-development` → `planning-and-task-breakdown` → `incremental-implementation` → `test-driven-development` → `code-review-and-quality` → `code-simplification` → `shipping-and-launch` in sequence.
+3. **Multiple skills can apply.** A feature implementation might involve `idea-refine` → `spec-driven-development` → `planning` → `task-breakdown` → `incremental-implementation` → `test-driven-development` → `code-review-and-quality` → `code-simplification` → `shipping-and-launch` in sequence.
 
 4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with `spec-driven-development`.
 
@@ -147,20 +150,21 @@ For a complete feature, the typical skill sequence is:
 1.  interview-me                → Extract what the user actually wants
 2.  idea-refine                 → Refine vague ideas
 3.  spec-driven-development     → Define what we're building
-4.  planning-and-task-breakdown → Break into verifiable chunks
-5.  context-engineering         → Load the right context
-6.  source-driven-development   → Verify against official docs
-7.  testing-first-class         → Discover and reconcile durable test contracts
-8.  incremental-implementation  → Build slice by slice
-9.  observability-and-instrumentation → Instrument as you build (runs parallel with 8-10, not after)
-10. doubt-driven-development    → Cross-examine non-trivial decisions in-flight
-11. test-driven-development     → Prove each slice works
-12. code-review-and-quality     → Review before merge
-13. code-simplification         → Reduce unnecessary complexity while preserving behavior
-14. git-workflow-and-versioning → Clean commit history
-15. documentation-and-adrs      → Document decisions
-16. deprecation-and-migration   → Retire old systems and move users safely when needed
-17. shipping-and-launch         → Deploy safely
+4.  planning                    → Decide the approach and record the plan
+5.  task-breakdown              → Turn the accepted plan into delivery tasks
+6.  context-engineering         → Load the right context
+7.  source-driven-development   → Verify against official docs
+8.  testing-first-class         → Discover and reconcile durable test contracts
+9.  incremental-implementation  → Build slice by slice
+10. observability-and-instrumentation → Instrument as you build (runs parallel with 9-11, not after)
+11. doubt-driven-development    → Cross-examine non-trivial decisions in-flight
+12. test-driven-development     → Prove each slice works
+13. code-review-and-quality     → Review before merge
+14. code-simplification         → Reduce unnecessary complexity while preserving behavior
+15. git-workflow-and-versioning → Clean commit history
+16. documentation-and-adrs      → Document decisions
+17. deprecation-and-migration   → Retire old systems and move users safely when needed
+18. shipping-and-launch         → Deploy safely
 ```
 
 Not every task needs every skill. A bug fix might only need: `debugging-and-error-recovery` → `test-driven-development` → `code-review-and-quality`.
@@ -174,7 +178,8 @@ For this repository, `testing-first-class` is required before implementation or 
 | Define | interview-me                      | Surface what the user actually wants before any plan, spec, or code exists |
 | Define | idea-refine                       | Refine ideas through structured divergent and convergent thinking          |
 | Define | spec-driven-development           | Requirements and acceptance criteria before code                           |
-| Plan   | planning-and-task-breakdown       | Decompose into small, verifiable tasks                                     |
+| Plan   | planning                          | Decide the approach, boundaries, dependencies, and verification strategy   |
+| Plan   | task-breakdown                    | Turn an accepted plan into ordered, verifiable delivery tasks              |
 | Build  | testing-first-class               | Discover TST-* obligations and reconcile progressive evidence              |
 | Build  | incremental-implementation        | Thin vertical slices, test each before expanding                           |
 | Build  | source-driven-development         | Verify against official docs before implementing                           |

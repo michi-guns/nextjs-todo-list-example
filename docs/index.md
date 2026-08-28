@@ -6,6 +6,7 @@ This directory is the knowledge system for the Next.js Todo List Example.
 
 - [DWF design authority](../.dwf/README.md)
 - [Project glossary](./glossary.md)
+- [AgentForge documentation and plans](./agentforge/README.md)
 - [Testing decisions and test contracts](../.dwf/decisions/TESTING.md)
 - [System in five minutes](./handbook/system-in-five-minutes.md)
 - [Documentation protocol](./documentation-protocol.md)
@@ -27,6 +28,7 @@ The `.dwf/` workspace is authoritative for product and technical design. This `d
 
 - `../.dwf/`: canonical product/technical design authority
 - `handbook/`: fast human orientation and derived explanations
+- `agentforge/`: AgentForge planning artifacts and framework documentation
 - `architecture/`: supporting architecture notes
 - `domain/`: supporting domain vocabulary and lifecycle notes
 - `data/`: supporting data ownership and consistency notes

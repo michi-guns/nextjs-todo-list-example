@@ -21,4 +21,5 @@ For repository work, use only AgentForge. Do not use user-scoped Superpowers ski
 
 - **AgentForge skill** means a skill stored in this repository's `.agents/skills/` directory.
 - **AgentForge router** means the `using-agent-skills` skill that selects and sequences applicable skills.
+- **AgentForge plan** means a repository-grounded implementation approach stored under `docs/agentforge/plans/`.
 - **AgentForge workflow** means the project-specific sequence and rules an agent follows for a task.

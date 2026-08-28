@@ -32,6 +32,8 @@ This repository uses **AgentForge**, its project-local software development fram
 
 Use only AgentForge for work in this repository. Do not use user-scoped Superpowers skills, Superpowers plans, or Superpowers conventions here. If a user-scoped skill conflicts with AgentForge, follow AgentForge and the repository's DWF instructions. If an applicable capability is missing from AgentForge, stop and surface the gap rather than silently switching frameworks.
 
+For multi-step work, use AgentForge `planning` in read-only mode first and save the accepted approach under `docs/agentforge/plans/`. Then use `task-breakdown` to turn that plan into ordered tasks in `TODO.md`. Do not begin implementation until both outputs and their prerequisites are understood.
+
 Before starting any non-trivial engineering task:
 
 1. Consult `using-agent-skills` to determine which installed skills apply.
@@ -50,7 +52,7 @@ For any implementation or behavior-changing task in this repository, use the pro
 
 - Before establishing a repository convention, inspect the relevant source, manifest, tests, scripts, and documentation. Treat files as evidence of a current convention only when they are actually wired or used.
 - This repository is a greenfield starter, so do not require existing analogues where none exist. Distinguish current code from generated files, examples, and abandoned experiments. When no local pattern exists, follow the DWF contracts and the installed framework documentation.
-- For multi-step work, create one concise, code-aware plan that maps acceptance criteria to files, tests, and commands. Do not create overlapping plans or use planning to rewrite accepted product design.
+- For multi-step work, keep the AgentForge plan concise and code-aware, mapping acceptance criteria to files, tests, and commands. Do not create overlapping plans or use planning to rewrite accepted product design.
 - Work task by task against the accepted plan. Keep changes coherent, preserve scope-out boundaries, and stop investigating once the evidence supports a safe implementation decision.
 
 ## Task prerequisites and preflight
