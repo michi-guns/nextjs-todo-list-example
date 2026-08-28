@@ -151,6 +151,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-FOUNDATION-001 — Shared database runtime
 
 - **Status:** `verified`
+- **Capability:** Database runtime foundation
+- **Evidence layers/modes:** Infrastructure / unit, local integration, hosted smoke
 - **Verifies product decisions:** D-001, D-002, D-003, D-004, D-009
 - **Verifies technical decisions:** TD-011, TD-015
 - **Edge cases:** [EC-022](EDGE-CASES.md#ec-022)
@@ -165,6 +167,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-MIGRATION-001 — Versioned migration chain
 
 - **Status:** `specified`
+- **Capability:** Database migration foundation
+- **Evidence layers/modes:** Infrastructure / migration integration, hosted smoke
 - **Verifies product decisions:** D-003, D-004, D-009
 - **Verifies technical decisions:** TD-013, TD-014, TD-019
 - **Edge cases:** [EC-020](EDGE-CASES.md#ec-020), [EC-021](EDGE-CASES.md#ec-021)
@@ -179,6 +183,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-HARNESS-001 — Safe database-backed test harness
 
 - **Status:** `specified`
+- **Capability:** Test infrastructure
+- **Evidence layers/modes:** Infrastructure / integration harness, orchestration checks
 - **Verifies product decisions:** D-009
 - **Verifies technical decisions:** TD-013, TD-014, TD-017
 - **Edge cases:** [EC-020](EDGE-CASES.md#ec-020), [EC-021](EDGE-CASES.md#ec-021), [EC-024](EDGE-CASES.md#ec-024)
@@ -193,6 +199,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-PERSISTENCE-001 — Relational invariants and repository mappings
 
 - **Status:** `specified`
+- **Capability:** Persistence
+- **Evidence layers/modes:** Domain, application, infrastructure / unit, integration
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
 - **Verifies technical decisions:** TD-005, TD-006, TD-010, TD-013
 - **Edge cases:** [EC-005](EDGE-CASES.md#ec-005), [EC-006](EDGE-CASES.md#ec-006), [EC-014](EDGE-CASES.md#ec-014), [EC-017](EDGE-CASES.md#ec-017), [EC-018](EDGE-CASES.md#ec-018)
@@ -207,6 +215,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-AUTH-001 — Email/password session lifecycle
 
 - **Status:** `specified`
+- **Capability:** Authentication
+- **Evidence layers/modes:** Application, boundary, end-to-end / integration, browser
 - **Verifies product decisions:** D-001, D-002
 - **Verifies technical decisions:** TD-004, TD-008
 - **Edge cases:** [EC-008](EDGE-CASES.md#ec-008)
@@ -221,6 +231,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-AUTH-002 — Magic-link local/test lifecycle
 
 - **Status:** `specified`
+- **Capability:** Authentication
+- **Evidence layers/modes:** Infrastructure, boundary, end-to-end / mailbox integration, browser
 - **Verifies product decisions:** D-002
 - **Verifies technical decisions:** TD-004, TD-014
 - **Edge cases:** [EC-009](EDGE-CASES.md#ec-009)
@@ -235,6 +247,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-AUTH-003 — Private authorization and owner identity
 
 - **Status:** `specified`
+- **Capability:** Authentication and authorization
+- **Evidence layers/modes:** Application, boundary, end-to-end / contract, integration, browser
 - **Verifies product decisions:** D-001, D-002
 - **Verifies technical decisions:** TD-004, TD-006, TD-008, TD-022
 - **Edge cases:** [EC-004](EDGE-CASES.md#ec-004), [EC-006](EDGE-CASES.md#ec-006), [EC-008](EDGE-CASES.md#ec-008), [EC-026](EDGE-CASES.md#ec-026)
@@ -249,6 +263,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-LISTS-001 — Inbox and list lifecycle
 
 - **Status:** `specified`
+- **Capability:** Lists
+- **Evidence layers/modes:** Domain, application, infrastructure / unit, integration
 - **Verifies product decisions:** D-003
 - **Verifies technical decisions:** TD-005, TD-006, TD-013, TD-017
 - **Edge cases:** [EC-001](EDGE-CASES.md#ec-001)
@@ -263,6 +279,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-LISTS-002 — List validation, CRUD, uniqueness, and cascade
 
 - **Status:** `specified`
+- **Capability:** Lists
+- **Evidence layers/modes:** Domain, application, infrastructure, boundary / unit, integration, contract
 - **Verifies product decisions:** D-003, D-004
 - **Verifies technical decisions:** TD-005, TD-006, TD-008, TD-010
 - **Edge cases:** [EC-002](EDGE-CASES.md#ec-002), [EC-005](EDGE-CASES.md#ec-005), [EC-014](EDGE-CASES.md#ec-014)
@@ -277,6 +295,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-LISTS-003 — Bounded and context-safe list pagination
 
 - **Status:** `specified`
+- **Capability:** Lists
+- **Evidence layers/modes:** Application, infrastructure, boundary, UI / integration, contract, browser
 - **Verifies product decisions:** D-001, D-003
 - **Verifies technical decisions:** TD-006, TD-008, TD-010, TD-011
 - **Edge cases:** [EC-013](EDGE-CASES.md#ec-013), [EC-015](EDGE-CASES.md#ec-015), [EC-016](EDGE-CASES.md#ec-016), [EC-017](EDGE-CASES.md#ec-017), [EC-018](EDGE-CASES.md#ec-018)
@@ -291,6 +311,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-TASKS-001 — Task lifecycle, statuses, titles, and notes
 
 - **Status:** `specified`
+- **Capability:** Tasks
+- **Evidence layers/modes:** Domain, application, boundary / unit, integration, contract
 - **Verifies product decisions:** D-004
 - **Verifies technical decisions:** TD-006, TD-008
 - **Edge cases:** [EC-002](EDGE-CASES.md#ec-002), [EC-003](EDGE-CASES.md#ec-003), [EC-010](EDGE-CASES.md#ec-010), [EC-011](EDGE-CASES.md#ec-011), [EC-012](EDGE-CASES.md#ec-012)
@@ -305,6 +327,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-TASKS-002 — Task ownership, relationships, uniqueness, and cascade
 
 - **Status:** `specified`
+- **Capability:** Tasks and persistence
+- **Evidence layers/modes:** Application, infrastructure, boundary / integration, contract
 - **Verifies product decisions:** D-001, D-003, D-004
 - **Verifies technical decisions:** TD-005, TD-006, TD-008, TD-010
 - **Edge cases:** [EC-005](EDGE-CASES.md#ec-005), [EC-006](EDGE-CASES.md#ec-006), [EC-014](EDGE-CASES.md#ec-014)
@@ -319,6 +343,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-TASKS-003 — Bounded task pagination and completed filtering
 
 - **Status:** `specified`
+- **Capability:** Tasks
+- **Evidence layers/modes:** Application, infrastructure, boundary, UI / integration, contract, browser
 - **Verifies product decisions:** D-004
 - **Verifies technical decisions:** TD-006, TD-008, TD-010, TD-011
 - **Edge cases:** [EC-003](EDGE-CASES.md#ec-003), [EC-013](EDGE-CASES.md#ec-013), [EC-015](EDGE-CASES.md#ec-015), [EC-016](EDGE-CASES.md#ec-016), [EC-018](EDGE-CASES.md#ec-018)
@@ -333,6 +359,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-CONCURRENCY-001 — Last-successful-write behavior
 
 - **Status:** `specified`
+- **Capability:** Concurrent mutations
+- **Evidence layers/modes:** Application, infrastructure / integration
 - **Verifies product decisions:** D-007
 - **Verifies technical decisions:** TD-005, TD-006, TD-008
 - **Edge cases:** [EC-027](EDGE-CASES.md#ec-027)
@@ -347,6 +375,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-BOUNDARY-001 — Server entry-path contracts
 
 - **Status:** `specified`
+- **Capability:** Server boundaries
+- **Evidence layers/modes:** Boundary / request contract, integration
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
 - **Verifies technical decisions:** TD-008, TD-020, TD-022
 - **Edge cases:** [EC-004](EDGE-CASES.md#ec-004), [EC-008](EDGE-CASES.md#ec-008), [EC-014](EDGE-CASES.md#ec-014), [EC-015](EDGE-CASES.md#ec-015), [EC-016](EDGE-CASES.md#ec-016), [EC-026](EDGE-CASES.md#ec-026)
@@ -361,6 +391,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-LANDING-001 — Sanity payload validation and mapping
 
 - **Status:** `specified`
+- **Capability:** Landing content
+- **Evidence layers/modes:** Infrastructure / fixture integration
 - **Verifies product decisions:** D-005, D-008
 - **Verifies technical decisions:** TD-007, TD-018, TD-023
 - **Edge cases:** [EC-007](EDGE-CASES.md#ec-007), [EC-025](EDGE-CASES.md#ec-025)
@@ -375,6 +407,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-LANDING-002 — Published Sanity read smoke
 
 - **Status:** `specified`
+- **Capability:** Landing content
+- **Evidence layers/modes:** Infrastructure / live smoke
 - **Verifies product decisions:** D-005, D-008, D-009
 - **Verifies technical decisions:** TD-018, TD-023
 - **Edge cases:** [EC-007](EDGE-CASES.md#ec-007), [EC-025](EDGE-CASES.md#ec-025)
@@ -389,6 +423,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-LANDING-003 — Sanity freshness and recovery
 
 - **Status:** `specified`
+- **Capability:** Landing content freshness
+- **Evidence layers/modes:** Infrastructure, boundary / contract, deployed smoke
 - **Verifies product decisions:** D-005, D-008
 - **Verifies technical decisions:** TD-023
 - **Edge cases:** [EC-028](EDGE-CASES.md#ec-028)
@@ -403,6 +439,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-UI-001 — Selected UI direction and usable states
 
 - **Status:** `specified`
+- **Capability:** Product UI
+- **Evidence layers/modes:** UI / prototype inspection, runtime inspection, browser acceptance
 - **Verifies product decisions:** D-001, D-002, D-003, D-004, D-009
 - **Verifies technical decisions:** TD-009, TD-020
 - **SPEC:** [9 UI](../output/agent/SPEC.md#9-ui), [14.6 Presentation boundary](../output/agent/SPEC.md#146-presentation-boundary)
@@ -416,6 +454,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-E2E-001 — Core authenticated todo journey
 
 - **Status:** `specified`
+- **Capability:** Core todo journey
+- **Evidence layers/modes:** End-to-end / Playwright Chromium
 - **Verifies product decisions:** D-001, D-002, D-003, D-004, D-009
 - **Verifies technical decisions:** TD-009, TD-014, TD-016, TD-017, TD-018, TD-022
 - **SPEC:** [7 Starter baseline acceptance](../output/agent/PRD.md#7-starter-baseline-complete-acceptance), [10.3 Playwright](../output/agent/SPEC.md#103-playwright)
@@ -429,6 +469,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-E2E-002 — Magic-link browser journey
 
 - **Status:** `specified`
+- **Capability:** Authentication
+- **Evidence layers/modes:** End-to-end / Playwright Chromium
 - **Verifies product decisions:** D-002
 - **Verifies technical decisions:** TD-014, TD-016, TD-017
 - **Edge cases:** [EC-009](EDGE-CASES.md#ec-009)
@@ -443,6 +485,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-E2E-003 — Browser-visible capability behavior
 
 - **Status:** `specified`
+- **Capability:** Authenticated product UI
+- **Evidence layers/modes:** UI, end-to-end / Playwright Chromium, on-demand cross-browser
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
 - **Verifies technical decisions:** TD-009, TD-014, TD-016, TD-017, TD-018, TD-022
 - **Edge cases:** [EC-003](EDGE-CASES.md#ec-003), [EC-004](EDGE-CASES.md#ec-004), [EC-013](EDGE-CASES.md#ec-013), [EC-015](EDGE-CASES.md#ec-015), [EC-016](EDGE-CASES.md#ec-016), [EC-025](EDGE-CASES.md#ec-025)
@@ -457,6 +501,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 ### TST-PERFORMANCE-001 — Representative Neon query evidence
 
 - **Status:** `specified`
+- **Capability:** Database performance
+- **Evidence layers/modes:** Infrastructure / query plan and controlled performance evidence
 - **Verifies product decisions:** D-003, D-004, D-009
 - **Verifies technical decisions:** TD-010, TD-011, TD-012
 - **Edge cases:** [EC-017](EDGE-CASES.md#ec-017), [EC-018](EDGE-CASES.md#ec-018), [EC-019](EDGE-CASES.md#ec-019)
