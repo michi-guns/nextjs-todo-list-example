@@ -138,15 +138,28 @@ Dependencies: T-03.
 
 ### T-04: Add the lists and tasks schema
 
-- [ ] Add `lists` and `tasks` Drizzle tables with ownership, timestamps, statuses, and nullable notes as defined by the SPEC.
+- [~] Add `lists` and `tasks` Drizzle tables with ownership, timestamps, statuses, and nullable notes as defined by the SPEC.
 - [ ] Add the list-to-task foreign key with database-level cascade deletion.
 - [ ] Add database-enforced case-insensitive uniqueness for list names per user and task titles per list.
 - [ ] Add the required composite cursor indexes aligned with the authenticated equality scopes and ordering.
 - [ ] Retire the scaffold `posts` schema from active application code without editing the already-applied migration in place.
 
+Recommended AgentForge skills:
+
+- `using-agent-skills` to route the task through the repository-local workflow.
+- `planning` to preserve the accepted schema, migration, and evidence approach in `docs/agentforge/plans/`.
+- `task-breakdown` to keep this task's acceptance and evidence metadata complete.
+- `testing-first-class` to reconcile `TST-MIGRATION-001` and `TST-PERSISTENCE-001`.
+- `test-driven-development` to add focused failing persistence checks before implementation.
+- `source-driven-development` to verify the installed Drizzle v1 RC index, enum, and timestamp APIs.
+- `incremental-implementation` to land schema, migration, and evidence in reviewable slices.
+- `neon-postgres` and `neon-postgres-branches` for pooled/direct connection boundaries and non-default migration verification.
+- `git-workflow-and-versioning` and `code-review-and-quality` for the task branch, commit, and final review.
+
 Verification:
 
-- [ ] A new versioned migration applies to an empty PostgreSQL 18 Testcontainer.
+- [ ] A new versioned migration applies to an empty local PostgreSQL database/schema through the available integration lane.
+- [!] PostgreSQL 18 Testcontainers migration evidence is blocked until the reusable T-14 harness exists; the local integration check does not replace that obligation.
 - [ ] The reviewed migration applies successfully to the Neon development branch.
 - [ ] Integration coverage proves uniqueness, cascade deletion, and required indexes/constraints.
 
