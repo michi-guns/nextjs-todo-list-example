@@ -122,7 +122,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | ------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------- | ----------- |
 | [TST-FOUNDATION-001](#tst-foundation-001)   | Shared database runtime works across local PostgreSQL and Neon                       | Unit, local integration, hosted smoke                  | T-03                            | `verified`  |
 | [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                | `partial`   |
-| [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks          | T-14, T-15                      | `specified` |
+| [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks          | T-14, T-15                      | `partial`   |
 | [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration                                 | T-04, T-06, T-07, T-14          | `partial`   |
 | [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                      | `partial`   |
 | [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                      | `partial`   |
@@ -130,7 +130,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration            | T-06, T-14                      | `partial`   |
 | [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14          | `partial`   |
 | [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14          | `partial`   |
-| [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09                      | `partial`   |
+| [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09, T-14                | `partial`   |
 | [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14          | `partial`   |
 | [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14          | `partial`   |
 | [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                | `partial`   |
@@ -177,14 +177,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The complete versioned Drizzle migration chain applies to an empty PostgreSQL 18 Testcontainer and the reviewed migration applies successfully to the non-default Neon development branch before promotion.
 - **Required evidence:** Harness-owned empty-database migration run and non-destructive Neon development-branch migration smoke.
 - **Dependencies:** T-04 schema work, T-14 Testcontainers harness, and the existing T-01 Neon development branch.
-- **Current evidence:** T-04's `pnpm test:integration` applied the complete consolidated versioned chain to an isolated schema in a fresh disposable local `postgres:18-alpine` container. `pnpm exec drizzle-kit migrate` applied that same consolidated chain to a fresh local migration database, and catalog inspection confirmed native UUID list/task keys with `uuidv7()` defaults, text owner FKs, the `task_status` enum, cursor/unique indexes, and cascading foreign keys. The agent-owned Neon `development` branch still records the pre-consolidation two-step chain and was not destructively reset in this slice.
-- **Follow-up:** T-14 must run the same chain through the reusable `@testcontainers/postgresql` harness and record its lifecycle/failure-cleanup evidence before this contract can be `verified`.
+- **Current evidence:** T-04's `pnpm test:integration` applied the complete consolidated versioned chain to an isolated schema in a fresh disposable local `postgres:18-alpine` container. The T-14 harness now applies that same chain to the empty database of one harness-owned PostgreSQL 18 Testcontainer per integration suite. `pnpm exec drizzle-kit migrate` applied the chain to a fresh local migration database, and catalog inspection confirmed native UUID list/task keys with `uuidv7()` defaults, text owner FKs, the `task_status` enum, cursor/unique indexes, and cascading foreign keys. The agent-owned Neon `development` branch still records the pre-consolidation two-step chain and was not destructively reset in this slice.
+- **Follow-up:** T-01 must separately realign and smoke-test the reviewed consolidated chain on the non-default Neon development branch before this contract can be `verified`.
 
 <a id="tst-harness-001"></a>
 
 ### TST-HARNESS-001 — Safe database-backed test harness
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Test infrastructure
 - **Evidence layers/modes:** Infrastructure / integration harness, orchestration checks
 - **Verifies product decisions:** D-009
@@ -195,6 +195,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Database-backed tests use one harness-owned PostgreSQL 18 container per suite, run serially while sharing it, create unique users and mutable records, remain order-independent, clean up after failures, and refuse destructive cleanup against external URLs.
 - **Required evidence:** Docker-unavailable failure, state-isolation test, failure cleanup, external-URL refusal, and the equivalent Playwright lifecycle check.
 - **Dependencies:** T-14 harness orchestration and T-15 browser orchestration.
+- **Current evidence:** `pnpm test:integration` starts one disposable `postgres:18-alpine` container in global setup, applies the complete migration chain, injects its local URI into the existing integration seam, runs six files serially, and tears the container down. Harness unit tests cover loopback URL refusal, migration statement splitting, injected startup failure reporting, migration-failure cleanup, and normal teardown; a harness integration test confirms PostgreSQL 18 catalog visibility and isolated schemas. A live Docker-daemon outage and the equivalent Playwright lifecycle remain unobserved.
+- **Follow-up:** T-15 must reuse the lifecycle for the dedicated Next.js/Playwright run; retain the live-daemon outage check as release evidence if the environment supports it.
 
 <a id="tst-persistence-001"></a>
 
@@ -211,8 +213,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Real PostgreSQL behavior preserves ownership, case-insensitive uniqueness, list-to-task cascade deletion, repository field mappings, bounded cursor reads, required indexes, and the absence of N+1 or unbounded page work.
 - **Required evidence:** PostgreSQL integration cases against the real migrations, including concurrent uniqueness and cascade behavior, plus query-shape assertions where the contract requires them.
 - **Dependencies:** T-04 schema and T-14 harness.
-- **Current evidence:** T-04's focused integration suite passed three real-database cases covering database-generated native UUID IDs, Drizzle `Date` mappings, nullable notes and native status values, owner-scoped case-insensitive list/task uniqueness, list-to-task cascade deletion, cascading foreign keys, and the required cursor-index column order/direction. It does not yet prove concurrent repository operations, bounded cursor queries, or N+1 behavior.
-- **Follow-up:** T-06/T-07 repository implementations and T-14's PostgreSQL 18 harness must add the remaining ownership, concurrent-uniqueness, cursor, and query-shape evidence.
+- **Current evidence:** T-04's focused integration suite passed three real-database cases covering database-generated native UUID IDs, Drizzle `Date` mappings, nullable notes and native status values, owner-scoped case-insensitive list/task uniqueness, list-to-task cascade deletion, cascading foreign keys, and the required cursor-index column order/direction. The complete T-06/T-07 repository suite now runs through the T-14 harness and covers ownership, concurrent uniqueness, bounded cursor reads, cascade behavior, repository mappings, and the existing query-shape guards.
+- **Follow-up:** Keep this contract `partial` until the remaining query-shape/performance evidence is reconciled against the full acceptance baseline; the reusable harness prerequisite is satisfied.
 
 <a id="tst-auth-001"></a>
 
@@ -283,8 +285,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A listless private workspace creates exactly one ordinary `Inbox` atomically and idempotently, including after final-list deletion; any existing list prevents automatic creation; Inbox can later be renamed or deleted.
 - **Required evidence:** Database-free application tests for lifecycle outcomes, PostgreSQL integration for atomic/concurrent creation, and the relevant authenticated journey when the UI exists.
 - **Dependencies:** T-04 schema, T-05 auth boundary, and T-14 real database harness.
-- **Current evidence:** `src/modules/lists/application/list-use-cases.test.ts` and the local PostgreSQL repository suite cover Inbox normalization and lifecycle outcomes. The integration suite proves eight concurrent listless calls converge to one Inbox, an existing list prevents automatic creation, final-list deletion permits recreation, and a controlled conflict/read-back interleaving does not create a duplicate after the winner is renamed. The reusable T-14 harness and authenticated journey remain outstanding.
-- **Follow-up:** T-14 must repeat the lifecycle cases through the harness and T-15/T-10 must add the authenticated private-workspace journey before this contract can be `verified`.
+- **Current evidence:** `src/modules/lists/application/list-use-cases.test.ts` and the local PostgreSQL repository suite cover Inbox normalization and lifecycle outcomes. The harness-backed integration suite proves eight concurrent listless calls converge to one Inbox, an existing list prevents automatic creation, final-list deletion permits recreation, and a controlled conflict/read-back interleaving does not create a duplicate after the winner is renamed.
+- **Follow-up:** T-15/T-10 must add the authenticated private-workspace journey before this contract can be `verified`.
 
 <a id="tst-lists-002"></a>
 
@@ -301,8 +303,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** List names are trimmed and limited to 1–80 characters, list CRUD is owner-scoped, duplicate names conflict case-insensitively after trimming, and deleting a list removes its tasks through the relational cascade.
 - **Required evidence:** Domain/application validation tests, PostgreSQL constraint and cascade tests, and request-boundary conflict/invalid-input tests.
 - **Dependencies:** T-04 schema, T-06 use cases, and T-09 entry paths.
-- **Current evidence:** The application suite proves trimming, 1–80 validation, owner forwarding, privacy-preserving not-found mapping, and conflict preservation. The local PostgreSQL suite proves owner-scoped CRUD, case-insensitive uniqueness, cross-owner privacy, and list-to-task cascade deletion. T-09 boundary coverage and the reusable T-14 harness remain outstanding.
-- **Follow-up:** T-09 must add request-boundary `409`/`422`/privacy tests, and T-14 must repeat the persistence cases through the harness before this contract can be `verified`.
+- **Current evidence:** The application suite proves trimming, 1–80 validation, owner forwarding, privacy-preserving not-found mapping, and conflict preservation. The harness-backed PostgreSQL suite proves owner-scoped CRUD, case-insensitive uniqueness, cross-owner privacy, and list-to-task cascade deletion.
+- **Follow-up:** T-09 must add request-boundary `409`/`422`/privacy tests before this contract can be `verified`.
 
 <a id="tst-lists-003"></a>
 
@@ -319,8 +321,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** List reads default to 20, accept 1–100, return oldest-first deterministic pages with opaque context-bound cursors, fetch at most `limit + 1` rows, and expose a next page only when one exists.
 - **Required evidence:** Application and PostgreSQL pagination tests, malformed/cross-context cursor and limit boundary tests, and a browser-visible `Load more` check.
 - **Dependencies:** T-04 indexes, T-06 repository/use case, T-08 shared pagination contract, and T-14 harness.
-- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. T-08 shared pagination tests cover default 20, accepted 1/100, invalid limits, blank and repeated URL parameters, and the stable page shape. The local PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, bounded `limit + 1` repository reads, and maximum-page continuation from 100 records to the 101st record. T-09 boundary mapping, T-10 browser `Load more`, and T-14 harness evidence remain outstanding.
-- **Follow-up:** T-09 must add request-level boundary response-shape tests, T-10 must verify browser-visible pagination, and T-14 must repeat the query behavior through the reusable harness before this contract can be `verified`.
+- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. T-08 shared pagination tests cover default 20, accepted 1/100, invalid limits, blank and repeated URL parameters, and the stable page shape. The harness-backed PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, bounded `limit + 1` repository reads, and maximum-page continuation from 100 records to the 101st record. T-09 boundary mapping and T-10 browser `Load more` remain outstanding.
+- **Follow-up:** T-09 must add request-level boundary response-shape tests and T-10 must verify browser-visible pagination before this contract can be `verified`.
 
 <a id="tst-tasks-001"></a>
 
@@ -337,8 +339,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Tasks validate trimmed titles and optional notes, start as `todo`, support direct transitions among valid statuses, treat repeated status as a no-op, preserve or clear notes according to patch semantics, and keep completed tasks stored and visible by default.
 - **Required evidence:** Domain/application tests for status, trimming, note, and patch rules, plus boundary tests for invalid inputs and expected outcomes.
 - **Dependencies:** T-06 list use cases, T-07 task use cases, and T-09 entry paths.
-- **Current evidence:** `pnpm test` covers task title and notes normalization, all three valid statuses, direct and repeated status application, default creation status, explicit note clearing, page validation, and privacy/conflict outcome mapping. `TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/todo_test pnpm test:integration` proves PostgreSQL status transitions, repeated-status `updatedAt` preservation, and completed-task storage/filter behavior. T-09 boundary validation and T-14 reusable-harness evidence remain outstanding.
-- **Follow-up:** T-09 must add boundary validation and outcome tests, and T-14 must repeat the persistence behavior through the reusable PostgreSQL 18 harness before this contract can be `verified`.
+- **Current evidence:** `pnpm test` covers task title and notes normalization, all three valid statuses, direct and repeated status application, default creation status, explicit note clearing, page validation, and privacy/conflict outcome mapping. The harness-backed PostgreSQL suite proves status transitions, repeated-status `updatedAt` preservation, and completed-task storage/filter behavior.
+- **Follow-up:** T-09 must add boundary validation and outcome tests before this contract can be `verified`.
 
 <a id="tst-tasks-002"></a>
 
@@ -355,8 +357,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A task can be created or changed only within an owned list, task titles are unique case-insensitively within one list but may repeat in another, and deleting the parent list cascades to its tasks.
 - **Required evidence:** Application ownership tests, PostgreSQL foreign-key/unique/cascade tests, and boundary not-found/conflict tests.
 - **Dependencies:** T-04 schema, T-07 use cases, and T-14 harness.
-- **Current evidence:** The task unit suite covers application mapping for missing task lists and conflict/not-found outcomes. The local PostgreSQL suite proves owned-list membership on insert and reads, privacy-preserving `list_not_found` for missing or foreign-owned lists, owner-scoped task reads and mutations, case-insensitive per-list title uniqueness, same-title isolation across lists, and list-to-task cascade deletion. T-09 boundary outcomes and T-14 reusable-harness evidence remain outstanding.
-- **Follow-up:** T-09 must add boundary `404`/`409` mappings, and T-14 must repeat ownership, uniqueness, and cascade cases through the reusable harness before this contract can be `verified`.
+- **Current evidence:** The task unit suite covers application mapping for missing task lists and conflict/not-found outcomes. The harness-backed PostgreSQL suite proves owned-list membership on insert and reads, privacy-preserving `list_not_found` for missing or foreign-owned lists, owner-scoped task reads and mutations, case-insensitive per-list title uniqueness, same-title isolation across lists, and list-to-task cascade deletion.
+- **Follow-up:** T-09 must add boundary `404`/`409` mappings before this contract can be `verified`.
 
 <a id="tst-tasks-003"></a>
 
@@ -373,8 +375,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Task reads default to completed tasks included, support explicit hiding without changing stored state or the relative order of visible tasks, return newest-first deterministic bounded pages, and restart pagination when list or filter context changes.
 - **Required evidence:** Application and PostgreSQL filter/order/cursor tests, boundary validation tests, and a browser check for filtering and `Load more`.
 - **Dependencies:** T-07 task repository/use case, T-08 pagination contract, T-10 UI, and T-14 harness.
-- **Current evidence:** Task application/cursor tests cover default completed-task visibility, explicit filter validation, page limits, opaque cursor validation, and context mismatches. T-08 shared pagination tests cover the common default/maximum/invalid URL limit and cursor contract. The local PostgreSQL suite proves newest-first ordering, same-timestamp `createdAt`/`id` tie-breaking, continuation and terminal cursors, stable relative order after hiding `done`, cross-context cursor rejection, bounded `limit + 1` reads, and maximum-page continuation from 100 records to the 101st record. T-09 boundary validation, T-10 browser `Load more`/filter evidence, and T-14 reusable-harness evidence remain outstanding.
-- **Follow-up:** T-09 must add request-level boundary validation tests, T-10 must verify browser-visible filtering and pagination, and T-14 must repeat the query behavior through the reusable harness before this contract can be `verified`.
+- **Current evidence:** Task application/cursor tests cover default completed-task visibility, explicit filter validation, page limits, opaque cursor validation, and context mismatches. T-08 shared pagination tests cover the common default/maximum/invalid URL limit and cursor contract. The harness-backed PostgreSQL suite proves newest-first ordering, same-timestamp `createdAt`/`id` tie-breaking, continuation and terminal cursors, stable relative order after hiding `done`, cross-context cursor rejection, bounded `limit + 1` reads, and maximum-page continuation from 100 records to the 101st record. T-09 boundary validation and T-10 browser `Load more`/filter evidence remain outstanding.
+- **Follow-up:** T-09 must add request-level boundary validation tests and T-10 must verify browser-visible filtering and pagination before this contract can be `verified`.
 
 <a id="tst-concurrency-001"></a>
 
@@ -391,8 +393,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Concurrent accepted mutations do not require version tokens; each patch changes only submitted fields; same-field writes expose the last successfully committed value; disjoint-field writes may both persist; ordinary ownership, validation, and uniqueness outcomes remain intact.
 - **Required evidence:** Application tests using realistic concurrent operations and PostgreSQL integration tests for commit ordering and disjoint-field preservation.
 - **Dependencies:** T-06/T-07 mutation paths and T-14 real database harness.
-- **Current evidence:** The local PostgreSQL suite proves controlled same-row list rename commit ordering (the later committed write is retained), concurrent Inbox uniqueness and its conflict/read-back race, task same-field commit ordering, task disjoint-field preservation, and repeated status timestamp idempotence. The task application suite proves that patch inputs preserve omitted-versus-submitted fields; the reusable T-14 harness remains outstanding.
-- **Follow-up:** T-14 must repeat the list and task concurrency cases through the reusable PostgreSQL 18 harness before this contract can be `verified`.
+- **Current evidence:** The harness-backed PostgreSQL suite proves controlled same-row list rename commit ordering (the later committed write is retained), concurrent Inbox uniqueness and its conflict/read-back race, task same-field commit ordering, task disjoint-field preservation, and repeated status timestamp idempotence. The task application suite proves that patch inputs preserve omitted-versus-submitted fields.
+- **Follow-up:** Keep this contract `partial` until the full concurrency acceptance evidence is reconciled; the reusable harness prerequisite is satisfied.
 
 <a id="tst-boundary-001"></a>
 

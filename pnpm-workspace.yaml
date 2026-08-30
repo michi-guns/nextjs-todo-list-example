@@ -6,22 +6,25 @@ allowBuilds:
   msw: false
   esbuild: true
   agent-browser: true
+  cpu-features: false
+  protobufjs: false
+  ssh2: false
 
 minimumReleaseAgeExclude:
-  - '@better-auth/core@1.7.1'
-  - '@better-auth/drizzle-adapter@1.7.1'
-  - '@better-auth/kysely-adapter@1.7.1'
-  - '@better-auth/memory-adapter@1.7.1'
-  - '@better-auth/mongo-adapter@1.7.1'
-  - '@better-auth/prisma-adapter@1.7.1'
-  - '@better-auth/telemetry@1.7.1'
+  - "@better-auth/core@1.7.1"
+  - "@better-auth/drizzle-adapter@1.7.1"
+  - "@better-auth/kysely-adapter@1.7.1"
+  - "@better-auth/memory-adapter@1.7.1"
+  - "@better-auth/mongo-adapter@1.7.1"
+  - "@better-auth/prisma-adapter@1.7.1"
+  - "@better-auth/telemetry@1.7.1"
   - better-auth@1.7.1
   - lucide-react@1.32.0
-  - '@vitest/expect@4.1.11'
-  - '@vitest/mocker@4.1.11'
-  - '@vitest/pretty-format@4.1.11'
-  - '@vitest/runner@4.1.11'
-  - '@vitest/snapshot@4.1.11'
-  - '@vitest/spy@4.1.11'
-  - '@vitest/utils@4.1.11'
+  - "@vitest/expect@4.1.11"
+  - "@vitest/mocker@4.1.11"
+  - "@vitest/pretty-format@4.1.11"
+  - "@vitest/runner@4.1.11"
+  - "@vitest/snapshot@4.1.11"
+  - "@vitest/spy@4.1.11"
+  - "@vitest/utils@4.1.11"
   - vitest@4.1.11

@@ -11,5 +11,11 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.integration.test.ts"],
     exclude: ["**/node_modules/**", "**/e2e/**", "**/.playwright/**"],
+    globalSetup: "./src/test/postgres-global-setup.ts",
+    setupFiles: ["./src/test/postgres-test-setup.ts"],
+    fileParallelism: false,
+    sequence: {
+      concurrent: false,
+    },
   },
 })

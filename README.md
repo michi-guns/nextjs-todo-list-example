@@ -32,8 +32,13 @@ link is consumed first, that deliberate Better Auth security transition revokes
 the unproven password credential; password reset/recovery is a later product
 surface.
 
-The integration suite uses `TEST_DATABASE_URL` and refuses non-local
-PostgreSQL URLs. Do not commit environment files, credentials, or captured
+`pnpm test:integration` starts one disposable PostgreSQL 18 Testcontainer,
+applies the committed migrations, runs the integration files serially, and
+tears the container down after the suite. Docker must be available for this
+command; the harness owns the generated `TEST_DATABASE_URL` and does not use an
+external database target. The harness also refuses non-local PostgreSQL URLs
+before destructive schema cleanup. The regular `pnpm test` suite remains
+Docker-free. Do not commit environment files, credentials, or captured
 authentication links.
 
 ## Adding components
