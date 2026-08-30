@@ -406,11 +406,21 @@ PR: No PR branch was needed; the repository's `AGENTS.md` permits direct, cohere
 
 ### T-10: Build the authenticated dashboard
 
-- [ ] Materialize the selected direction from T-09B in the authenticated dashboard rather than introducing a new visual system during implementation.
-- [ ] Add the authenticated app route and dashboard shell using shadcn/ui.
-- [ ] Add list sidebar operations: create, select, rename, delete, and visible `Load more`.
-- [ ] Add task operations: create, edit, delete, status changes, completed-task toggle, and visible `Load more`.
-- [ ] Reset task pagination when the selected list or completed-task filter changes.
+- [x] Implement the accepted plan in [`docs/agentforge/plans/2026-08-30-t-10-authenticated-dashboard.md`](docs/agentforge/plans/2026-08-30-t-10-authenticated-dashboard.md).
+- [x] Materialize the Focus Rail composition at `/dashboard`: authenticated server route, header/session context, persistent list rail, task workspace, and semantic shadcn-style controls using the existing token system.
+- [x] Keep the route server-owned for session gating, Inbox provisioning, and initial view-model reads; keep browser orchestration free of Drizzle, Better Auth, Sanity, and provider payloads.
+- [x] Add list operations (create, select, rename, delete, and visible cursor `Load more`) through the existing list Server Actions and authenticated JSON read route.
+- [x] Add task operations (create, edit title/notes, delete, direct status changes, completed-task toggle, and visible cursor `Load more`) through the existing task Server Actions and authenticated JSON read route.
+- [x] Reset task items/cursor and reload page one when the selected list or completed-task visibility changes; append later pages in server order only while a cursor exists.
+- [x] Provide accessible loading, empty, validation/conflict, recoverable-error, disabled/pending, selected, long-content, and final-list reload states, including focus management and non-color-only labels.
+
+Implementation scope and interfaces:
+
+- Create `app/(app)/dashboard/page.tsx` plus route-local `loading.tsx` and `error.tsx`; consume `requireUser`, `listApplication`, `taskApplication`, `toListPageViewModel`, and `toTaskPageViewModel`, and pass only serializable user/list/task view models plus Server Action references to the client.
+- Create the dashboard client/container and composable Focus Rail pieces under `components/dashboard/` (or one clearly owned module presentation location if implementation evidence requires it); use the existing `components/ui/button.tsx` and only the focused semantic primitives needed for labels, text input, textarea, checkbox/select, alert, and confirmation.
+- Add a small framework-independent dashboard state/response helper and focused tests only if needed to prove replace/append/reset behavior; do not introduce a state-management dependency or a full React unit-test matrix.
+- Read pagination from `/api/lists` and `/api/lists/:listId/tasks` with same-origin `fetch`; invoke `createListAction`, `renameListAction`, `deleteListAction`, `createTaskAction`, `updateTaskAction`, and `deleteTaskAction` with serializable objects.
+- Leave migrations, schema, auth provider configuration, landing/Sanity content, and the rejected UI directions unchanged.
 
 Recommended agent skills:
 
@@ -418,16 +428,25 @@ Recommended agent skills:
 - `vercel-composition-patterns` for composable dashboard and task/list component APIs without boolean-prop or configuration sprawl.
 - `vercel-react-best-practices` for React and Next.js rendering, state, and performance decisions.
 - `next-dev-loop` for runtime verification in the running Next.js app after implementation.
+- `testing-first-class` and `test-driven-development` for the affected test contracts and behavior loop.
+- `incremental-implementation` for vertical slices and `git-workflow-and-versioning` for the coherent delivery commit.
 
 Verification:
 
-- [ ] The dashboard works with authenticated session data only.
-- [ ] A manual runtime check confirms list/task pagination, filtering, and mutation feedback.
-- [ ] The UI works at 320px, 768px, 1024px, and 1440px with keyboard-accessible interactions and visible focus.
+- [x] Focused unit/state tests (when added) pass, and authenticated route/action behavior remains covered by the existing boundary tests.
+- [x] `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file `pnpm exec prettier --check`, and `git diff --check` pass.
+- [x] With `next dev` and the repository runtime/browser prerequisites available, an authenticated manual/browser check confirms private-session gating, list/task pagination, filtering, mutation feedback, final-list reload, keyboard reachability, visible focus, and no overflow at 320px, 768px, 1024px, and 1440px.
+- [x] Runtime evidence is recorded without credentials; any unavailable prerequisite or deferred T-15 harness evidence is reported rather than replaced by a weaker check.
+
+Evidence: Added the server-owned `/dashboard` route, route loading/error states, sign-out action, Focus Rail client composition, semantic input/textarea/label/alert primitives, and the framework-independent pagination state helper with three focused tests. `pnpm test` passes (19 files, 95 tests), `pnpm typecheck` passes, `pnpm lint` passes with only the pre-existing `app/layout.tsx:1:10` `Geist` warning, `pnpm build` passes on Next.js 16.3.1/Turbopack, changed-file Prettier checks pass, and `git diff --check` passes. The Next runtime loop used the disposable local PostgreSQL 18 database `dashboard_t10_20260830` and local mailbox mode without recording credentials: anonymous `/dashboard` requests redirect to `/sign-in?next=%2Fdashboard`; the authenticated browser session exercised Inbox provisioning, list create/select/rename/delete, task create/edit/delete/status, completed-task filtering, both visible cursor continuations, duplicate/blank validation feedback, final-list reload with Inbox recreation, sign-out, keyboard focus return after deletion, and focus-visible styling. Seeded disposable rows made both `Load more` controls continue through their remaining pages without duplicate IDs or order changes. At 320px, 768px, 1024px, and 1440px there was no horizontal document overflow. Axe reported 0 violations (39 passes); browser errors were empty, console output contained only expected React DevTools/HMR messages, Next MCP reported `issues: []`, `configErrors: []`, `sessionErrors: []`, and the route map includes `/dashboard`. T-15 reusable Playwright evidence and the T-11 auth/landing route remain intentionally deferred.
+
+Review gate: implementation review is pending on a fresh GPT-5.6-Sol medium agent before the task is closed and the next dependency graph is recomputed.
 
 Test contracts: `TST-LISTS-003`, `TST-TASKS-003`, `TST-UI-001`, `TST-E2E-003`.
 
 Dependencies: T-09, T-09B.
+
+Unblock condition: T-09 and T-09B are merged on `main`; T-10 is safely implementable without T-11, T-12A, or T-15. Completing T-10 and reviewing its changed tip should advance browser evidence for the four contracts and re-open the dependency graph for the next safe task.
 
 ### T-11: Build the public landing and auth screens
 

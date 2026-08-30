@@ -129,10 +129,10 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                | `partial`   |
 | [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration            | T-06, T-14                      | `partial`   |
 | [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14          | `verified`  |
-| [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14          | `partial`   |
+| [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14          | `verified`  |
 | [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09, T-14                | `verified`  |
 | [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14          | `verified`  |
-| [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14          | `partial`   |
+| [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14          | `verified`  |
 | [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                | `partial`   |
 | [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                      | `verified`  |
 | [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                            | `verified`  |
@@ -141,7 +141,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance              | T-09A, T-09B, T-10, T-11, T-12A | `partial`   |
 | [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                    | T-15                            | `specified` |
 | [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                    | T-15                            | `specified` |
-| [TST-E2E-003](#tst-e2e-003)                 | Browser-visible privacy, pagination, filtering, and mutation feedback work together  | Playwright Chromium, on-demand cross-browser           | T-10, T-12A, T-15               | `specified` |
+| [TST-E2E-003](#tst-e2e-003)                 | Browser-visible privacy, pagination, filtering, and mutation feedback work together  | Playwright Chromium, on-demand cross-browser           | T-10, T-12A, T-15               | `partial`   |
 | [TST-PERFORMANCE-001](#tst-performance-001) | Representative Neon queries use the intended indexes and meet the agreed warm target | Query plans and controlled performance evidence        | T-16                            | `verified`  |
 
 ## Test contracts
@@ -309,7 +309,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-LISTS-003 — Bounded and context-safe list pagination
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Lists
 - **Evidence layers/modes:** Application, infrastructure, boundary, UI / integration, contract, browser
 - **Verifies product decisions:** D-001, D-003
@@ -320,8 +320,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** List reads default to 20, accept 1–100, return oldest-first deterministic pages with opaque context-bound cursors, fetch at most `limit + 1` rows, and expose a next page only when one exists.
 - **Required evidence:** Application and PostgreSQL pagination tests, malformed/cross-context cursor and limit boundary tests, and a browser-visible `Load more` check.
 - **Dependencies:** T-04 indexes, T-06 repository/use case, T-08 shared pagination contract, and T-14 harness.
-- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. T-08 shared pagination tests cover default 20, accepted 1/100, invalid limits, blank and repeated URL parameters, and the stable page shape. The harness-backed PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, bounded `limit + 1` repository reads, and maximum-page continuation from 100 records to the 101st record. `src/modules/lists/presentation/list-entry.test.ts` proves the request-level paginated response shape and invalid-input mapping. T-10 browser `Load more` remains outstanding.
-- **Follow-up:** T-10 must verify browser-visible pagination before this contract can be `verified`.
+- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. T-08 shared pagination tests cover default 20, accepted 1/100, invalid limits, blank and repeated URL parameters, and the stable page shape. The harness-backed PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, bounded `limit + 1` repository reads, and maximum-page continuation from 100 records to the 101st record. `src/modules/lists/presentation/list-entry.test.ts` proves the request-level paginated response shape and invalid-input mapping. T-10's authenticated browser loop seeded disposable rows, observed a visible `Load more lists`, appended the remaining records without duplicate IDs, and preserved server order.
+- **Follow-up:** No remaining evidence is required for this baseline contract; reusable harness evidence remains owned by T-14 as recorded in the task ledger.
 
 <a id="tst-tasks-001"></a>
 
@@ -363,7 +363,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-TASKS-003 — Bounded task pagination and completed filtering
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Tasks
 - **Evidence layers/modes:** Application, infrastructure, boundary, UI / integration, contract, browser
 - **Verifies product decisions:** D-004
@@ -374,8 +374,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Task reads default to completed tasks included, support explicit hiding without changing stored state or the relative order of visible tasks, return newest-first deterministic bounded pages, and restart pagination when list or filter context changes.
 - **Required evidence:** Application and PostgreSQL filter/order/cursor tests, boundary validation tests, and a browser check for filtering and `Load more`.
 - **Dependencies:** T-07 task repository/use case, T-08 pagination contract, T-10 UI, and T-14 harness.
-- **Current evidence:** Task application/cursor tests cover default completed-task visibility, explicit filter validation, page limits, opaque cursor validation, and context mismatches. T-08 shared pagination tests cover the common default/maximum/invalid URL limit and cursor contract. The harness-backed PostgreSQL suite proves newest-first ordering, same-timestamp `createdAt`/`id` tie-breaking, continuation and terminal cursors, stable relative order after hiding `done`, cross-context cursor rejection, bounded `limit + 1` reads, and maximum-page continuation from 100 records to the 101st record. `src/modules/tasks/presentation/task-entry.test.ts` proves request-level filter/pagination validation and response mapping. T-10 browser `Load more`/filter evidence remains outstanding.
-- **Follow-up:** T-10 must verify browser-visible filtering and pagination before this contract can be `verified`.
+- **Current evidence:** Task application/cursor tests cover default completed-task visibility, explicit filter validation, page limits, opaque cursor validation, and context mismatches. T-08 shared pagination tests cover the common default/maximum/invalid URL limit and cursor contract. The harness-backed PostgreSQL suite proves newest-first ordering, same-timestamp `createdAt`/`id` tie-breaking, continuation and terminal cursors, stable relative order after hiding `done`, cross-context cursor rejection, bounded `limit + 1` reads, and maximum-page continuation from 100 records to the 101st record. `src/modules/tasks/presentation/task-entry.test.ts` proves request-level filter/pagination validation and response mapping. T-10's authenticated browser loop exercised completed-task hiding/showing, reset on list/filter context changes, a visible `Load more tasks`, and ordered continuation through the remaining seeded tasks.
+- **Follow-up:** No remaining evidence is required for this baseline contract; reusable harness evidence remains owned by T-14 as recorded in the task ledger.
 
 <a id="tst-concurrency-001"></a>
 
@@ -478,7 +478,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The selected UI direction remains recognizable in the materialized landing, auth, and dashboard surfaces, and the critical controls and states remain usable at the agreed viewports with keyboard reachability, visible focus, loading, empty, error, disabled, selected, long-content, and overflow behavior.
 - **Required evidence:** Fair prototype inspection during exploration, browser/runtime inspection during materialization, and focused browser acceptance for critical interactions. This is not a requirement for a complete React component unit-test matrix.
 - **Dependencies:** T-09A/T-09B design work and the implemented surfaces in T-10/T-11.
-- **Evidence:** T-09A's isolated static prototype uses one fixture and three materially different directions. Structural validation passes with exactly three manifests; Chromium Playwright inspection covers all directions at 1440x900, 1024x768, 768x1024, and 320x800 with zero console errors and no document overflow. Prototype evidence covers task/list capture, status changes, completed filtering, list switching, bounded continuation, keyboard-visible focus and search shortcuts, explicit final-list reload/Inbox recreation, loading/disabled, empty, validation-error, selected, and long-content states. T-09B selects Focus Rail based on the locked list-sidebar/task-panel contract, first-open comprehension, narrow-viewport evidence, and lower implementation complexity; [`handoff.md`](../../.ui-explorations/t09a-dashboard/handoff.md) records the rejected alternatives, reusable primitives, responsive/accessibility rules, and required state matrix. Materialized UI runtime/state evidence remains deferred to T-10/T-11/T-12A; T-15's end-to-end browser journeys remain under the separate `TST-E2E-*` contracts.
+- **Evidence:** T-09A's isolated static prototype uses one fixture and three materially different directions. Structural validation passes with exactly three manifests; Chromium Playwright inspection covers all directions at 1440x900, 1024x768, 768x1024, and 320x800 with zero console errors and no document overflow. Prototype evidence covers task/list capture, status changes, completed filtering, list switching, bounded continuation, keyboard-visible focus and search shortcuts, explicit final-list reload/Inbox recreation, loading/disabled, empty, validation-error, selected, and long-content states. T-09B selects Focus Rail based on the locked list-sidebar/task-panel contract, first-open comprehension, narrow-viewport evidence, and lower implementation complexity; [`handoff.md`](../../.ui-explorations/t09a-dashboard/handoff.md) records the rejected alternatives, reusable primitives, responsive/accessibility rules, and required state matrix. T-10 materializes the selected dashboard direction and its state matrix in Next.js: authenticated browser coverage exercised create/select/rename/delete, task capture/edit/status/delete, completed filtering, both cursor continuations, validation/conflict/recoverable states, final-list reload/Inbox recreation, keyboard focus return, and long-content wrapping. Axe reported zero violations at the authenticated dashboard route and the four agreed viewports had no horizontal overflow. Landing/auth materialization remains T-11's responsibility, and T-15's end-to-end browser journeys remain under the separate `TST-E2E-*` contracts.
 
 <a id="tst-e2e-001"></a>
 
@@ -515,7 +515,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-E2E-003 — Browser-visible capability behavior
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Authenticated product UI
 - **Evidence layers/modes:** UI, end-to-end / Playwright Chromium, on-demand cross-browser
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
@@ -526,6 +526,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The browser-visible dashboard preserves private ownership, list/task creation and mutation feedback, completed-task filtering, and visible cursor pagination with deterministic landing content.
 - **Required evidence:** Chromium Playwright scenarios against the local harness; Firefox and WebKit remain explicit on-demand compatibility evidence, not routine database-backed duplication.
 - **Dependencies:** T-10 dashboard, T-12A UI audit, and T-15 Playwright harness.
+- **Evidence:** T-10's authenticated Next.js browser loop covers the dashboard portion of this contract with private-session gating, mutation feedback, completed filtering, visible list/task cursor pagination, duplicate-safe continuation, and final-list reset behavior. Full contract status remains `partial` until T-12A's UI audit and T-15's reusable Playwright harness provide the required repeatable end-to-end evidence.
 
 <a id="tst-performance-001"></a>
 
