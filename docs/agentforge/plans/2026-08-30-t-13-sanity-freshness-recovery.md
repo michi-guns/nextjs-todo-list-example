@@ -2,7 +2,7 @@
 
 > AgentForge plan. This plan is accepted for implementation under the temporary reviewer-follow-through run context.
 
-**Status:** Accepted
+**Status:** Completed
 
 **Goal:** Make published landing-cache freshness recoverable through one server-only, idempotent invalidation service reached by a signature-verified Sanity webhook and an explicitly authorized manual recovery route.
 
