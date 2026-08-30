@@ -221,6 +221,8 @@ Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`.
 
 Evidence: `pnpm test` (6 unit tests), `pnpm test:integration` against disposable local PostgreSQL 18 (7 tests), and `pnpm exec drizzle-kit migrate` plus catalog inspection all pass. The auth contracts remain `partial` until T-09 adds private entry paths and T-15 records the required Chromium journeys.
 
+PR: [#7](https://github.com/michi-guns/nextjs-todo-list-example/pull/7) | commit `196aaa0`
+
 Dependencies: T-03, T-03A.
 
 ## Checkpoint: foundations
