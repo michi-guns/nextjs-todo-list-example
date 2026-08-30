@@ -6,6 +6,9 @@ allowBuilds:
   msw: false
   esbuild: true
   agent-browser: true
+  cpu-features: false
+  protobufjs: false
+  ssh2: false
 
 minimumReleaseAgeExclude:
   - '@better-auth/core@1.7.1'

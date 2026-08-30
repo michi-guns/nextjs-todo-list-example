@@ -55,6 +55,7 @@
     "@playwright/cli": "^0.1.18",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
+    "@testcontainers/postgresql": "12.1.0",
     "@types/node": "^26.2.0",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
