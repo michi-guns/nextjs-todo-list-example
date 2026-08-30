@@ -86,6 +86,15 @@ describe("mapSanityLandingDocument", () => {
     )
   })
 
+  it("rejects an incomplete payload missing a required field", () => {
+    const payload = { ...landingPageFixture } as Record<string, unknown>
+    delete payload.primaryCtaLabel
+
+    expect(() => mapSanityLandingDocument(payload)).toThrow(
+      "Invalid Sanity landingPage payload"
+    )
+  })
+
   it("maps content returned by the repository's published-read port", async () => {
     const repository = createSanityLandingContentRepository(
       async () => landingPageFixture

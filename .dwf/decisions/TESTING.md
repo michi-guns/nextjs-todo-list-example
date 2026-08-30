@@ -405,7 +405,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Unknown Sanity payloads are validated and mapped into a plain landing view model; optional fields remain optional; missing or invalid required content fails explicitly; raw provider records do not cross the infrastructure boundary.
 - **Required evidence:** Local fixture tests for valid, optional, malformed, and incomplete payloads and mapping failures.
 - **Dependencies:** T-02 Sanity resource and T-12 landing read path.
-- **Evidence:** `pnpm test` passed with 4 test files and 18 tests, including `src/modules/landing/infrastructure/sanity-landing-repository.test.ts` and `src/sanity/config.test.ts`. The fixtures cover valid unknown payloads, optional omission/null, malformed required/optional fields, missing payload, identity mismatch, provider-field isolation, and the stable query/cache-tag boundary.
+- **Evidence:** `pnpm test` passed with 4 test files and 19 tests, including `src/modules/landing/infrastructure/sanity-landing-repository.test.ts` and `src/sanity/config.test.ts`. The fixtures cover valid unknown payloads, optional omission/null, malformed required/optional fields, missing payload, incomplete required content, identity mismatch, provider-field isolation, and the stable query/cache-tag boundary.
 
 <a id="tst-landing-002"></a>
 
