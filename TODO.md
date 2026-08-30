@@ -520,7 +520,7 @@ Plan: [`2026-08-30-t-14-postgresql-harness.md`](docs/agentforge/plans/2026-08-30
 
 Evidence: `pnpm test` (15 files, 67 tests), `pnpm test:integration` without `TEST_DATABASE_URL` (6 files, 23 tests against one disposable `postgres:18-alpine` Testcontainer), `pnpm typecheck`, `pnpm lint` (one pre-existing `Geist` warning), `pnpm build`, `pnpm exec drizzle-kit check`, `pnpm exec drizzle-kit generate` (no schema changes), changed-file Prettier checks, and `git diff --check` all pass. Harness tests cover local URL refusal, migration splitting, startup-failure reporting, migration-failure cleanup, teardown, PostgreSQL 18 catalog visibility, and isolated schemas. The remaining live Docker-daemon outage and Playwright lifecycle evidence belong to T-15; Neon development-branch migration alignment remains with T-01. No migration files or snapshots changed.
 
-PR: [#13](https://github.com/michi-guns/nextjs-todo-list-example/pull/13) | implementation tip `ce8c4dc` received a fresh GPT-5.6-Sol review with no actionable findings; closeout tip review is required before merge.
+PR: [#13](https://github.com/michi-guns/nextjs-todo-list-example/pull/13) | implementation tip `ce8c4dc`, closeout tip `29d0343`, formatting tip `fbe3948`, and checkpoint tip `dadcd68` received fresh GPT-5.6-Sol reviews with no actionable findings; merged as `df974b9`.
 
 ### T-15: Replace the example Playwright suite
 
