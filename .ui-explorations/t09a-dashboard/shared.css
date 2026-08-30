@@ -2,7 +2,7 @@
   color-scheme: light;
   --ink: #18211f;
   --muted: #64706c;
-  --subtle: #87918d;
+  --subtle: #5f6c65;
   --line: #dce3df;
   --line-strong: #c5d0ca;
   --surface: #ffffff;
@@ -533,7 +533,7 @@ h3 {
 
 .field::placeholder,
 .textarea::placeholder {
-  color: #96a19b;
+  color: #617069;
 }
 
 .field:focus,
@@ -690,6 +690,10 @@ h3 {
   display: block;
   margin-bottom: 4px;
   color: var(--ink);
+}
+
+.state-card .button {
+  margin-top: 14px;
 }
 
 .state-card.error {

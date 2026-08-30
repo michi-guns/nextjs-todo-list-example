@@ -109,9 +109,8 @@ function renderListManager(state) {
 
 function renderListSelect(state, includeAll = false) {
   const selected = state.selectedListId
-  return `<label class="toolbar-group"><span class="toolbar-label">List</span><select class="select" data-action="scope-list" aria-label="Choose a list" ${state.loading ? "disabled" : ""}>
-    ${includeAll ? `<option value="all" ${selected === "all" ? "selected" : ""}>All lists</option>` : ""}
-    ${state.lists.map((list) => `<option value="${escapeHtml(list.id)}" ${list.id === selected ? "selected" : ""}>${escapeHtml(list.name)}</option>`).join("")}
+  return `<label class="toolbar-group"><span class="toolbar-label">List</span><select class="select" data-action="scope-list" aria-label="Choose a list" ${state.loading || !state.lists.length ? "disabled" : ""}>
+    ${!state.lists.length ? `<option value="" selected>No lists yet</option>` : `${includeAll ? `<option value="all" ${selected === "all" ? "selected" : ""}>All lists</option>` : ""}${state.lists.map((list) => `<option value="${escapeHtml(list.id)}" ${list.id === selected ? "selected" : ""}>${escapeHtml(list.name)}</option>`).join("")}`}
   </select></label>`
 }
 
@@ -144,6 +143,10 @@ function renderTaskList(state, tasks, emptyTitle, emptyCopy) {
   return `<div class="task-list">${tasks.map((task) => renderTaskRow(state, task)).join("")}</div>`
 }
 
+function renderReloadState() {
+  return `<div class="state-card workspace-reload" role="status"><div><strong>This workspace has no lists</strong><span>Inbox will be recreated when the workspace loads again.</span><button class="button primary" type="button" data-action="reload-workspace">Reload workspace</button></div></div>`
+}
+
 function renderError(state) {
   return state.error && !state.listFormMode
     ? `<div class="state-card error" role="alert"><div><strong>That action needs attention</strong><span>${escapeHtml(state.error)}</span></div></div>`
@@ -160,11 +163,11 @@ function renderFocus(state) {
     <header class="page-header"><div><p class="eyebrow">Direction 01 · focused queue</p><h1>Focus Rail</h1><p class="lede">One selected list, one calm queue, and progressive detail for people who want to know what matters next.</p></div><div class="header-actions"><button class="button" type="button" data-action="simulate-loading"${pending}>↻ Refresh preview</button><a class="button ghost" href="../status-board/index.html">Next direction →</a></div></header>
     <div class="shell rail-shell" aria-busy="${state.loading}">${renderTopbar(state, "Focus Rail")}<div class="shell-body">${renderListRail(state)}<section class="workspace" aria-labelledby="focus-title">
       <div class="workspace-heading"><div><p class="eyebrow">Private workspace</p><h2 id="focus-title">${escapeHtml(list?.name ?? "Choose a list")}</h2><p>${allTasks.length} visible task${allTasks.length === 1 ? "" : "s"} · the next action stays close.</p></div><span class="status-chip in_progress">${list ? "Selected" : "No list"}</span></div>
-      <form class="capture-form with-notes" data-form="task"><label class="sr-only" for="focus-task-title">Task title</label><input class="field" id="focus-task-title" name="title" maxlength="160" aria-required="true" placeholder="Capture a task…"${pending} /><label class="sr-only" for="focus-task-notes">Optional note</label><input class="field" id="focus-task-notes" name="notes" maxlength="2000" placeholder="Optional note"${pending} /><button class="button primary" type="submit"${pending}>Add task</button></form>
+      <form class="capture-form with-notes" data-form="task"><label class="sr-only" for="focus-task-title">Task title</label><input class="field" id="focus-task-title" name="title" maxlength="200" aria-required="true" placeholder="Capture a task…"${pending} /><label class="sr-only" for="focus-task-notes">Optional note</label><input class="field" id="focus-task-notes" name="notes" maxlength="5000" placeholder="Optional note"${pending} /><button class="button primary" type="submit"${pending}>Add task</button></form>
       ${renderError(state)}
       <div class="toolbar"><span class="toolbar-label">Your queue</span><div class="toolbar-group"><label class="toggle"><input type="checkbox" data-action="toggle-completed" ${state.showCompleted ? "checked" : ""}${pending} /> Show completed</label><button class="button ghost" type="button" data-action="simulate-loading"${pending}>Refresh</button></div></div>
-      ${renderTaskList(state, tasks, "This list is clear", state.showCompleted ? "Capture the next useful action above." : "Completed tasks are hidden for this view.")}
-      ${canLoadMore ? `<button class="button load-more" type="button" data-action="load-more">${escapeHtml(state.continuationLabel)}</button><p class="helper-note">Showing ${tasks.length} of ${allTasks.length} visible tasks · bounded page ${state.page}.</p>` : `<p class="helper-note">Showing ${tasks.length} of ${allTasks.length} visible tasks · end of this page set.</p>`}
+      ${state.lists.length === 0 ? renderReloadState() : renderTaskList(state, tasks, "This list is clear", state.showCompleted ? "Capture the next useful action above." : "Completed tasks are hidden for this view.")}
+      ${state.lists.length === 0 ? "" : canLoadMore ? `<button class="button load-more" type="button" data-action="load-more">${escapeHtml(state.continuationLabel)}</button><p class="helper-note">Showing ${tasks.length} of ${allTasks.length} visible tasks · bounded page ${state.page}.</p>` : `<p class="helper-note">Showing ${tasks.length} of ${allTasks.length} visible tasks · end of this page set.</p>`}
       <details class="danger-zone"><summary>Destructive actions keep their meaning</summary><div class="danger-zone-content"><span>Deleting a list also removes its tasks in the real application.</span><button class="button ghost danger" type="button" data-action="delete-list">Delete selected list</button></div></details>
     </section></div></div>
     <p class="comparison-note"><strong>Hypothesis:</strong> a persistent rail keeps list context visible while the single queue reduces decision fatigue. Trade-off: comparing several statuses requires more navigation.</p>
@@ -185,18 +188,20 @@ function renderBoard(state) {
     <header class="page-header"><div><p class="eyebrow">Direction 02 · state visibility</p><h1>Status Board</h1><p class="lede">Three lanes turn task status into the organizing principle, making work in progress visible at a glance.</p></div><div class="header-actions"><button class="button" type="button" data-action="simulate-loading"${pending}>↻ Refresh preview</button><a class="button ghost" href="../command-inspector/index.html">Next direction →</a></div></header>
     <div class="shell board-shell" aria-busy="${state.loading}">${renderTopbar(state, "Status Board")}<div class="shell-body"><section class="workspace status-board" aria-labelledby="board-title">
       <div class="board-toolbar"><div><p class="eyebrow">Selected list</p><h2 id="board-title">${escapeHtml(list?.name ?? "Choose a list")}</h2><p class="muted">Move the work across lanes without opening a second context.</p></div>${renderListSelect(state)}${renderListManager(state)}</div>
-      <form class="capture-form with-notes" data-form="task"><label class="sr-only" for="board-task-title">Task title</label><input class="field" id="board-task-title" name="title" maxlength="160" aria-required="true" placeholder="Add a task to this list…"${pending} /><label class="sr-only" for="board-task-notes">Optional note</label><input class="field" id="board-task-notes" name="notes" maxlength="2000" placeholder="Optional note"${pending} /><button class="button primary" type="submit"${pending}>Add task</button></form>
+      <form class="capture-form with-notes" data-form="task"><label class="sr-only" for="board-task-title">Task title</label><input class="field" id="board-task-title" name="title" maxlength="200" aria-required="true" placeholder="Add a task to this list…"${pending} /><label class="sr-only" for="board-task-notes">Optional note</label><input class="field" id="board-task-notes" name="notes" maxlength="5000" placeholder="Optional note"${pending} /><button class="button primary" type="submit"${pending}>Add task</button></form>
       ${renderError(state)}
       <div class="toolbar"><span class="toolbar-label">${tasks.length} of ${allTasks.length} visible tasks</span><div class="toolbar-group"><label class="toggle"><input type="checkbox" data-action="toggle-completed" ${state.showCompleted ? "checked" : ""}${pending} /> Show completed</label><button class="button ghost" type="button" data-action="simulate-loading"${pending}>Refresh</button></div></div>
       ${
         state.loading
           ? `<div class="state-card loading" role="status"><div><strong>Loading board…</strong><span>Preserving the selected list and lane positions.</span></div></div>`
-          : `<div class="board-grid">${STATUS_ORDER.map((status) => {
-              const laneTasks = tasks.filter((task) => task.status === status)
-              return `<section class="board-lane ${status}" aria-labelledby="lane-${status}"><div class="lane-heading"><h3 id="lane-${status}">${statusLabel(status)}</h3><span class="count-chip">${laneTasks.length}</span></div><div class="lane-cards">${laneTasks.length ? laneTasks.map((task) => renderBoardTask(state, task)).join("") : `<p class="board-empty">${status === "done" && !state.showCompleted ? "Completed hidden" : "No tasks here yet"}</p>`}</div></section>`
-            }).join("")}</div>`
+          : state.lists.length === 0
+            ? renderReloadState()
+            : `<div class="board-grid">${STATUS_ORDER.map((status) => {
+                const laneTasks = tasks.filter((task) => task.status === status)
+                return `<section class="board-lane ${status}" aria-labelledby="lane-${status}"><div class="lane-heading"><h3 id="lane-${status}">${statusLabel(status)}</h3><span class="count-chip">${laneTasks.length}</span></div><div class="lane-cards">${laneTasks.length ? laneTasks.map((task) => renderBoardTask(state, task)).join("") : `<p class="board-empty">${status === "done" && !state.showCompleted ? "Completed hidden" : "No tasks here yet"}</p>`}</div></section>`
+              }).join("")}</div>`
       }
-      ${canLoadMore ? `<button class="button load-more" type="button" data-action="load-more">${escapeHtml(state.continuationLabel)}</button>` : `<p class="helper-note">End of this page set · changing the list or filter resets pagination.</p>`}
+      ${state.lists.length === 0 ? "" : canLoadMore ? `<button class="button load-more" type="button" data-action="load-more">${escapeHtml(state.continuationLabel)}</button>` : `<p class="helper-note">End of this page set · changing the list or filter resets pagination.</p>`}
       <details class="danger-zone"><summary>Destructive actions keep their meaning</summary><div class="danger-zone-content"><span>Deleting a list also removes its tasks in the real application.</span><button class="button ghost danger" type="button" data-action="delete-list">Delete selected list</button></div></details>
     </section></div></div>
     <p class="comparison-note"><strong>Hypothesis:</strong> status lanes optimize throughput and state visibility. Trade-off: the dense three-column model creates horizontal pressure on narrow screens.</p>
@@ -230,7 +235,7 @@ function renderInspector(state, task) {
   const list = state.lists.find((item) => item.id === task.listId)
   return `<aside class="inspector" aria-labelledby="inspector-title"><div class="inspector-heading"><div><p class="eyebrow">Task inspector</p><h2 id="inspector-title">${escapeHtml(task.title)}</h2><p class="muted">${escapeHtml(list?.name ?? "Unknown list")}</p></div><button class="icon-button" type="button" data-action="delete-task" data-task-id="${escapeHtml(task.id)}" aria-label="Delete task" title="Delete task">×</button></div>
     <div class="inspector-section"><span class="inspector-label">Status</span>${renderTaskStatusSelect(task)}</div>
-    <div class="inspector-section"><span class="inspector-label">Notes</span><form data-form="note"><label class="sr-only" for="inspector-notes">Task notes</label><textarea class="textarea" id="inspector-notes" name="notes" maxlength="2000" placeholder="Add context">${escapeHtml(task.notes ?? "")}</textarea><button class="button primary" type="submit">Save note</button></form></div>
+    <div class="inspector-section"><span class="inspector-label">Notes</span><form data-form="note" data-task-id="${escapeHtml(task.id)}"><label class="sr-only" for="inspector-notes">Task notes</label><textarea class="textarea" id="inspector-notes" name="notes" maxlength="5000" placeholder="Add context">${escapeHtml(task.notes ?? "")}</textarea><button class="button primary" type="submit">Save note</button></form></div>
     <div class="inspector-section"><span class="inspector-label">Context</span><p class="inspector-value">Private task · changes stay in this prototype fixture.</p></div>
   </aside>`
 }
@@ -252,11 +257,11 @@ function renderCommand(state) {
       <div class="command-layout"><div class="command-spine"><div class="command-header"><div><p class="eyebrow">Command spine</p><h2 id="command-title">Find or capture</h2></div><span class="command-key">⌘ K</span></div>
         <div class="command-search"><span aria-hidden="true">⌕</span><label class="sr-only" for="command-query">Search tasks</label><input class="field" id="command-query" name="query" data-action="scope-search" value="${escapeHtml(state.query)}" placeholder="Search tasks and notes…" autocomplete="off"${pending} /><span class="command-key">/</span></div>
         <div class="command-filter-row">${renderListSelect(state, true)}<label class="toggle"><input type="checkbox" data-action="toggle-completed" ${state.showCompleted ? "checked" : ""}${pending} /> Show completed</label></div>
-        <form class="capture-form with-notes" data-form="task"><label class="sr-only" for="command-task-title">Task title</label><input class="field" id="command-task-title" name="title" maxlength="160" aria-required="true" placeholder="Capture a task…"${pending} /><label class="sr-only" for="command-task-notes">Optional note</label><input class="field" id="command-task-notes" name="notes" maxlength="2000" placeholder="Optional note"${pending} /><button class="button primary" type="submit"${pending}>Capture</button></form>
+        <form class="capture-form with-notes" data-form="task"><label class="sr-only" for="command-task-title">Task title</label><input class="field" id="command-task-title" name="title" maxlength="200" aria-required="true" placeholder="Capture a task…"${pending} /><label class="sr-only" for="command-task-notes">Optional note</label><input class="field" id="command-task-notes" name="notes" maxlength="5000" placeholder="Optional note"${pending} /><button class="button primary" type="submit"${pending}>Capture</button></form>
         ${renderError(state)}
         <div class="section-heading"><div><h3>Results</h3><p class="muted">${matches.length} matching task${matches.length === 1 ? "" : "s"} · local search simulation</p></div>${renderListManager(state)}</div>
-        ${state.loading ? `<div class="state-card loading" role="status"><div><strong>Refreshing index…</strong><span>Keeping the current query and inspector selection.</span></div></div>` : matches.length ? `<div class="result-list">${tasks.map((task) => renderResultItem(state, task)).join("")}</div>` : `<div class="state-card"><div><strong>No matching tasks</strong><span>Try another term or capture a new task above.</span></div></div>`}
-        ${canLoadMore ? `<button class="button load-more" type="button" data-action="load-more">${escapeHtml(state.continuationLabel)}</button>` : `<p class="helper-note">${matches.length ? "End of this page set." : "Search is ready for a new task."}</p>`}
+        ${state.loading ? `<div class="state-card loading" role="status"><div><strong>Refreshing index…</strong><span>Keeping the current query and inspector selection.</span></div></div>` : state.lists.length === 0 ? renderReloadState() : matches.length ? `<div class="result-list">${tasks.map((task) => renderResultItem(state, task)).join("")}</div>` : `<div class="state-card"><div><strong>No matching tasks</strong><span>Try another term or capture a new task above.</span></div></div>`}
+        ${state.lists.length === 0 ? "" : canLoadMore ? `<button class="button load-more" type="button" data-action="load-more">${escapeHtml(state.continuationLabel)}</button>` : `<p class="helper-note">${matches.length ? "End of this page set." : "Search is ready for a new task."}</p>`}
       </div>${renderInspector(state, selectedTask)}</div>
       <details class="danger-zone"><summary>Destructive actions keep their meaning</summary><div class="danger-zone-content"><span>Deleting a task is explicit and removes it from the private fixture.</span><button class="button ghost danger" type="button" data-action="delete-task" data-task-id="${escapeHtml(selectedTask?.id ?? "")}" ${selectedTask ? "" : "disabled"}>Delete selected task</button></div></details>
     </section></div></div>
@@ -349,19 +354,28 @@ function handleClick(event, root, state) {
   } else if (action === "delete-list") {
     const list = currentList(state)
     if (!list) setError(state, "There is no selected list to delete.")
-    else if (state.lists.length === 1)
-      setError(
-        state,
-        "Keep one list available so the workspace has a destination."
-      )
     else if (window.confirm(`Delete “${list.name}” and its tasks?`)) {
       state.lists = state.lists.filter((item) => item.id !== list.id)
       state.tasks = state.tasks.filter((task) => task.listId !== list.id)
-      state.selectedListId = state.lists[0].id
-      state.selectedTaskId =
-        tasksForList(state, state.selectedListId)[0]?.id ?? ""
+      state.selectedListId = state.lists[0]?.id ?? ""
+      state.selectedTaskId = state.selectedListId
+        ? (tasksForList(state, state.selectedListId)[0]?.id ?? "")
+        : ""
       resetPaging(state)
-      state.toast = `Deleted ${list.name}.`
+      state.workspaceNeedsReload = state.lists.length === 0
+      state.toast = state.workspaceNeedsReload
+        ? `Deleted ${list.name}. Inbox will be recreated on the next workspace load.`
+        : `Deleted ${list.name}.`
+      clearTransient(state)
+    }
+  } else if (action === "reload-workspace") {
+    if (!state.lists.length && state.workspaceNeedsReload) {
+      state.lists.push({ id: "inbox", name: "Inbox", count: 0 })
+      state.selectedListId = "inbox"
+      state.selectedTaskId = ""
+      state.workspaceNeedsReload = false
+      resetPaging(state)
+      state.toast = "Inbox was recreated on workspace load."
       clearTransient(state)
     }
   } else if (action === "toggle-task") {
@@ -472,13 +486,16 @@ function handleSubmit(event, root, state) {
       state.lists.push({ id, name })
       state.selectedListId = id
       state.selectedTaskId = ""
+      state.workspaceNeedsReload = false
       state.listFormMode = ""
       resetPaging(state)
       state.toast = `Created ${name}.`
       clearTransient(state)
     }
   } else if (form.dataset.form === "note") {
-    const task = state.tasks.find((item) => item.id === state.selectedTaskId)
+    const task = state.tasks.find(
+      (item) => item.id === (form.dataset.taskId ?? state.selectedTaskId)
+    )
     if (task) {
       task.notes = getFormValue(form, "notes") || null
       state.toast = "Saved the task note."
@@ -495,7 +512,7 @@ export function bootstrap() {
   const data = cloneFixture()
   const state = {
     ...data,
-    selectedListId: direction === "command-inspector" ? "all" : "launch-week",
+    selectedListId: "launch-week",
     selectedTaskId: "task-audit",
     showCompleted: true,
     page: 1,
@@ -508,6 +525,7 @@ export function bootstrap() {
     listFormMode: "",
     nextTaskNumber: 1,
     nextListNumber: 1,
+    workspaceNeedsReload: false,
   }
   root.dataset.direction = direction
   root.addEventListener("click", (event) => handleClick(event, root, state))

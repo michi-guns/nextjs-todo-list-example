@@ -6,9 +6,9 @@
     "email": "jordan@example.test"
   },
   "lists": [
-    { "id": "inbox", "name": "Inbox", "count": 7 },
-    { "id": "launch-week", "name": "Launch week", "count": 12 },
-    { "id": "home-reset", "name": "Home reset — long label", "count": 4 }
+    { "id": "inbox", "name": "Inbox", "count": 4 },
+    { "id": "launch-week", "name": "Launch week", "count": 6 },
+    { "id": "home-reset", "name": "Home reset — long label", "count": 2 }
   ],
   "tasks": [
     {

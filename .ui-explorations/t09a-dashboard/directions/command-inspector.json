@@ -4,6 +4,10 @@
   "hypothesis": "A global capture/search spine plus a contextual inspector makes rapid re-entry and keyboard-oriented editing faster than browsing a hierarchy.",
   "optimize_for": "fast retrieval, continuity, and direct manipulation",
   "tradeoff": "The model is less discoverable for users who prefer visible browse-first navigation and can make empty search states feel stark.",
+  "surface_extensions": {
+    "landing": "Borrow the direct capture and retrieval metaphor for a decisive public CTA, but do not expose global task search before sign-in.",
+    "auth": "Make keyboard-first focus order and recovery actions prominent; keep command shortcuts and private data out until the user is authenticated."
+  },
   "fixture_id": "t09a-shared-workspace-fixture",
   "prototype": "directions/command-inspector/index.html",
   "axes": {

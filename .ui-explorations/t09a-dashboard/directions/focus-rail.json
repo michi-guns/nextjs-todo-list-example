@@ -4,6 +4,10 @@
   "hypothesis": "A persistent list rail and one calm task queue help occasional users see the next useful action without losing private-list context.",
   "optimize_for": "comprehension, confidence, and low cognitive load",
   "tradeoff": "Less simultaneous status context and more navigation when comparing several lists.",
+  "surface_extensions": {
+    "landing": "Carry the calm next-action hierarchy into a public landing page with one clear sign-up CTA; do not expose private list controls or task data.",
+    "auth": "Use spacious single-column sign-up, sign-in, and magic-link recovery forms with the focus accent and the same visible focus treatment."
+  },
   "fixture_id": "t09a-shared-workspace-fixture",
   "prototype": "directions/focus-rail/index.html",
   "axes": {

@@ -342,7 +342,7 @@ PR: [#14](https://github.com/michi-guns/nextjs-todo-list-example/pull/14) | revi
 ### T-09A: Explore and prototype UI directions
 
 - [~] Implement the accepted plan in [`docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md`](docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md).
-- [x] Define the locked product constraints, critical user scenarios, representative data, target viewports, and free UI dimensions for the landing, auth, and dashboard surfaces.
+- [x] Define the locked product constraints, critical user scenarios, representative data, target viewports, and free UI dimensions for the dashboard, with landing/auth extension notes and locked journeys.
 - [x] Produce three materially different UI directions based on different information-architecture or interaction hypotheses, not cosmetic variations.
 - [x] Prototype the critical scenario with the same realistic fixture data while keeping each direction isolated, removable, and independent of backend or schema changes.
 - [x] Render and inspect each direction for hierarchy, density, overflow, focus, selected, disabled, error, empty, and responsive states where relevant.

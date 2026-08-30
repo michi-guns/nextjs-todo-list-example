@@ -4,6 +4,10 @@
   "hypothesis": "A three-lane status board makes work-in-progress visible and turns status changes into the primary flow for frequent task managers.",
   "optimize_for": "throughput, scanability, and state visibility",
   "tradeoff": "Higher density and horizontal pressure make narrow-screen reading and list-level context harder.",
+  "surface_extensions": {
+    "landing": "Carry a structured proof-and-status rhythm into the public landing without presenting a board or private records; keep the primary CTA prominent.",
+    "auth": "Use compact, step-oriented authentication forms with clear progress and error grouping while keeping provider payloads out of UI-facing types."
+  },
   "fixture_id": "t09a-shared-workspace-fixture",
   "prototype": "directions/status-board/index.html",
   "axes": {

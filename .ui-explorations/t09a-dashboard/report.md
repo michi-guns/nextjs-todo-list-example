@@ -8,6 +8,10 @@ Every prototype uses [`fixture.json`](./fixture.json) and the same in-memory int
 
 The fixture deliberately includes mixed statuses, a long list label, long titles and notes, an empty newly created list, and enough records to make the `Load 3 more` continuation meaningful. The prototypes do not call the application API, mutate the schema, add a route, or add a dependency.
 
+## Surface scope
+
+This spike materializes the authenticated dashboard journey only. The landing and authentication surfaces are intentionally extension notes, not interactive prototypes: their locked journeys remain Sanity-backed landing rendering with links into sign-up/sign-in, plus sign-up, sign-in, magic-link request/consume, and sign-out. The direction manifests record how each dashboard hypothesis should carry into those surfaces without exposing private task controls or provider payloads. T-11 remains the implementation owner for landing/auth screens, and T-09B remains the owner for choosing the direction they should inherit.
+
 ## Directions
 
 | Direction                                                      | Primary hypothesis                                                                                    | Optimizes for                                               | Material trade-off                                                                            |
