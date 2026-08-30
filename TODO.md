@@ -283,7 +283,7 @@ Dependencies: T-04, T-05, T-06.
 
 Evidence: `pnpm test` (12 files, 57 tests), `TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/todo_test pnpm test:integration` (5 files, 19 tests against disposable `postgres:18-alpine`), `pnpm typecheck`, `pnpm lint` (zero errors and the one pre-existing `Geist` warning), `pnpm build`, both Drizzle checks, and `git diff --check` all pass. The task tests prove framework-independent normalization, status transitions including repeated-status timestamp idempotence, privacy-preserving list reads, ownership, uniqueness, pagination/filtering, cascade, and controlled concurrent writes. No migration was needed because T-07 consumes the existing schema. `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, and `TST-CONCURRENCY-001` are `partial`; T-08/T-09 boundary evidence, T-10/T-15 browser evidence, and T-14 reusable-harness evidence remain deferred.
 
-PR: [#11](https://github.com/michi-guns/nextjs-todo-list-example/pull/11) | final reviewed tip `2253724` | fresh GPT-5.6-Sol review returned no actionable findings.
+PR: [#11](https://github.com/michi-guns/nextjs-todo-list-example/pull/11) | implementation tip `2253724` received no actionable findings; closeout metadata is maintained on the current PR tip.
 
 ### T-08: Add shared pagination and error contracts
 
