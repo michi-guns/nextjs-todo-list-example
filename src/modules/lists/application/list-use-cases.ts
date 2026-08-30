@@ -1,4 +1,5 @@
 import type { List } from "../domain/list"
+import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT } from "../../../shared/pagination"
 import {
   InvalidListNameError,
   InvalidPageRequestError,
@@ -6,9 +7,6 @@ import {
   ListNotFoundError,
 } from "../domain/list-errors"
 import type { ListRepository, Page, PageRequest } from "./list-repository"
-
-const DEFAULT_PAGE_LIMIT = 20
-const MAX_PAGE_LIMIT = 100
 
 export function normalizeListName(name: string): string {
   if (typeof name !== "string") {

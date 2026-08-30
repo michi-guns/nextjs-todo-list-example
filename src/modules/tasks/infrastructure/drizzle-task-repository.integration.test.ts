@@ -39,6 +39,10 @@ function quoteIdentifier(identifier: string) {
   return `"${identifier.replaceAll('"', '""')}"`
 }
 
+function fixtureUuid(sequence: number) {
+  return `0198f2c0-3a6b-7000-8000-${sequence.toString(16).padStart(12, "0")}`
+}
+
 async function applyMigration(client: PoolClient, migrationSql: string) {
   const statements = migrationSql
     .split(/--> statement-breakpoint\s*/)
@@ -527,5 +531,56 @@ describe.sequential("Drizzle task repository", () => {
         .from(tasksTable)
         .where(eq(tasksTable.id, task.id))
     ).resolves.toEqual([])
+  })
+
+  it("continues correctly at the maximum page size", async () => {
+    const userId = `t08-task-max-page-${Date.now()}`
+    const listId = fixtureUuid(0x400)
+    await database.insert(usersTable).values({
+      id: userId,
+      name: "T-08 Maximum Task Page User",
+      email: `${userId}@example.test`,
+    })
+    await database.insert(listsTable).values({
+      id: listId,
+      userId,
+      name: "Maximum task page",
+    })
+
+    const createdAt = new Date("2026-08-30T13:05:00.000Z")
+    const taskRows = Array.from({ length: 101 }, (_, index) => ({
+      id: fixtureUuid(0x500 + index),
+      userId,
+      listId,
+      title: `Maximum page task ${index}`,
+      notes: null,
+      status: "todo" as const,
+      createdAt,
+      updatedAt: createdAt,
+    }))
+    await database.insert(tasksTable).values(taskRows)
+
+    const repository = createDrizzleTaskRepository(database)
+    const firstPage = await repository.listByOwnedList(userId, listId, {
+      limit: 100,
+      includeCompleted: true,
+    })
+    if (firstPage === "list_not_found") {
+      throw new Error("expected the owned list to return a task page")
+    }
+    expect(firstPage.items).toHaveLength(100)
+    expect(firstPage.nextCursor).toEqual(expect.any(String))
+
+    const secondPage = await repository.listByOwnedList(userId, listId, {
+      cursor: firstPage.nextCursor!,
+      limit: 100,
+      includeCompleted: true,
+    })
+    if (secondPage === "list_not_found") {
+      throw new Error("expected the owned list to return a task page")
+    }
+    expect(secondPage.items).toHaveLength(1)
+    expect(secondPage.items[0]?.title).toBe("Maximum page task 0")
+    expect(secondPage.nextCursor).toBeNull()
   })
 })

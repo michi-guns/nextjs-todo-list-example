@@ -1,14 +1,7 @@
 import type { List, ListId, UserId } from "../domain/list"
+import type { Page, PageRequest } from "../../../shared/pagination"
 
-export interface PageRequest {
-  readonly cursor?: string
-  readonly limit?: number
-}
-
-export interface Page<T> {
-  readonly items: readonly T[]
-  readonly nextCursor: string | null
-}
+export type { Page, PageRequest } from "../../../shared/pagination"
 
 export interface ListRepository {
   listByUser(userId: UserId, page: PageRequest): Promise<Page<List>>
