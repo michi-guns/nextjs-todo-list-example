@@ -653,6 +653,8 @@ Plan: [`docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md`](docs/agent
 Implementation scope and interfaces:
 
 - `playwright.config.ts` and `e2e/global-setup.ts` own the fixed loopback base URL, serial browser projects, lifecycle startup/readiness, inherited test environment, and cleanup; they consume `startPostgresHarness()` rather than duplicating Testcontainers logic.
+- `next.config.ts` selects the ignored `.next-playwright` build directory only under `PLAYWRIGHT_E2E=true`, allowing the dedicated test server to coexist safely with an unrelated default Next dev server.
+- `eslint.config.mjs` ignores the generated `.next-playwright` directory so the standard lint gate remains source-only.
 - `scripts/playwright-local/seed.ts` owns the explicit Better Auth-backed users and parameterized deterministic lists/tasks; `scripts/playwright-local/run.ts` owns the cross-browser project-selection wrapper.
 - `e2e/fixtures.ts` and the journey specs own stable labels/selectors and browser outcomes only; they do not import provider records, credentials, or application database internals beyond the ignored local mailbox reader.
 - `src/modules/landing/infrastructure/sanity-landing-reader.ts` receives only a `PLAYWRIGHT_E2E=true` + non-production fixture branch; the normal Sanity path and all domain/persistence/migration behavior remain unchanged.

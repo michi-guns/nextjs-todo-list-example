@@ -86,6 +86,11 @@ Chromium-only.
 - `playwright.config.ts` has no base URL, lifecycle, or browser-selection
   policy; it will gain global setup, the fixed local base URL, serial execution,
   and Chromium-first projects.
+- `next.config.ts` will use the ignored `.next-playwright` directory only when
+  `PLAYWRIGHT_E2E=true`, so the dedicated test server does not contend with an
+  unrelated development server's default `.next` lock.
+- `eslint.config.mjs` ignores that generated test directory so routine linting
+  only evaluates checked-in source.
 - `src/test/postgres-harness.ts` already starts PostgreSQL 18, applies every
   committed migration, rejects external URLs, and stops partially started
   containers; T-15 must consume this interface rather than duplicate it.
