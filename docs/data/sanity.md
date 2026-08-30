@@ -27,6 +27,10 @@ Fetch and validate Sanity documents in infrastructure, then map them to a landin
 
 Published landing reads use one stable cache identity. A signature-verified Sanity webhook automatically calls the server-only invalidation service for relevant published singleton changes. A separately authorized manual recovery mechanism calls that same idempotent service when automatic delivery or cache state needs intervention.
 
+The webhook endpoint is `POST /api/sanity/webhook`. It requires the server-only `SANITY_REVALIDATE_SECRET` and the current `sanity-webhook-signature` produced by Sanity. Configure the Sanity document webhook to filter the published singleton (`_id == "landingPage" && _type == "landingPage"`) and project `_id` and `_type`; the application checks those identities again before invalidating the `landing-content` tag. The manual recovery endpoint is `POST /api/sanity/recover` and requires `Authorization: Bearer <SANITY_MANUAL_RECOVERY_SECRET>`. Neither secret is exposed to client bundles.
+
+Local boundary tests exercise generated signed requests, invalid signatures, irrelevant and draft events, duplicate delivery, and manual authorization. A real deployed Sanity delivery remains release evidence for a deployment, not a substitute for these deterministic tests.
+
 Authenticated Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live are an accepted later phase. They will provide draft reads, click-to-edit overlays, and live draft updates for authorized editors. They do not replace webhook invalidation for published traffic.
 
 ## Verification

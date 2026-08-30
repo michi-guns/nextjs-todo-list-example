@@ -13,8 +13,8 @@ Public editorial content may be unavailable. Private PostgreSQL-backed todo beha
 1. Check the Sanity project, dataset, API version, and server environment variables.
 2. Confirm the expected document exists and is published.
 3. Inspect the GROQ query and validation error without exposing tokens.
-4. Check webhook delivery and signature-verification evidence without logging secrets.
-5. If published content is valid but the cache is stale, use the protected manual recovery mechanism and verify a fresh landing read.
+4. Check `POST /api/sanity/webhook` delivery and signature-verification evidence without logging secrets.
+5. If published content is valid but the cache is stale, call `POST /api/sanity/recover` with the protected `SANITY_MANUAL_RECOVERY_SECRET` and verify a fresh landing read.
 6. Determine whether the failure is a provider outage, configuration issue, schema change, mapping bug, or invalidation failure.
 7. Use the explicitly marked local fallback only while Sanity is not wired; do not fabricate transactional data.
 
