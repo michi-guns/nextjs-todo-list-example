@@ -1,7 +1,7 @@
 [
   {
     "source": "Project DWF / Agent SPEC",
-    "url": "../.dwf/output/agent/SPEC.md#9-ui",
+    "url": "../../.dwf/output/agent/SPEC.md#9-ui",
     "problem": "A private personal todo workspace must support list navigation, task status changes, completed filtering, and bounded load-more pagination.",
     "observed_pattern": "The product contract locks the capabilities and behavior while leaving hierarchy, composition, and interaction presentation open.",
     "relevant_transfer": "Use the same scenario and data in every direction; vary the information architecture rather than inventing business behavior.",
