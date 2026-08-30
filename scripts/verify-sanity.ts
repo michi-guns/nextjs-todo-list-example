@@ -3,9 +3,18 @@ import { config } from "dotenv"
 config({ path: ".env.local" })
 
 try {
-  const { getPublishedLandingContent } =
-    await import("../src/modules/landing/infrastructure/sanity-landing-reader")
-  const landingContent = await getPublishedLandingContent()
+  const [
+    { createSanityClient },
+    { createSanityLandingContentRepositoryFromClient },
+    { getLandingContent },
+  ] = await Promise.all([
+    import("../src/sanity/client-factory"),
+    import("../src/modules/landing/infrastructure/sanity-landing-source"),
+    import("../src/modules/landing/application/get-landing-content"),
+  ])
+  const landingContent = await getLandingContent(
+    createSanityLandingContentRepositoryFromClient(createSanityClient())
+  )
 
   console.log(
     `Sanity landing smoke passed: ${JSON.stringify({

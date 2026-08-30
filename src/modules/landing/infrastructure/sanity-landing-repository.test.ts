@@ -1,10 +1,14 @@
 import landingPageFixture from "@/sanity/fixtures/landingPage.json"
-import { describe, expect, it } from "vitest"
+import type { SanityClient } from "next-sanity"
+import { describe, expect, it, vi } from "vitest"
 
 import {
   createSanityLandingContentRepository,
+  LANDING_CONTENT_CACHE_TAG,
+  LANDING_PAGE_QUERY,
   mapSanityLandingDocument,
 } from "./sanity-landing-repository"
+import { createSanityLandingContentRepositoryFromClient } from "./sanity-landing-source"
 
 describe("mapSanityLandingDocument", () => {
   it("maps a valid unknown payload to only the landing view model", () => {
@@ -93,5 +97,24 @@ describe("mapSanityLandingDocument", () => {
       primaryCtaLabel: "Get started",
       secondaryCtaLabel: "Sign in",
     })
+  })
+
+  it("uses the stable published query and cache tag for the Sanity client", async () => {
+    const fetch = vi.fn().mockResolvedValue(landingPageFixture)
+    const client = { fetch } as unknown as Pick<SanityClient, "fetch">
+    const repository = createSanityLandingContentRepositoryFromClient(client)
+
+    await repository.getPublishedLandingContent()
+
+    expect(fetch).toHaveBeenCalledWith(
+      LANDING_PAGE_QUERY,
+      {},
+      {
+        next: {
+          revalidate: false,
+          tags: [LANDING_CONTENT_CACHE_TAG],
+        },
+      }
+    )
   })
 })

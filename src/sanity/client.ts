@@ -1,16 +1,9 @@
-import { createClient } from "next-sanity"
+import "server-only"
 
-import { getSanityConfig } from "./config"
-
-const { projectId, dataset, apiVersion } = getSanityConfig()
+import { createSanityClient } from "./client-factory"
 
 /**
  * Application-facing published-content client. Keep this module on the
  * server-side read path; Studio has its own client under the root `sanity/`.
  */
-export const sanityClient = createClient({
-  projectId,
-  dataset,
-  apiVersion,
-  useCdn: false,
-})
+export const sanityClient = createSanityClient()
