@@ -254,8 +254,6 @@ describe.sequential("Drizzle task repository", () => {
     const statuses = [
       ["todo", "2026-08-30T13:01:06.000Z"],
       ["in_progress", "2026-08-30T13:01:07.000Z"],
-      ["done", "2026-08-30T13:01:08.000Z"],
-      ["done", "2026-08-30T13:01:09.000Z"],
     ] as const
     for (const [status, timestamp] of statuses) {
       await expect(
@@ -265,8 +263,21 @@ describe.sequential("Drizzle task repository", () => {
           { status },
           new Date(timestamp)
         )
-      ).resolves.toMatchObject({ status })
+      ).resolves.toMatchObject({ status, updatedAt: new Date(timestamp) })
     }
+
+    const doneAt = new Date("2026-08-30T13:01:08.000Z")
+    await expect(
+      repository.updateForUser(ownerId, created.id, { status: "done" }, doneAt)
+    ).resolves.toMatchObject({ status: "done", updatedAt: doneAt })
+
+    const repeatedDone = await repository.updateForUser(
+      ownerId,
+      created.id,
+      { status: "done" },
+      new Date("2026-08-30T13:01:09.000Z")
+    )
+    expect(repeatedDone).toMatchObject({ status: "done", updatedAt: doneAt })
 
     await expect(
       repository.deleteForUser(otherOwnerId, created.id)

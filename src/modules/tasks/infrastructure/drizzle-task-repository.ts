@@ -1,4 +1,4 @@
-import { and, desc, eq, lt, ne, or } from "drizzle-orm"
+import { and, desc, eq, lt, ne, or, sql, type SQL } from "drizzle-orm"
 import { type NodePgDatabase } from "drizzle-orm/node-postgres"
 
 import { listsTable } from "../../../../db/schema/lists"
@@ -188,7 +188,7 @@ export function createDrizzleTaskRepository(
         title?: string
         notes?: string | null
         status?: TaskStatus
-        updatedAt: Date
+        updatedAt: Date | SQL
       } = { updatedAt: now }
 
       if (Object.hasOwn(patch, "title")) {
@@ -199,6 +199,21 @@ export function createDrizzleTaskRepository(
       }
       if (Object.hasOwn(patch, "status")) {
         updates.status = patch.status
+      }
+
+      if (
+        Object.hasOwn(patch, "status") &&
+        patch.status !== undefined &&
+        !Object.hasOwn(patch, "title") &&
+        !Object.hasOwn(patch, "notes")
+      ) {
+        updates.updatedAt = sql`
+          CASE
+            WHEN ${tasksTable.status} IS DISTINCT FROM ${patch.status}
+              THEN ${now}
+            ELSE ${tasksTable.updatedAt}
+          END
+        `
       }
 
       try {
