@@ -1,6 +1,25 @@
 {
   "id": "t09a-dashboard",
-  "status": "comparing",
+  "status": "selected",
+  "selected_direction": "focus-rail",
+  "decision": {
+    "selected_direction": "focus-rail",
+    "rationale": "Focus Rail is the clearest fit for the locked list-sidebar plus task-panel shell, performs strongly at narrow viewports, and delivers the required workflow with the lowest implementation complexity.",
+    "tradeoff": "The single queue exposes less simultaneous cross-status context than Status Board and requires more navigation for comparison-heavy work; explicit status controls and chips preserve the required lifecycle behavior.",
+    "alternatives": [
+      {
+        "direction": "status-board",
+        "disposition": "not selected",
+        "reason": "Its dense three-lane overview improves status visibility but adds horizontal and cognitive pressure that conflicts with the starter's browse-first shell and narrow viewport requirement."
+      },
+      {
+        "direction": "command-inspector",
+        "disposition": "not selected",
+        "reason": "Its global search-first model favors returning power users but makes the locked list-sidebar context and browse-first discoverability less immediate."
+      }
+    ]
+  },
+  "handoff": "handoff.md",
   "target_surface": "authenticated dashboard direction exploration with landing and auth extension notes",
   "surface_scope": {
     "dashboard": {
@@ -78,7 +97,7 @@
     "viewport_evidence": "1440x900, 1024x768, 768x1024, and 320x800 for all three directions",
     "console_errors": 0,
     "page_overflow_at_target_viewports": false,
-    "decision": "deferred to T-09B"
+    "decision": "Focus Rail selected in T-09B; see handoff.md"
   },
   "implementation_root": ".ui-explorations/t09a-dashboard"
 }

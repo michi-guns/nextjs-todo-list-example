@@ -1,6 +1,6 @@
 # T-09A dashboard direction exploration
 
-Status: comparing. T-09B is responsible for selecting one direction; this exploration does not force a winner.
+Status: selected. T-09B selected Focus Rail for production implementation; the prototype evidence and rejected alternatives remain preserved below.
 
 ## What stayed constant
 
@@ -52,7 +52,17 @@ The browser screenshots used for visual inspection were intentionally kept as lo
 | Narrow viewport suitability | Strong: rail becomes a scrollable context strip and queue stacks. | Medium: lanes stack, increasing page length.          | Strong: spine and inspector stack without document overflow.                   |
 | Implementation complexity   | Low: straightforward list rail and queue.                         | Medium: lane grouping and responsive board rules.     | Medium: search, result selection, and inspector state add interaction surface. |
 
-These are prototype observations, not a product decision. T-09B should weigh the intended user mix and expected task volume before selecting a direction. The current recommendation is to carry all three forward until that decision is made.
+## T-09B decision
+
+**Selected direction:** [Focus Rail](./directions/focus-rail/index.html)
+
+Focus Rail wins because it directly matches the locked app-shell shape in the PRD (a list sidebar plus a task main panel), makes the active list and next action obvious on first open, remains the strongest narrow-viewport option in the shared inspection matrix, and has the lowest implementation complexity. That combination best supports a signed-in individual managing a small set of private lists while keeping the starter opinionated and easy to extend.
+
+The material trade-off is reduced simultaneous cross-status visibility compared with Status Board and more navigation for comparison-heavy work. The production handoff keeps explicit `todo`, `in_progress`, and `done` labels, direct status controls, the completed-task toggle, and bounded `Load more` affordances so the accepted lifecycle behavior remains visible without importing a denser board model.
+
+Status Board remains a useful rejected alternative when throughput-oriented status comparison becomes the dominant product need; its narrow-screen pressure and denser information architecture are not justified by the current reference contract. Command Inspector remains a useful rejected alternative for a later retrieval-heavy product; its search-first model makes browse-first list context and discoverability less immediate here.
+
+The implementation-ready brief is [`handoff.md`](./handoff.md). It covers the dashboard composition, landing/auth extension notes, responsive behavior, accessibility requirements, state matrix, and reusable tokens/primitives for T-10 and T-11. This selection changes presentation guidance only; it does not change the PRD, SPEC, data contracts, or API boundaries.
 
 ## Contract reconciliation and limitations
 

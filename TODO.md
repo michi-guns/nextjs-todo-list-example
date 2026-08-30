@@ -372,10 +372,10 @@ Evidence: [`report.md`](.ui-explorations/t09a-dashboard/report.md) records the s
 
 ### T-09B: Select and hand off the UI direction
 
-- [ ] Compare the directions against explicit criteria derived from the product goal and the accepted todo workflow.
+- [ ] Compare Focus Rail, Status Board, and Command Inspector against explicit criteria derived from the product goal and accepted todo workflow, then record the winning trade-off.
 - [ ] Select one direction and record its information architecture, interaction model, visual hierarchy, component composition, responsive behavior, accessibility requirements, and important states.
 - [ ] Keep the exploration record and prototype links outside `.dwf`; update the DWF only if the selected direction changes product behavior or an accepted technical boundary.
-- [ ] Identify the reusable tokens and primitives that the production implementation should preserve.
+- [ ] Identify the reusable tokens and primitives that the production implementation should preserve for T-10 and T-11.
 
 Recommended agent skills:
 
@@ -387,10 +387,20 @@ Verification:
 - [ ] The chosen direction has a clear reason for winning and a documented trade-off.
 - [ ] T-10 and T-11 can be implemented from the handoff without inventing a competing UI direction.
 - [ ] The handoff includes the empty, loading, error, focus, narrow-viewport, and long-content states needed by the product.
+- [ ] `python .agents/skills/ui-direction-explorer/scripts/validate-directions.py .ui-explorations/t09a-dashboard` reports exactly three directions and zero errors.
+- [ ] Changed JSON/Markdown files pass Prettier, `git diff --check`, `pnpm test`, `pnpm typecheck`, `pnpm lint`, and `pnpm build`; no production source or dependency files change.
 
 Test contracts: `TST-UI-001`.
 
 Dependencies: T-09A.
+
+Plan: [`2026-08-30-t-09b-ui-direction-handoff.md`](docs/agentforge/plans/2026-08-30-t-09b-ui-direction-handoff.md).
+
+Implementation scope: update `.ui-explorations/t09a-dashboard/exploration.json` and `report.md`, add `.ui-explorations/t09a-dashboard/handoff.md`, and reconcile this task plus `TST-UI-001` evidence. Do not change `app/`, `components/`, `src/`, `db/`, `migrations/`, package manifests, or DWF product/technical authority.
+
+Handoff interface: T-10 and T-11 consume the selected direction id (`focus-rail`), its dashboard information architecture, shared semantic tokens/primitives, responsive breakpoints, accessibility/state matrix, and explicit extension notes. The handoff produces no runtime API or component contract.
+
+Evidence requirement: the final task tip must receive a fresh GPT-5.6-Sol medium-reasoning review with actionable findings only; every actionable finding must be fixed and re-reviewed before this task is marked complete. `TST-UI-001` remains `partial` because materialized runtime and end-to-end browser evidence belong to T-10/T-11/T-12A/T-15.
 
 ### T-10: Build the authenticated dashboard
 
