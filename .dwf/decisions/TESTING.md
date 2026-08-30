@@ -135,8 +135,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14          | `specified` |
 | [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                | `specified` |
 | [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                      | `specified` |
-| [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                            | `specified` |
-| [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                      | `specified` |
+| [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                            | `verified`  |
+| [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                      | `verified`  |
 | [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence        | T-13                            | `specified` |
 | [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance              | T-09A, T-09B, T-10, T-11, T-12A | `specified` |
 | [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                    | T-15                            | `specified` |
@@ -394,7 +394,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-LANDING-001 — Sanity payload validation and mapping
 
-- **Status:** `specified`
+- **Status:** `verified`
 - **Capability:** Landing content
 - **Evidence layers/modes:** Infrastructure / fixture integration
 - **Verifies product decisions:** D-005, D-008
@@ -405,12 +405,13 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Unknown Sanity payloads are validated and mapped into a plain landing view model; optional fields remain optional; missing or invalid required content fails explicitly; raw provider records do not cross the infrastructure boundary.
 - **Required evidence:** Local fixture tests for valid, optional, malformed, and incomplete payloads and mapping failures.
 - **Dependencies:** T-02 Sanity resource and T-12 landing read path.
+- **Evidence:** `pnpm test` passed with 4 test files and 17 tests, including `src/modules/landing/infrastructure/sanity-landing-repository.test.ts` and `src/sanity/config.test.ts`. The fixtures cover valid unknown payloads, optional omission/null, malformed required/optional fields, missing payload, identity mismatch, and provider-field isolation.
 
 <a id="tst-landing-002"></a>
 
 ### TST-LANDING-002 — Published Sanity read smoke
 
-- **Status:** `specified`
+- **Status:** `verified`
 - **Capability:** Landing content
 - **Evidence layers/modes:** Infrastructure / live smoke
 - **Verifies product decisions:** D-005, D-008, D-009
@@ -421,6 +422,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The dedicated published landing singleton can be fetched through the real Sanity client and query, validated as unknown input, and mapped into the application view model without mutation.
 - **Required evidence:** A separate read-only live smoke with clear failures for missing configuration, missing content, query failure, validation failure, or mapping failure.
 - **Dependencies:** T-02 dedicated Sanity project/dataset and T-12 application mapping.
+- **Evidence:** `pnpm sanity:smoke` passed against the configured published singleton and reported the mapped fields `blurb`, `headline`, `primaryCtaLabel`, and `secondaryCtaLabel`. The TypeScript smoke imports the canonical reader and performs no mutations.
 
 <a id="tst-landing-003"></a>
 
