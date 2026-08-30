@@ -50,14 +50,15 @@ the container in a `finally` path. No external database, Neon credential, or
 remote email delivery is used.
 
 The behavior seed is a small, explicit fixture in `scripts/playwright-local/`.
-It creates five independently usable scenario users through the real Better
+It creates six independently usable scenario users through the real Better
 Auth handler and local email-verification mailbox, then inserts deterministic
 lists/tasks with fixed names, timestamps, and UUIDs through a parameterized
 local PostgreSQL connection. The fixture includes a core user, a pagination /
-completed-filter user, a skip-link user, and two privacy-isolation users. Each
-browser scenario owns a distinct seeded user (or the deliberate two-user pair),
-uses project-qualified names for records it creates, and therefore remains
-independent of scenario order and cross-browser project repetition.
+completed-filter user, a skip-link user, a magic-link user, and two
+privacy-isolation users. Each browser scenario owns a distinct seeded user (or
+the deliberate two-user pair), uses project-qualified names for records it
+creates, and therefore remains independent of scenario order and cross-browser
+project repetition.
 `seedPlaywrightDatabase(databaseUrl, baseUrl): Promise<PlaywrightSeed>` is the
 only seed entry point, and `PLAYWRIGHT_USERS` is the typed fixture export used
 by the browser helpers; neither export includes connection strings, mailbox
@@ -192,7 +193,9 @@ src/test/playwright-seed.test.ts`, and
   password users, so the seed does not copy or guess password hashes. The
   shared fixture password is test data only and is never printed or committed
   as a secret.
-- A Playwright worker can inherit the setup environment. If the installed
+- A Playwright worker can inherit the setup environment, including
+  `NODE_ENV=development` (the local mailbox gate requires `development` or
+  `test`; the dedicated Next server also runs in development mode). If the installed
   runner does not propagate it, setup will write a narrowly scoped process
   environment bridge consumed by the fixture; it will not fall back to
   `.env.local`, Neon, or a remote mailbox.
