@@ -18,3 +18,12 @@ export type {
   ErrorMapping,
   ErrorResponseCode,
 } from "./error-contract"
+export {
+  actionErrorResult,
+  assertSameOriginMutation,
+  inputFromActionValue,
+  InvalidEntryInputError,
+  invalidInputActionResult,
+  jsonErrorResponse,
+} from "./entry-contract"
+export type { ActionResult } from "./entry-contract"

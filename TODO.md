@@ -314,19 +314,30 @@ PR: [#12](https://github.com/michi-guns/nextjs-todo-list-example/pull/12) | impl
 
 ### T-09: Add Server Actions and JSON Route Handlers
 
-- [ ] Add the stable list/task routes from the SPEC: `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`.
-- [ ] Make actions and handlers follow authenticate, authorize, validate, use case, map, and revalidate/respond.
-- [ ] Share Zod schemas and application use cases between actions and handlers.
-- [ ] Keep the private JSON API same-origin and session-authenticated. Do not add bearer-token or machine authentication.
+- [x] Implement the accepted plan in [`docs/agentforge/plans/2026-08-30-t-09-server-entry-paths.md`](docs/agentforge/plans/2026-08-30-t-09-server-entry-paths.md).
+- [x] Add the stable list/task routes from the SPEC: `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`.
+- [x] Make actions and handlers follow authenticate, authorize, validate, use case, map, and revalidate/respond.
+- [x] Share Zod schemas and application use cases between actions and handlers.
+- [x] Keep the private JSON API same-origin and session-authenticated. Do not add bearer-token or machine authentication.
 
 Verification:
 
-- [ ] Route Handler contract tests cover success, pagination, `401`, privacy-preserving `404`, `409`, and `422` responses.
-- [ ] Server Action tests cover authentication, validation, successful mapping, and expected errors.
+- [x] Route Handler contract tests cover success, pagination, `401`, privacy-preserving `404`, `409`, and `422` responses.
+- [x] Server Action tests cover authentication, validation, successful mapping, and expected errors.
 
 Test contracts: `TST-AUTH-003`, `TST-BOUNDARY-001`.
 
 Dependencies: T-05, T-06, T-07, T-08.
+
+Implementation scope: capability-owned schemas, view models, JSON Route Handler adapters, and Server Action adapters under `src/modules/lists/presentation` and `src/modules/tasks/presentation`; thin composition wrappers under `app/api/` and `app/actions/`; request/action contract tests. Existing application, infrastructure, auth, schema, migration, snapshot, and UI files remain unchanged unless a type-only composition adjustment is required.
+
+Recommended AgentForge skills: `using-agent-skills`, `planning`, `task-breakdown`, `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, `api-and-interface-design`, `security-and-hardening`, `git-workflow-and-versioning`, `code-review-and-quality`, and `verification-before-completion`.
+
+Verification commands: focused list/task presentation tests during implementation; completion gates are `pnpm test`, `pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, both Drizzle checks, changed-file Prettier checks, and `git diff --check`. Next.js browser/runtime journey evidence remains with T-15 because the dashboard UI is not yet implemented.
+
+Evidence: `pnpm test` (17 files, 86 tests), `pnpm test:integration` (6 files, 23 tests against one disposable PostgreSQL 18 Testcontainer), `pnpm typecheck`, `pnpm lint` (zero errors and one pre-existing `Geist` warning), `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text`, changed-file Prettier checks, and `git diff --check main..853fedd` all pass. Focused list/task boundary tests cover authenticated success and owner propagation, pagination/filtering, `401`, privacy-preserving `404`, `409`, `422`, safe view models, Server Action mapping/revalidation, expected action errors, and same-origin mutation rejection. No schema, migration, snapshot, or dependency changes were made. Implementation commits `b4292b5` and `6604141`, closeout metadata `da40794`, and code/test tip `853fedd` are covered by the fresh review loop; the additional task-action regression is included in the code/test tip. Next.js browser/runtime evidence remains with T-15 because the dashboard UI is not yet implemented.
+
+PR: [#14](https://github.com/michi-guns/nextjs-todo-list-example/pull/14) | reviewed code/test tip `853fedd` | current metadata tip is its descendant and is in final review | merge pending.
 
 ### T-09A: Explore and prototype UI directions
 
