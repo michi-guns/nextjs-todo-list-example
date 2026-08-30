@@ -328,4 +328,32 @@ describe("task Server Action adapters", () => {
       error: { code: "invalid_input", message: "Input is invalid" },
     })
   })
+
+  it("maps expected application errors to canonical action results", async () => {
+    const conflictHandlers = createTaskActionHandlers(
+      actionDependencies(
+        makeApplication({
+          updateTask: vi.fn().mockRejectedValue(new TaskConflictError()),
+        })
+      )
+    )
+    await expect(
+      conflictHandlers.updateTask({ taskId, title: "Duplicate" })
+    ).resolves.toEqual({
+      ok: false,
+      error: { code: "conflict", message: "Resource already exists" },
+    })
+
+    const missingHandlers = createTaskActionHandlers(
+      actionDependencies(
+        makeApplication({
+          deleteTask: vi.fn().mockRejectedValue(new TaskNotFoundError()),
+        })
+      )
+    )
+    await expect(missingHandlers.deleteTask({ taskId })).resolves.toEqual({
+      ok: false,
+      error: { code: "not_found", message: "Resource not found" },
+    })
+  })
 })
