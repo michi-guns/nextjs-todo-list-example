@@ -412,7 +412,7 @@ Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
 
 ### T-13: Add Sanity freshness and recovery
 
-- [ ] Add a signature-verified webhook for relevant published landing changes.
+- [~] Add a signature-verified webhook for relevant published landing changes.
 - [ ] Reject invalid signatures, irrelevant events, and invalid requests without invalidating cache.
 - [ ] Add an explicitly authorized manual recovery path.
 - [ ] Route both mechanisms through one server-only, idempotent invalidation service.
@@ -425,6 +425,10 @@ Verification:
 Test contracts: `TST-LANDING-003`.
 
 Dependencies: T-12.
+
+Plan: [`2026-08-30-t-13-sanity-freshness-recovery.md`](docs/agentforge/plans/2026-08-30-t-13-sanity-freshness-recovery.md).
+
+Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `security-and-hardening`, `source-driven-development`, `incremental-implementation`, and `git-workflow-and-versioning`.
 
 ### T-12A: Audit and refine the materialized UI
 
