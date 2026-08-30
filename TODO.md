@@ -640,13 +640,13 @@ Verification:
 
 - [ ] Focused landing-fixture and lifecycle tests pass; failures during server, migration, seed, or browser startup report the prerequisite and clean up the container/process/mailbox.
 - [ ] `pnpm exec playwright test` passes in Chromium against the harness-owned local database and leaves no server, container, mailbox, or browser test artifact that belongs outside the ignored paths.
-- [ ] The browser evidence covers the core authenticated journey, magic-link mailbox journey, two-user privacy isolation, seeded pagination/filtering, and dashboard skip-link activation followed by the next logical tab stop.
+- [ ] The browser evidence covers the deterministic landing fixture, core authenticated journey, magic-link mailbox journey, two-user privacy isolation, seeded pagination/filtering, and dashboard skip-link activation followed by the next logical tab stop.
 - [ ] `pnpm test:e2e:cross-browser` provides the same journeys in Firefox and WebKit when those on-demand browsers are installed; those engines are not required for the routine gate.
 - [ ] `pnpm test`, `pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file `pnpm exec prettier --check`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, and `git diff --check` pass. Any pre-existing lint warning is recorded separately.
 
 Test contracts: `TST-HARNESS-001`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`.
 
-Dependencies: T-05, T-09, T-10, T-11, T-14 (all complete on `main`).
+Dependencies: T-05, T-09, T-10, T-11, T-12, T-12A, T-14 (all complete on `main`; T-12 is also transitive through the T-12A landing prerequisite).
 
 Plan: [`docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md`](docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md).
 
@@ -657,7 +657,47 @@ Implementation scope and interfaces:
 - `e2e/fixtures.ts` and the journey specs own stable labels/selectors and browser outcomes only; they do not import provider records, credentials, or application database internals beyond the ignored local mailbox reader.
 - `src/modules/landing/infrastructure/sanity-landing-reader.ts` receives only a `PLAYWRIGHT_E2E=true` + non-production fixture branch; the normal Sanity path and all domain/persistence/migration behavior remain unchanged.
 
-Task breakdown: (1) add and test the guarded landing fixture plus Playwright lifecycle/configuration; (2) add the Better Auth/UUID behavior seed and mailbox-safe fixtures; (3) replace the example suite with serial Chromium core, magic-link, privacy, pagination/filtering, and skip-link journeys; (4) add the opt-in cross-browser wrapper, run all gates, reconcile affected `TST-*` evidence and the temporary implementation checkpoint, complete the fresh GPT-5.6-Sol pragmatic review loop, and recompute dependencies.
+Task breakdown: the following four delivery units are independently reviewable and must each leave an executable, verifiable tip.
+
+#### T-15.1 — Add the guarded local test runtime
+
+- Files: `src/modules/landing/infrastructure/sanity-landing-reader.ts` and its focused test; `playwright.config.ts`; `e2e/global-setup.ts`; lifecycle helper tests under `e2e/` or `scripts/playwright-local/`.
+- Interfaces: consume `startPostgresHarness()` and `stopPostgresHarness()`; expose the fixed `http://127.0.0.1:3100` base URL, inherited `DATABASE_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_LOCAL_MAILBOX`, `BETTER_AUTH_MAILBOX_DIR`, and `PLAYWRIGHT_E2E` values to the server and workers.
+- Acceptance: a setup/teardown smoke can start the harness-owned container and dedicated Next.js server, wait for a local landing response, and clean up on success or startup/migration/server failure; the Sanity reader uses deterministic content only under the non-production E2E switch and never in production.
+- Contracts/evidence: `TST-HARNESS-001`, `TST-E2E-003`; prove local URL guarding, server readiness, failure cleanup, and the fixture gate. Keep `TST-HARNESS-001` partial until the required live Docker-unavailable observation exists.
+- Checks: focused tests, `pnpm typecheck`, `pnpm lint`, and a direct Playwright setup smoke with no application data assertions yet.
+- Dependencies/unblock: T-12, T-12A, and T-14; T-15.2 consumes the lifecycle seam.
+- Recommended skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, `security-and-hardening`, and `git-workflow-and-versioning`.
+
+#### T-15.2 — Add the deterministic behavior seed and browser fixtures
+
+- Files: `scripts/playwright-local/seed.ts`; mailbox-safe helpers in `e2e/fixtures.ts`; the T-15.1 setup call; focused seed/helper tests where pure behavior is testable.
+- Interfaces: create verified scenario users through the real Better Auth handler and local mailbox; insert parameterized fixed-ID/timestamp lists and tasks through the harness-owned loopback connection; export opaque fixture credentials/names to specs without logging secrets or tokens.
+- Acceptance: the seed is repeatable on a fresh container, contains core, pagination/completed-filter, skip-link, and two privacy users, includes another user's records, and clears the mailbox before handing control to Playwright; no Neon or Sanity network is contacted.
+- Contracts/evidence: `TST-HARNESS-001`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`; prove verified seeded sign-in data and safe mailbox boundaries without replacing browser evidence.
+- Checks: focused seed tests, a setup run that inspects only non-secret row counts/labels, and the existing unit/integration suites.
+- Dependencies/unblock: T-15.1; T-15.3 consumes the exported fixtures.
+- Recommended skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `security-and-hardening`, and `git-workflow-and-versioning`.
+
+#### T-15.3 — Replace the example suite with Chromium journeys
+
+- Files: replace `e2e/example.spec.ts`; add `e2e/fixtures.ts` and any focused spec files under `e2e/`.
+- Interfaces: use stable accessible labels and existing route/action boundaries; read the local mailbox only through `readLatestMagicLink()`/`clearMagicLinkMailbox()`; do not reach into Drizzle repositories or provider records.
+- Acceptance: serial Chromium journeys assert the deterministic landing copy, password sign-in/Inbox/list/task/status/sign-out and private-route redirect, seeded list/task pagination and completed filtering, two-user UI/API privacy isolation, magic-link request/read/consume, and dashboard skip-link activation followed by the next logical tab stop. Created names are project-qualified so an opt-in cross-browser repetition is order-independent.
+- Contracts/evidence: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`; record real browser URLs/outcomes and no weaker substitute.
+- Checks: `pnpm exec playwright test` in Chromium, with console errors and unexpected network failures treated as test failures; preserve traces/reports only in ignored paths.
+- Dependencies/unblock: T-15.2; T-15.4 consumes the complete journey evidence.
+- Recommended skills: `playwright-cli`, `browser-testing-with-devtools`, `testing-first-class`, `test-driven-development`, `incremental-implementation`, and `security-and-hardening`.
+
+#### T-15.4 — Add opt-in browsers and close out the task
+
+- Files: `scripts/playwright-local/run.ts`, `package.json`, `playwright.config.ts`, `TODO.md`, `.dwf/decisions/TESTING.md`, and `docs/agentforge/temporary/2026-08-30-implementation-run.md`.
+- Interfaces: default direct Playwright invocation remains Chromium-only; `pnpm test:e2e:cross-browser` sets the explicit project switch for Firefox/WebKit while retaining the same local lifecycle and no unknown-server reuse.
+- Acceptance: the opt-in command is documented and selectable, all required gates pass, affected contracts and evidence are reconciled honestly, and the dependency graph is recomputed so T-17 is unblocked only after the final reviewed tip.
+- Contracts/evidence: reconcile all eight T-15 contracts; keep `TST-HARNESS-001` partial if Docker-outage evidence is not observed, and mark browser contracts verified only when the landing assertion and all required journeys pass.
+- Checks: `pnpm test`, `pnpm test:integration`, `pnpm exec playwright test`, optional `pnpm test:e2e:cross-browser`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier, `pnpm exec drizzle-kit check --config drizzle.config.ts`, and `git diff --check`.
+- Dependencies/unblock: T-15.3; fresh GPT-5.6-Sol review must return no actionable findings before marking T-15 complete.
+- Recommended skills: `code-review-and-quality`, `verification-before-completion`, `git-workflow-and-versioning`, `testing-first-class`, and `unslop`.
 
 Dependency checkpoint: T-15 is the sole safely unblocked implementation task after T-12A merged as `df08ed4`; T-17 remains blocked until T-15 is complete. Recompute the graph after the final reviewed T-15 tip.
 

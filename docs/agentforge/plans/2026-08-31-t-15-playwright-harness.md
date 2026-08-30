@@ -128,11 +128,12 @@ claimed for this shared lifecycle.
   one `postgres:18-alpine` container, apply both committed migrations, create
   the deterministic fixture, start the dedicated server, run Chromium serially,
   and clean up on both pass and failure.
-- Browser evidence must cover password sign-in and sign-out with private-route
-  redirect, Inbox/list/task creation and status change, seeded list/task
-  continuation, completed-task hiding/showing, magic-link mailbox
-  request/read/consume, two-user private-data isolation, and dashboard skip
-  target focus followed by the next logical tab stop.
+- Browser evidence must cover the deterministic landing fixture, password
+  sign-in and sign-out with private-route redirect, Inbox/list/task creation
+  and status change, seeded list/task continuation, completed-task
+  hiding/showing, magic-link mailbox request/read/consume, two-user private-data
+  isolation, and dashboard skip target focus followed by the next logical tab
+  stop.
 - `pnpm test:e2e:cross-browser` (or its documented project-selection equivalent)
   must make the same scenarios available in Firefox and WebKit without making
   them part of the default run.
@@ -144,9 +145,10 @@ claimed for this shared lifecycle.
   `pnpm exec drizzle-kit check --config drizzle.config.ts`, and
   `git diff --check`. Record the pre-existing `Geist` lint warning separately
   if it remains the only warning.
-- `TST-HARNESS-001` becomes complete only for the equivalent Playwright
-  lifecycle evidence; the live Docker-outage check remains an honest deferred
-  release observation if it cannot be exercised safely. `TST-AUTH-001`,
+- `TST-HARNESS-001` remains `partial` until both the equivalent Playwright
+  lifecycle evidence and the required Docker-unavailable failure observation
+  are recorded; the outage check must not be replaced by a unit simulation.
+  `TST-AUTH-001`,
   `TST-AUTH-002`, `TST-AUTH-003`, `TST-E2E-001`, and `TST-E2E-002` can be
   reconciled to verified when their browser journeys pass. `TST-UI-001`'s
   remaining dashboard skip-link evidence is completed by the dedicated check;
@@ -176,7 +178,7 @@ claimed for this shared lifecycle.
 
 ## Handoff to task breakdown
 
-Task-breakdown should turn this plan into the following fresh-review units:
+The task breakdown recorded in `TODO.md` uses the following fresh-review units:
 
 1. **T-15.1 — deterministic test runtime:** test-only landing content,
    Playwright config/global setup/teardown, local server readiness, and focused
@@ -184,8 +186,9 @@ Task-breakdown should turn this plan into the following fresh-review units:
 2. **T-15.2 — behavior seed and fixtures:** Better Auth-backed verified users,
    deterministic PostgreSQL lists/tasks, mailbox-safe shared helpers, and seed
    tests/evidence.
-3. **T-15.3 — Chromium journeys:** replace the example suite with the core,
-   magic-link, privacy, pagination/filtering, and dashboard skip-link scenarios.
+3. **T-15.3 — Chromium journeys:** replace the example suite with the
+   deterministic landing assertion, core, magic-link, privacy,
+   pagination/filtering, and dashboard skip-link scenarios.
 4. **T-15.4 — browser selection and closeout:** opt-in Firefox/WebKit command,
    full gates, ledger/TODO/checkpoint reconciliation, fresh review loop, and
    dependency recomputation.
