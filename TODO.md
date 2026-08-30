@@ -208,14 +208,14 @@ Dependencies: T-04.
 - [x] Keep Better Auth configuration and raw records behind the auth infrastructure boundary.
 - [x] Expose server-only current-user helpers equivalent to `getCurrentUser()` and `requireUser()`.
 - [x] Support email/password sign-up, sign-in, and sign-out.
-- [x] Require local email verification before a password session and preserve the credential when the same verified account uses a magic link.
+- [x] Require local email verification before a password session; preserve the credential when verification comes first and retain Better Auth's unproven-account revocation when a magic link comes first.
 - [x] Support magic-link request and consumption.
 - [x] In explicit local/test mode only, capture authentication links in a temporary gitignored mailbox.
 
 Verification:
 
 - [!] Private list/task reads and mutations are deferred to T-09; the current `requireUser()` boundary fails closed for unauthenticated requests.
-- [x] The local/test mailbox flow can request, read, and consume email-verification and magic links; the same-account credential regression passes.
+- [x] The local/test mailbox flow can request, read, and consume email-verification and magic links; both same-account lifecycle orders are covered.
 - [x] Authenticated code never accepts a client-provided owner id.
 
 Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`.

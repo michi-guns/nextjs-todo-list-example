@@ -27,7 +27,10 @@ Password accounts must verify their email before a password session is
 created. This preserves the password credential when the same verified account
 later uses a magic link; Better Auth intentionally removes unproven account
 credentials when a magic link proves an otherwise-unverified email. Production
-email delivery remains outside the T-05 local mailbox boundary.
+email delivery remains outside the T-05 local mailbox boundary. If the magic
+link is consumed first, that deliberate Better Auth security transition revokes
+the unproven password credential; password reset/recovery is a later product
+surface.
 
 The integration suite uses `TEST_DATABASE_URL` and refuses non-local
 PostgreSQL URLs. Do not commit environment files, credentials, or captured

@@ -15,7 +15,7 @@
 ## Implementation outcome
 
 - Better Auth is configured behind `lib/auth.ts`, exposed through the server-only catch-all route, and mapped to the app-facing `CurrentUser` contract through `getCurrentUser()` and `requireUser()`.
-- Email/password and magic-link flows are covered by request-level integration tests against disposable local PostgreSQL 18. Password accounts must first consume an email-verification link; this prevents Better Auth's unproven-account cleanup from removing a password credential when the same account later uses a magic link. Both link types are captured only when `NODE_ENV` is `development` or `test` and `BETTER_AUTH_LOCAL_MAILBOX=true`; the mailbox path is restricted to the operating-system temporary directory or the ignored `.local/better-auth-mailbox` directory.
+- Email/password and magic-link flows are covered by request-level integration tests against disposable local PostgreSQL 18. Password accounts must consume an email-verification link before password access; a verified account keeps its password credential when it later uses a magic link, while Better Auth deliberately revokes an unproven credential when the magic link is consumed first. Both link types are captured only when `NODE_ENV` is `development` or `test` and `BETTER_AUTH_LOCAL_MAILBOX=true`; the mailbox path is restricted to the operating-system temporary directory or the ignored `.local/better-auth-mailbox` directory.
 - Better Auth 1.7 requires `account.issuer` and a unique `(issuer, account_id)` identity index. Because this repository is still pre-release and the migration target is disposable/agent-owned, the approved migration-history workflow consolidated those additions into the existing T-04 migration and regenerated its tracked snapshot rather than adding another migration file. The baseline migration remains unchanged.
 
 ## Initial state and file map (before implementation)
@@ -56,7 +56,7 @@
 ### Lifecycle amendment
 
 - Better Auth's email-verification boundary is enabled with local/test mailbox delivery, and `emailAndPassword.requireEmailVerification` prevents an unverified password account from establishing a session.
-- `src/modules/auth/auth.integration.test.ts` now covers the captured email-verification link and the same-account password-preservation regression: verify the email, use a magic link, then sign in again with the original password.
+- `src/modules/auth/auth.integration.test.ts` now covers both supported same-account orders: magic-link-first revokes the unproven password credential, while verification-first preserves it for later password sign-in.
 - Production/shared email delivery remains intentionally outside T-05; a real provider and the polished verification UI remain follow-up work.
 
 ## Risks and assumptions
