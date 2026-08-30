@@ -7,6 +7,7 @@ import { Pool, type PoolClient } from "pg"
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
 import { usersTable } from "../../../../db/schema/auth"
+import { listsTable } from "../../../../db/schema/lists"
 import { tasksTable } from "../../../../db/schema/tasks"
 import { createListApplication } from "../application/list-use-cases"
 import { decodeListCursor } from "../application/list-cursor"
@@ -146,6 +147,133 @@ describe.sequential("Drizzle list repository", () => {
     await expect(repository.listByUser(userId, { limit: 20 })).resolves.toEqual(
       {
         items: [expect.objectContaining({ name: "Inbox" })],
+        nextCursor: null,
+      }
+    )
+  })
+
+  it("returns the renamed winner when an Inbox conflict is read back after a rename", async () => {
+    const userId = `t06-inbox-race-${Date.now()}`
+    await database.insert(usersTable).values({
+      id: userId,
+      name: "T-06 Inbox Race User",
+      email: `${userId}@example.test`,
+    })
+    const repository = createDrizzleListRepository(database)
+
+    let initialSelectCount = 0
+    let initialSelectGateOpen = true
+    let conflictPaused = false
+    let releaseInitialSelects: () => void = () => undefined
+    let initialSelectsReady: () => void = () => undefined
+    let conflictReady: () => void = () => undefined
+    let releaseConflictReadback: () => void = () => undefined
+    const initialSelectGate = new Promise<void>((resolve) => {
+      releaseInitialSelects = resolve
+    })
+    const initialSelectsObserved = new Promise<void>((resolve) => {
+      initialSelectsReady = resolve
+    })
+    const conflictObserved = new Promise<void>((resolve) => {
+      conflictReady = resolve
+    })
+    const conflictReadbackGate = new Promise<void>((resolve) => {
+      releaseConflictReadback = resolve
+    })
+
+    const gatedPool = new Proxy(appPool!, {
+      get(target, property, receiver) {
+        if (property !== "query") {
+          return Reflect.get(target, property, receiver)
+        }
+
+        return (...args: unknown[]) => {
+          const firstArgument = args[0]
+          const queryText =
+            typeof firstArgument === "string"
+              ? firstArgument
+              : typeof firstArgument === "object" &&
+                  firstArgument !== null &&
+                  "text" in firstArgument &&
+                  typeof firstArgument.text === "string"
+                ? firstArgument.text
+                : ""
+          const normalizedQuery = queryText
+            .replaceAll(/\s+/g, " ")
+            .toLowerCase()
+
+          return Promise.resolve(
+            Reflect.apply(target.query, target, args)
+          ).then(async (result: unknown) => {
+            const rows =
+              typeof result === "object" &&
+              result !== null &&
+              "rows" in result &&
+              Array.isArray(result.rows)
+                ? result.rows
+                : []
+
+            const isInitialEnsureSelect =
+              initialSelectGateOpen &&
+              normalizedQuery.includes('from "lists"') &&
+              normalizedQuery.includes("order by") &&
+              !normalizedQuery.includes("lower(")
+
+            if (isInitialEnsureSelect) {
+              initialSelectCount += 1
+              if (initialSelectCount === 2) {
+                initialSelectsReady()
+              }
+              await initialSelectGate
+            }
+
+            const isInboxInsert =
+              normalizedQuery.includes('insert into "lists"') &&
+              normalizedQuery.includes("on conflict do nothing") &&
+              rows.length === 0
+
+            if (isInboxInsert && !conflictPaused) {
+              conflictPaused = true
+              conflictReady()
+              await conflictReadbackGate
+            }
+
+            return result
+          })
+        }
+      },
+    })
+    const gatedDatabase = drizzle({ client: gatedPool })
+    const gatedRepository = createDrizzleListRepository(gatedDatabase)
+    const timestamp = new Date("2026-08-30T12:00:10.000Z")
+    const ensureResults = Promise.all([
+      gatedRepository.ensureDefaultInbox(userId, timestamp),
+      gatedRepository.ensureDefaultInbox(userId, timestamp),
+    ])
+
+    await initialSelectsObserved
+    initialSelectGateOpen = false
+    releaseInitialSelects()
+    await conflictObserved
+
+    const winner = await repository.listByUser(userId, { limit: 20 })
+    expect(winner.items).toHaveLength(1)
+    await expect(
+      repository.rename(
+        userId,
+        winner.items[0].id,
+        "Projects",
+        new Date("2026-08-30T12:00:11.000Z")
+      )
+    ).resolves.toMatchObject({ name: "Projects" })
+
+    releaseConflictReadback()
+    const results = await ensureResults
+    expect(new Set(results.map((list) => list.id)).size).toBe(1)
+    expect(results.some((list) => list.name === "Projects")).toBe(true)
+    await expect(repository.listByUser(userId, { limit: 20 })).resolves.toEqual(
+      {
+        items: [expect.objectContaining({ name: "Projects" })],
         nextCursor: null,
       }
     )
@@ -297,6 +425,56 @@ describe.sequential("Drizzle list repository", () => {
     ).rejects.toBeInstanceOf(InvalidPageRequestError)
   })
 
+  it("uses the id tie-breaker when lists share a creation timestamp", async () => {
+    const userId = `t06-page-tie-${Date.now()}`
+    await database.insert(usersTable).values({
+      id: userId,
+      name: "T-06 Page Tie User",
+      email: `${userId}@example.test`,
+    })
+
+    const repository = createDrizzleListRepository(database)
+    const createdAt = new Date("2026-08-30T12:04:00.000Z")
+    const firstId = "00000000-0000-4000-8000-000000000001"
+    const secondId = "00000000-0000-4000-8000-000000000002"
+    const thirdId = "00000000-0000-4000-8000-000000000003"
+    await database.insert(listsTable).values([
+      {
+        id: thirdId,
+        userId,
+        name: "First inserted",
+        createdAt,
+        updatedAt: createdAt,
+      },
+      {
+        id: firstId,
+        userId,
+        name: "Second inserted",
+        createdAt,
+        updatedAt: createdAt,
+      },
+      {
+        id: secondId,
+        userId,
+        name: "Third inserted",
+        createdAt,
+        updatedAt: createdAt,
+      },
+    ])
+
+    const firstPage = await repository.listByUser(userId, { limit: 2 })
+    expect(firstPage.items.map((list) => list.id)).toEqual([firstId, secondId])
+    expect(firstPage.nextCursor).toEqual(expect.any(String))
+    expect(decodeListCursor(firstPage.nextCursor!, userId).id).toBe(secondId)
+
+    const secondPage = await repository.listByUser(userId, {
+      cursor: firstPage.nextCursor!,
+      limit: 2,
+    })
+    expect(secondPage.items.map((list) => list.id)).toEqual([thirdId])
+    expect(secondPage.nextCursor).toBeNull()
+  })
+
   it("retains the last successfully committed rename", async () => {
     const userId = `t06-write-${Date.now()}`
     await database.insert(usersTable).values({
@@ -311,23 +489,29 @@ describe.sequential("Drizzle list repository", () => {
       name: "Initial",
       now: new Date("2026-08-30T12:05:00.000Z"),
     })
-    const writes = await Promise.all([
-      repository.rename(
-        userId,
-        list.id,
-        "First write",
-        new Date("2026-08-30T12:06:00.000Z")
-      ),
-      repository.rename(
+    const firstClient = await appPool!.connect()
+    try {
+      await firstClient.query("BEGIN")
+      await firstClient.query(
+        `UPDATE "lists"
+         SET "name" = $1, "updated_at" = $2
+         WHERE "user_id" = $3 AND "id" = $4`,
+        ["First write", new Date("2026-08-30T12:06:00.000Z"), userId, list.id]
+      )
+
+      const laterWrite = repository.rename(
         userId,
         list.id,
         "Second write",
         new Date("2026-08-30T12:07:00.000Z")
-      ),
-    ])
+      )
+      await firstClient.query("COMMIT")
+      await expect(laterWrite).resolves.toMatchObject({ name: "Second write" })
+    } finally {
+      firstClient.release()
+    }
 
-    expect(writes.every(Boolean)).toBe(true)
     const finalList = await repository.findByIdForUser(userId, list.id)
-    expect(["First write", "Second write"]).toContain(finalList?.name)
+    expect(finalList?.name).toBe("Second write")
   })
 })

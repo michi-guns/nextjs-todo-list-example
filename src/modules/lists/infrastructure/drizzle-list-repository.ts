@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, or, sql } from "drizzle-orm"
+import { and, asc, eq, gt, or } from "drizzle-orm"
 import { type NodePgDatabase } from "drizzle-orm/node-postgres"
 
 import { listsTable, type SelectList } from "../../../../db/schema/lists"
@@ -128,12 +128,8 @@ export function createDrizzleListRepository(
         const existing = await database
           .select()
           .from(listsTable)
-          .where(
-            and(
-              eq(listsTable.userId, userId),
-              sql`lower(${listsTable.name}) = lower('Inbox')`
-            )
-          )
+          .where(eq(listsTable.userId, userId))
+          .orderBy(asc(listsTable.createdAt), asc(listsTable.id))
           .limit(1)
 
         if (existing[0]) {
