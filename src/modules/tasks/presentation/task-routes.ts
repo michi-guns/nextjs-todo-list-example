@@ -1,5 +1,6 @@
 import type { CurrentUser } from "../../auth/domain/current-user"
 import {
+  assertSameOriginMutation,
   InvalidEntryInputError,
   jsonErrorResponse,
 } from "../../../shared/entry-contract"
@@ -131,6 +132,12 @@ export function createTaskListHandlers(dependencies: TaskRouteDependencies) {
       return authentication.response
     }
 
+    try {
+      assertSameOriginMutation(request, { jsonBody: true })
+    } catch (error) {
+      return jsonErrorResponse(error)
+    }
+
     let listId: string | Response
     try {
       listId = await resourceId(context)
@@ -191,6 +198,12 @@ export function createTaskResourceHandlers(
       return authentication.response
     }
 
+    try {
+      assertSameOriginMutation(request, { jsonBody: true })
+    } catch (error) {
+      return jsonErrorResponse(error)
+    }
+
     let taskId: string | Response
     try {
       taskId = await resourceId(context)
@@ -233,6 +246,12 @@ export function createTaskResourceHandlers(
     const authentication = await getAuthenticatedUser(request, dependencies)
     if ("response" in authentication) {
       return authentication.response
+    }
+
+    try {
+      assertSameOriginMutation(request)
+    } catch (error) {
+      return jsonErrorResponse(error)
     }
 
     let taskId: string | Response

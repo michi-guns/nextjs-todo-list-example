@@ -74,7 +74,11 @@ function actionDependencies(
 }
 
 function request(url: string, init: RequestInit = {}) {
-  return new Request(`http://localhost${url}`, init)
+  const headers = new Headers(init.headers)
+  if (!headers.has("origin")) {
+    headers.set("origin", "http://localhost")
+  }
+  return new Request(`http://localhost${url}`, { ...init, headers })
 }
 
 async function json(response: Response) {
@@ -181,6 +185,27 @@ describe("list JSON entry adapters", () => {
     await expect(json(response)).resolves.toEqual({
       error: { code: "conflict", message: "Resource already exists" },
     })
+  })
+
+  it("rejects foreign-origin simple mutations before parsing or calling the application", async () => {
+    const application = makeApplication()
+    const handlers = createListCollectionHandlers(
+      routeDependencies(application)
+    )
+
+    const response = await handlers.POST(
+      request("/api/lists", {
+        method: "POST",
+        headers: {
+          origin: "https://attacker.example",
+          "content-type": "text/plain",
+        },
+        body: JSON.stringify({ name: "Projects" }),
+      })
+    )
+
+    expect(response.status).toBe(422)
+    expect(application.createList).not.toHaveBeenCalled()
   })
 
   it("maps malformed pagination and path IDs to 422 without reaching the application", async () => {

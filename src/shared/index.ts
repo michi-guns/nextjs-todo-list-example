@@ -20,6 +20,7 @@ export type {
 } from "./error-contract"
 export {
   actionErrorResult,
+  assertSameOriginMutation,
   inputFromActionValue,
   InvalidEntryInputError,
   invalidInputActionResult,

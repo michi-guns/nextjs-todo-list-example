@@ -78,7 +78,11 @@ function actionDependencies(
 }
 
 function request(url: string, init: RequestInit = {}) {
-  return new Request(`http://localhost${url}`, init)
+  const headers = new Headers(init.headers)
+  if (!headers.has("origin")) {
+    headers.set("origin", "http://localhost")
+  }
+  return new Request(`http://localhost${url}`, { ...init, headers })
 }
 
 async function json(response: Response) {
@@ -162,6 +166,7 @@ describe("task JSON entry adapters", () => {
     const missing = await missingHandlers.POST(
       request(`/api/lists/${listId}/tasks`, {
         method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ title: "Created" }),
       }),
       { params: Promise.resolve({ listId }) }
@@ -218,6 +223,26 @@ describe("task JSON entry adapters", () => {
 
     expect(response.status).toBe(401)
     expect(application.listTasks).not.toHaveBeenCalled()
+  })
+
+  it("rejects foreign-origin task mutations before calling the application", async () => {
+    const application = makeApplication()
+    const handlers = createTaskListHandlers(routeDependencies(application))
+
+    const response = await handlers.POST(
+      request(`/api/lists/${listId}/tasks`, {
+        method: "POST",
+        headers: {
+          origin: "https://attacker.example",
+          "content-type": "text/plain",
+        },
+        body: JSON.stringify({ title: "Created" }),
+      }),
+      { params: Promise.resolve({ listId }) }
+    )
+
+    expect(response.status).toBe(422)
+    expect(application.createTask).not.toHaveBeenCalled()
   })
 
   it("returns explicit task delete success and maps an absent task to 404", async () => {

@@ -13,6 +13,32 @@ export class InvalidEntryInputError extends Error {
   }
 }
 
+export function assertSameOriginMutation(
+  request: Request,
+  options: { readonly jsonBody?: boolean } = {}
+): void {
+  const origin = request.headers.get("origin")
+  let requestOrigin: string
+
+  try {
+    requestOrigin = new URL(request.url).origin
+  } catch {
+    throw new InvalidEntryInputError()
+  }
+
+  if (!origin || origin !== requestOrigin) {
+    throw new InvalidEntryInputError()
+  }
+
+  if (options.jsonBody) {
+    const contentType = request.headers.get("content-type")
+    const mediaType = contentType?.split(";", 1)[0]?.trim().toLowerCase()
+    if (mediaType !== "application/json") {
+      throw new InvalidEntryInputError()
+    }
+  }
+}
+
 export function inputFromActionValue(value: unknown): unknown {
   if (typeof FormData !== "undefined" && value instanceof FormData) {
     return Object.fromEntries(value.entries())

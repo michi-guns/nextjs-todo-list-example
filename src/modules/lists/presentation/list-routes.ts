@@ -1,5 +1,6 @@
 import type { CurrentUser } from "../../auth/domain/current-user"
 import {
+  assertSameOriginMutation,
   InvalidEntryInputError,
   jsonErrorResponse,
 } from "../../../shared/entry-contract"
@@ -80,6 +81,12 @@ export function createListCollectionHandlers(
       return authentication.response
     }
 
+    try {
+      assertSameOriginMutation(request, { jsonBody: true })
+    } catch (error) {
+      return jsonErrorResponse(error)
+    }
+
     let value: unknown
     try {
       value = await readJson(request)
@@ -129,6 +136,12 @@ export function createListResourceHandlers(
       return authentication.response
     }
 
+    try {
+      assertSameOriginMutation(request, { jsonBody: true })
+    } catch (error) {
+      return jsonErrorResponse(error)
+    }
+
     let listId: string | Response
     try {
       listId = await resourceId(context)
@@ -174,6 +187,12 @@ export function createListResourceHandlers(
     const authentication = await getAuthenticatedUser(request, dependencies)
     if ("response" in authentication) {
       return authentication.response
+    }
+
+    try {
+      assertSameOriginMutation(request)
+    } catch (error) {
+      return jsonErrorResponse(error)
     }
 
     let listId: string | Response
