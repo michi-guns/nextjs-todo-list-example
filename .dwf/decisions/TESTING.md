@@ -127,13 +127,13 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                      | `partial`   |
 | [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                      | `partial`   |
 | [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                | `partial`   |
-| [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration            | T-06, T-14                      | `specified` |
-| [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14          | `specified` |
-| [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14          | `specified` |
+| [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration            | T-06, T-14                      | `partial`   |
+| [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14          | `partial`   |
+| [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14          | `partial`   |
 | [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09                      | `specified` |
 | [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14          | `specified` |
 | [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14          | `specified` |
-| [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                | `specified` |
+| [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                | `partial`   |
 | [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                      | `specified` |
 | [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                            | `verified`  |
 | [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                      | `verified`  |
@@ -272,7 +272,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-LISTS-001 — Inbox and list lifecycle
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Lists
 - **Evidence layers/modes:** Domain, application, infrastructure / unit, integration
 - **Verifies product decisions:** D-003
@@ -283,12 +283,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A listless private workspace creates exactly one ordinary `Inbox` atomically and idempotently, including after final-list deletion; any existing list prevents automatic creation; Inbox can later be renamed or deleted.
 - **Required evidence:** Database-free application tests for lifecycle outcomes, PostgreSQL integration for atomic/concurrent creation, and the relevant authenticated journey when the UI exists.
 - **Dependencies:** T-04 schema, T-05 auth boundary, and T-14 real database harness.
+- **Current evidence:** `src/modules/lists/application/list-use-cases.test.ts` and the local PostgreSQL repository suite cover Inbox normalization and lifecycle outcomes. The integration suite proves eight concurrent listless calls converge to one Inbox, an existing list prevents automatic creation, final-list deletion permits recreation, and a controlled conflict/read-back interleaving does not create a duplicate after the winner is renamed. The reusable T-14 harness and authenticated journey remain outstanding.
+- **Follow-up:** T-14 must repeat the lifecycle cases through the harness and T-15/T-10 must add the authenticated private-workspace journey before this contract can be `verified`.
 
 <a id="tst-lists-002"></a>
 
 ### TST-LISTS-002 — List validation, CRUD, uniqueness, and cascade
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Lists
 - **Evidence layers/modes:** Domain, application, infrastructure, boundary / unit, integration, contract
 - **Verifies product decisions:** D-003, D-004
@@ -299,12 +301,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** List names are trimmed and limited to 1–80 characters, list CRUD is owner-scoped, duplicate names conflict case-insensitively after trimming, and deleting a list removes its tasks through the relational cascade.
 - **Required evidence:** Domain/application validation tests, PostgreSQL constraint and cascade tests, and request-boundary conflict/invalid-input tests.
 - **Dependencies:** T-04 schema, T-06 use cases, and T-09 entry paths.
+- **Current evidence:** The application suite proves trimming, 1–80 validation, owner forwarding, privacy-preserving not-found mapping, and conflict preservation. The local PostgreSQL suite proves owner-scoped CRUD, case-insensitive uniqueness, cross-owner privacy, and list-to-task cascade deletion. T-09 boundary coverage and the reusable T-14 harness remain outstanding.
+- **Follow-up:** T-09 must add request-boundary `409`/`422`/privacy tests, and T-14 must repeat the persistence cases through the harness before this contract can be `verified`.
 
 <a id="tst-lists-003"></a>
 
 ### TST-LISTS-003 — Bounded and context-safe list pagination
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Lists
 - **Evidence layers/modes:** Application, infrastructure, boundary, UI / integration, contract, browser
 - **Verifies product decisions:** D-001, D-003
@@ -315,6 +319,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** List reads default to 20, accept 1–100, return oldest-first deterministic pages with opaque context-bound cursors, fetch at most `limit + 1` rows, and expose a next page only when one exists.
 - **Required evidence:** Application and PostgreSQL pagination tests, malformed/cross-context cursor and limit boundary tests, and a browser-visible `Load more` check.
 - **Dependencies:** T-04 indexes, T-06 repository/use case, T-08 shared pagination contract, and T-14 harness.
+- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. The local PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, and bounded `limit + 1` repository reads. T-08 boundary mapping, T-10 browser `Load more`, and T-14 harness evidence remain outstanding.
+- **Follow-up:** T-08 must add shared boundary response-shape tests, T-10 must verify browser-visible pagination, and T-14 must repeat the query behavior through the reusable harness before this contract can be `verified`.
 
 <a id="tst-tasks-001"></a>
 
@@ -368,7 +374,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-CONCURRENCY-001 — Last-successful-write behavior
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Concurrent mutations
 - **Evidence layers/modes:** Application, infrastructure / integration
 - **Verifies product decisions:** D-007
@@ -379,6 +385,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Concurrent accepted mutations do not require version tokens; each patch changes only submitted fields; same-field writes expose the last successfully committed value; disjoint-field writes may both persist; ordinary ownership, validation, and uniqueness outcomes remain intact.
 - **Required evidence:** Application tests using realistic concurrent operations and PostgreSQL integration tests for commit ordering and disjoint-field preservation.
 - **Dependencies:** T-06/T-07 mutation paths and T-14 real database harness.
+- **Current evidence:** The local PostgreSQL suite proves controlled same-row rename commit ordering (the later committed write is retained), concurrent Inbox uniqueness, and the conflict/read-back race. Task-side disjoint-field behavior and the reusable T-14 harness remain outstanding.
+- **Follow-up:** T-07 must add task mutation and disjoint-field evidence, and T-14 must repeat the concurrency cases through the harness before this contract can be `verified`.
 
 <a id="tst-boundary-001"></a>
 
