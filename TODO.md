@@ -572,7 +572,7 @@ Dependencies: T-05, T-09, T-10, T-11, T-14.
 
 ### T-16: Produce Neon performance evidence
 
-- [x] Add a guarded, repeatable `pnpm neon:performance` script that obtains an ephemeral direct Neon URL, refuses non-development targets, and replaces only its two deterministic synthetic users.
+- [x] Add a guarded, repeatable `pnpm neon:performance` script that obtains the authoritative development endpoint through the Neon CLI, refuses non-development targets (including a mismatched `DATABASE_URL` override), and replaces only its two deterministic synthetic users.
 - [x] Create the separate Neon development-branch performance seed: approximately 100 lists, 10,000 tasks in one list, and another user's records.
 - [x] Run `EXPLAIN ANALYZE` for representative first-page and next-page list/task queries, including completed-task filtering when its SQL differs.
 - [x] Verify correct cursor behavior at page size 100 and a warm 20-record database query under 50 ms with compute active.
@@ -593,7 +593,7 @@ Implementation scope: `scripts/verify-neon-performance/`, the single `pnpm neon:
 
 Plan: [`2026-08-30-t-16-neon-performance-evidence.md`](docs/agentforge/plans/2026-08-30-t-16-neon-performance-evidence.md).
 
-Evidence: [`docs/agentforge/evidence/t16-neon-performance.json`](docs/agentforge/evidence/t16-neon-performance.json) records the direct development-branch run: 101 primary lists, 10,000 primary tasks in one list, 10,000 secondary-owner tasks, six index-backed plans with no lists/tasks sequential scans, owner isolation, maximum-page-size cursor checks, and ten warmed server-reported execution samples with a 0.334 ms maximum against the 50 ms target. Focused core tests and the full suite pass (18 files/91 tests); local integration passes (6 files/23 tests against one disposable PostgreSQL 18 Testcontainer); typecheck and build pass; lint reports only the pre-existing `app/layout.tsx:1:10 Geist` warning; changed-file Prettier and diff checks pass. The task repository now expresses explicit `NULLS LAST` ordering to match the existing task index without changing `NOT NULL` result semantics. Fresh GPT-5.6-Sol review and PR details will be appended after the review loop.
+Evidence: [`docs/agentforge/evidence/t16-neon-performance.json`](docs/agentforge/evidence/t16-neon-performance.json) records the direct development-branch run: 101 primary lists, 10,000 primary tasks in one list, 10,000 secondary-owner tasks, six index-backed plans with no lists/tasks sequential scans, owner isolation, maximum-page-size cursor checks, and ten warmed server-reported execution samples with a 0.06 ms maximum against the 50 ms target. Focused core tests and the full suite pass (18 files/91 tests); local integration passes (6 files/23 tests against one disposable PostgreSQL 18 Testcontainer); typecheck and build pass; lint reports only the pre-existing `app/layout.tsx:1:10 Geist` warning; changed-file Prettier and diff checks pass. The task repository now expresses explicit `NULLS LAST` ordering to match the existing task index without changing `NOT NULL` result semantics. The CLI obtains the development endpoint independently through `neon connection-string development` and rejects a supplied default-branch URL before mutation. Fresh GPT-5.6-Sol review and PR details will be appended after the review loop.
 
 ### T-17: Finish documentation and final quality gates
 

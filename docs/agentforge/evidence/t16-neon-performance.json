@@ -1,6 +1,6 @@
 {
   "contract": "TST-PERFORMANCE-001",
-  "generatedAt": "2026-08-30T19:06:17.170Z",
+  "generatedAt": "2026-08-30T19:24:02.461Z",
   "measurementScope": {
     "databaseExecution": "PostgreSQL EXPLAIN ANALYZE Execution Time after warmup",
     "excluded": [
@@ -16,7 +16,7 @@
     {
       "expectedIndex": "lists_user_created_at_id_idx",
       "label": "lists:first-page",
-      "executionTimeMs": 0.064,
+      "executionTimeMs": 0.061,
       "indexNames": ["lists_user_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -25,7 +25,7 @@
     {
       "expectedIndex": "lists_user_created_at_id_idx",
       "label": "lists:next-page",
-      "executionTimeMs": 0.109,
+      "executionTimeMs": 0.071,
       "indexNames": ["lists_user_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -34,7 +34,7 @@
     {
       "expectedIndex": "tasks_user_list_created_at_id_idx",
       "label": "tasks:first-page:include-completed",
-      "executionTimeMs": 0.063,
+      "executionTimeMs": 0.085,
       "indexNames": ["tasks_user_list_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -43,7 +43,7 @@
     {
       "expectedIndex": "tasks_user_list_created_at_id_idx",
       "label": "tasks:next-page:include-completed",
-      "executionTimeMs": 0.062,
+      "executionTimeMs": 0.064,
       "indexNames": ["tasks_user_list_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -52,7 +52,7 @@
     {
       "expectedIndex": "tasks_user_list_created_at_id_idx",
       "label": "tasks:first-page:hide-completed",
-      "executionTimeMs": 0.061,
+      "executionTimeMs": 0.063,
       "indexNames": ["tasks_user_list_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -135,11 +135,11 @@
   },
   "warmQuery": {
     "databaseExecutionTimeMs": {
-      "max": 0.334,
-      "median": 0.066,
-      "min": 0.053,
+      "max": 0.06,
+      "median": 0.0575,
+      "min": 0.055,
       "samples": [
-        0.058, 0.059, 0.067, 0.067, 0.334, 0.133, 0.075, 0.065, 0.053, 0.059
+        0.057, 0.056, 0.058, 0.06, 0.057, 0.055, 0.06, 0.058, 0.058, 0.057
       ]
     },
     "fetchedLimit": 21,

@@ -2,21 +2,7 @@ import { createHash } from "node:crypto"
 
 const DIRECT_POSTGRES_PROTOCOLS = new Set(["postgres:", "postgresql:"])
 
-export function assertDevelopmentTarget({
-  databaseUrl,
-  expectedHost,
-  branchName,
-}) {
-  if (branchName !== "development") {
-    throw new Error(
-      `Neon performance evidence requires the development branch, received ${branchName || "no branch label"}`
-    )
-  }
-
-  if (!expectedHost) {
-    throw new Error("NEON_DEVELOPMENT_HOST is required for the branch guard")
-  }
-
+function parseDirectPostgresUrl(databaseUrl) {
   let parsedUrl
   try {
     parsedUrl = new URL(databaseUrl)
@@ -29,6 +15,33 @@ export function assertDevelopmentTarget({
   }
 
   const host = parsedUrl.hostname.toLowerCase()
+  if (/-pooler(?:\.|$)/i.test(host)) {
+    throw new Error(
+      "The Neon performance script requires a direct connection, not a pooled host"
+    )
+  }
+
+  return { parsedUrl, host }
+}
+
+export function assertDevelopmentTarget({
+  databaseUrl,
+  expectedHost,
+  branchName,
+}) {
+  if (branchName !== "development") {
+    throw new Error(
+      `Neon performance evidence requires the development branch, received ${branchName || "no branch label"}`
+    )
+  }
+
+  if (!expectedHost) {
+    throw new Error(
+      "An expected development host is required for the branch guard"
+    )
+  }
+
+  const { host } = parseDirectPostgresUrl(databaseUrl)
   const normalizedExpectedHost = expectedHost.toLowerCase()
   if (host !== normalizedExpectedHost) {
     throw new Error(
@@ -36,13 +49,27 @@ export function assertDevelopmentTarget({
     )
   }
 
-  if (/-pooler(?:\.|$)/i.test(host)) {
+  return { branchName, host }
+}
+
+export function assertAuthoritativeDevelopmentTarget({
+  databaseUrl,
+  authoritativeDatabaseUrl,
+}) {
+  const authoritative = parseDirectPostgresUrl(authoritativeDatabaseUrl)
+  const supplied = parseDirectPostgresUrl(databaseUrl)
+
+  if (supplied.host !== authoritative.host) {
     throw new Error(
-      "The Neon performance script requires a direct connection, not a pooled host"
+      "DATABASE_URL does not match the authoritative development endpoint"
     )
   }
 
-  return { branchName, host }
+  return {
+    authoritativeHost: authoritative.host,
+    branchName: "development",
+    host: supplied.host,
+  }
 }
 
 export function normalizeSslMode(databaseUrl) {

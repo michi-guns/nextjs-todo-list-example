@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import {
   assertCursorSequence,
+  assertAuthoritativeDevelopmentTarget,
   assertDevelopmentTarget,
   deterministicUuid,
   extractPlanSummary,
@@ -49,6 +50,17 @@ describe("Neon performance guards", () => {
         branchName: "main",
       })
     ).toThrow(/development/i)
+  })
+
+  it("rejects a default endpoint even when its caller-supplied host matches", () => {
+    expect(() =>
+      assertAuthoritativeDevelopmentTarget({
+        databaseUrl:
+          "postgresql://user:password@ep-default.us-east-2.aws.neon.tech/neondb",
+        authoritativeDatabaseUrl:
+          "postgresql://user:password@ep-development.us-east-2.aws.neon.tech/neondb",
+      })
+    ).toThrow(/authoritative development endpoint/i)
   })
 
   it("creates stable UUIDs for rerunnable synthetic rows", () => {

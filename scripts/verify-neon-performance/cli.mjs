@@ -1,15 +1,19 @@
+import { execFile } from "node:child_process"
+import { promisify } from "node:util"
 import { mkdir, writeFile } from "node:fs/promises"
 import { dirname, relative, resolve, sep } from "node:path"
 import { Pool } from "pg"
 
 import {
+  assertAuthoritativeDevelopmentTarget,
   assertCursorSequence,
-  assertDevelopmentTarget,
   assertPlanUsesIndex,
   deterministicUuid,
   extractPlanSummary,
   normalizeSslMode,
 } from "./core.mjs"
+
+const execFileAsync = promisify(execFile)
 
 const PRIMARY_USER_ID = "t16-performance-primary"
 const SECONDARY_USER_ID = "t16-performance-secondary"
@@ -25,6 +29,8 @@ const WARMUP_COUNT = 3
 const DEFAULT_WARM_SAMPLE_COUNT = 10
 const WARM_TARGET_MS = 50
 const SEED_BASE_TIME = Date.UTC(2025, 0, 1, 0, 0, 0)
+const DEVELOPMENT_BRANCH = "development"
+const NEON_CLI_TIMEOUT_MS = 30_000
 const PERFORMANCE_EVIDENCE_PATH =
   "docs/agentforge/evidence/t16-neon-performance.json"
 const EXPECTED_INDEXES = {
@@ -44,10 +50,48 @@ function parsePositiveInteger(value, fallback, name) {
   return parsed
 }
 
-function loadConfig(environment = process.env) {
-  const databaseUrl = environment.DATABASE_URL?.trim()
-  const expectedHost = environment.NEON_DEVELOPMENT_HOST?.trim()
-  const branchName = environment.NEON_DEVELOPMENT_BRANCH?.trim()
+async function getAuthoritativeDevelopmentUrl() {
+  const command = process.platform === "win32" ? "powershell.exe" : "neon"
+  const args =
+    process.platform === "win32"
+      ? [
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-Command",
+          "neon connection-string development",
+        ]
+      : ["connection-string", DEVELOPMENT_BRANCH]
+
+  let result
+  try {
+    result = await execFileAsync(command, args, {
+      encoding: "utf8",
+      maxBuffer: 1024 * 1024,
+      timeout: NEON_CLI_TIMEOUT_MS,
+      windowsHide: true,
+    })
+  } catch {
+    throw new Error(
+      "Unable to obtain the authoritative Neon development connection string; verify that the Neon CLI is installed, authenticated, and the development branch is available"
+    )
+  }
+
+  const databaseUrl = result.stdout.trim()
+  if (!databaseUrl) {
+    throw new Error(
+      "The Neon CLI returned no connection string for the development branch"
+    )
+  }
+
+  return databaseUrl
+}
+
+function loadConfig(environment = process.env, authoritativeDatabaseUrl) {
+  const suppliedDatabaseUrl = environment.DATABASE_URL?.trim()
+  const databaseUrl = suppliedDatabaseUrl || authoritativeDatabaseUrl
   const computeActive = environment.NEON_COMPUTE_ACTIVE?.trim().toLowerCase()
   const expectedDatabase =
     environment.NEON_EXPECTED_DATABASE?.trim() || "neondb"
@@ -59,10 +103,13 @@ function loadConfig(environment = process.env) {
     "T16_WARM_SAMPLES"
   )
 
-  if (!databaseUrl) {
+  if (!authoritativeDatabaseUrl) {
     throw new Error(
-      "DATABASE_URL is required; obtain it ephemerally from the Neon development branch"
+      "The authoritative Neon development connection string is required"
     )
+  }
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL must be available for the development branch")
   }
   if (computeActive !== "true") {
     throw new Error(
@@ -70,14 +117,13 @@ function loadConfig(environment = process.env) {
     )
   }
 
-  const target = assertDevelopmentTarget({
+  const target = assertAuthoritativeDevelopmentTarget({
     databaseUrl,
-    expectedHost,
-    branchName,
+    authoritativeDatabaseUrl,
   })
 
   return {
-    branchName,
+    branchName: target.branchName,
     databaseUrl,
     evidencePath,
     expectedDatabase,
@@ -754,7 +800,8 @@ function redactError(error) {
 }
 
 async function main() {
-  const config = loadConfig()
+  const authoritativeDatabaseUrl = await getAuthoritativeDevelopmentUrl()
+  const config = loadConfig(process.env, authoritativeDatabaseUrl)
   const evidencePath = resolveEvidencePath(config.evidencePath)
   const evidence = await runPerformanceEvidence(config)
   await mkdir(dirname(evidencePath), { recursive: true })
