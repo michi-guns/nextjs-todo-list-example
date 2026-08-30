@@ -500,6 +500,7 @@ Dependencies: T-10, T-11, T-12, T-13.
 
 ### T-14: Build the PostgreSQL integration harness
 
+- [~] Implement T-14 from the accepted plan in [`docs/agentforge/plans/2026-08-30-t-14-postgresql-harness.md`](docs/agentforge/plans/2026-08-30-t-14-postgresql-harness.md).
 - [ ] Use `@testcontainers/postgresql` with PostgreSQL 18.
 - [ ] Start one ephemeral container per integration suite, apply versioned migrations, and clean it up on success or failure.
 - [ ] Keep integration tests serial, give each test a unique user/data set, and refuse external database URLs in destructive cleanup.
@@ -512,6 +513,8 @@ Verification:
 Test contracts: `TST-HARNESS-001`, `TST-MIGRATION-001`, `TST-PERSISTENCE-001`, `TST-LISTS-001`, `TST-LISTS-002`, `TST-LISTS-003`, `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, `TST-CONCURRENCY-001`.
 
 Dependencies: T-04, T-06, T-07, T-08.
+
+Implementation scope: `src/test/postgres-harness.ts`, `src/test/postgres-global-setup.ts`, `src/test/postgres-test-setup.ts`, `vitest.integration.config.ts`, harness guard/isolation tests, and the required package/README evidence. Existing integration behavior and migrations remain unchanged; Playwright orchestration is T-15.
 
 ### T-15: Replace the example Playwright suite
 
