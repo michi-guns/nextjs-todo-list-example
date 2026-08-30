@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import { appendPage, resetPage, type PageState } from "./dashboard-state"
+import {
+  appendPage,
+  resetPage,
+  resolveListDeleteOutcome,
+  type PageState,
+} from "./dashboard-state"
 
 describe("dashboard pagination state", () => {
   it("replaces the current page and cursor when the context changes", () => {
@@ -44,5 +49,15 @@ describe("dashboard pagination state", () => {
       items: [{ id: "first" }, { id: "new" }, { id: "later" }],
       nextCursor: null,
     })
+  })
+
+  it("reloads the first list page when the loaded page is empty but continues", () => {
+    expect(resolveListDeleteOutcome(0, "cursor-for-unloaded-lists")).toBe(
+      "reload"
+    )
+    expect(resolveListDeleteOutcome(0, null)).toBe("empty")
+    expect(resolveListDeleteOutcome(1, "cursor-for-unloaded-lists")).toBe(
+      "select"
+    )
   })
 })

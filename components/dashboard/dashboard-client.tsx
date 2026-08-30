@@ -8,9 +8,9 @@ import type { ActionResult } from "@/src/shared/entry-contract"
 import {
   appendPage,
   resetPage,
+  resolveListDeleteOutcome,
   type PageState,
 } from "@/src/modules/dashboard/presentation/dashboard-state"
-import type { CurrentUser } from "@/src/modules/auth/domain/current-user"
 import type {
   ListPageViewModel,
   ListViewModel,
@@ -24,7 +24,7 @@ import type {
 import { AppHeader } from "./app-header"
 import { ListRail } from "./list-rail"
 import { TaskWorkspace } from "./task-workspace"
-import type { Notice, PendingOperation } from "./types"
+import type { DashboardUser, Notice, PendingOperation } from "./types"
 
 type ServerAction<T> = (input: unknown) => Promise<ActionResult<T>>
 
@@ -37,7 +37,7 @@ type TaskPatch = {
 }
 
 export interface DashboardClientProps {
-  readonly user: CurrentUser
+  readonly user: DashboardUser
   readonly initialLists: ListPageViewModel
   readonly initialTasks: TaskPageViewModel | null
   readonly createList: ServerAction<ListViewModel>
@@ -234,9 +234,11 @@ export function DashboardClient({
     readonly id: string
     readonly label: string
   } | null>(null)
+  const [confirmError, setConfirmError] = useState<string | null>(null)
   const taskRequestVersion = useRef(0)
   const reloadRef = useRef<HTMLButtonElement>(null)
   const confirmReturnFocus = useRef<HTMLElement | null>(null)
+  const dashboardContentRef = useRef<HTMLDivElement>(null)
 
   const selectedList =
     listPage.items.find((list) => list.id === selectedListId) ?? null
@@ -244,6 +246,24 @@ export function DashboardClient({
   useEffect(() => {
     if (finalListState) reloadRef.current?.focus()
   }, [finalListState])
+
+  useEffect(() => {
+    const content = dashboardContentRef.current
+    if (!content) return
+
+    const dialogOpen = confirmRequest !== null
+    content.inert = dialogOpen
+    if (dialogOpen) {
+      content.setAttribute("aria-hidden", "true")
+    } else {
+      content.removeAttribute("aria-hidden")
+    }
+
+    return () => {
+      content.inert = false
+      content.removeAttribute("aria-hidden")
+    }
+  }, [confirmRequest])
 
   function setErrorNotice(message: string) {
     setNotice({ tone: "error", message })
@@ -411,6 +431,34 @@ export function DashboardClient({
     return true
   }
 
+  async function reloadListsAfterDelete() {
+    setPendingOperation("load-lists")
+    try {
+      const page = await fetchPage(listPagePath(), isList)
+      setListPage(resetPage(listPage, page))
+
+      const nextList = page.items[0]
+      if (!nextList) {
+        setSelectedListId(null)
+        setTaskPage(emptyTaskPage)
+        setTaskLoading(false)
+        setFinalListState(true)
+        return
+      }
+
+      setFinalListState(false)
+      setSelectedListId(nextList.id)
+      setTaskPage(emptyTaskPage)
+      await loadTasksPage(nextList.id, includeCompleted, undefined, "replace")
+      focusById(`list-option-${nextList.id}`)
+    } catch (error) {
+      setFinalListState(false)
+      setErrorNotice(unexpectedErrorMessage(error))
+    } finally {
+      setPendingOperation(null)
+    }
+  }
+
   function requestDeleteList(listId: string) {
     const list = listPage.items.find((item) => item.id === listId)
     if (!list) return
@@ -418,6 +466,7 @@ export function DashboardClient({
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null
+    setConfirmError(null)
     setConfirmRequest({ kind: "list", id: list.id, label: list.name })
   }
 
@@ -428,12 +477,14 @@ export function DashboardClient({
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null
+    setConfirmError(null)
     setConfirmRequest({ kind: "task", id: task.id, label: task.title })
   }
 
   function cancelDelete() {
     const returnFocus = confirmReturnFocus.current
     confirmReturnFocus.current = null
+    setConfirmError(null)
     setConfirmRequest(null)
     requestAnimationFrame(() => returnFocus?.focus())
   }
@@ -441,12 +492,19 @@ export function DashboardClient({
   async function confirmDelete() {
     const request = confirmRequest
     if (!request) return
+    setConfirmError(null)
 
     if (request.kind === "list") {
       const result = await runMutation("delete-list", () =>
         deleteList({ listId: request.id })
       )
-      if (!result || !result.ok) return
+      if (!result || !result.ok) {
+        setConfirmError(
+          result?.error.message ??
+            "The list could not be deleted. Try again or cancel."
+        )
+        return
+      }
 
       const remaining = listPage.items.filter((list) => list.id !== request.id)
       confirmReturnFocus.current = null
@@ -460,12 +518,26 @@ export function DashboardClient({
         message: `Deleted list “${request.label}”.`,
       })
 
-      if (remaining.length === 0) {
+      const outcome = resolveListDeleteOutcome(
+        remaining.length,
+        listPage.nextCursor
+      )
+
+      if (outcome === "empty") {
         taskRequestVersion.current += 1
         setSelectedListId(null)
         setTaskPage(emptyTaskPage)
         setTaskLoading(false)
         setFinalListState(true)
+        return
+      }
+
+      if (outcome === "reload") {
+        taskRequestVersion.current += 1
+        setSelectedListId(null)
+        setTaskPage(emptyTaskPage)
+        setTaskLoading(false)
+        await reloadListsAfterDelete()
         return
       }
 
@@ -480,7 +552,13 @@ export function DashboardClient({
     const result = await runMutation("delete-task", () =>
       deleteTask({ taskId: request.id })
     )
-    if (!result || !result.ok) return
+    if (!result || !result.ok) {
+      setConfirmError(
+        result?.error.message ??
+          "The task could not be deleted. Try again or cancel."
+      )
+      return
+    }
 
     const deletedIndex = taskPage.items.findIndex(
       (task) => task.id === request.id
@@ -563,74 +641,82 @@ export function DashboardClient({
 
   return (
     <div className="min-h-svh bg-background">
-      <AppHeader user={user} signOut={signOut} />
-      <div className="flex min-h-[calc(100svh-81px)] min-w-0 flex-col lg:flex-row">
-        {finalListState ? (
-          <FinalListState reloadRef={reloadRef} />
-        ) : (
-          <ListRail
-            lists={listPage.items}
-            selectedListId={selectedListId}
-            nextCursor={listPage.nextCursor}
-            pendingOperation={pendingOperation}
-            onSelectList={(listId) => void handleSelectList(listId)}
-            onCreateList={handleCreateList}
-            onRenameList={handleRenameList}
-            onRequestDeleteList={requestDeleteList}
-            onLoadMore={handleListLoadMore}
-          />
-        )}
-        <main className="flex min-w-0 flex-1 flex-col">
-          <div className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-            {notice ? (
-              <Alert
-                className={
-                  notice.tone === "error"
-                    ? "border-destructive/40 text-destructive"
-                    : "border-primary/40"
-                }
-              >
-                {notice.message}
-              </Alert>
-            ) : null}
-          </div>
-          <TaskWorkspace
-            selectedList={selectedList}
-            tasks={taskPage.items}
-            nextCursor={taskPage.nextCursor}
-            includeCompleted={includeCompleted}
-            loading={taskLoading}
-            loadError={taskLoadError}
-            pendingOperation={pendingOperation}
-            onToggleCompleted={(value) => void handleToggleCompleted(value)}
-            onCreateTask={handleCreateTask}
-            onUpdateTask={handleUpdateTask}
-            onRequestDeleteTask={requestDeleteTask}
-            onLoadMore={() =>
-              selectedListId
-                ? loadTasksPage(
+      <div ref={dashboardContentRef}>
+        <AppHeader user={user} signOut={signOut} />
+        <div className="flex min-h-[calc(100svh-81px)] min-w-0 flex-col lg:flex-row">
+          {finalListState ? (
+            <FinalListState reloadRef={reloadRef} />
+          ) : (
+            <ListRail
+              lists={listPage.items}
+              selectedListId={selectedListId}
+              nextCursor={listPage.nextCursor}
+              pendingOperation={pendingOperation}
+              onSelectList={(listId) => void handleSelectList(listId)}
+              onCreateList={handleCreateList}
+              onRenameList={handleRenameList}
+              onRequestDeleteList={requestDeleteList}
+              onLoadMore={handleListLoadMore}
+            />
+          )}
+          <main className="flex min-w-0 flex-1 flex-col">
+            <div className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+              {notice ? (
+                <Alert
+                  className={
+                    notice.tone === "error"
+                      ? "border-destructive/40 text-destructive"
+                      : "border-primary/40"
+                  }
+                >
+                  {notice.message}
+                </Alert>
+              ) : null}
+            </div>
+            <TaskWorkspace
+              selectedList={selectedList}
+              tasks={taskPage.items}
+              nextCursor={taskPage.nextCursor}
+              includeCompleted={includeCompleted}
+              loading={taskLoading}
+              loadError={taskLoadError}
+              pendingOperation={pendingOperation}
+              onToggleCompleted={(value) => void handleToggleCompleted(value)}
+              onCreateTask={handleCreateTask}
+              onUpdateTask={handleUpdateTask}
+              onRequestDeleteTask={requestDeleteTask}
+              onLoadMore={() =>
+                selectedListId
+                  ? loadTasksPage(
+                      selectedListId,
+                      includeCompleted,
+                      taskPage.nextCursor ?? undefined,
+                      "append"
+                    )
+                  : Promise.resolve(false)
+              }
+              onRetryLoad={() => {
+                if (selectedListId) {
+                  void loadTasksPage(
                     selectedListId,
                     includeCompleted,
-                    taskPage.nextCursor ?? undefined,
-                    "append"
+                    undefined,
+                    "replace"
                   )
-                : Promise.resolve(false)
-            }
-            onRetryLoad={() => {
-              if (selectedListId) {
-                void loadTasksPage(
-                  selectedListId,
-                  includeCompleted,
-                  undefined,
-                  "replace"
-                )
-              }
-            }}
-          />
-        </main>
+                }
+              }}
+            />
+          </main>
+        </div>
+        {!hasLists && !finalListState ? (
+          <p className="sr-only" role="status">
+            No lists are available.
+          </p>
+        ) : null}
       </div>
       <ConfirmDialog
         request={confirmRequest}
+        error={confirmError}
         pending={
           pendingOperation === "delete-list" ||
           pendingOperation === "delete-task"
@@ -638,11 +724,6 @@ export function DashboardClient({
         onCancel={cancelDelete}
         onConfirm={() => void confirmDelete()}
       />
-      {!hasLists && !finalListState ? (
-        <p className="sr-only" role="status">
-          No lists are available.
-        </p>
-      ) : null}
     </div>
   )
 }
@@ -680,6 +761,7 @@ interface ConfirmDialogProps {
     readonly id: string
     readonly label: string
   } | null
+  readonly error: string | null
   readonly pending: boolean
   readonly onCancel: () => void
   readonly onConfirm: () => void
@@ -687,6 +769,7 @@ interface ConfirmDialogProps {
 
 function ConfirmDialog({
   request,
+  error,
   pending,
   onCancel,
   onConfirm,
@@ -739,7 +822,11 @@ function ConfirmDialog({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="delete-dialog-title"
-        aria-describedby="delete-dialog-description"
+        aria-describedby={
+          error
+            ? "delete-dialog-description delete-dialog-error"
+            : "delete-dialog-description"
+        }
         className="w-full max-w-md rounded-xl border border-border bg-background p-6 shadow-xl"
       >
         <h2 id="delete-dialog-title" className="text-lg font-semibold">
@@ -752,6 +839,15 @@ function ConfirmDialog({
           “{request.label}” and its stored data will be permanently deleted.
           This action cannot be undone.
         </p>
+        {error ? (
+          <p
+            id="delete-dialog-error"
+            role="alert"
+            className="mt-3 text-sm text-destructive"
+          >
+            {error}
+          </p>
+        ) : null}
         <div className="mt-6 flex flex-wrap justify-end gap-2">
           <Button
             ref={cancelRef}

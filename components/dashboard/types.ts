@@ -1,3 +1,8 @@
+export interface DashboardUser {
+  readonly email: string
+  readonly name: string | null
+}
+
 export type PendingOperation =
   | "create-list"
   | "rename-list"

@@ -12,6 +12,7 @@ import {
 } from "@/app/actions/tasks"
 import { signOutAction } from "@/app/actions/auth"
 import { DashboardClient } from "@/components/dashboard/dashboard-client"
+import type { DashboardUser } from "@/components/dashboard/types"
 import { listApplication, taskApplication } from "@/app/_todo-dependencies"
 import { requireUser, UnauthenticatedError } from "@/src/modules/auth"
 import { toListPageViewModel } from "@/src/modules/lists/presentation/list-view-model"
@@ -43,10 +44,14 @@ export default async function DashboardPage() {
         await taskApplication.listTasks(user.id, selectedList.id)
       )
     : null
+  const dashboardUser: DashboardUser = {
+    email: user.email,
+    name: user.name,
+  }
 
   return (
     <DashboardClient
-      user={user}
+      user={dashboardUser}
       initialLists={listPage}
       initialTasks={initialTasks}
       createList={createListAction}

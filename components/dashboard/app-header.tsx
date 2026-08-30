@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button"
 
-import type { CurrentUser } from "@/src/modules/auth/domain/current-user"
+import type { DashboardUser } from "./types"
 
 export interface AppHeaderProps {
-  readonly user: CurrentUser
+  readonly user: DashboardUser
   readonly signOut: (formData: FormData) => Promise<void>
 }
 

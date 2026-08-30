@@ -3,6 +3,16 @@ export interface PageState<T> {
   readonly nextCursor: string | null
 }
 
+export type ListDeleteOutcome = "select" | "reload" | "empty"
+
+export function resolveListDeleteOutcome(
+  remainingCount: number,
+  nextCursor: string | null
+): ListDeleteOutcome {
+  if (remainingCount > 0) return "select"
+  return nextCursor ? "reload" : "empty"
+}
+
 export function resetPage<T>(
   _current: PageState<T>,
   page: PageState<T>
