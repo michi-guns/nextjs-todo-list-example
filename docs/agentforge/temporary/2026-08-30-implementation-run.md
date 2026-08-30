@@ -87,6 +87,14 @@ Evidence: `pnpm test` (15 files/67 tests), `pnpm test:integration` without `TEST
 
 The current TODO graph marks T-09A complete and PR #15 merged as `b88f377`, T-09B complete on `main` at `994bca0`, T-16 complete in TODO after final reviewed metadata tip `85d3998` and PR #16 merge commit `5e40bfd` (the hosted evidence itself ran against implementation commit `7837a69`), T-10 complete at reviewed code tip `a25461b`, and T-11 complete at reviewed code tip `7c1b617` pending closeout metadata review. T-12A and T-15 are now safely unblocked; T-17 remains blocked by their listed prerequisites. T-16 has no remaining implementation dependency.
 
+## T-12A closeout checkpoint
+
+The accepted plan [`2026-08-31-t-12a-ui-audit.md`](../plans/2026-08-31-t-12a-ui-audit.md) is complete on branch `task/T-12A-ui-audit`. The reviewed implementation tip `a3eed2c` adds a shared focus-visible skip link to the public/auth/dashboard shells and hides the decorative landing preview from the accessibility tree. The first review of `7c3d320` found that the landing target included header navigation; `a3eed2c` moves the target to the post-header content region so the next Tab reaches `Get started`. The fresh review of `a3eed2c` returned **No actionable findings**, and PR [#17](https://github.com/michi-guns/nextjs-todo-list-example/pull/17) is ready to merge.
+
+T-12A evidence includes `pnpm test` (20 files/110 tests), `pnpm test:integration` (6 files/23 tests against one disposable PostgreSQL 18 Testcontainer), typecheck, lint with only the pre-existing `Geist` warning, build, changed-file Prettier, `git diff --check`, Next.js runtime checks, and Chromium inspection of the four public/auth routes at `320x800`, `768x1024`, `1024x768`, and `1440x900`. The browser audit confirms skip-link target focus, next-Tab behavior, zero axe violations, no browser errors, and no horizontal overflow; the unauthenticated dashboard remains session-gated, with its new target covered by source/build inspection and T-10's authenticated runtime evidence. TST-UI-001 and TST-E2E-003 remain `partial`; TST-E2E-001/002 remain `specified` until T-15's repeatable Playwright/mailbox lifecycle.
+
+After T-12A merges, recompute TODO dependencies and start T-15 from the latest `main`; T-17 remains blocked by T-15.
+
 ## Review loop
 
 After a task's focused and project checks pass:
