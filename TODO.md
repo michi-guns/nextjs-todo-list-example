@@ -222,7 +222,7 @@ Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`.
 
 Evidence: `pnpm test` (6 unit tests), `pnpm test:integration` against disposable local PostgreSQL 18 (8 tests), and `pnpm exec drizzle-kit migrate` plus catalog inspection all pass. The auth contracts remain `partial` until T-09 adds private entry paths and T-15 records the required Chromium journeys.
 
-PR: [#7](https://github.com/michi-guns/nextjs-todo-list-example/pull/7) | commit `196aaa0`
+PR: [#7](https://github.com/michi-guns/nextjs-todo-list-example/pull/7) | final task commit `d241a75` | merged as `2935283`
 
 Dependencies: T-03, T-03A.
 
@@ -237,17 +237,26 @@ Dependencies: T-03, T-03A.
 
 ### T-06: Implement the lists capability
 
-- [ ] Add framework-independent list rules and repository ports under `src/modules/lists`.
-- [ ] Implement `ensureDefaultInbox`, list reads, create, rename, and delete use cases.
-- [ ] Make Inbox creation atomic and idempotent, including after final-list deletion.
-- [ ] Enforce trimming, 1–80 character names, ownership, privacy-preserving not-found results, and last-successful-write behavior.
+- [x] Implement T-06 from the accepted plan in [`docs/agentforge/plans/2026-08-30-t-06-lists-capability.md`](docs/agentforge/plans/2026-08-30-t-06-lists-capability.md).
+- [x] Add framework-independent list rules and repository ports under `src/modules/lists`.
+- [x] Implement `ensureDefaultInbox`, list reads, create, rename, and delete use cases.
+- [x] Make Inbox creation atomic and idempotent, including after final-list deletion.
+- [x] Enforce trimming, 1–80 character names, ownership, privacy-preserving not-found results, and last-successful-write behavior.
 
 Verification:
 
-- [ ] Unit tests cover normalization, ownership, Inbox lifecycle, and expected application outcomes.
-- [ ] Integration tests cover concurrent Inbox creation, duplicate names, cursor ordering, and cascade behavior.
+- [x] Unit tests cover normalization, ownership, Inbox lifecycle, and expected application outcomes.
+- [x] Integration tests cover concurrent Inbox creation, duplicate names, cursor ordering, and cascade behavior.
 
 Test contracts: `TST-LISTS-001`, `TST-LISTS-002`, `TST-LISTS-003`, `TST-CONCURRENCY-001`.
+
+Recommended AgentForge skills: `using-agent-skills`, `planning`, `task-breakdown`, `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, `security-and-hardening`, `api-and-interface-design`, `git-workflow-and-versioning`, and `code-review-and-quality`.
+
+Verification commands: focused unit and local PostgreSQL integration tests during implementation; completion gates are `pnpm test`, `TEST_DATABASE_URL=<local PostgreSQL URL> pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text`, and `git diff --check`. Reusable Testcontainers evidence remains with T-14.
+
+Evidence: `pnpm test` (10 files, 46 tests), `TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/todo_test pnpm test:integration` (4 files, 15 tests against disposable `postgres:18-alpine`), `pnpm typecheck`, `pnpm lint` (one pre-existing `Geist` warning), `pnpm build`, both Drizzle checks, and `git diff --check` all pass. The affected contracts are `partial` with local unit/integration evidence; T-09 boundary, T-10/T-15 browser, and T-14 reusable-harness evidence remain deferred.
+
+PR: [#10](https://github.com/michi-guns/nextjs-todo-list-example/pull/10) | reviewed commit `cdf6ee1` | pending merge after final tip review.
 
 Dependencies: T-04, T-05.
 
