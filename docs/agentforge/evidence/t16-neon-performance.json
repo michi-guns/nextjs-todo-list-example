@@ -1,6 +1,6 @@
 {
   "contract": "TST-PERFORMANCE-001",
-  "generatedAt": "2026-08-30T19:24:02.461Z",
+  "generatedAt": "2026-08-30T19:38:03.303Z",
   "measurementScope": {
     "databaseExecution": "PostgreSQL EXPLAIN ANALYZE Execution Time after warmup",
     "excluded": [
@@ -16,7 +16,7 @@
     {
       "expectedIndex": "lists_user_created_at_id_idx",
       "label": "lists:first-page",
-      "executionTimeMs": 0.061,
+      "executionTimeMs": 0.06,
       "indexNames": ["lists_user_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -25,7 +25,7 @@
     {
       "expectedIndex": "lists_user_created_at_id_idx",
       "label": "lists:next-page",
-      "executionTimeMs": 0.071,
+      "executionTimeMs": 0.087,
       "indexNames": ["lists_user_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -34,7 +34,7 @@
     {
       "expectedIndex": "tasks_user_list_created_at_id_idx",
       "label": "tasks:first-page:include-completed",
-      "executionTimeMs": 0.085,
+      "executionTimeMs": 0.06,
       "indexNames": ["tasks_user_list_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -43,7 +43,7 @@
     {
       "expectedIndex": "tasks_user_list_created_at_id_idx",
       "label": "tasks:next-page:include-completed",
-      "executionTimeMs": 0.064,
+      "executionTimeMs": 0.065,
       "indexNames": ["tasks_user_list_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -52,7 +52,7 @@
     {
       "expectedIndex": "tasks_user_list_created_at_id_idx",
       "label": "tasks:first-page:hide-completed",
-      "executionTimeMs": 0.063,
+      "executionTimeMs": 0.064,
       "indexNames": ["tasks_user_list_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -61,7 +61,7 @@
     {
       "expectedIndex": "tasks_user_list_created_at_id_idx",
       "label": "tasks:next-page:hide-completed",
-      "executionTimeMs": 0.085,
+      "executionTimeMs": 0.083,
       "indexNames": ["tasks_user_list_created_at_id_idx"],
       "nodeTypes": ["Limit", "Index Scan"],
       "sequentialScans": [],
@@ -135,11 +135,11 @@
   },
   "warmQuery": {
     "databaseExecutionTimeMs": {
-      "max": 0.06,
-      "median": 0.0575,
+      "max": 0.086,
+      "median": 0.058499999999999996,
       "min": 0.055,
       "samples": [
-        0.057, 0.056, 0.058, 0.06, 0.057, 0.055, 0.06, 0.058, 0.058, 0.057
+        0.057, 0.059, 0.055, 0.057, 0.068, 0.086, 0.055, 0.059, 0.058, 0.084
       ]
     },
     "fetchedLimit": 21,
@@ -151,6 +151,8 @@
   },
   "reproducibility": {
     "command": "pnpm neon:performance",
+    "commit": "7837a69cf8cacaa01825e324d305d799e42fce07",
+    "ref": "task/t-16-neon-performance-evidence",
     "seedReplacement": "exact synthetic user IDs with foreign-key cascade",
     "rerunnable": true
   },
