@@ -3,7 +3,10 @@ import { type NodePgDatabase } from "drizzle-orm/node-postgres"
 
 import { listsTable, type SelectList } from "../../../../db/schema/lists"
 import type { List } from "../domain/list"
-import { ListConflictError } from "../domain/list-errors"
+import {
+  InvalidPageRequestError,
+  ListConflictError,
+} from "../domain/list-errors"
 import { decodeListCursor, encodeListCursor } from "../application/list-cursor"
 import type {
   ListRepository,
@@ -38,7 +41,7 @@ function isUniqueViolation(error: unknown) {
 function getPageLimit(page: PageRequest) {
   const limit = page.limit ?? DEFAULT_PAGE_LIMIT
   if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
-    throw new Error("Invalid list page limit")
+    throw new InvalidPageRequestError("Invalid list page limit")
   }
   return limit
 }

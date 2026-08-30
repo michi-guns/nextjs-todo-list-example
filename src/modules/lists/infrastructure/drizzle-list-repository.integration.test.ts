@@ -263,6 +263,9 @@ describe.sequential("Drizzle list repository", () => {
     await expect(
       repository.listByUser(userId, { cursor: "bad", limit: 2 })
     ).rejects.toBeInstanceOf(InvalidPageRequestError)
+    await expect(
+      repository.listByUser(userId, { limit: 0 })
+    ).rejects.toBeInstanceOf(InvalidPageRequestError)
   })
 
   it("retains the last successfully committed rename", async () => {
