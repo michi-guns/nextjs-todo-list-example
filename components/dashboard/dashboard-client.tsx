@@ -765,7 +765,7 @@ function FinalListState({ reloadRef }: FinalListStateProps) {
 
 function FinalListWorkspace() {
   return (
-    <main className="flex min-w-0 flex-1 flex-col">
+    <section className="flex min-w-0 flex-1 flex-col">
       <div className="mx-auto flex w-full max-w-4xl min-w-0 flex-col gap-4 p-4 sm:p-6 lg:p-10">
         <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
           Workspace reset
@@ -778,7 +778,7 @@ function FinalListWorkspace() {
           fresh private list.
         </p>
       </div>
-    </main>
+    </section>
   )
 }
 
