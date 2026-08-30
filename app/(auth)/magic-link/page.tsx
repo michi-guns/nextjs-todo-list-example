@@ -1,8 +1,5 @@
 import { MagicLinkForm } from "@/components/auth/magic-link-form"
-import {
-  getAuthErrorMessage,
-  getSafeAuthRedirect,
-} from "@/src/modules/auth/presentation/auth-flow"
+import { getSafeAuthRedirect } from "@/src/modules/auth/presentation/auth-flow"
 
 export const metadata = {
   title: "Magic link | Focus Rail",
@@ -20,7 +17,7 @@ export default async function MagicLinkPage({
   return (
     <MagicLinkForm
       next={getSafeAuthRedirect(params.next)}
-      initialError={errorCode ? getAuthErrorMessage(errorCode) : null}
+      initialError={errorCode}
     />
   )
 }
