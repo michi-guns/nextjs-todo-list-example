@@ -15,11 +15,7 @@ export function LandingPage({ content }: LandingPageProps) {
   return (
     <>
       <SkipLink targetId="landing-content" />
-      <main
-        id="landing-content"
-        tabIndex={-1}
-        className="min-h-svh bg-background text-foreground outline-none"
-      >
+      <main className="min-h-svh bg-background text-foreground">
         <div className="mx-auto flex min-h-svh w-full max-w-7xl flex-col px-4 sm:px-6 lg:px-8">
           <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border py-5">
             <Link
@@ -53,7 +49,11 @@ export function LandingPage({ content }: LandingPageProps) {
             </nav>
           </header>
 
-          <div className="grid flex-1 items-center gap-12 py-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)] lg:gap-20 lg:py-20">
+          <div
+            id="landing-content"
+            tabIndex={-1}
+            className="grid flex-1 items-center gap-12 py-16 outline-none lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)] lg:gap-20 lg:py-20"
+          >
             <section className="max-w-2xl">
               <p className="mb-5 text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
                 Personal task system
