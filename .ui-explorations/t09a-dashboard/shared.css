@@ -952,6 +952,10 @@ h3 {
   font-size: 11px;
 }
 
+.result-item.selected .result-context {
+  color: #56645c;
+}
+
 .inspector {
   position: sticky;
   top: 18px;
