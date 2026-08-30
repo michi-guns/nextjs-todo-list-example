@@ -1,0 +1,25 @@
+{
+  "id": "status-board",
+  "name": "Status Board",
+  "hypothesis": "A three-lane status board makes work-in-progress visible and turns status changes into the primary flow for frequent task managers.",
+  "optimize_for": "throughput, scanability, and state visibility",
+  "tradeoff": "Higher density and horizontal pressure make narrow-screen reading and list-level context harder.",
+  "fixture_id": "t09a-shared-workspace-fixture",
+  "prototype": "directions/status-board/index.html",
+  "axes": {
+    "information_architecture": "selected list grouped by lifecycle status",
+    "workflow_model": "scan lanes then move work across statuses",
+    "navigation_model": "compact list selector above the board",
+    "composition_model": "three status columns with shared toolbar",
+    "content_hierarchy": "status lanes and counts before individual titles",
+    "density": "dense operational overview",
+    "disclosure": "task details visible in each card",
+    "interaction_model": "direct lane/status controls",
+    "search_filter_model": "board-level completed and status controls",
+    "visual_language": "structured neutral grid with status-coded accents"
+  },
+  "patterns_informed_by": [
+    "Todoist view/grouping patterns",
+    "project DWF task status contract"
+  ]
+}

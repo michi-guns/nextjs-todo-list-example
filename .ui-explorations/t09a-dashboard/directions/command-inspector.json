@@ -1,0 +1,25 @@
+{
+  "id": "command-inspector",
+  "name": "Command Inspector",
+  "hypothesis": "A global capture/search spine plus a contextual inspector makes rapid re-entry and keyboard-oriented editing faster than browsing a hierarchy.",
+  "optimize_for": "fast retrieval, continuity, and direct manipulation",
+  "tradeoff": "The model is less discoverable for users who prefer visible browse-first navigation and can make empty search states feel stark.",
+  "fixture_id": "t09a-shared-workspace-fixture",
+  "prototype": "directions/command-inspector/index.html",
+  "axes": {
+    "information_architecture": "global task index with selected context",
+    "workflow_model": "capture or search then inspect then act",
+    "navigation_model": "command/search spine with compact list index",
+    "composition_model": "result list plus persistent detail inspector",
+    "content_hierarchy": "current query and selected task before list chrome",
+    "density": "medium density with high context continuity",
+    "disclosure": "inspector reveals notes and status controls",
+    "interaction_model": "keyboard-first command entry and contextual editing",
+    "search_filter_model": "prominent global search across lists and tasks",
+    "visual_language": "editorial dark-on-light workspace with command accent"
+  },
+  "patterns_informed_by": [
+    "Things Quick Find",
+    "project DWF safe view-model boundary"
+  ]
+}

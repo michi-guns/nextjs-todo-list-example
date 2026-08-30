@@ -1,0 +1,45 @@
+{
+  "id": "t09a-dashboard",
+  "status": "framing",
+  "target_surface": "personal todo landing, auth, and authenticated dashboard direction exploration",
+  "direction_count": 3,
+  "spike_depth": "prototype",
+  "goal": "Help the team choose a dashboard information architecture that makes private list and task work clear, fast, and resilient at desktop and narrow viewports.",
+  "primary_user": "A signed-in individual managing personal tasks across a small set of private lists.",
+  "critical_tasks": [
+    "open the private workspace and identify the active list",
+    "capture a task with a note",
+    "change a task status",
+    "show or hide completed tasks",
+    "switch lists without losing context",
+    "load another bounded page of records"
+  ],
+  "constraints": [
+    "preserve personal-list and task terminology",
+    "preserve session-derived private ownership",
+    "preserve todo, in_progress, and done status semantics",
+    "preserve completed-task visibility and filtering behavior",
+    "preserve bounded pagination and destructive-action meaning",
+    "use the same fixture and capabilities in every direction",
+    "keep prototypes isolated from production routes, APIs, schemas, migrations, and dependencies"
+  ],
+  "free_dimensions": [
+    "information architecture",
+    "workflow model",
+    "navigation model",
+    "content hierarchy",
+    "composition",
+    "density",
+    "progressive disclosure",
+    "filter and search presentation",
+    "local interaction details"
+  ],
+  "target_viewports": [
+    { "width": 1440, "height": 900, "purpose": "primary desktop comparison" },
+    { "width": 1024, "height": 768, "purpose": "compact desktop comparison" },
+    { "width": 768, "height": 1024, "purpose": "tablet stress check" },
+    { "width": 320, "height": 800, "purpose": "narrow mobile stress check" }
+  ],
+  "direction_ids": ["focus-rail", "status-board", "command-inspector"],
+  "implementation_root": ".ui-explorations/t09a-dashboard"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "focus-rail",
+  "name": "Focus Rail",
+  "hypothesis": "A persistent list rail and one calm task queue help occasional users see the next useful action without losing private-list context.",
+  "optimize_for": "comprehension, confidence, and low cognitive load",
+  "tradeoff": "Less simultaneous status context and more navigation when comparing several lists.",
+  "fixture_id": "t09a-shared-workspace-fixture",
+  "prototype": "directions/focus-rail/index.html",
+  "axes": {
+    "information_architecture": "one selected list as a focused queue",
+    "workflow_model": "capture then triage then complete within one list",
+    "navigation_model": "persistent list rail with one active context",
+    "composition_model": "rail plus single task stream",
+    "content_hierarchy": "next action first, details on demand",
+    "density": "calm, spacious scan",
+    "disclosure": "progressive task details",
+    "interaction_model": "inline capture with direct status menu",
+    "search_filter_model": "small local completed toggle",
+    "visual_language": "warm neutral surfaces with one focus accent"
+  },
+  "patterns_informed_by": [
+    "Microsoft To Do focus view",
+    "project DWF dashboard contract"
+  ]
+}

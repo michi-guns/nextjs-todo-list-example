@@ -1,0 +1,91 @@
+{
+  "id": "t09a-shared-workspace-fixture",
+  "scenario": "Jordan signs in before a busy workday, opens the Launch week list, captures an accessibility-audit task with a note, moves it to in progress, checks the completed-task filter, switches to Inbox, and loads the next page without losing the selected-list context.",
+  "user": {
+    "name": "Jordan Lee",
+    "email": "jordan@example.test"
+  },
+  "lists": [
+    { "id": "inbox", "name": "Inbox", "count": 7 },
+    { "id": "launch-week", "name": "Launch week", "count": 12 },
+    { "id": "home-reset", "name": "Home reset — long label", "count": 4 }
+  ],
+  "tasks": [
+    {
+      "id": "task-audit",
+      "listId": "launch-week",
+      "title": "Reply to the accessibility audit before Friday",
+      "notes": "Confirm keyboard order, focus visibility, and the empty-state announcement with the design partner.",
+      "status": "in_progress",
+      "completed": false
+    },
+    {
+      "id": "task-copy",
+      "listId": "launch-week",
+      "title": "Polish the landing-page copy",
+      "notes": "Keep the headline short enough for the narrow viewport.",
+      "status": "todo",
+      "completed": false
+    },
+    {
+      "id": "task-demo",
+      "listId": "launch-week",
+      "title": "Rehearse the stakeholder demo",
+      "notes": "Run through the create-list and create-task happy path.",
+      "status": "done",
+      "completed": true
+    },
+    {
+      "id": "task-dentist",
+      "listId": "inbox",
+      "title": "Book dentist appointment",
+      "notes": "Ask for the first appointment after 16:00.",
+      "status": "todo",
+      "completed": false
+    },
+    {
+      "id": "task-receipts",
+      "listId": "inbox",
+      "title": "Upload receipts from the last trip",
+      "notes": null,
+      "status": "todo",
+      "completed": false
+    },
+    {
+      "id": "task-groceries",
+      "listId": "home-reset",
+      "title": "Restock pantry staples and refill the water filter",
+      "notes": "Use the recurring list at the store.",
+      "status": "done",
+      "completed": true
+    }
+  ],
+  "required_capabilities": [
+    "list selection",
+    "create, rename, and delete list affordances",
+    "task capture with optional notes",
+    "status changes among todo, in_progress, and done",
+    "show or hide completed tasks",
+    "visible load-more pagination affordance",
+    "empty, loading, validation-error, selected, disabled, and long-content states"
+  ],
+  "states": [
+    "normal",
+    "empty",
+    "loading",
+    "validation-error",
+    "selected",
+    "disabled-pending",
+    "completed-hidden",
+    "long-content",
+    "pagination-continuation"
+  ],
+  "viewports": ["1440x900", "1024x768", "768x1024", "320x800"],
+  "stress_conditions": [
+    "long list name",
+    "long task title and note",
+    "mixed task statuses",
+    "empty list after switching context",
+    "second page of records"
+  ]
+}
