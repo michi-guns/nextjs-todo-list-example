@@ -59,6 +59,7 @@ export function TaskWorkspace({
   const controlsDisabled = pendingOperation !== null
   const isLoadingMore = pendingOperation === "load-more-tasks"
   const [paginationAnnouncement, setPaginationAnnouncement] = useState("")
+  const loadMoreRef = useRef<HTMLButtonElement>(null)
   const paginationStatusRef = useRef<HTMLParagraphElement>(null)
 
   function announcePagination(added: number) {
@@ -68,7 +69,9 @@ export function TaskWorkspace({
         ? `Loaded ${added} more ${added === 1 ? "task" : "tasks"}; ${total} total.`
         : `No new tasks were loaded; ${total} total.`
     )
-    requestAnimationFrame(() => paginationStatusRef.current?.focus())
+    requestAnimationFrame(() =>
+      (loadMoreRef.current ?? paginationStatusRef.current)?.focus()
+    )
   }
 
   return (
@@ -130,6 +133,7 @@ export function TaskWorkspace({
               <LoadMoreTasks
                 loading={isLoadingMore}
                 disabled={controlsDisabled}
+                buttonRef={loadMoreRef}
                 onLoadMore={onLoadMore}
                 onLoaded={announcePagination}
               />
@@ -139,7 +143,11 @@ export function TaskWorkspace({
               tabIndex={-1}
               role="status"
               aria-live="polite"
-              className="sr-only"
+              className={
+                paginationAnnouncement && !nextCursor
+                  ? "rounded-lg border border-border bg-muted px-3 py-2 text-sm text-muted-foreground outline-none focus:border-ring focus:ring-3 focus:ring-ring/30"
+                  : "sr-only"
+              }
             >
               {paginationAnnouncement}
             </p>
@@ -520,6 +528,7 @@ function TaskRow({
 interface LoadMoreTasksProps {
   readonly loading: boolean
   readonly disabled: boolean
+  readonly buttonRef: React.Ref<HTMLButtonElement>
   readonly onLoadMore: () => Promise<number>
   readonly onLoaded: (added: number) => void
 }
@@ -527,6 +536,7 @@ interface LoadMoreTasksProps {
 function LoadMoreTasks({
   loading,
   disabled,
+  buttonRef,
   onLoadMore,
   onLoaded,
 }: LoadMoreTasksProps) {
@@ -536,6 +546,7 @@ function LoadMoreTasks({
 
   return (
     <Button
+      ref={buttonRef}
       type="button"
       variant="outline"
       className="self-start"

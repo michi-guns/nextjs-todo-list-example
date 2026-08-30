@@ -255,7 +255,11 @@ export function ListRail({
           tabIndex={-1}
           role="status"
           aria-live="polite"
-          className="sr-only"
+          className={
+            paginationAnnouncement && !nextCursor
+              ? "rounded-lg border border-border bg-muted px-3 py-2 text-sm text-muted-foreground outline-none focus:border-ring focus:ring-3 focus:ring-ring/30"
+              : "sr-only"
+          }
         >
           {paginationAnnouncement}
         </p>
