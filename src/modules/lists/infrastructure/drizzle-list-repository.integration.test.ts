@@ -151,6 +151,35 @@ describe.sequential("Drizzle list repository", () => {
     )
   })
 
+  it("does not add an Inbox when the user already has a list", async () => {
+    const userId = `t06-existing-${Date.now()}`
+    await database.insert(usersTable).values({
+      id: userId,
+      name: "T-06 Existing List User",
+      email: `${userId}@example.test`,
+    })
+
+    const repository = createDrizzleListRepository(database)
+    const existing = await repository.insert({
+      userId,
+      name: "Projects",
+      now: new Date("2026-08-30T12:00:30.000Z"),
+    })
+
+    await expect(
+      repository.ensureDefaultInbox(
+        userId,
+        new Date("2026-08-30T12:00:31.000Z")
+      )
+    ).resolves.toMatchObject({ id: existing.id, name: "Projects" })
+    await expect(repository.listByUser(userId, { limit: 20 })).resolves.toEqual(
+      {
+        items: [expect.objectContaining({ id: existing.id, name: "Projects" })],
+        nextCursor: null,
+      }
+    )
+  })
+
   it("keeps CRUD owner-scoped and maps database uniqueness conflicts", async () => {
     const ownerId = `t06-owner-${Date.now()}`
     const otherOwnerId = `${ownerId}-other`

@@ -103,6 +103,17 @@ export function createDrizzleListRepository(
     },
 
     async ensureDefaultInbox(userId, now) {
+      const existingList = await database
+        .select()
+        .from(listsTable)
+        .where(eq(listsTable.userId, userId))
+        .orderBy(asc(listsTable.createdAt), asc(listsTable.id))
+        .limit(1)
+
+      if (existingList[0]) {
+        return mapList(existingList[0])
+      }
+
       for (let attempt = 0; attempt < MAX_INBOX_INSERT_ATTEMPTS; attempt += 1) {
         const inserted = await database
           .insert(listsTable)
