@@ -43,14 +43,15 @@ The browser screenshots used for visual inspection were intentionally kept as lo
 
 ## Portfolio evaluation for T-09B
 
-| Criterion                   | Focus Rail                                                        | Status Board                                          | Command Inspector                                                              |
-| --------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------ |
-| First-open comprehension    | Strong: selected list and next action are explicit.               | Medium: lane model is clear but denser.               | Medium: command model needs orientation.                                       |
-| Status visibility           | Medium: one queue with status chips.                              | Strong: all lanes and counts are immediately visible. | Medium: status is visible in results and inspector.                            |
-| Capture speed               | Strong: inline title/note capture.                                | Strong: capture sits above the board.                 | Strong for returning users: capture is next to search.                         |
-| Retrieval and continuity    | Medium: list navigation is explicit.                              | Medium: list selector preserves context.              | Strong: query, result index, and inspector stay together.                      |
-| Narrow viewport suitability | Strong: rail becomes a scrollable context strip and queue stacks. | Medium: lanes stack, increasing page length.          | Strong: spine and inspector stack without document overflow.                   |
-| Implementation complexity   | Low: straightforward list rail and queue.                         | Medium: lane grouping and responsive board rules.     | Medium: search, result selection, and inspector state add interaction surface. |
+| Criterion                   | Focus Rail                                                                                        | Status Board                                                                   | Command Inspector                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| First-open comprehension    | Strong: selected list and next action are explicit.                                               | Medium: lane model is clear but denser.                                        | Medium: command model needs orientation.                                                                                   |
+| Status visibility           | Medium: one queue with status chips.                                                              | Strong: all lanes and counts are immediately visible.                          | Medium: status is visible in results and inspector.                                                                        |
+| Capture speed               | Strong: inline title/note capture.                                                                | Strong: capture sits above the board.                                          | Strong for returning users: capture is next to search.                                                                     |
+| Retrieval and continuity    | Medium: list navigation is explicit.                                                              | Medium: list selector preserves context.                                       | Strong: query, result index, and inspector stay together.                                                                  |
+| Narrow viewport suitability | Strong: rail becomes a scrollable context strip and queue stacks.                                 | Medium: lanes stack, increasing page length.                                   | Strong: spine and inspector stack without document overflow.                                                               |
+| Accessibility basics        | Strong: straightforward rail-to-queue tab path, visible focus, and text-labelled status controls. | Medium: semantic lane headings and controls, but denser responsive navigation. | Strong for keyboard users: explicit search focus and result labels, with more orientation required for browse-first users. |
+| Implementation complexity   | Low: straightforward list rail and queue.                                                         | Medium: lane grouping and responsive board rules.                              | Medium: search, result selection, and inspector state add interaction surface.                                             |
 
 ## T-09B decision
 
@@ -66,7 +67,7 @@ The implementation-ready brief is [`handoff.md`](./handoff.md). It covers the da
 
 ## Contract reconciliation and limitations
 
-`TST-UI-001` is now `partial`: the fair prototype and Chromium inspection layer is evidenced here. The contract's materialized Next.js runtime, authenticated ownership, and end-to-end browser layers remain owned by T-09B, T-10, T-11, T-12A, and T-15. This prototype does not prove persistence, API authorization, Sanity rendering, or cross-browser compatibility.
+`TST-UI-001` is now `partial`: the fair prototype and Chromium inspection layer is evidenced here. The contract's materialized Next.js runtime and authenticated UI states remain owned by T-10, T-11, and T-12A. T-15 owns the separate end-to-end browser journeys under `TST-E2E-*`; this prototype does not prove persistence, API authorization, Sanity rendering, or cross-browser compatibility.
 
 Structural validation command:
 
