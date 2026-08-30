@@ -1,7 +1,10 @@
 import landingPageFixture from "@/sanity/fixtures/landingPage.json"
 import { describe, expect, it } from "vitest"
 
-import { mapSanityLandingDocument } from "./sanity-landing-repository"
+import {
+  createSanityLandingContentRepository,
+  mapSanityLandingDocument,
+} from "./sanity-landing-repository"
 
 describe("mapSanityLandingDocument", () => {
   it("maps a valid unknown payload to only the landing view model", () => {
@@ -77,5 +80,18 @@ describe("mapSanityLandingDocument", () => {
     expect(() => mapSanityLandingDocument(null)).toThrow(
       "Invalid Sanity landingPage payload"
     )
+  })
+
+  it("maps content returned by the repository's published-read port", async () => {
+    const repository = createSanityLandingContentRepository(
+      async () => landingPageFixture
+    )
+
+    await expect(repository.getPublishedLandingContent()).resolves.toEqual({
+      headline: "Make progress visible.",
+      blurb: "Keep personal tasks clear, focused, and moving forward.",
+      primaryCtaLabel: "Get started",
+      secondaryCtaLabel: "Sign in",
+    })
   })
 })

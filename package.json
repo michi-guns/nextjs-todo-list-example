@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "better-auth-mcp": "tsx scripts/better-auth-mcp/cli.ts",
-    "sanity:smoke": "node scripts/verify-sanity.mjs",
+    "sanity:smoke": "tsx scripts/verify-sanity.ts",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",

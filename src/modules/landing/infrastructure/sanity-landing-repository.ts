@@ -1,7 +1,7 @@
 import { z } from "zod"
 
-import type { LandingContent } from "../domain/landing-content"
 import type { LandingContentRepository } from "../application/get-landing-content"
+import type { LandingContent } from "../domain/landing-content"
 
 export const LANDING_PAGE_QUERY =
   '*[_id == "landingPage" && _type == "landingPage"][0]{_id,_type,headline,blurb,primaryCtaLabel,secondaryCtaLabel}'
