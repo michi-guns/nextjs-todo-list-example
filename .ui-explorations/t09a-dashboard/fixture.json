@@ -58,8 +58,60 @@
       "notes": "Use the recurring list at the store.",
       "status": "done",
       "completed": true
+    },
+    {
+      "id": "task-stakeholder-notes",
+      "listId": "launch-week",
+      "title": "Send the stakeholder demo notes",
+      "notes": "Call out the decisions that need a follow-up owner.",
+      "status": "todo",
+      "completed": false
+    },
+    {
+      "id": "task-release-checklist",
+      "listId": "launch-week",
+      "title": "Check the release checklist",
+      "notes": null,
+      "status": "todo",
+      "completed": false
+    },
+    {
+      "id": "task-monitoring",
+      "listId": "launch-week",
+      "title": "Verify the error monitoring alert",
+      "notes": "Use the staging alert and document the expected signal.",
+      "status": "in_progress",
+      "completed": false
+    },
+    {
+      "id": "task-vet",
+      "listId": "inbox",
+      "title": "Call the vet about the annual checkup",
+      "notes": "Have the vaccination record ready.",
+      "status": "todo",
+      "completed": false
+    },
+    {
+      "id": "task-renewal",
+      "listId": "inbox",
+      "title": "Review the software renewal invoice",
+      "notes": null,
+      "status": "in_progress",
+      "completed": false
+    },
+    {
+      "id": "task-laundry",
+      "listId": "home-reset",
+      "title": "Run the weekend laundry",
+      "notes": "Start with towels so they are ready before guests arrive.",
+      "status": "todo",
+      "completed": false
     }
   ],
+  "pagination": {
+    "pageSize": 3,
+    "continuationLabel": "Load 3 more"
+  },
   "required_capabilities": [
     "list selection",
     "create, rename, and delete list affordances",
