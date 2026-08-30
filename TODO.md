@@ -204,29 +204,31 @@ Dependencies: T-04.
 
 ### T-05: Complete the Better Auth boundary
 
-- [~] Start T-05 on `task/t-05-better-auth-boundary` using the accepted plan in [`docs/agentforge/plans/2026-08-30-t-05-better-auth-boundary.md`](docs/agentforge/plans/2026-08-30-t-05-better-auth-boundary.md).
-- [ ] Keep Better Auth configuration and raw records behind the auth infrastructure boundary.
-- [ ] Expose server-only current-user helpers equivalent to `getCurrentUser()` and `requireUser()`.
-- [ ] Support email/password sign-up, sign-in, and sign-out.
-- [ ] Support magic-link request and consumption.
-- [ ] In explicit local/test mode only, capture magic links in a temporary gitignored mailbox.
+- [x] Complete T-05 on `task/t-05-better-auth-boundary` using the accepted plan in [`docs/agentforge/plans/2026-08-30-t-05-better-auth-boundary.md`](docs/agentforge/plans/2026-08-30-t-05-better-auth-boundary.md).
+- [x] Keep Better Auth configuration and raw records behind the auth infrastructure boundary.
+- [x] Expose server-only current-user helpers equivalent to `getCurrentUser()` and `requireUser()`.
+- [x] Support email/password sign-up, sign-in, and sign-out.
+- [x] Support magic-link request and consumption.
+- [x] In explicit local/test mode only, capture magic links in a temporary gitignored mailbox.
 
 Verification:
 
-- [ ] Unauthenticated private reads and mutations return the ordinary unauthenticated result.
-- [ ] The local/test mailbox flow can request, read, and consume one magic link.
-- [ ] Authenticated code never accepts a client-provided owner id.
+- [!] Private list/task reads and mutations are deferred to T-09; the current `requireUser()` boundary fails closed for unauthenticated requests.
+- [x] The local/test mailbox flow can request, read, and consume one magic link.
+- [x] Authenticated code never accepts a client-provided owner id.
 
 Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`.
+
+Evidence: `pnpm test` (6 unit tests), `pnpm test:integration` against disposable local PostgreSQL 18 (7 tests), and `pnpm exec drizzle-kit migrate` plus catalog inspection all pass. The auth contracts remain `partial` until T-09 adds private entry paths and T-15 records the required Chromium journeys.
 
 Dependencies: T-03, T-03A.
 
 ## Checkpoint: foundations
 
-- [ ] `pnpm typecheck` passes.
-- [ ] `pnpm lint` passes without new warnings.
-- [ ] PostgreSQL 18 integration setup applies the complete migration chain.
-- [ ] Password and magic-link authentication work against the local test database.
+- [x] `pnpm typecheck` passes.
+- [x] `pnpm lint` passes without new warnings.
+- [x] PostgreSQL 18 integration setup applies the complete migration chain.
+- [x] Password and magic-link authentication work against the local test database.
 
 ## Phase 2: domain and application behavior
 

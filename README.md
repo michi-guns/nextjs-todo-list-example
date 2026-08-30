@@ -13,6 +13,19 @@ architecture, persistence, or integrations, read
 [`docs/documentation-protocol.md`](docs/documentation-protocol.md) and the
 relevant DWF decision ledgers.
 
+## Local authentication and integration tests
+
+The application reads `DATABASE_URL`, `BETTER_AUTH_URL`, and
+`BETTER_AUTH_SECRET` from the server environment. `BETTER_AUTH_SECRET` is
+required in production. The local/test magic-link mailbox is opt-in: set
+`BETTER_AUTH_LOCAL_MAILBOX=true` only in development or test, and optionally
+set `BETTER_AUTH_MAILBOX_DIR` to a child of the operating-system temporary
+directory or `.local/better-auth-mailbox`.
+
+The integration suite uses `TEST_DATABASE_URL` and refuses non-local
+PostgreSQL URLs. Do not commit environment files, credentials, or captured
+magic links.
+
 ## Adding components
 
 To add components to your app, run the following command:

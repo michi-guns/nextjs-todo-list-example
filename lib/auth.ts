@@ -7,8 +7,35 @@ import {
 } from "@/db/schema/auth"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { magicLink } from "better-auth/plugins"
+
+import { captureMagicLink } from "@/src/modules/auth/infrastructure/local-mailbox"
+
+const configuredBaseUrl = process.env.BETTER_AUTH_URL?.trim()
+const configuredSecret = process.env.BETTER_AUTH_SECRET?.trim()
+
+if (process.env.NODE_ENV === "production" && !configuredSecret) {
+  throw new Error("BETTER_AUTH_SECRET is required in production")
+}
+
+function getTrustedOrigins() {
+  const origins: string[] = []
+
+  if (configuredBaseUrl) {
+    origins.push(new URL(configuredBaseUrl).origin)
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    origins.push("http://localhost:3000", "http://127.0.0.1:3000")
+  }
+
+  return [...new Set(origins)]
+}
 
 export const auth = betterAuth({
+  ...(configuredBaseUrl ? { baseURL: configuredBaseUrl } : {}),
+  ...(configuredSecret ? { secret: configuredSecret } : {}),
+  trustedOrigins: getTrustedOrigins(),
   database: drizzleAdapter(db, {
     provider: "pg", // or "mysql", "sqlite"
     schema: {
@@ -20,5 +47,20 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+    autoSignIn: true,
   },
+  plugins: [
+    magicLink({
+      sendMagicLink: async ({ email, url, token, metadata }) => {
+        await captureMagicLink({
+          email,
+          url,
+          token,
+          metadata,
+        })
+      },
+    }),
+  ],
 })

@@ -1,8 +1,8 @@
 # T-05 Better Auth boundary implementation plan
 
-> AgentForge plan. This plan is accepted for the next dependency-ready task; `task-breakdown` reconciles its delivery metadata before implementation.
+> AgentForge plan and implementation record. `task-breakdown` reconciled its delivery metadata before implementation.
 
-**Status:** Accepted
+**Status:** Completed
 
 **Goal:** Complete the Better Auth boundary for the starter application: keep provider configuration and raw records behind server-side infrastructure, expose the app-facing current-user helpers, support email/password and magic-link authentication, and provide a strictly local/test-only temporary mailbox for deterministic magic-link verification.
 
@@ -12,7 +12,13 @@
 
 **Global constraints:** Preserve the accepted DWF auth and data contracts. Do not add OAuth/social providers, list/task use cases, dashboard/UI work, client-side owner fields, or a production mailbox. Do not expose raw Better Auth user/session/account/verification rows from app-facing modules. Do not weaken cookie/session security or allow bearer/cross-origin credentials to broaden authorization. Keep secrets and captured links out of source control and logs.
 
-## Current state and file map
+## Implementation outcome
+
+- Better Auth is configured behind `lib/auth.ts`, exposed through the server-only catch-all route, and mapped to the app-facing `CurrentUser` contract through `getCurrentUser()` and `requireUser()`.
+- Email/password and magic-link flows are covered by request-level integration tests against disposable local PostgreSQL 18. Magic links are captured only when `NODE_ENV` is `development` or `test` and `BETTER_AUTH_LOCAL_MAILBOX=true`; the mailbox path is restricted to the operating-system temporary directory or the ignored `.local/better-auth-mailbox` directory.
+- Better Auth 1.7 requires `account.issuer` and a unique `(issuer, account_id)` identity index. Because this repository is still pre-release and the migration target is disposable/agent-owned, the approved migration-history workflow consolidated those additions into the existing T-04 migration and regenerated its tracked snapshot rather than adding another migration file. The baseline migration remains unchanged.
+
+## Initial state and file map (before implementation)
 
 - `lib/auth.ts` already contains the minimal Better Auth + Drizzle adapter configuration for `users`, `sessions`, `accounts`, and `verification`; it needs the final provider callbacks/plugins and environment-safe behavior required by the SPEC.
 - `db/schema/auth.ts` owns the Better Auth tables and remains the persistence source of truth; its text user IDs and session foreign keys must stay compatible with the existing migration.
@@ -37,6 +43,15 @@
 - **TST-AUTH-003:** Prove anonymous private reads/mutations return the ordinary unauthenticated result; authenticated operations derive ownership from the server session; another user's identifiers resolve as privacy-preserving not-found; and client-provided owner IDs or broadened bearer/cross-origin credentials are ignored or rejected.
 - Keep tests deterministic and isolated. Use only the repository's disposable local PostgreSQL contract, refuse external database URLs, and ensure temporary mailbox cleanup cannot remove unrelated files. Do not claim hosted or browser evidence when the prerequisite is unavailable.
 - Focused checks should include the auth test targets, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `git diff --check`, and the repository's Next.js runtime/browser verification for the new route if a local server and browser are available.
+
+### Recorded evidence
+
+- `pnpm test` — 3 files, 6 unit tests passed.
+- `TEST_DATABASE_URL=postgresql://...@127.0.0.1:55432/t05 pnpm test:integration` — 3 files, 7 tests passed against a disposable `postgres:18-alpine` container.
+- `pnpm exec drizzle-kit check --config drizzle.config.ts` and `pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text` — migration metadata is coherent and produces no pending statements.
+- `pnpm exec drizzle-kit migrate --config drizzle.config.ts` on a fresh local migration database, followed by catalog inspection — issuer default, unique identity index, UUIDv7 list/task defaults, foreign keys, and indexes applied successfully.
+- `pnpm typecheck`, targeted ESLint, and `git diff --check` passed; full `pnpm lint` passed with the existing unused `Geist` warning in `app/layout.tsx`. `pnpm build` completed with the auth route present and no Turbopack tracing warnings.
+- The `next-dev-loop` runtime check opened the running app with `agent-browser`, returned `null` from `GET /api/auth/get-session`, and recorded empty Next MCP compilation/error results. Private list/task entry-path evidence and the required authenticated Chromium journeys remain owned by T-09/T-15; the three auth contracts are therefore recorded as `partial` in the testing ledger.
 
 ## Risks and assumptions
 

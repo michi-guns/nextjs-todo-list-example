@@ -45,4 +45,7 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# local/test Better Auth mailbox
+/.local/better-auth-mailbox/
 /playwright/.auth/

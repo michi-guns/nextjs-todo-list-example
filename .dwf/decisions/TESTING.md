@@ -124,9 +124,9 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                | `partial`   |
 | [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks          | T-14, T-15                      | `specified` |
 | [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration                                 | T-04, T-06, T-07, T-14          | `partial`   |
-| [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                      | `specified` |
-| [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                      | `specified` |
-| [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                | `specified` |
+| [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                      | `partial`   |
+| [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                      | `partial`   |
+| [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                | `partial`   |
 | [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration            | T-06, T-14                      | `specified` |
 | [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14          | `specified` |
 | [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14          | `specified` |
@@ -218,7 +218,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-AUTH-001 — Email/password session lifecycle
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Authentication
 - **Evidence layers/modes:** Application, boundary, end-to-end / integration, browser
 - **Verifies product decisions:** D-001, D-002
@@ -229,12 +229,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A user can sign up, sign in, retain a valid session for private operations, and sign out so later private operations are unauthenticated.
 - **Required evidence:** Auth boundary tests for session outcomes and a Chromium browser journey using the real local database.
 - **Dependencies:** T-05 Better Auth boundary and T-15 browser harness.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` passes against a disposable local PostgreSQL 18 database for email/password sign-up, sign-in, current-user resolution, sign-out, and the resulting unauthenticated state. The browser journey remains outstanding.
+- **Follow-up:** T-15 must run the Chromium journey through the Next.js route and record the real-browser evidence before this contract can be `verified`.
 
 <a id="tst-auth-002"></a>
 
 ### TST-AUTH-002 — Magic-link local/test lifecycle
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Authentication
 - **Evidence layers/modes:** Infrastructure, boundary, end-to-end / mailbox integration, browser
 - **Verifies product decisions:** D-002
@@ -245,12 +247,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** In explicitly enabled local/test mode, a requested magic link is captured in the temporary mailbox, can be read deterministically, and can be consumed once to establish the expected session.
 - **Required evidence:** Mailbox integration test and a real browser request/read/consume journey. The mailbox must be unavailable outside local/test mode.
 - **Dependencies:** T-05 mailbox boundary and T-15 browser harness.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` passes the request/read/consume/replay flow against disposable local PostgreSQL 18, and `src/modules/auth/infrastructure/local-mailbox.test.ts` proves explicit test-mode gating and safe cleanup. The browser journey remains outstanding.
+- **Follow-up:** T-15 must run the Chromium mailbox journey with cleanup before execution; production/shared email delivery remains outside T-05.
 
 <a id="tst-auth-003"></a>
 
 ### TST-AUTH-003 — Private authorization and owner identity
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Authentication and authorization
 - **Evidence layers/modes:** Application, boundary, end-to-end / contract, integration, browser
 - **Verifies product decisions:** D-001, D-002
@@ -261,6 +265,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Anonymous requests cannot read or mutate private data; authenticated operations derive the owner from the Better Auth session; another user's identifiers produce the ordinary privacy-preserving not-found outcome; bearer tokens and cross-origin credentials do not broaden the baseline API.
 - **Required evidence:** Application and request-boundary tests, plus a browser scenario proving that private data remains isolated between users.
 - **Dependencies:** T-05 session helpers, T-09 entry paths, and T-15 browser harness.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` proves the current-user boundary fails closed without a session and ignores a client-supplied `x-user-id`; private list/task entry paths, cross-origin/bearer behavior, and browser isolation are not implemented in this slice.
+- **Follow-up:** T-09 must add application/request-boundary ownership and privacy tests, and T-15 must add the multi-user Chromium scenario before this contract can be `verified`.
 
 <a id="tst-lists-001"></a>
 
