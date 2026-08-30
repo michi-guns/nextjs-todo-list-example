@@ -46,6 +46,10 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 
+# Local UI exploration/browser evidence
+/.playwright-cli/
+/.ui-explorations/t09a-dashboard/*.png
+
 # local/test Better Auth mailbox
 /.local/better-auth-mailbox/
 /playwright/.auth/
