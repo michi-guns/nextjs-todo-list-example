@@ -262,6 +262,7 @@ Dependencies: T-04, T-05.
 
 ### T-07: Implement the tasks capability
 
+- [~] Implement T-07 from the accepted plan in [`docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md`](docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md).
 - [ ] Add framework-independent task rules and repository ports under `src/modules/tasks`.
 - [ ] Implement task reads, create, update, status changes, and delete use cases.
 - [ ] Enforce title and notes normalization, status rules, list ownership, per-list case-insensitive title uniqueness, and patch semantics.
@@ -273,6 +274,10 @@ Verification:
 - [ ] Integration tests cover ownership, duplicate titles, pagination, completed filtering, cascade deletion, and last-successful-write behavior.
 
 Test contracts: `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, `TST-CONCURRENCY-001`.
+
+Recommended AgentForge skills: `using-agent-skills`, `planning`, `task-breakdown`, `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, `security-and-hardening`, `api-and-interface-design`, `git-workflow-and-versioning`, and `code-review-and-quality`.
+
+Verification commands: focused unit and local PostgreSQL integration tests during implementation; completion gates are `pnpm test`, `TEST_DATABASE_URL=<local PostgreSQL URL> pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text`, and `git diff --check`. Reusable Testcontainers evidence remains with T-14.
 
 Dependencies: T-04, T-05, T-06.
 
