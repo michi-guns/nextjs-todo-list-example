@@ -481,7 +481,7 @@ Verification:
 
 Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`.
 
-Dependencies: T-02, T-05, T-09B.
+Dependencies: T-02, T-05, T-09B, T-10, T-12.
 
 Plan: [`docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md`](docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md).
 
