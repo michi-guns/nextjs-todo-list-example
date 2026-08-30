@@ -29,6 +29,8 @@ describe("shared pagination contracts", () => {
       "limit=not-a-number",
       "limit=",
       "cursor=   ",
+      "limit=1&limit=2",
+      "cursor=first&cursor=second",
     ]) {
       expect(() => parsePaginationQuery(new URLSearchParams(query))).toThrow(
         InvalidPaginationError

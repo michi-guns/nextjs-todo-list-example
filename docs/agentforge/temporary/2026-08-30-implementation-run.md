@@ -13,10 +13,10 @@ Continue the repository's AgentForge delivery autonomously through every task th
 ## Repository state at handoff
 
 - Repository: `michi-guns/nextjs-todo-list-example`
-- Current branch: `task/t-08-pagination-errors` from `main` at `9a1fb60` (T-08 plan/task breakdown active)
+- Current branch: `task/t-08-pagination-errors` from `main` at `9a1fb60` (T-08 implementation and review complete; closeout metadata update in progress)
 - Base: latest `main` from `origin/main`
 - T-05 PR #7 is merged as `2935283`; T-12 and T-13 are already merged and complete.
-- T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. Dependency recomputation leaves T-08 as the only safely unblocked implementation task; its accepted plan and task breakdown are now on this branch. T-09/T-09A/T-09B and later UI/application tasks remain blocked by their prerequisites, and T-14/T-16 remain blocked by their listed dependencies.
+- T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. T-08 PR #12 is pushed at implementation tip `c3044b5`; its first review finding was fixed, and the fresh review of the exact implementation tip returned no actionable findings. T-08 closeout metadata is being reconciled before merge; dependency recomputation follows the merge. T-09/T-09A/T-09B and later UI/application tasks remain blocked until their prerequisites are recomputed, and T-14/T-16 remain blocked by their listed dependencies until then.
 - This is a live checkpoint, not authority: verify the current branch, `HEAD`, remote/PR state, `TODO.md`, accepted plan, and prerequisites before acting, then update this section after every task transition.
 - No secrets, token values, or environment contents belong in commits, logs, or PR bodies.
 
@@ -42,7 +42,7 @@ Add framework-independent shared pagination and error contracts: stable `Page<T>
 
 Affected contracts: `TST-LISTS-003`, `TST-TASKS-003`, and `TST-BOUNDARY-001`.
 
-Expected evidence: shared unit tests for pagination parsing/page shape/error mapping; local PostgreSQL list/task continuation tests at limit 100; full unit/integration/type/lint/build/Drizzle/diff gates. Testcontainers lifecycle and authenticated request evidence remain with T-14/T-09.
+Expected evidence: shared unit tests for pagination parsing/page shape/error mapping; local PostgreSQL list/task continuation tests at limit 100; full unit/integration/type/lint/build/Drizzle/diff gates. Achieved evidence is 14 unit-test files/62 tests and 5 local PostgreSQL integration files/21 tests against disposable `postgres:18-alpine`; the exact implementation tip `c3044b5` received no actionable findings from a fresh reviewer. Testcontainers lifecycle and authenticated request evidence remain with T-14/T-09.
 
 ## Review loop
 
