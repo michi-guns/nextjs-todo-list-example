@@ -13,7 +13,7 @@ Continue the repository's AgentForge delivery autonomously through every task th
 ## Repository state at handoff
 
 - Repository: `michi-guns/nextjs-todo-list-example`
-- Current branch: `task/t-16-neon-performance-evidence` (T-09A merged as `b88f377`; T-09B is complete on the direct-main tip `994bca0`; T-16 implementation tip `7837a69`; PR #16 remains open pending final closeout review and merge; verify `git rev-parse HEAD` before acting)
+- Current branch: `task/t-16-neon-performance-evidence` (T-09A merged as `b88f377`; T-09B is complete on the direct-main tip `994bca0`; T-16 hosted evidence ran against implementation commit `7837a69`; current reviewed closeout tip is `944c35f`; PR #16 remains open pending final closeout review and merge; verify `git rev-parse HEAD` before acting)
 - Base: latest `main` from `origin/main`
 - T-05 PR #7 is merged as `2935283`; T-12 and T-13 are already merged and complete.
 - T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. T-08 PR #12 was independently reviewed through closeout tip `72e999e` with no actionable findings and merged as `ee20cea`. T-14 PR #13 was reviewed through implementation tip `ce8c4dc`, closeout tip `29d0343`, formatting tip `fbe3948`, and checkpoint tip `dadcd68`, with all actionable findings fixed and the final current-tip review returning no actionable findings; it is merged as `df974b9`. At that historical checkpoint, dependency recomputation left T-09, T-09A, and T-16 as candidate tasks; the current graph is recorded below.
@@ -71,7 +71,7 @@ Evidence: `pnpm test` (15 files/67 tests), `pnpm test:integration` without `TEST
 
 ## Next-task dependency checkpoint
 
-The current TODO graph marks T-09A complete and PR #15 merged as `b88f377`, T-09B complete on `main` at `994bca0`, and T-16 complete in TODO on branch tip `7837a69` with PR #16 open pending final review/merge. Once PR #16 is merged, T-10 (authenticated dashboard) and T-11 (public landing/auth) are the safely unblocked implementation candidates; T-12A, T-15, and T-17 remain blocked by their listed dependencies. T-16 has no remaining implementation dependency.
+The current TODO graph marks T-09A complete and PR #15 merged as `b88f377`, T-09B complete on `main` at `994bca0`, and T-16 complete in TODO on reviewed closeout tip `944c35f` (the hosted evidence itself ran against implementation commit `7837a69`) with PR #16 open pending final review/merge. Once PR #16 is merged, T-10 (authenticated dashboard) and T-11 (public landing/auth) are the safely unblocked implementation candidates; T-12A, T-15, and T-17 remain blocked by their listed dependencies. T-16 has no remaining implementation dependency.
 
 ## Review loop
 
