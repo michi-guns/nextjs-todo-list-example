@@ -74,6 +74,14 @@ For any implementation or behavior-changing task in this repository, use the pro
 - Never claim a check passed when it was skipped or replaced with a weaker check. Report task-caused failures, pre-existing failures, unexecuted verification, blockers, and optional observations separately.
 - For meaningful Next.js runtime changes, use the repository's browser/runtime verification workflow when its prerequisites are available. A typecheck or lint pass alone does not prove visible behavior.
 
+## Review and task follow-through
+
+- For each completed non-trivial task, obtain a fresh GPT-5.6-Sol review of the exact latest artifact. Ask for reasonable, proportional, pragmatic, actionable findings; do not invite speculative perfection or scope expansion.
+- Treat reviewer output as evidence, not as a new source of requirements. Before accepting or rejecting a finding, reread the changed artifact and reconcile it with the applicable DWF contracts, `TST-*` obligations, installed-version official documentation/source, and executable behavior. A suggestion that overrides a framework's built-in security or lifecycle behavior is a contract conflict until those sources support it.
+- Classify findings as actionable, contract conflict/design gap, optional/nit, or noise. Fix in-scope actionable findings; document or defer optional feedback; stop and surface unresolved contract conflicts instead of silently choosing. When a finding changes behavior, add or update the smallest regression test before or alongside the fix when the prerequisite is available.
+- Any code or test change invalidates the previous approval. Rerun the affected checks and obtain a fresh review. If three substantive cycles remain unresolved or contradictory, stop and report the exact conflict rather than looping indefinitely or claiming approval.
+- Before marking a task complete or merging, confirm that the reviewed commit is the current branch/PR tip, reconcile exact verification evidence and affected `TST-*` statuses, update `TODO.md`, and recompute every dependency to find all genuinely unblocked work. Keep any temporary run/checkpoint artifact current after each task transition.
+
 ## Git and destructive-action safety
 
 - Preserve existing dirty or untracked work and use the repository's simple branch strategy unless the user says otherwise.
