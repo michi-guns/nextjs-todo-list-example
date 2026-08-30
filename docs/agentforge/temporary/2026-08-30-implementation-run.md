@@ -13,10 +13,10 @@ Continue the repository's AgentForge delivery autonomously through every task th
 ## Repository state at handoff
 
 - Repository: `michi-guns/nextjs-todo-list-example`
-- Current branch: `task/t-07-tasks-capability` (T-07 implementation tip `2253724` reviewed; closeout metadata is on the current PR tip; PR #11 open)
+- Current branch: `main` at merge commit `cce883c` (T-07 merged; T-08 is the next task)
 - Base: latest `main` from `origin/main`
 - T-05 PR #7 is merged as `2935283`; T-12 and T-13 are already merged and complete.
-- T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 is implemented on PR #11 at `2253724`; fresh reviewers identified and the branch fixed for privacy-preserving list reads, complete status-transition evidence, and repeated-status timestamp idempotence, then the latest review returned no actionable findings. Dependency recomputation before merge leaves T-08 as the next safely unblocked task; T-09/T-09A/T-09B and later UI/application tasks remain blocked by their prerequisites, and T-14/T-16 remain blocked by their listed dependencies.
+- T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. Dependency recomputation leaves T-08 as the only safely unblocked implementation task; T-09/T-09A/T-09B and later UI/application tasks remain blocked by their prerequisites, and T-14/T-16 remain blocked by their listed dependencies.
 - This is a live checkpoint, not authority: verify the current branch, `HEAD`, remote/PR state, `TODO.md`, accepted plan, and prerequisites before acting, then update this section after every task transition.
 - No secrets, token values, or environment contents belong in commits, logs, or PR bodies.
 
@@ -24,17 +24,21 @@ Continue the repository's AgentForge delivery autonomously through every task th
 
 - Use only repository-local AgentForge skills and DWF contracts.
 - For behavior changes, use `testing-first-class`, then `test-driven-development`, with incremental slices.
-- Follow the saved plan at `docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md`.
+- Follow the saved plan at `docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md` for the completed checkpoint; create and accept a new T-08 plan before implementation.
 - No recursive deletes. Routine reads, edits, tests, commits, pushes, PRs, merges, and branch cleanup are authorized for this run.
 - Do not broaden a task or reopen accepted product/technical decisions without a concrete contract gap.
 
-## T-07 acceptance target
+## T-07 completed checkpoint
 
-Implement the framework-independent tasks domain/application boundary and Drizzle repository under `src/modules/tasks`: validate and normalize task fields, provide owner/list-scoped CRUD and deterministic bounded cursor reads, enforce list ownership and per-list title uniqueness, support completed filtering and direct status transitions, and preserve omitted-versus-submitted patch fields. Keep raw Drizzle rows inside infrastructure and leave entry paths and UI to later tasks; consume the existing schema without adding a migration.
+The framework-independent tasks domain/application boundary and Drizzle repository under `src/modules/tasks` are complete: task fields are validated and normalized; CRUD and deterministic bounded cursor reads are owner/list-scoped; list ownership, per-list title uniqueness, completed filtering, direct status transitions, repeated-status timestamp idempotence, and omitted-versus-submitted patch semantics are covered. Raw Drizzle rows remain inside infrastructure, and the existing schema was consumed without a migration. Entry paths and UI remain with later tasks.
 
 Affected contracts: `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, and the task-side portion of `TST-CONCURRENCY-001`.
 
-Expected evidence: database-free task normalization/application/cursor tests; local PostgreSQL integration for ownership/privacy, uniqueness, status and notes mappings, cursor ordering/bounds, completed filtering, list cascade, and controlled task writes; `pnpm test`; `pnpm test:integration`; `pnpm typecheck`; `pnpm lint`; `pnpm build`; Drizzle checks/generation; and `git diff --check`. Testcontainers lifecycle evidence remains deferred to T-14. Final T-07 contract status is honestly `partial` for the boundary and reusable-harness obligations that belong to T-08/T-09/T-10/T-14.
+Evidence is recorded in `TODO.md` and `.dwf/decisions/TESTING.md`: the full unit/integration/type/lint/build/Drizzle/diff gates pass, while boundary, browser, and reusable-harness obligations remain honestly `partial` and owned by T-08/T-09/T-10/T-14.
+
+## Next checkpoint: T-08
+
+T-08 is the only task whose dependencies are satisfied after T-07: T-06 and T-07 are complete, while T-09/T-09A/T-09B/T-14/T-16 remain blocked by their listed prerequisites. Create the T-08 AgentForge plan and task breakdown from the current `main` before coding.
 
 ## Review loop
 
