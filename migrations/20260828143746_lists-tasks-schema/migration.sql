@@ -1,4 +1,6 @@
 CREATE TYPE "task_status" AS ENUM('todo', 'in_progress', 'done');--> statement-breakpoint
+ALTER TABLE "account" ADD COLUMN "issuer" text DEFAULT 'local:credential' NOT NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX "account_issuer_accountId_uidx" ON "account" ("issuer","account_id");--> statement-breakpoint
 CREATE TABLE "lists" (
 	"id" uuid PRIMARY KEY DEFAULT uuidv7(),
 	"user_id" text NOT NULL,
