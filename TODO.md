@@ -487,7 +487,7 @@ Plan: [`docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md`](docs/agen
 
 Implementation scope and interfaces:
 
-- Create the server route and error boundary under `app/(marketing)/`, auth route group pages under `app/(auth)/`, and composition-owned landing/auth UI under `components/landing/` and `components/auth/`.
+- Replace the scaffold `app/page.tsx` in place as the sole server-owned `/` landing route and add its provider-safe root error boundary without creating a duplicate `app/(marketing)/page.tsx`; add auth route group pages under `app/(auth)/` and composition-owned landing/auth UI under `components/landing/` and `components/auth/`.
 - Add one client-only Better Auth wrapper under `lib/auth-client.ts` using `createAuthClient` and `magicLinkClient`; do not export provider records or server-only helpers through it.
 - Add a framework-independent safe internal redirect/error helper and focused tests under `src/modules/auth/presentation/` only if the form boundary requires them.
 - Consume `getPublishedLandingContent()` and `LandingContent` from the existing landing application/infrastructure boundary; leave Sanity client/query/configuration and the dashboard implementation untouched.
