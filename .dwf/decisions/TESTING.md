@@ -134,7 +134,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14          | `partial`   |
 | [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14          | `partial`   |
 | [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                | `partial`   |
-| [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                      | `specified` |
+| [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                      | `partial`   |
 | [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                            | `verified`  |
 | [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                      | `verified`  |
 | [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence        | T-13                            | `partial`   |
@@ -319,8 +319,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** List reads default to 20, accept 1–100, return oldest-first deterministic pages with opaque context-bound cursors, fetch at most `limit + 1` rows, and expose a next page only when one exists.
 - **Required evidence:** Application and PostgreSQL pagination tests, malformed/cross-context cursor and limit boundary tests, and a browser-visible `Load more` check.
 - **Dependencies:** T-04 indexes, T-06 repository/use case, T-08 shared pagination contract, and T-14 harness.
-- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. The local PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, and bounded `limit + 1` repository reads. T-08 boundary mapping, T-10 browser `Load more`, and T-14 harness evidence remain outstanding.
-- **Follow-up:** T-08 must add shared boundary response-shape tests, T-10 must verify browser-visible pagination, and T-14 must repeat the query behavior through the reusable harness before this contract can be `verified`.
+- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. T-08 shared pagination tests cover default 20, accepted 1/100, invalid limits, blank and repeated URL parameters, and the stable page shape. The local PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, bounded `limit + 1` repository reads, and maximum-page continuation from 100 records to the 101st record. T-09 boundary mapping, T-10 browser `Load more`, and T-14 harness evidence remain outstanding.
+- **Follow-up:** T-09 must add request-level boundary response-shape tests, T-10 must verify browser-visible pagination, and T-14 must repeat the query behavior through the reusable harness before this contract can be `verified`.
 
 <a id="tst-tasks-001"></a>
 
@@ -373,8 +373,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Task reads default to completed tasks included, support explicit hiding without changing stored state or the relative order of visible tasks, return newest-first deterministic bounded pages, and restart pagination when list or filter context changes.
 - **Required evidence:** Application and PostgreSQL filter/order/cursor tests, boundary validation tests, and a browser check for filtering and `Load more`.
 - **Dependencies:** T-07 task repository/use case, T-08 pagination contract, T-10 UI, and T-14 harness.
-- **Current evidence:** Task application/cursor tests cover default completed-task visibility, explicit filter validation, page limits, opaque cursor validation, and context mismatches. The local PostgreSQL suite proves newest-first ordering, same-timestamp `createdAt`/`id` tie-breaking, continuation and terminal cursors, stable relative order after hiding `done`, cross-context cursor rejection, and bounded `limit + 1` reads. T-08 boundary mapping, T-10 browser `Load more`/filter evidence, and T-14 reusable-harness evidence remain outstanding.
-- **Follow-up:** T-08 must add shared boundary response/validation tests, T-10 must verify browser-visible filtering and pagination, and T-14 must repeat the query behavior through the reusable harness before this contract can be `verified`.
+- **Current evidence:** Task application/cursor tests cover default completed-task visibility, explicit filter validation, page limits, opaque cursor validation, and context mismatches. T-08 shared pagination tests cover the common default/maximum/invalid URL limit and cursor contract. The local PostgreSQL suite proves newest-first ordering, same-timestamp `createdAt`/`id` tie-breaking, continuation and terminal cursors, stable relative order after hiding `done`, cross-context cursor rejection, bounded `limit + 1` reads, and maximum-page continuation from 100 records to the 101st record. T-09 boundary validation, T-10 browser `Load more`/filter evidence, and T-14 reusable-harness evidence remain outstanding.
+- **Follow-up:** T-09 must add request-level boundary validation tests, T-10 must verify browser-visible filtering and pagination, and T-14 must repeat the query behavior through the reusable harness before this contract can be `verified`.
 
 <a id="tst-concurrency-001"></a>
 
@@ -398,7 +398,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-BOUNDARY-001 — Server entry-path contracts
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Server boundaries
 - **Evidence layers/modes:** Boundary / request contract, integration
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
@@ -409,6 +409,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** JSON Route Handlers and Server Actions authenticate, authorize, validate with shared Zod rules, call shared use cases, and map success, pagination, unauthenticated, privacy-preserving not-found, conflict, and invalid-input outcomes consistently.
 - **Required evidence:** Request-level JSON contract tests and a smaller Server Action adapter suite. Business rules remain primarily covered below the entry path.
 - **Dependencies:** T-05 auth, T-06/T-07 use cases, and T-08 shared contracts.
+- **Current evidence:** T-08 shared error-contract tests cover the accepted 401/404/409/422 mappings, canonical `{ error: { code, message } }` envelopes, safe handling of unknown errors, and non-leaking canonical messages when an arbitrary error spoofs a known code. Request-level JSON Route Handler and Server Action tests remain outstanding in T-09.
+- **Follow-up:** T-09 must add authenticated request/action tests for success, pagination, privacy-preserving 404, conflict 409, invalid-input 422, and authentication outcomes before this contract can be `verified`.
 
 <a id="tst-landing-001"></a>
 

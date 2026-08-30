@@ -41,6 +41,10 @@ function quoteIdentifier(identifier: string) {
   return `"${identifier.replaceAll('"', '""')}"`
 }
 
+function fixtureUuid(sequence: number) {
+  return `0198f2c0-3a6b-7000-8000-${sequence.toString(16).padStart(12, "0")}`
+}
+
 async function applyMigration(client: PoolClient, migrationSql: string) {
   const statements = migrationSql
     .split(/--> statement-breakpoint\s*/)
@@ -513,5 +517,37 @@ describe.sequential("Drizzle list repository", () => {
 
     const finalList = await repository.findByIdForUser(userId, list.id)
     expect(finalList?.name).toBe("Second write")
+  })
+
+  it("continues correctly at the maximum page size", async () => {
+    const userId = `t08-list-max-page-${Date.now()}`
+    await database.insert(usersTable).values({
+      id: userId,
+      name: "T-08 Maximum List Page User",
+      email: `${userId}@example.test`,
+    })
+
+    const createdAt = new Date("2026-08-30T12:08:00.000Z")
+    const listRows = Array.from({ length: 101 }, (_, index) => ({
+      id: fixtureUuid(0x200 + index),
+      userId,
+      name: `Maximum page list ${index}`,
+      createdAt,
+      updatedAt: createdAt,
+    }))
+    await database.insert(listsTable).values(listRows)
+
+    const repository = createDrizzleListRepository(database)
+    const firstPage = await repository.listByUser(userId, { limit: 100 })
+    expect(firstPage.items).toHaveLength(100)
+    expect(firstPage.nextCursor).toEqual(expect.any(String))
+
+    const secondPage = await repository.listByUser(userId, {
+      cursor: firstPage.nextCursor!,
+      limit: 100,
+    })
+    expect(secondPage.items).toHaveLength(1)
+    expect(secondPage.items[0]?.name).toBe("Maximum page list 100")
+    expect(secondPage.nextCursor).toBeNull()
   })
 })

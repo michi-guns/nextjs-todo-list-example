@@ -287,19 +287,28 @@ PR: [#11](https://github.com/michi-guns/nextjs-todo-list-example/pull/11) | impl
 
 ### T-08: Add shared pagination and error contracts
 
-- [ ] Validate cursors and limits at the presentation boundary. Default `limit` to 20 and cap it at 100.
-- [ ] Return only `{ items, nextCursor }` for page reads, with opaque context-bound cursors.
-- [ ] Map unauthenticated, not-found, conflict, and invalid-input outcomes consistently across entry points.
-- [ ] Keep list/task queries bounded to at most `limit + 1` rows and avoid N+1 work.
+- [x] Implement T-08 from the accepted plan in [`docs/agentforge/plans/2026-08-30-t-08-pagination-errors.md`](docs/agentforge/plans/2026-08-30-t-08-pagination-errors.md).
+- [x] Add framework-independent shared pagination types, constants, and Zod query parsing without importing modules or app routes.
+- [x] Add the shared error envelope/status mapper for unauthenticated, not-found, conflict, invalid-input, and safe internal failures.
+- [x] Refactor list/task ports and limit consumers to use the shared page contract while preserving module-specific cursor and domain-error behavior.
+- [x] Prove maximum-size list/task pagination continues correctly from 100 to the 101st record without changing migrations or query bounds.
 
 Verification:
 
-- [ ] Unit and boundary tests cover malformed/cross-context cursors, limit errors, response shape, and privacy-preserving `404` behavior.
-- [ ] Query tests prove the required ordering and continuation behavior at the maximum page size.
+- [x] Shared unit tests cover default/maximum limits, invalid pagination inputs, stable page shape, known error mappings, and safe unknown-error fallback.
+- [x] PostgreSQL integration tests cover list/task ordering and continuation at the maximum page size; existing cursor/filter/privacy tests remain green.
 
 Test contracts: `TST-LISTS-003`, `TST-TASKS-003`, `TST-BOUNDARY-001`.
 
+Recommended AgentForge skills: `using-agent-skills`, `planning`, `task-breakdown`, `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, `security-and-hardening`, `api-and-interface-design`, `git-workflow-and-versioning`, and `code-review-and-quality`.
+
+Verification commands: focused shared/list/task unit tests and local PostgreSQL integration tests during implementation; completion gates are `pnpm test`, `TEST_DATABASE_URL=<local PostgreSQL URL> pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text`, `pnpm exec prettier --check` for changed Markdown, and `git diff --check`. Testcontainers lifecycle evidence remains with T-14; authenticated boundary request tests remain with T-09.
+
 Dependencies: T-06, T-07.
+
+Evidence: `pnpm test` (14 files, 62 tests), `TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/todo_test pnpm test:integration` (5 files, 21 tests against disposable `postgres:18-alpine`), `pnpm typecheck`, `pnpm lint` (zero errors and the one pre-existing `Geist` warning), `pnpm build`, both Drizzle checks, changed-file Prettier checks, and `git diff --check` all pass. Shared pagination tests cover default/maximum limits, invalid URL values, blank cursors, duplicate parameters, and the stable page shape. Shared error-contract tests cover 401/404/409/422 mappings, canonical non-leaking messages, and the generic 500 fallback. List/task integration tests prove maximum-page continuation from 100 records to the 101st record. No migration was needed. `TST-LISTS-003`, `TST-TASKS-003`, and `TST-BOUNDARY-001` remain `partial` because authenticated request/action, browser, and reusable-harness evidence belong to T-09/T-10/T-14.
+
+PR: [#12](https://github.com/michi-guns/nextjs-todo-list-example/pull/12) | implementation tip `c3044b5` received no actionable findings; the closeout metadata tip is reviewed before merge.
 
 ## Phase 3: application surfaces
 

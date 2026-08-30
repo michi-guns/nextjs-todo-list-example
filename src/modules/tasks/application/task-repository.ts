@@ -1,14 +1,10 @@
 import type { ListId, Task, TaskId, TaskStatus, UserId } from "../domain/task"
+import type { Page, PageRequest } from "../../../shared/pagination"
 
-export interface TaskPageRequest {
-  readonly cursor?: string
-  readonly limit?: number
+export type { Page, PageRequest } from "../../../shared/pagination"
+
+export type TaskPageRequest = PageRequest & {
   readonly includeCompleted?: boolean
-}
-
-export interface Page<T> {
-  readonly items: readonly T[]
-  readonly nextCursor: string | null
 }
 
 export interface TaskPatch {

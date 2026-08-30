@@ -3,6 +3,7 @@ import { type NodePgDatabase } from "drizzle-orm/node-postgres"
 
 import { listsTable } from "../../../../db/schema/lists"
 import { tasksTable, type SelectTask } from "../../../../db/schema/tasks"
+import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT } from "../../../shared/pagination"
 import type { Task, TaskStatus } from "../domain/task"
 import {
   InvalidTaskPageRequestError,
@@ -14,9 +15,6 @@ import type {
   TaskPatch,
   TaskRepository,
 } from "../application/task-repository"
-
-const DEFAULT_PAGE_LIMIT = 20
-const MAX_PAGE_LIMIT = 100
 
 function mapTask(row: SelectTask): Task {
   return {

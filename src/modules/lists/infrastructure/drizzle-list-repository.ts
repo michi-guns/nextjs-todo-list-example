@@ -2,6 +2,7 @@ import { and, asc, eq, gt, or } from "drizzle-orm"
 import { type NodePgDatabase } from "drizzle-orm/node-postgres"
 
 import { listsTable, type SelectList } from "../../../../db/schema/lists"
+import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT } from "../../../shared/pagination"
 import type { List } from "../domain/list"
 import {
   InvalidPageRequestError,
@@ -13,7 +14,6 @@ import type {
   PageRequest,
 } from "../application/list-repository"
 
-const DEFAULT_PAGE_LIMIT = 20
 const MAX_INBOX_INSERT_ATTEMPTS = 3
 
 function mapList(row: SelectList): List {
@@ -40,7 +40,7 @@ function isUniqueViolation(error: unknown) {
 
 function getPageLimit(page: PageRequest) {
   const limit = page.limit ?? DEFAULT_PAGE_LIMIT
-  if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+  if (!Number.isInteger(limit) || limit < 1 || limit > MAX_PAGE_LIMIT) {
     throw new InvalidPageRequestError("Invalid list page limit")
   }
   return limit

@@ -1,4 +1,5 @@
 import type { Task, TaskStatus } from "../domain/task"
+import { DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT } from "../../../shared/pagination"
 import {
   InvalidTaskNotesError,
   InvalidTaskPageRequestError,
@@ -15,8 +16,6 @@ import type {
   TaskRepository,
 } from "./task-repository"
 
-const DEFAULT_PAGE_LIMIT = 20
-const MAX_PAGE_LIMIT = 100
 const TASK_STATUSES: readonly TaskStatus[] = ["todo", "in_progress", "done"]
 
 export function normalizeTaskTitle(title: unknown): string {
