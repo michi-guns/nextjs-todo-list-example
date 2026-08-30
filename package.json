@@ -13,6 +13,7 @@
     "test:e2e": "playwright test",
     "better-auth-mcp": "tsx scripts/better-auth-mcp/cli.ts",
     "sanity:smoke": "tsx scripts/verify-sanity.ts",
+    "neon:performance": "node scripts/verify-neon-performance/cli.mjs",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",

@@ -123,7 +123,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-FOUNDATION-001](#tst-foundation-001)   | Shared database runtime works across local PostgreSQL and Neon                       | Unit, local integration, hosted smoke                  | T-03                            | `verified`  |
 | [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                | `partial`   |
 | [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks          | T-14, T-15                      | `partial`   |
-| [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration                                 | T-04, T-06, T-07, T-14          | `partial`   |
+| [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration and hosted query-plan evidence  | T-04, T-06, T-07, T-14, T-16    | `verified`  |
 | [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                      | `partial`   |
 | [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                      | `partial`   |
 | [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                | `partial`   |
@@ -142,7 +142,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                    | T-15                            | `specified` |
 | [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                    | T-15                            | `specified` |
 | [TST-E2E-003](#tst-e2e-003)                 | Browser-visible privacy, pagination, filtering, and mutation feedback work together  | Playwright Chromium, on-demand cross-browser           | T-10, T-12A, T-15               | `specified` |
-| [TST-PERFORMANCE-001](#tst-performance-001) | Representative Neon queries use the intended indexes and meet the agreed warm target | Query plans and controlled performance evidence        | T-16                            | `specified` |
+| [TST-PERFORMANCE-001](#tst-performance-001) | Representative Neon queries use the intended indexes and meet the agreed warm target | Query plans and controlled performance evidence        | T-16                            | `verified`  |
 
 ## Test contracts
 
@@ -209,12 +209,11 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Verifies technical decisions:** TD-005, TD-006, TD-010, TD-013
 - **Edge cases:** [EC-005](EDGE-CASES.md#ec-005), [EC-006](EDGE-CASES.md#ec-006), [EC-014](EDGE-CASES.md#ec-014), [EC-017](EDGE-CASES.md#ec-017), [EC-018](EDGE-CASES.md#ec-018)
 - **SPEC:** [3 Data model](../output/agent/SPEC.md#3-data-model-postgres), [4 Domain rules](../output/agent/SPEC.md#4-domain-rules), [5 Application use cases](../output/agent/SPEC.md#5-application-use-cases-minimum)
-- **Owners:** T-04, T-06, T-07, T-14
+- **Owners:** T-04, T-06, T-07, T-14, T-16
 - **Contract:** Real PostgreSQL behavior preserves ownership, case-insensitive uniqueness, list-to-task cascade deletion, repository field mappings, bounded cursor reads, required indexes, and the absence of N+1 or unbounded page work.
 - **Required evidence:** PostgreSQL integration cases against the real migrations, including concurrent uniqueness and cascade behavior, plus query-shape assertions where the contract requires them.
-- **Dependencies:** T-04 schema and T-14 harness.
-- **Current evidence:** T-04's focused integration suite passed three real-database cases covering database-generated native UUID IDs, Drizzle `Date` mappings, nullable notes and native status values, owner-scoped case-insensitive list/task uniqueness, list-to-task cascade deletion, cascading foreign keys, and the required cursor-index column order/direction. The complete T-06/T-07 repository suite now runs through the T-14 harness and covers ownership, concurrent uniqueness, bounded cursor reads, cascade behavior, repository mappings, and the existing query-shape guards.
-- **Follow-up:** Keep this contract `partial` until the remaining query-shape/performance evidence is reconciled against the full acceptance baseline; the reusable harness prerequisite is satisfied.
+- **Dependencies:** T-04 schema, T-14 harness, and T-16 hosted query-plan evidence.
+- **Current evidence:** T-04's focused integration suite passed three real-database cases covering database-generated native UUID IDs, Drizzle `Date` mappings, nullable notes and native status values, owner-scoped case-insensitive list/task uniqueness, list-to-task cascade deletion, cascading foreign keys, and the required cursor-index column order/direction. The complete T-06/T-07 repository suite runs through the T-14 harness and covers ownership, concurrent uniqueness, bounded cursor reads, cascade behavior, repository mappings, and query-shape guards. T-16's redacted Neon development-branch evidence confirms both composite indexes on representative owner/list data, no lists/tasks sequential scans, and cursor/warm-query behavior. The task repository states explicit `NULLS LAST` ordering so the task index ordering is usable without changing result semantics for the `NOT NULL` columns.
 
 <a id="tst-auth-001"></a>
 
@@ -532,7 +531,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-PERFORMANCE-001 — Representative Neon query evidence
 
-- **Status:** `specified`
+- **Status:** `verified`
 - **Capability:** Database performance
 - **Evidence layers/modes:** Infrastructure / query plan and controlled performance evidence
 - **Verifies product decisions:** D-003, D-004, D-009
@@ -543,6 +542,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Representative list/task first-page and next-page queries use the intended composite indexes, preserve cursor correctness at page size 100, and meet the agreed warm 20-record database execution target with compute active.
 - **Required evidence:** The separate Neon development-branch performance seed, `EXPLAIN ANALYZE`, cursor checks, and measurements that distinguish database execution from network, auth, rendering, CMS, and compute startup.
 - **Dependencies:** T-01 development branch, T-04 schema/indexes, T-08 query paths, and the completed application repositories.
+- **Current evidence:** T-16's `pnpm neon:performance` run against the direct, agent-owned Neon `development` branch seeded 101 primary lists, 10,000 primary tasks in one list, and 10,000 secondary-owner tasks. Six representative first/next-page plans (including the completed-task filter) used `lists_user_created_at_id_idx` or `tasks_user_list_created_at_id_idx` with no `lists`/`tasks` sequential scan. Maximum-page-size cursor checks returned all 101 lists in two pages and all 10,000 tasks in 100 pages without duplicates or ordering violations; owner isolation checks passed. After three warmups, ten server-reported PostgreSQL execution samples for the 20-record task query had a maximum of 0.086 ms, below the 50 ms target. The CLI obtains the development endpoint independently through `neon connection-string development` and rejects a supplied default-branch URL before mutation. The artifact records the command, commit `7837a69cf8cacaa01825e324d305d799e42fce07`, and ref `task/t-16-neon-performance-evidence`; network latency, authentication, rendering, CMS access, and compute startup are explicitly excluded.
 
 ## SPEC traceability map
 

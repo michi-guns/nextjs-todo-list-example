@@ -572,18 +572,28 @@ Dependencies: T-05, T-09, T-10, T-11, T-14.
 
 ### T-16: Produce Neon performance evidence
 
-- [ ] Create the separate Neon development-branch performance seed: approximately 100 lists, 10,000 tasks in one list, and another user's records.
-- [ ] Run `EXPLAIN ANALYZE` for representative first-page and next-page list/task queries, including completed-task filtering when its SQL differs.
-- [ ] Verify correct cursor behavior at page size 100 and a warm 20-record database query under 50 ms with compute active.
+- [x] Add a guarded, repeatable `pnpm neon:performance` script that obtains the authoritative development endpoint through the Neon CLI, refuses non-development targets (including a mismatched `DATABASE_URL` override), and replaces only its two deterministic synthetic users.
+- [x] Create the separate Neon development-branch performance seed: approximately 100 lists, 10,000 tasks in one list, and another user's records.
+- [x] Run `EXPLAIN ANALYZE` for representative first-page and next-page list/task queries, including completed-task filtering when its SQL differs.
+- [x] Verify correct cursor behavior at page size 100 and a warm 20-record database query under 50 ms with compute active.
+- [x] Record redacted hosted evidence outside `.dwf` and reconcile the performance test contract, task status, and dependency checkpoint.
 
 Verification:
 
-- [ ] Query plans use the intended composite indexes without a full sequential scan of the lists or tasks table.
-- [ ] Evidence records database execution separately from network, authentication, rendering, CMS access, and compute startup.
+- [x] The script's focused tests and hosted run pass with seed counts, ownership isolation, deterministic cursor continuation/termination, and non-secret evidence output.
+- [x] Query plans use the intended composite indexes without a full sequential scan of the lists or tasks table.
+- [x] The warm target is measured from server-reported database execution after compute is active and data is warm; network, authentication, rendering, CMS access, and compute startup are explicitly excluded.
+- [x] `pnpm test`, `pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier checks, and `git diff --check` pass.
 
 Test contracts: `TST-PERFORMANCE-001`.
 
 Dependencies: T-01, T-04, T-08.
+
+Implementation scope: `scripts/verify-neon-performance/`, the single `pnpm neon:performance` package command, the semantic-preserving explicit `NULLS LAST` task ordering in `src/modules/tasks/infrastructure/drizzle-task-repository.ts`, redacted evidence under `docs/agentforge/evidence/`, this T-16 entry, `TST-PERFORMANCE-001` reconciliation, and the temporary implementation checkpoint. No application routes, migrations, schema changes, production/default-branch operations, or local behavior-seed changes.
+
+Plan: [`2026-08-30-t-16-neon-performance-evidence.md`](docs/agentforge/plans/2026-08-30-t-16-neon-performance-evidence.md).
+
+Evidence: [`docs/agentforge/evidence/t16-neon-performance.json`](docs/agentforge/evidence/t16-neon-performance.json) records the direct development-branch run: 101 primary lists, 10,000 primary tasks in one list, 10,000 secondary-owner tasks, six index-backed plans with no lists/tasks sequential scans, owner isolation, maximum-page-size cursor checks, and ten warmed server-reported execution samples with a 0.086 ms maximum against the 50 ms target. The artifact records the `pnpm neon:performance` command, commit `7837a69cf8cacaa01825e324d305d799e42fce07`, and ref `task/t-16-neon-performance-evidence`. Focused core tests and the full suite pass (18 files/92 tests); local integration passes (6 files/23 tests against one disposable PostgreSQL 18 Testcontainer); typecheck and build pass; lint reports only the pre-existing `app/layout.tsx:1:10 Geist` warning; changed-file Prettier and diff checks pass. The task repository now expresses explicit `NULLS LAST` ordering to match the existing task index without changing `NOT NULL` result semantics. The CLI obtains the development endpoint independently through `neon connection-string development` and rejects a supplied default-branch URL before mutation. PR [#16](https://github.com/michi-guns/nextjs-todo-list-example/pull/16) is reviewed through closeout tip `649f147` with no actionable findings and is ready to merge.
 
 ### T-17: Finish documentation and final quality gates
 

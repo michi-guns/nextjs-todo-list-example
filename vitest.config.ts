@@ -10,7 +10,11 @@ export default defineConfig({
   test: {
     environment: "node",
     passWithNoTests: true,
-    include: ["src/**/*.{test,spec}.ts", "src/**/*.{test,spec}.tsx"],
+    include: [
+      "src/**/*.{test,spec}.ts",
+      "src/**/*.{test,spec}.tsx",
+      "scripts/verify-neon-performance/**/*.test.mjs",
+    ],
     exclude: [
       "**/node_modules/**",
       "**/e2e/**",
