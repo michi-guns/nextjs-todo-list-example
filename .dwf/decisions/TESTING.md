@@ -137,7 +137,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                      | `specified` |
 | [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                            | `verified`  |
 | [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                      | `verified`  |
-| [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence        | T-13                            | `specified` |
+| [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence        | T-13                            | `partial`   |
 | [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance              | T-09A, T-09B, T-10, T-11, T-12A | `specified` |
 | [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                    | T-15                            | `specified` |
 | [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                    | T-15                            | `specified` |
@@ -428,7 +428,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-LANDING-003 — Sanity freshness and recovery
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Landing content freshness
 - **Evidence layers/modes:** Infrastructure, boundary / contract, deployed smoke
 - **Verifies product decisions:** D-005, D-008
@@ -439,6 +439,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A trusted relevant Sanity publish event and an authorized manual recovery request reach one server-only idempotent invalidation service; invalid signatures, irrelevant events, unauthorized recovery, and duplicate delivery do not cause unsafe invalidation.
 - **Required evidence:** Boundary tests for signatures, relevance, authorization, duplication, and shared service routing, plus one real deployed webhook delivery for release evidence.
 - **Dependencies:** T-12 cache identity/read path and the deployed webhook prerequisite.
+- **Evidence:** Local boundary tests pass in `pnpm test` (6 files, 32 tests at the implementation checkpoint) and cover generated valid/invalid Sanity signatures, malformed payloads, irrelevant and draft events, duplicate deliveries, the stable tag with immediate-expiration profile `{ expire: 0 }`, manual authorization, and shared invalidation routing. The deployed webhook-delivery clause remains deferred because this repository has no deployed release candidate; local direct-handler evidence does not replace it.
 
 <a id="tst-ui-001"></a>
 

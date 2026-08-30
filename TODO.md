@@ -412,19 +412,25 @@ Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
 
 ### T-13: Add Sanity freshness and recovery
 
-- [ ] Add a signature-verified webhook for relevant published landing changes.
-- [ ] Reject invalid signatures, irrelevant events, and invalid requests without invalidating cache.
-- [ ] Add an explicitly authorized manual recovery path.
-- [ ] Route both mechanisms through one server-only, idempotent invalidation service.
+- [x] Add a signature-verified webhook for relevant published landing changes.
+- [x] Reject invalid signatures, irrelevant events, and invalid requests without invalidating cache.
+- [x] Add an explicitly authorized manual recovery path.
+- [x] Route both mechanisms through one server-only, idempotent invalidation service.
 
 Verification:
 
-- [ ] Tests cover valid/invalid signatures, relevance filtering, duplicate delivery, and manual authorization.
-- [ ] A deployed release candidate receives one real Sanity webhook successfully.
+- [x] Tests cover valid/invalid signatures, relevance filtering, duplicate delivery, manual authorization, immediate tag expiration, and shared invalidation routing.
+- [!] A deployed release candidate receives one real Sanity webhook successfully; deferred because this repository has no deployed release candidate yet.
 
 Test contracts: `TST-LANDING-003`.
 
 Dependencies: T-12.
+
+Plan: [`2026-08-30-t-13-sanity-freshness-recovery.md`](docs/agentforge/plans/2026-08-30-t-13-sanity-freshness-recovery.md).
+
+Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `security-and-hardening`, `source-driven-development`, `incremental-implementation`, and `git-workflow-and-versioning`.
+
+Evidence: `pnpm test` (6 files, 32 tests), `pnpm sanity:smoke`, `pnpm typecheck`, `pnpm lint` (one pre-existing `Geist` warning), `pnpm build`, and `git diff --check` all pass. [PR #9](https://github.com/michi-guns/nextjs-todo-list-example/pull/9) was independently reviewed by fresh GPT-5.6-Sol agents until no actionable findings remained. `TST-LANDING-003` is `partial` only because deployed webhook delivery awaits a release candidate.
 
 ### T-12A: Audit and refine the materialized UI
 

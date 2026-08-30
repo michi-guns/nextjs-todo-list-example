@@ -13,10 +13,10 @@ Continue the repository's AgentForge delivery autonomously through every task th
 ## Repository state at handoff
 
 - Repository: `michi-guns/nextjs-todo-list-example`
-- Current branch: `task/t-12-sanity-landing-read-path` (T-12 review satisfied; close-out and merge in progress)
+- Current branch: `task/t-13-sanity-freshness-recovery` (T-13 review satisfied; close-out and merge in progress)
 - Base: latest `main` from `origin/main`
 - T-05 PR #7 remains open and unmerged: `task/t-05-better-auth-boundary`
-- T-12 is complete pending close-out. T-13 becomes eligible after T-12 is merged. T-06 and later todo capabilities remain blocked by T-05.
+- T-12 is merged and complete. T-13 implementation/review is complete pending close-out; T-06 and later todo capabilities remain blocked by T-05.
 - No secrets, token values, or environment contents belong in commits, logs, or PR bodies.
 
 ## Non-negotiable constraints
