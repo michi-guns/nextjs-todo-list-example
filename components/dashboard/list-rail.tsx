@@ -81,10 +81,11 @@ export function ListRail({
 
   async function handleLoadMore() {
     const added = await onLoadMore()
+    const total = lists.length + added
     setPaginationAnnouncement(
       added > 0
-        ? `Loaded ${added} more ${added === 1 ? "list" : "lists"}.`
-        : "No new lists were loaded."
+        ? `Loaded ${added} more ${added === 1 ? "list" : "lists"}; ${total} total.`
+        : `No new lists were loaded; ${total} total.`
     )
     requestAnimationFrame(() =>
       (loadMoreRef.current ?? paginationStatusRef.current)?.focus()

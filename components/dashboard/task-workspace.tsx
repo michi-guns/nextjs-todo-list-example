@@ -62,10 +62,11 @@ export function TaskWorkspace({
   const paginationStatusRef = useRef<HTMLParagraphElement>(null)
 
   function announcePagination(added: number) {
+    const total = tasks.length + added
     setPaginationAnnouncement(
       added > 0
-        ? `Loaded ${added} more ${added === 1 ? "task" : "tasks"}.`
-        : "No new tasks were loaded."
+        ? `Loaded ${added} more ${added === 1 ? "task" : "tasks"}; ${total} total.`
+        : `No new tasks were loaded; ${total} total.`
     )
     requestAnimationFrame(() => paginationStatusRef.current?.focus())
   }
