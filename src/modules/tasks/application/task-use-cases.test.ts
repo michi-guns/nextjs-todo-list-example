@@ -156,6 +156,49 @@ describe("task domain and application", () => {
     )
   })
 
+  it("accepts every status and reapplying the current status is idempotent", async () => {
+    const repository = createRepository()
+    const application = createTaskApplication(repository, () => now)
+
+    for (const status of ["todo", "in_progress", "done"] as const) {
+      expect(normalizeTaskStatus(status)).toBe(status)
+      await expect(
+        application.updateTask("user-a", "task-1", { status })
+      ).resolves.toMatchObject({ status })
+    }
+
+    expect(repository.calls.updateForUser).toEqual([
+      {
+        userId: "user-a",
+        taskId: "task-1",
+        patch: { status: "todo" },
+        now,
+      },
+      {
+        userId: "user-a",
+        taskId: "task-1",
+        patch: { status: "in_progress" },
+        now,
+      },
+      {
+        userId: "user-a",
+        taskId: "task-1",
+        patch: { status: "done" },
+        now,
+      },
+    ])
+
+    await expect(
+      application.updateTask("user-a", "task-1", { status: "done" })
+    ).resolves.toMatchObject({ status: "done" })
+    expect(repository.calls.updateForUser.at(-1)).toEqual({
+      userId: "user-a",
+      taskId: "task-1",
+      patch: { status: "done" },
+      now,
+    })
+  })
+
   it("forwards the authenticated owner, list, and default task fields", async () => {
     const repository = createRepository()
     const application = createTaskApplication(repository, () => now)
@@ -257,5 +300,19 @@ describe("task domain and application", () => {
     await expect(
       conflictApplication.updateTask("user-a", "task-1", { title: "Task" })
     ).rejects.toBeInstanceOf(TaskConflictError)
+  })
+
+  it("maps missing or foreign-owned task list reads to not-found", async () => {
+    const repository = createRepository({
+      listByOwnedList: async () => "list_not_found",
+    })
+    const application = createTaskApplication(repository)
+
+    await expect(
+      application.listTasks("user-a", "missing-list")
+    ).rejects.toBeInstanceOf(TaskNotFoundError)
+    await expect(
+      application.listTasks("user-a", "other-users-list")
+    ).rejects.toMatchObject({ code: "not_found" })
   })
 })

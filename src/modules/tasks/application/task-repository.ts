@@ -22,7 +22,7 @@ export interface TaskRepository {
     userId: UserId,
     listId: ListId,
     options: TaskPageRequest & { readonly includeCompleted: boolean }
-  ): Promise<Page<Task>>
+  ): Promise<Page<Task> | "list_not_found">
   insert(input: {
     readonly userId: UserId
     readonly listId: ListId

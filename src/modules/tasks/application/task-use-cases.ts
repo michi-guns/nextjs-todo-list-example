@@ -120,16 +120,20 @@ export function createTaskApplication(
   clock: () => Date = () => new Date()
 ) {
   return {
-    listTasks(
+    async listTasks(
       userId: string,
       listId: string,
       page?: TaskPageRequest
     ): Promise<Page<Task>> {
-      return repository.listByOwnedList(
+      const result = await repository.listByOwnedList(
         userId,
         listId,
         normalizeTaskPageRequest(page)
       )
+      if (result === "list_not_found") {
+        throw new TaskNotFoundError()
+      }
+      return result
     },
 
     async createTask(

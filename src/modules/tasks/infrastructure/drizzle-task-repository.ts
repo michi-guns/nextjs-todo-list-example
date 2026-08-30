@@ -84,6 +84,17 @@ export function createDrizzleTaskRepository(
         page.cursor !== undefined
           ? decodeTaskCursor(page.cursor, userId, listId, includeCompleted)
           : undefined
+
+      const ownedList = await database
+        .select({ id: listsTable.id })
+        .from(listsTable)
+        .where(and(eq(listsTable.id, listId), eq(listsTable.userId, userId)))
+        .limit(1)
+
+      if (!ownedList[0]) {
+        return "list_not_found"
+      }
+
       const afterCursor = cursor
         ? or(
             lt(tasksTable.createdAt, cursor.createdAt),

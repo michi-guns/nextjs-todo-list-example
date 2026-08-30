@@ -210,7 +210,17 @@ describe.sequential("Drizzle task repository", () => {
         includeCompleted: true,
         limit: 20,
       })
-    ).resolves.toEqual({ items: [], nextCursor: null })
+    ).resolves.toBe("list_not_found")
+    await expect(
+      repository.listByOwnedList(
+        ownerId,
+        "0198f2c0-3a6b-7000-8000-000000000104",
+        {
+          includeCompleted: true,
+          limit: 20,
+        }
+      )
+    ).resolves.toBe("list_not_found")
     await expect(
       repository.updateForUser(
         otherOwnerId,
@@ -240,6 +250,23 @@ describe.sequential("Drizzle task repository", () => {
         new Date("2026-08-30T13:01:05.000Z")
       )
     ).resolves.toMatchObject({ notes: null, status: "done" })
+
+    const statuses = [
+      ["todo", "2026-08-30T13:01:06.000Z"],
+      ["in_progress", "2026-08-30T13:01:07.000Z"],
+      ["done", "2026-08-30T13:01:08.000Z"],
+      ["done", "2026-08-30T13:01:09.000Z"],
+    ] as const
+    for (const [status, timestamp] of statuses) {
+      await expect(
+        repository.updateForUser(
+          ownerId,
+          created.id,
+          { status },
+          new Date(timestamp)
+        )
+      ).resolves.toMatchObject({ status })
+    }
 
     await expect(
       repository.deleteForUser(otherOwnerId, created.id)
@@ -312,6 +339,9 @@ describe.sequential("Drizzle task repository", () => {
       limit: 2,
       includeCompleted: true,
     })
+    if (firstPage === "list_not_found") {
+      throw new Error("expected the owned list to return a task page")
+    }
     expect(firstPage.items.map((task) => task.id)).toEqual([thirdId, secondId])
     expect(firstPage.nextCursor).toEqual(expect.any(String))
 
@@ -320,6 +350,9 @@ describe.sequential("Drizzle task repository", () => {
       limit: 2,
       includeCompleted: true,
     })
+    if (secondPage === "list_not_found") {
+      throw new Error("expected the owned list to return a task page")
+    }
     expect(secondPage.items.map((task) => task.id)).toEqual([firstId])
     expect(secondPage.nextCursor).toBeNull()
 
@@ -327,6 +360,9 @@ describe.sequential("Drizzle task repository", () => {
       limit: 20,
       includeCompleted: false,
     })
+    if (activePage === "list_not_found") {
+      throw new Error("expected the owned list to return a task page")
+    }
     expect(activePage.items.map((task) => task.id)).toEqual([thirdId, firstId])
 
     await expect(
