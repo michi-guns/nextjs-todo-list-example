@@ -469,7 +469,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-UI-001 — Selected UI direction and usable states
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Product UI
 - **Evidence layers/modes:** UI / prototype inspection, runtime inspection, browser acceptance
 - **Verifies product decisions:** D-001, D-002, D-003, D-004, D-009
@@ -479,6 +479,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The selected UI direction remains recognizable in the materialized landing, auth, and dashboard surfaces, and the critical controls and states remain usable at the agreed viewports with keyboard reachability, visible focus, loading, empty, error, disabled, selected, long-content, and overflow behavior.
 - **Required evidence:** Fair prototype inspection during exploration, browser/runtime inspection during materialization, and focused browser acceptance for critical interactions. This is not a requirement for a complete React component unit-test matrix.
 - **Dependencies:** T-09A/T-09B design work and the implemented surfaces in T-10/T-11.
+- **Evidence:** T-09A's isolated static prototype uses one fixture and three materially different directions. Structural validation passes with exactly three manifests; Chromium Playwright inspection covers all directions at 1440x900, 1024x768, 768x1024, and 320x800 with zero console errors and no document overflow. Prototype evidence covers task/list capture, status changes, completed filtering, list switching, bounded continuation, keyboard-visible focus, loading/disabled, empty, validation-error, selected, and long-content states. Materialized application runtime and end-to-end browser evidence remain deferred to T-09B/T-10/T-11/T-12A/T-15.
 
 <a id="tst-e2e-001"></a>
 
