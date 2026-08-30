@@ -2,7 +2,7 @@
 
 > AgentForge plan. Use `task-breakdown` after this plan is accepted.
 
-**Status:** Accepted
+**Status:** Completed
 
 **Goal:** Select the dashboard direction that best fits the accepted personal-todo product contract and leave an implementation-ready handoff for the production landing, auth, and dashboard surfaces.
 
