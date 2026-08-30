@@ -51,10 +51,10 @@ export function LandingPage({ content }: LandingPageProps) {
             <p className="mb-5 text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
               Personal task system
             </p>
-            <h1 className="max-w-xl text-4xl leading-[1.08] font-semibold tracking-tight text-balance break-words sm:text-5xl lg:text-6xl">
+            <h1 className="max-w-xl text-4xl leading-[1.08] font-semibold tracking-tight text-balance wrap-anywhere sm:text-5xl lg:text-6xl">
               {content.headline}
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-pretty break-words text-muted-foreground">
+            <p className="mt-6 max-w-xl text-lg leading-8 text-pretty wrap-anywhere text-muted-foreground">
               {content.blurb}
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -62,7 +62,7 @@ export function LandingPage({ content }: LandingPageProps) {
                 href="/sign-up"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "h-auto min-h-9 max-w-full text-center break-words whitespace-normal"
+                  "h-auto min-h-9 max-w-full text-center wrap-anywhere whitespace-normal"
                 )}
               >
                 {content.primaryCtaLabel}
@@ -71,7 +71,7 @@ export function LandingPage({ content }: LandingPageProps) {
                 href="/sign-in"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "h-auto min-h-9 max-w-full text-center break-words whitespace-normal"
+                  "h-auto min-h-9 max-w-full text-center wrap-anywhere whitespace-normal"
                 )}
               >
                 {secondaryCtaLabel}
