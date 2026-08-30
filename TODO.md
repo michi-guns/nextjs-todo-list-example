@@ -337,7 +337,7 @@ Verification commands: focused list/task presentation tests during implementatio
 
 Evidence: `pnpm test` (17 files, 86 tests), `pnpm test:integration` (6 files, 23 tests against one disposable PostgreSQL 18 Testcontainer), `pnpm typecheck`, `pnpm lint` (zero errors and one pre-existing `Geist` warning), `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text`, changed-file Prettier checks, and `git diff --check main..853fedd` all pass. Focused list/task boundary tests cover authenticated success and owner propagation, pagination/filtering, `401`, privacy-preserving `404`, `409`, `422`, safe view models, Server Action mapping/revalidation, expected action errors, and same-origin mutation rejection. No schema, migration, snapshot, or dependency changes were made. Implementation commits `b4292b5` and `6604141`, closeout metadata `da40794`, and code/test tip `853fedd` are covered by the fresh review loop; the additional task-action regression is included in the code/test tip. Next.js browser/runtime evidence remains with T-15 because the dashboard UI is not yet implemented.
 
-PR: [#14](https://github.com/michi-guns/nextjs-todo-list-example/pull/14) | reviewed code/test tip `853fedd` | current metadata tip is its descendant and is in final review | merge pending.
+PR: [#14](https://github.com/michi-guns/nextjs-todo-list-example/pull/14) | reviewed code/test tip `853fedd` and metadata tip `5e45396` received fresh GPT-5.6-Sol reviews with no actionable findings | merged as `17c0799`.
 
 ### T-09A: Explore and prototype UI directions
 
