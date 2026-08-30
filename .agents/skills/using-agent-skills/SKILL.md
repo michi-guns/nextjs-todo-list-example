@@ -36,6 +36,7 @@ Task arrives
     │   └── Performance concerns? ────→ performance-optimization
     ├── Committing/branching? ─────────→ git-workflow-and-versioning
     ├── CI/CD pipeline work? ──────────→ ci-cd-and-automation
+    ├── Migration history work? ──────→ migration-history-workflow
     ├── Deprecating/migrating? ────────→ deprecation-and-migration
     ├── Writing docs/ADRs? ───────────→ documentation-and-adrs
     ├── Adding logs/metrics/alerts? ───→ observability-and-instrumentation
@@ -181,6 +182,7 @@ For this repository, `testing-first-class` is required before implementation or 
 | Build  | testing-first-class               | Discover TST-* obligations and reconcile progressive evidence              |
 | Build  | incremental-implementation        | Thin vertical slices, test each before expanding                           |
 | Build  | source-driven-development         | Verify against official docs before implementing                           |
+| Build  | migration-history-workflow        | Classify target state before consolidating or appending migration history  |
 | Build  | doubt-driven-development          | Adversarial fresh-context review of every non-trivial decision             |
 | Build  | context-engineering               | Right context at the right time                                            |
 | Build  | frontend-ui-engineering           | Production-quality UI with accessibility                                   |

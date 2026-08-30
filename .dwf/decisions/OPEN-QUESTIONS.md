@@ -61,8 +61,8 @@ No Sanity project, dataset, document type, or published landing document is curr
 ## OQ-003 — Database migration/application state
 
 - **Status:** ANSWERED
-- **Blocking:** NO for current-state verification — the planned list/task schema still needs implementation and migration
-- **Source:** linked Neon status, read-only `information_schema` queries, live Drizzle migration ledger, and local migration hash on 2026-08-19
+- **Blocking:** NO — current migration and environment state is verified; future Neon realignment is a separately authorized delivery operation
+- **Source:** linked Neon status, read-only `information_schema` queries, live Drizzle migration ledgers, local Docker catalog inspection, and migration metadata review on 2026-08-28
 - **Related:** D-003, D-004, TD-005, TD-006, OD-006
 
 ### Exact Question
@@ -79,6 +79,6 @@ A safe local/development database inspection during implementation preparation.
 
 ### Answer
 
-The workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch. The live Drizzle ledger contains one applied migration. Its stored hash exactly matches the SHA-256 hash of `migrations/20260807190126_silly_vivisector/migration.sql`, confirming that the current local migration was applied.
+The workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch. The default branch still contains the scaffold Better Auth tables and `posts_table`, with its original migration ledger intact. The non-default `development` branch is an agent-owned migration-smoke target; it contains the previously verified two-step T-04 lists/tasks history and no real list/task consumers.
 
-The live schema contains the Better Auth tables `account`, `session`, `users`, and `verification`, plus the scaffold `posts_table`. It does not contain the planned `lists` or `tasks` tables. No migration for those tables currently exists. OD-006 requires that migration to be developed and verified on a non-default Neon branch before it is applied to the default branch.
+The repository now consolidates that pre-release history into one T-04 migration that creates native UUID list/task keys and UUIDv7 defaults directly. A fresh local PostgreSQL 18 database applied the complete consolidated chain successfully and matched the expected catalog. The existing Neon development ledger was not destructively reset; future use of the consolidated history there requires explicit realignment.

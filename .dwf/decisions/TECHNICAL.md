@@ -271,3 +271,42 @@ Keep the dedicated Sanity project, singleton landing document, server-side query
 Deliver signed webhook invalidation and protected manual recovery first. The webhook boundary verifies Sanity's signature before trusting the event and accepts only relevant published landing changes. The manual operator mechanism requires explicit authorization. Both call the same idempotent invalidation service, and neither exposes provider or operator secrets to the client. Exact route names, tag names, and operator-authentication mechanism remain implementation choices.
 
 Defer live draft preview to a later delivery phase without removing it from the intended starter. That phase uses authenticated Next.js Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live so editors can read drafts, click through to their source fields, and see changes while editing. Live draft subscriptions run only for authorized preview sessions and do not replace webhook invalidation for published traffic.
+
+<a id="td-024"></a>
+
+## TD-024 — Native UUIDv7 identifiers for lists and tasks
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-001, D-003, D-004
+- **Related resolutions:** [OD-006](OPEN-DECISIONS.md#od-006), [OD-014](OPEN-DECISIONS.md#od-014), [OD-017](OPEN-DECISIONS.md#od-017)
+- **Source:** resumed T-04 schema design review; PostgreSQL 18 UUID and identity guidance
+
+Use PostgreSQL's native `uuid` type for `lists.id`, `tasks.id`, and `tasks.list_id`. Let PostgreSQL 18 generate list and task primary keys with the `uuidv7()` default. Keep `lists.user_id` and `tasks.user_id` as `text` because Better Auth's existing `users.id` is text. Native UUIDs give the list/task boundary a strongly typed identifier without making public route IDs predictable numeric sequences; UUIDv7's time-ordered layout also gives the primary-key indexes a locality-friendly default.
+
+This is a deliberate choice rather than a requirement of Better Auth: Better Auth constrains the owner foreign-key type, not the list/task primary-key type. The pre-release T-04 migration creates the native UUID list/task keys and UUIDv7 defaults directly. The earlier text-key/conversion sequence was not released to a shared or production environment and is consolidated in place under TD-025; no production migration history is rewritten. PostgreSQL 18 is now the required database floor for the shared migration/test path.
+
+Alternatives considered: application-generated arbitrary `text` IDs were rejected because the database could not validate their shape; `bigint GENERATED ALWAYS AS IDENTITY` was rejected for these route-facing resources because sequential values are predictable and would require a numeric public-ID contract. UUIDv4 remains a possible later choice if timestamp visibility becomes a privacy concern.
+
+<a id="td-025"></a>
+
+## TD-025 — Environment-gated migration history policy
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-001, D-003, D-004
+- **Related resolutions:** [OD-006](OPEN-DECISIONS.md#od-006), [OD-021](OPEN-DECISIONS.md#od-021)
+- **Source:** resumed T-04 migration review; pre-release workflow decision
+
+Before creating or changing a database migration, inspect the repository and
+relevant database targets to classify the project as scaffolding-only, shared
+development, production, or unknown. While migration history exists only in
+fresh, agent-owned, ephemeral, or otherwise safely recreatable targets, prefer
+one coherent initial migration and consolidate unreleased changes in place.
+Regenerate and commit the Drizzle snapshot/chain metadata with that migration.
+
+Once a shared development or production target, non-disposable data, or real
+users/stakeholders depend on the history, treat applied migrations as
+immutable, add the smallest forward migration, and verify it through the
+branch-first Neon workflow before promotion. If the state is unknown or
+contradictory, stop and resolve it with the owner rather than guessing. This
+policy does not authorize destructive file or database operations; explicit
+confirmation remains required before rewriting files or realigning targets.
