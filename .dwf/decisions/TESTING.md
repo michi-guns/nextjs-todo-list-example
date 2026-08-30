@@ -267,7 +267,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Anonymous requests cannot read or mutate private data; authenticated operations derive the owner from the Better Auth session; another user's identifiers produce the ordinary privacy-preserving not-found outcome; bearer tokens and cross-origin credentials do not broaden the baseline API.
 - **Required evidence:** Application and request-boundary tests, plus a browser scenario proving that private data remains isolated between users.
 - **Dependencies:** T-05 session helpers, T-09 entry paths, and T-15 browser harness.
-- **Current evidence:** `src/modules/auth/auth.integration.test.ts` proves the current-user boundary fails closed without a session and ignores a client-supplied `x-user-id`. The T-09 list/task request and action suites prove session-derived owner propagation, anonymous `401` outcomes, privacy-preserving `404` outcomes, rejection of spoofed owner fields, rejection of bearer-only access, and rejection of foreign-origin mutations. Browser isolation remains outstanding.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` proves the current-user boundary fails closed without a session and rejects bearer-only access even when paired with a client-supplied `x-user-id`. The T-09 list/task request and action suites prove session-derived owner propagation, anonymous `401` outcomes, privacy-preserving `404` outcomes, rejection of spoofed body fields, and rejection of foreign-origin mutations. Browser isolation remains outstanding.
 - **Follow-up:** T-15 must add the multi-user Chromium scenario before this contract can be `verified`.
 
 <a id="tst-lists-001"></a>
