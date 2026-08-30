@@ -16,6 +16,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Treat `.dwf/` as the canonical product/technical design authority. Delivery artifacts live outside `.dwf/` and must reference, not redefine, it.
 - This repo is a standalone public, opinionated Next.js starter implemented through a complete todo reference application. Derived apps should be able to replace mostly domain and UI code while retaining or adapting the cross-cutting foundations.
 - Use current stable best practices and the simplest genuinely robust design. Add complexity only when it has a clear reusable payoff in safety, correctness, operability, maintainability, or avoided rework. Do not turn the starter into a configurable multi-stack framework.
+- Prefer generic, reusable artifacts when they remain clear and genuinely useful. Keep repository-specific details in thin adapters or documentation, and do not generalize merely for abstraction's sake.
 - Do not invent links to other products or private projects.
 
 ## Engineering posture and scope

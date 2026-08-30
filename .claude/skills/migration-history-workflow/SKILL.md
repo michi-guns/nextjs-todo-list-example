@@ -1,6 +1,6 @@
 ---
-name: postgresql-migration-workflow
-description: Deprecated bridge to the generic AgentForge migration-history workflow.
+name: migration-history-workflow
+description: Bridge to the canonical AgentForge migration-history workflow.
 ---
 
 Read and follow the canonical AgentForge skill at

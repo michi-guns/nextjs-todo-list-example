@@ -160,7 +160,7 @@ Recommended AgentForge skills:
 - `source-driven-development` to verify the installed Drizzle v1 RC index, enum, and timestamp APIs.
 - `incremental-implementation` to land schema, migration, and evidence in reviewable slices.
 - `neon-postgres` and `neon-postgres-branches` for pooled/direct connection boundaries and non-default migration verification.
-- `postgresql-migration-workflow` to classify the environment before consolidating or appending migration history.
+- `migration-history-workflow` to classify the environment before consolidating or appending migration history.
 - `documentation-and-adrs` and `deprecation-and-migration` to record the reopened key-type decision and migration-history policy.
 - `git-workflow-and-versioning` and `code-review-and-quality` for the task branch, commit, and final review.
 
@@ -176,6 +176,31 @@ Verification:
 Test contracts: `TST-MIGRATION-001`, `TST-PERSISTENCE-001`.
 
 Dependencies: T-01, T-03, T-03A.
+
+### T-04A: Generalize the migration-history AgentForge skill
+
+- [x] Add a database-agnostic `migration-history-workflow` skill that owns only the evidence-based consolidation-versus-append-only decision.
+- [x] Keep PostgreSQL/Drizzle/Neon/Testcontainers mechanics in project documentation rather than the reusable skill.
+- [x] Preserve the old PostgreSQL-named paths as deprecated compatibility aliases while updating active routing and links to the generic name.
+- [x] Add the generic-artifact/reuse principle to `AGENTS.md` with a clear no-overengineering boundary.
+
+Recommended AgentForge skills:
+
+- `using-agent-skills` to route the renamed project-local skill.
+- `planning` and `task-breakdown` to preserve a small, repository-grounded delivery record.
+- `documentation-and-adrs` to keep generic policy and project-specific mechanics in their owning documents.
+- `code-review-and-quality` and `git-workflow-and-versioning` for scope review, commit, and PR update.
+
+Verification:
+
+- [x] The canonical skill, compatibility aliases, Claude bridges, and router pass the available skill-format validation.
+- [x] Active references resolve to `migration-history-workflow`; the canonical skill contains no repository- or database-vendor-specific coupling.
+- [x] `git diff --check`, `pnpm test`, `pnpm typecheck`, and `pnpm lint` pass without task-caused failures.
+- [x] The PR describes the generic workflow and the compatibility/deprecation boundary.
+
+Testing contracts: None. This is a prose and agent-workflow change; application behavior and `TST-*` obligations are unchanged.
+
+Dependencies: T-04.
 
 ### T-05: Complete the Better Auth boundary
 

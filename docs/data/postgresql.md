@@ -22,12 +22,13 @@ Use node-postgres through Drizzle's node-postgres adapter as the shared runtime 
 
 - Keep Drizzle row types inside infrastructure.
 - Keep migrations versioned and reviewable.
-- Before changing migration history, use the repository-local
-  [`postgresql-migration-workflow`](../../.agents/skills/postgresql-migration-workflow/SKILL.md)
+- Before changing migration history, use the repository-local, database-agnostic
+  [`migration-history-workflow`](../../.agents/skills/migration-history-workflow/SKILL.md)
   skill to classify the targets. Consolidate unreleased changes only while
-  history is scaffolding-only and safely recreatable; once shared development
-  or production adopts the history, keep applied migrations immutable and add a
-  forward migration.
+  history is pre-release and safely recreatable; once shared development or
+  production adopts the history, keep applied migrations immutable and add a
+  forward migration. The PostgreSQL/Drizzle commands, Neon branch rules, and
+  Testcontainers evidence requirements below remain project-specific details.
 - Do not create a parallel user table outside Better Auth’s adapter schema.
 - Develop and verify schema-changing migrations on a non-default Neon branch before applying the same reviewed migration to the default branch.
 - Apply those same versioned migrations to ephemeral local integration databases; do not maintain a test-only schema.
