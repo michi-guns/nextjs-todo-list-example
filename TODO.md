@@ -390,7 +390,7 @@ Dependencies: T-02, T-05, T-09B.
 
 ### T-12: Add the Sanity landing read path
 
-- [ ] Add the Sanity client/configuration seat under `src/sanity`.
+- [~] Add the Sanity client/configuration seat under `src/sanity`.
 - [ ] Validate unknown Sanity payloads and map them to a plain landing view model inside landing infrastructure.
 - [ ] Give published landing reads one stable cache identity.
 - [ ] Remove any temporary fallback after the real CMS read path works.
@@ -403,6 +403,10 @@ Verification:
 Test contracts: `TST-LANDING-001`, `TST-LANDING-002`.
 
 Dependencies: T-02, T-03A.
+
+Plan: [`2026-08-30-t-12-sanity-landing-read-path.md`](docs/agentforge/plans/2026-08-30-t-12-sanity-landing-read-path.md).
+
+Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, and `git-workflow-and-versioning`.
 
 ### T-13: Add Sanity freshness and recovery
 
