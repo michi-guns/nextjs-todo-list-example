@@ -89,6 +89,36 @@ async function getAuthoritativeDevelopmentUrl() {
   return databaseUrl
 }
 
+async function getRepositoryContext() {
+  try {
+    const [commitResult, refResult] = await Promise.all([
+      execFileAsync("git", ["rev-parse", "HEAD"], {
+        encoding: "utf8",
+        timeout: NEON_CLI_TIMEOUT_MS,
+        windowsHide: true,
+      }),
+      execFileAsync("git", ["branch", "--show-current"], {
+        encoding: "utf8",
+        timeout: NEON_CLI_TIMEOUT_MS,
+        windowsHide: true,
+      }),
+    ])
+    const commit = commitResult.stdout.trim()
+    if (!/^[0-9a-f]{40}$/i.test(commit)) {
+      throw new Error("Git did not return a commit SHA")
+    }
+
+    return {
+      commit,
+      ref: refResult.stdout.trim() || "detached",
+    }
+  } catch {
+    throw new Error(
+      "Unable to capture the Git commit and ref for the performance evidence"
+    )
+  }
+}
+
 function loadConfig(environment = process.env, authoritativeDatabaseUrl) {
   const suppliedDatabaseUrl = environment.DATABASE_URL?.trim()
   const databaseUrl = suppliedDatabaseUrl || authoritativeDatabaseUrl
@@ -779,6 +809,8 @@ async function runPerformanceEvidence(config) {
       warmQuery: warmQueryEvidence,
       reproducibility: {
         command: "pnpm neon:performance",
+        commit: config.repositoryContext.commit,
+        ref: config.repositoryContext.ref,
         seedReplacement: "exact synthetic user IDs with foreign-key cascade",
         rerunnable: true,
       },
@@ -801,7 +833,10 @@ function redactError(error) {
 
 async function main() {
   const authoritativeDatabaseUrl = await getAuthoritativeDevelopmentUrl()
-  const config = loadConfig(process.env, authoritativeDatabaseUrl)
+  const config = {
+    ...loadConfig(process.env, authoritativeDatabaseUrl),
+    repositoryContext: await getRepositoryContext(),
+  }
   const evidencePath = resolveEvidencePath(config.evidencePath)
   const evidence = await runPerformanceEvidence(config)
   await mkdir(dirname(evidencePath), { recursive: true })
