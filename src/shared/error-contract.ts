@@ -66,13 +66,8 @@ export function mapApplicationError(error: unknown): ErrorMapping {
     return internalError()
   }
 
-  const message =
-    error instanceof Error && error.message.trim()
-      ? error.message
-      : fallbackMessageByCode[code]
-
   return {
     status: statusByCode[code],
-    body: { error: { code, message } },
+    body: { error: { code, message: fallbackMessageByCode[code] } },
   }
 }

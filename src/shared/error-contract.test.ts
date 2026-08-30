@@ -42,5 +42,16 @@ describe("shared error contracts", () => {
         },
       },
     })
+
+    expect(
+      mapApplicationError(
+        Object.assign(new Error("postgresql://user:password@host/db"), {
+          code: "invalid_input",
+        })
+      )
+    ).toEqual({
+      status: 422,
+      body: { error: { code: "invalid_input", message: "Input is invalid" } },
+    })
   })
 })
