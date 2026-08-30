@@ -204,6 +204,7 @@ Dependencies: T-04.
 
 ### T-05: Complete the Better Auth boundary
 
+- [~] Start T-05 on `task/t-05-better-auth-boundary` using the accepted plan in [`docs/agentforge/plans/2026-08-30-t-05-better-auth-boundary.md`](docs/agentforge/plans/2026-08-30-t-05-better-auth-boundary.md).
 - [ ] Keep Better Auth configuration and raw records behind the auth infrastructure boundary.
 - [ ] Expose server-only current-user helpers equivalent to `getCurrentUser()` and `requireUser()`.
 - [ ] Support email/password sign-up, sign-in, and sign-out.
