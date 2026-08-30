@@ -546,8 +546,10 @@ Evidence: `pnpm test` (6 files, 32 tests), `pnpm sanity:smoke`, `pnpm typecheck`
 
 ### T-12A: Audit and refine the materialized UI
 
-- [ ] Review the implemented landing, auth, and dashboard surfaces against the selected direction handoff.
-- [ ] Fix material issues in hierarchy, content density, overflow, responsive behavior, focus management, loading/error/empty states, and interaction clarity.
+- [~] Implement the accepted audit plan in [`docs/agentforge/plans/2026-08-31-t-12a-ui-audit.md`](docs/agentforge/plans/2026-08-31-t-12a-ui-audit.md).
+- [ ] Review the implemented landing, auth, and dashboard surfaces against the selected direction handoff and current Web Interface Guidelines.
+- [ ] Add a shared, focus-visible skip-to-content affordance for the persistent public/auth/dashboard navigation and hide the decorative landing preview from the accessibility tree.
+- [ ] Re-check hierarchy, content density, overflow, responsive behavior, focus management, loading/error/empty states, and interaction clarity; make no speculative changes where the current implementation already satisfies the handoff.
 - [ ] Confirm the implementation uses project tokens and composable components without adding speculative UI infrastructure.
 
 Recommended agent skills:
@@ -560,12 +562,19 @@ Recommended agent skills:
 Verification:
 
 - [ ] The review produces concrete file/line findings or records that no actionable findings remain.
-- [ ] The UI has no new console errors, obvious overflow, inaccessible controls, missing labels, or color-only critical state cues.
+- [ ] Skip links move focus to the primary content region; the UI has no new console errors, obvious overflow, inaccessible controls, missing labels, or color-only critical state cues.
 - [ ] The selected direction remains recognizable after implementation and the core product flow remains unchanged.
+- [ ] `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file formatting, `git diff --check`, and Next.js runtime checks pass; integration evidence is reused or rerun with its reason recorded.
 
 Test contracts: `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`.
 
 Dependencies: T-10, T-11, T-12, T-13.
+
+Plan: [`docs/agentforge/plans/2026-08-31-t-12a-ui-audit.md`](docs/agentforge/plans/2026-08-31-t-12a-ui-audit.md).
+
+Implementation scope: `components/ui/skip-link.tsx`, the public/auth/dashboard shell compositions, the landing decorative preview semantics, and the required UI/runtime evidence plus testing-ledger reconciliation. No route, domain, persistence, provider, or product-flow changes are in scope.
+
+Task breakdown: (a) add and wire the shared skip-link and content targets, (b) correct the decorative preview landmark semantics, (c) inspect the four contract viewports and keyboard/focus/state behavior in Chromium, (d) reconcile `TST-UI-001`/`TST-E2E-003`, TODO, and the temporary checkpoint, and (e) complete the fresh GPT-5.6-Sol pragmatic review loop before closeout.
 
 ## Checkpoint: core product
 

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { SkipLink } from "@/components/ui/skip-link"
 import type { ActionResult } from "@/src/shared/entry-contract"
 import {
   appendPage,
@@ -646,6 +647,7 @@ export function DashboardClient({
   return (
     <div className="min-h-svh bg-background">
       <div ref={dashboardContentRef}>
+        <SkipLink targetId="dashboard-main" />
         <AppHeader user={user} signOut={signOut} />
         <div className="flex min-h-[calc(100svh-81px)] min-w-0 flex-col lg:flex-row">
           {finalListState ? (
@@ -663,7 +665,11 @@ export function DashboardClient({
               onLoadMore={handleListLoadMore}
             />
           )}
-          <main className="flex min-w-0 flex-1 flex-col">
+          <main
+            id="dashboard-main"
+            tabIndex={-1}
+            className="flex min-w-0 flex-1 flex-col outline-none"
+          >
             <div className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
               {notice ? (
                 <Alert
