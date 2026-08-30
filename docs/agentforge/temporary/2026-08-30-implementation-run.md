@@ -13,11 +13,11 @@ Continue the repository's AgentForge delivery autonomously through every task th
 ## Repository state at handoff
 
 - Repository: `michi-guns/nextjs-todo-list-example`
-- Current branch: `task/t-09-server-entry-paths` at the closeout metadata tip following code/test tip `853fedd` (T-09 PR #14 is in final review)
-- Base: `main` at `dbffc53` (T-14 PR #13 merged; implementation, closeout, formatting, and checkpoint reviews are complete)
+- Current branch: `main` at merge commit `17c0799` (T-09 PR #14 merged; all implementation, closeout, and review loops are complete)
+- Base: latest `main` from `origin/main`
 - T-05 PR #7 is merged as `2935283`; T-12 and T-13 are already merged and complete.
 - T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. T-08 PR #12 was independently reviewed through closeout tip `72e999e` with no actionable findings and merged as `ee20cea`. T-14 PR #13 was reviewed through implementation tip `ce8c4dc`, closeout tip `29d0343`, formatting tip `fbe3948`, and checkpoint tip `dadcd68`, with all actionable findings fixed and the final current-tip review returning no actionable findings; it is merged as `df974b9`. Dependency recomputation now leaves T-09, T-09A, and T-16 as candidate tasks. T-09B and later UI/application tasks remain blocked by their listed dependencies.
-- T-09 PR #14 implements the list/task Server Actions and JSON Route Handler entry paths. Implementation `b4292b5`, same-origin security fix `6604141`, and code/test tip `853fedd` were reviewed through the required fresh-review loop; the metadata correction is the final review pass before merge. All unit, integration, typecheck, lint, build, Drizzle, Prettier, and diff gates pass. After the final review, merge and recompute the graph before continuing with every safely unblocked task.
+- T-09 PR #14 implemented the list/task Server Actions and JSON Route Handler entry paths. Implementation `b4292b5`, same-origin security fix `6604141`, code/test tip `853fedd`, and metadata tips `2ed1e35`, `4a58242`, and `5e45396` were reviewed through the required fresh-review loop with all actionable findings fixed; it is merged as `17c0799`. All unit, integration, typecheck, lint, build, Drizzle, Prettier, and diff gates pass. Dependency recomputation now leaves T-09A and T-16 as safely unblocked candidates; T-09B and later UI/application tasks remain blocked by their listed dependencies.
 - This is a live checkpoint, not authority: verify the current branch, `HEAD`, remote/PR state, `TODO.md`, accepted plan, and prerequisites before acting, then update this section after every task transition.
 - No secrets, token values, or environment contents belong in commits, logs, or PR bodies.
 
@@ -55,7 +55,7 @@ Evidence: `pnpm test` (15 files/67 tests), `pnpm test:integration` without `TEST
 
 ## Next-task dependency checkpoint
 
-The post-T-14 TODO graph identifies these dependency-satisfied candidates: T-09 (Server Actions and JSON Route Handlers), T-09A (UI direction exploration), and T-16 (Neon performance evidence). Before each implementation, verify its external and local prerequisites, choose the smallest safe slice, and update this checkpoint with the selected branch and plan. T-09B, T-10, T-11, T-12A, T-15, and T-17 remain blocked by their listed dependencies.
+The post-T-09 TODO graph identifies these dependency-satisfied candidates: T-09A (UI direction exploration) and T-16 (Neon performance evidence). Before each implementation, verify its external and local prerequisites, choose the smallest safe slice, and update this checkpoint with the selected branch and plan. T-09B, T-10, T-11, T-12A, T-15, and T-17 remain blocked by their listed dependencies.
 
 ## Review loop
 
