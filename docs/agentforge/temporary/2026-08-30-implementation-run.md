@@ -13,7 +13,7 @@ Continue the repository's AgentForge delivery autonomously through every task th
 ## Repository state at handoff
 
 - Repository: `michi-guns/nextjs-todo-list-example`
-- Current branch: `task/t-09a-ui-direction-exploration` at `98cb2cb` (T-09A complete in TODO; checkpoint tip under fresh review before merge)
+- Current branch: `task/t-09a-ui-direction-exploration` (T-09A complete in TODO; this checkpoint describes the current branch state—verify `git rev-parse HEAD` before acting)
 - Base: latest `main` from `origin/main`
 - T-05 PR #7 is merged as `2935283`; T-12 and T-13 are already merged and complete.
 - T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. T-08 PR #12 was independently reviewed through closeout tip `72e999e` with no actionable findings and merged as `ee20cea`. T-14 PR #13 was reviewed through implementation tip `ce8c4dc`, closeout tip `29d0343`, formatting tip `fbe3948`, and checkpoint tip `dadcd68`, with all actionable findings fixed and the final current-tip review returning no actionable findings; it is merged as `df974b9`. At that historical checkpoint, dependency recomputation left T-09, T-09A, and T-16 as candidate tasks; the current graph is recorded below.
@@ -23,7 +23,7 @@ Continue the repository's AgentForge delivery autonomously through every task th
 
 ## T-09A closeout checkpoint
 
-The accepted T-09A plan is implemented under `.ui-explorations/t09a-dashboard/`: three materially different dashboard prototypes share one fixture and interaction harness, with explicit landing/auth extension notes and no production surface changes. Reviewed code tip `b37fa8e` and closeout tip `e1cec9a` passed the structural validator, Chromium inspection, 86 unit tests, typecheck, lint (one pre-existing Geist warning), build, formatting, and diff checks. Checkpoint tip `98cb2cb` records T-09A as complete in TODO and is under fresh review after correcting this checkpoint. PR #15 is open; after the clean review and merge, recompute the graph: T-09B and T-16 are the dependency-satisfied candidates, subject to their respective UI-handoff and Neon prerequisite preflights.
+The accepted T-09A plan is implemented under `.ui-explorations/t09a-dashboard/`: three materially different dashboard prototypes share one fixture and interaction harness, with explicit landing/auth extension notes and no production surface changes. Reviewed code tip `b37fa8e` and closeout tip `e1cec9a` passed the structural validator, Chromium inspection, 86 unit tests, typecheck, lint (one pre-existing Geist warning), build, formatting, and diff checks. The checkpoint commits `98cb2cb` and `7d6dd8d` reconciled the closeout context; this current checkpoint records T-09A as complete in TODO and should be verified against the branch `HEAD` before acting. PR #15 is open; after the clean review and merge, recompute the graph: T-09B and T-16 are the dependency-satisfied candidates, subject to their respective UI-handoff and Neon prerequisite preflights.
 
 ## Non-negotiable constraints
 
