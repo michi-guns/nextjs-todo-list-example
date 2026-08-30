@@ -37,7 +37,7 @@ Do not impose a minimum code-coverage percentage. Give every behavior required b
 
 ## End-to-end tests
 
-Use Playwright for the core sign-in → create list → create task → change status → sign-out journey. For magic-link verification, explicitly enable the local/test file-backed mailbox, clear it before the test, request a link, read the captured URL, and visit it. The temporary mailbox is gitignored and unavailable outside local/test mode.
+Use Playwright for the core sign-in → create list → create task → change status → sign-out journey. For authentication-link verification, explicitly enable the local/test file-backed mailbox, clear it before the test, request the relevant link, read the captured URL, and visit it. Password sign-up first requires consuming the captured email-verification link; a verified account may then use either password or magic-link sign-in without losing its password credential. The temporary mailbox is gitignored and unavailable outside local/test mode.
 
 Chromium is the required browser for the routine acceptance suite. Keep Firefox and WebKit in a separate on-demand cross-browser run used before a public release and after major UI changes. They are not part of every ordinary database-backed test run.
 

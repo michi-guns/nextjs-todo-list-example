@@ -208,18 +208,19 @@ Dependencies: T-04.
 - [x] Keep Better Auth configuration and raw records behind the auth infrastructure boundary.
 - [x] Expose server-only current-user helpers equivalent to `getCurrentUser()` and `requireUser()`.
 - [x] Support email/password sign-up, sign-in, and sign-out.
+- [x] Require local email verification before a password session and preserve the credential when the same verified account uses a magic link.
 - [x] Support magic-link request and consumption.
-- [x] In explicit local/test mode only, capture magic links in a temporary gitignored mailbox.
+- [x] In explicit local/test mode only, capture authentication links in a temporary gitignored mailbox.
 
 Verification:
 
 - [!] Private list/task reads and mutations are deferred to T-09; the current `requireUser()` boundary fails closed for unauthenticated requests.
-- [x] The local/test mailbox flow can request, read, and consume one magic link.
+- [x] The local/test mailbox flow can request, read, and consume email-verification and magic links; the same-account credential regression passes.
 - [x] Authenticated code never accepts a client-provided owner id.
 
 Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`.
 
-Evidence: `pnpm test` (6 unit tests), `pnpm test:integration` against disposable local PostgreSQL 18 (7 tests), and `pnpm exec drizzle-kit migrate` plus catalog inspection all pass. The auth contracts remain `partial` until T-09 adds private entry paths and T-15 records the required Chromium journeys.
+Evidence: `pnpm test` (6 unit tests), `pnpm test:integration` against disposable local PostgreSQL 18 (8 tests), and `pnpm exec drizzle-kit migrate` plus catalog inspection all pass. The auth contracts remain `partial` until T-09 adds private entry paths and T-15 records the required Chromium journeys.
 
 PR: [#7](https://github.com/michi-guns/nextjs-todo-list-example/pull/7) | commit `196aaa0`
 

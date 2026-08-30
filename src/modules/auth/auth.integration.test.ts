@@ -252,9 +252,30 @@ describe.sequential("Better Auth boundary", () => {
     )
   }
 
+  async function consumeEmailVerification(email: string) {
+    const message = await getContext().readLatestMagicLink(email)
+    expect(message).toMatchObject({ email, token: expect.any(String) })
+    expect(message?.url).toContain("/verify-email")
+
+    if (!message) {
+      throw new Error(
+        "The local/test mailbox did not capture an email verification link"
+      )
+    }
+
+    const response = await getContext().auth.handler(
+      new Request(message.url, {
+        headers: { origin: baseUrl },
+      })
+    )
+    expect(response.status).toBe(302)
+    return response
+  }
+
   it("creates, uses, and ends an email/password session", async () => {
     const email = `t05-password-${Date.now()}@example.test`
     const password = "correct horse battery staple"
+    await getContext().clearMagicLinkMailbox()
     const signUpResponse = await authRequest("/api/auth/sign-up/email", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -271,7 +292,10 @@ describe.sequential("Better Auth boundary", () => {
     }
     expect(signUpPayload.user).toMatchObject({ email })
 
-    const signedUpCookie = getCookieHeader(signUpResponse)
+    expect(getCookieHeader(signUpResponse)).toBe("")
+
+    const verificationResponse = await consumeEmailVerification(email)
+    const signedUpCookie = getCookieHeader(verificationResponse)
     expect(signedUpCookie).toContain("better-auth.session_token=")
 
     const signedUpUser = await getContext().getCurrentUserForHeaders(
@@ -360,6 +384,122 @@ describe.sequential("Better Auth boundary", () => {
     )
     expect(replayResponse.status).toBe(302)
     expect(getResponseLocation(replayResponse)).toContain("INVALID_TOKEN")
+  })
+
+  it("preserves a password credential when the same account uses a magic link", async () => {
+    const email = `t05-password-magic-${Date.now()}@example.test`
+    const password = "correct horse battery staple"
+    await getContext().clearMagicLinkMailbox()
+
+    const signUpResponse = await authRequest("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: "Password Magic User",
+        email,
+        password,
+      }),
+    })
+    expect(signUpResponse.status).toBe(200)
+
+    const verificationMessage = await getContext().readLatestMagicLink(email)
+    expect(verificationMessage).toMatchObject({
+      email,
+      token: expect.any(String),
+    })
+    expect(verificationMessage?.url).toContain("/verify-email")
+    if (!verificationMessage) {
+      throw new Error(
+        "The local/test mailbox did not capture an email verification link"
+      )
+    }
+
+    const requestResponse = await authRequest("/api/auth/sign-in/magic-link", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email,
+        callbackURL: "/",
+      }),
+    })
+    expect(requestResponse.status).toBe(200)
+
+    const message = await getContext().readLatestMagicLink(email)
+    expect(message).toMatchObject({ email, token: expect.any(String) })
+    if (!message) {
+      throw new Error("The local/test mailbox did not capture a magic link")
+    }
+
+    const consumeResponse = await getContext().auth.handler(
+      new Request(message.url, {
+        headers: { origin: baseUrl },
+      })
+    )
+    expect(consumeResponse.status).toBe(403)
+
+    const unverifiedPasswordSignInResponse = await authRequest(
+      "/api/auth/sign-in/email",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    )
+    expect(unverifiedPasswordSignInResponse.status).toBe(403)
+
+    const verificationResponse = await getContext().auth.handler(
+      new Request(verificationMessage.url, {
+        headers: { origin: baseUrl },
+      })
+    )
+    expect(verificationResponse.status).toBe(302)
+
+    const passwordSignInResponse = await authRequest(
+      "/api/auth/sign-in/email",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    )
+    expect(passwordSignInResponse.status).toBe(200)
+
+    await getContext().clearMagicLinkMailbox()
+    const verifiedMagicRequestResponse = await authRequest(
+      "/api/auth/sign-in/magic-link",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, callbackURL: "/" }),
+      }
+    )
+    expect(verifiedMagicRequestResponse.status).toBe(200)
+
+    const verifiedMagicMessage = await getContext().readLatestMagicLink(email)
+    expect(verifiedMagicMessage).toMatchObject({
+      email,
+      token: expect.any(String),
+    })
+    if (!verifiedMagicMessage) {
+      throw new Error("The local/test mailbox did not capture a magic link")
+    }
+
+    const verifiedMagicConsumeResponse = await getContext().auth.handler(
+      new Request(verifiedMagicMessage.url, {
+        headers: { origin: baseUrl },
+      })
+    )
+    expect(verifiedMagicConsumeResponse.status).toBe(302)
+
+    const passwordSignInAfterMagicResponse = await authRequest(
+      "/api/auth/sign-in/email",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    )
+    expect(passwordSignInAfterMagicResponse.status).toBe(200)
   })
 
   it("fails closed for anonymous or client-supplied owner identity", async () => {

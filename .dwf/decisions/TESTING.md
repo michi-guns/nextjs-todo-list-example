@@ -229,7 +229,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A user can sign up, sign in, retain a valid session for private operations, and sign out so later private operations are unauthenticated.
 - **Required evidence:** Auth boundary tests for session outcomes and a Chromium browser journey using the real local database.
 - **Dependencies:** T-05 Better Auth boundary and T-15 browser harness.
-- **Current evidence:** `src/modules/auth/auth.integration.test.ts` passes against a disposable local PostgreSQL 18 database for email/password sign-up, sign-in, current-user resolution, sign-out, and the resulting unauthenticated state. The browser journey remains outstanding.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` passes against a disposable local PostgreSQL 18 database for email/password sign-up, local email verification, sign-in, current-user resolution, sign-out, the resulting unauthenticated state, and preservation of the password credential when the same verified account later uses a magic link. The browser journey remains outstanding.
 - **Follow-up:** T-15 must run the Chromium journey through the Next.js route and record the real-browser evidence before this contract can be `verified`.
 
 <a id="tst-auth-002"></a>

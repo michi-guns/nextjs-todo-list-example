@@ -4,18 +4,18 @@
 
 **Status:** Completed
 
-**Goal:** Complete the Better Auth boundary for the starter application: keep provider configuration and raw records behind server-side infrastructure, expose the app-facing current-user helpers, support email/password and magic-link authentication, and provide a strictly local/test-only temporary mailbox for deterministic magic-link verification.
+**Goal:** Complete the Better Auth boundary for the starter application: keep provider configuration and raw records behind server-side infrastructure, expose the app-facing current-user helpers, support email/password and magic-link authentication, and provide a strictly local/test-only temporary mailbox for deterministic authentication-link verification.
 
 **Spec and decisions:** [Agent SPEC authentication contract](../../.dwf/output/agent/SPEC.md#2-auth-better-auth), [authentication boundary](../../.dwf/output/agent/SPEC.md#143-authentication-boundary), [TD-003](../../.dwf/decisions/TECHNICAL.md#td-003), [TD-009](../../.dwf/decisions/TECHNICAL.md#td-009), [TD-016](../../.dwf/decisions/TECHNICAL.md#td-016), [TST-AUTH-001](../../.dwf/decisions/TESTING.md#tst-auth-001), [TST-AUTH-002](../../.dwf/decisions/TESTING.md#tst-auth-002), and [TST-AUTH-003](../../.dwf/decisions/TESTING.md#tst-auth-003).
 
-**Architecture:** Keep `lib/auth.ts` as the Better Auth infrastructure configuration and expose only app-facing server helpers from the auth module. Route all Better Auth requests through a server-only catch-all route; do not export Better Auth records or accept a client-supplied owner identifier. Keep the existing Better Auth text user/session identifiers because they are the established auth schema contract; list/task native UUIDs remain a separate persistence concern. Configure email/password and magic-link plugins according to the current Better Auth API, with the application-owned auth boundary responsible for current-user resolution and ordinary unauthenticated outcomes. The local/test magic-link mailbox is an explicit opt-in adapter backed by a temporary gitignored location, never enabled by default or exposed in shared/production modes.
+**Architecture:** Keep `lib/auth.ts` as the Better Auth infrastructure configuration and expose only app-facing server helpers from the auth module. Route all Better Auth requests through a server-only catch-all route; do not export Better Auth records or accept a client-supplied owner identifier. Keep the existing Better Auth text user/session identifiers because they are the established auth schema contract; list/task native UUIDs remain a separate persistence concern. Configure email/password and magic-link plugins according to the current Better Auth API, requiring email verification before a password session is created so a later magic-link proof does not replace an unproven password account. The local/test authentication-link mailbox is an explicit opt-in adapter backed by a temporary gitignored location, never enabled by default or exposed in shared/production modes.
 
 **Global constraints:** Preserve the accepted DWF auth and data contracts. Do not add OAuth/social providers, list/task use cases, dashboard/UI work, client-side owner fields, or a production mailbox. Do not expose raw Better Auth user/session/account/verification rows from app-facing modules. Do not weaken cookie/session security or allow bearer/cross-origin credentials to broaden authorization. Keep secrets and captured links out of source control and logs.
 
 ## Implementation outcome
 
 - Better Auth is configured behind `lib/auth.ts`, exposed through the server-only catch-all route, and mapped to the app-facing `CurrentUser` contract through `getCurrentUser()` and `requireUser()`.
-- Email/password and magic-link flows are covered by request-level integration tests against disposable local PostgreSQL 18. Magic links are captured only when `NODE_ENV` is `development` or `test` and `BETTER_AUTH_LOCAL_MAILBOX=true`; the mailbox path is restricted to the operating-system temporary directory or the ignored `.local/better-auth-mailbox` directory.
+- Email/password and magic-link flows are covered by request-level integration tests against disposable local PostgreSQL 18. Password accounts must first consume an email-verification link; this prevents Better Auth's unproven-account cleanup from removing a password credential when the same account later uses a magic link. Both link types are captured only when `NODE_ENV` is `development` or `test` and `BETTER_AUTH_LOCAL_MAILBOX=true`; the mailbox path is restricted to the operating-system temporary directory or the ignored `.local/better-auth-mailbox` directory.
 - Better Auth 1.7 requires `account.issuer` and a unique `(issuer, account_id)` identity index. Because this repository is still pre-release and the migration target is disposable/agent-owned, the approved migration-history workflow consolidated those additions into the existing T-04 migration and regenerated its tracked snapshot rather than adding another migration file. The baseline migration remains unchanged.
 
 ## Initial state and file map (before implementation)
@@ -47,11 +47,17 @@
 ### Recorded evidence
 
 - `pnpm test` — 3 files, 6 unit tests passed.
-- `TEST_DATABASE_URL=postgresql://...@127.0.0.1:55432/t05 pnpm test:integration` — 3 files, 7 tests passed against a disposable `postgres:18-alpine` container.
+- `TEST_DATABASE_URL=postgresql://...@127.0.0.1:55432/t05 pnpm test:integration` — 3 files, 8 tests passed against a disposable `postgres:18-alpine` container, including the verified same-account password/magic-link lifecycle.
 - `pnpm exec drizzle-kit check --config drizzle.config.ts` and `pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text` — migration metadata is coherent and produces no pending statements.
 - `pnpm exec drizzle-kit migrate --config drizzle.config.ts` on a fresh local migration database, followed by catalog inspection — issuer default, unique identity index, UUIDv7 list/task defaults, foreign keys, and indexes applied successfully.
 - `pnpm typecheck`, targeted ESLint, and `git diff --check` passed; full `pnpm lint` passed with the existing unused `Geist` warning in `app/layout.tsx`. `pnpm build` completed with the auth route present and no Turbopack tracing warnings.
 - The `next-dev-loop` runtime check opened the running app with `agent-browser`, returned `null` from `GET /api/auth/get-session`, and recorded empty Next MCP compilation/error results. Private list/task entry-path evidence and the required authenticated Chromium journeys remain owned by T-09/T-15; the three auth contracts are therefore recorded as `partial` in the testing ledger.
+
+### Lifecycle amendment
+
+- Better Auth's email-verification boundary is enabled with local/test mailbox delivery, and `emailAndPassword.requireEmailVerification` prevents an unverified password account from establishing a session.
+- `src/modules/auth/auth.integration.test.ts` now covers the captured email-verification link and the same-account password-preservation regression: verify the email, use a magic link, then sign in again with the original password.
+- Production/shared email delivery remains intentionally outside T-05; a real provider and the polished verification UI remain follow-up work.
 
 ## Risks and assumptions
 
