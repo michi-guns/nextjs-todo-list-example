@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>T-09A · Dashboard direction exploration</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./shared.css" />
+  </head>
+  <body>
+    <div class="exploration-banner">
+      <span
+        ><strong>Exploration only</strong> · T-09A dashboard directions · same
+        fixture, same capabilities</span
+      >
+      <span>Prototype depth · no production route</span>
+    </div>
+    <main class="page">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">T-09A · UI direction exploration</p>
+          <h1>Choose what the workspace makes visible first.</h1>
+          <p class="lede">
+            Three deliberately different dashboard information architectures use
+            the same private-list scenario, realistic records, and interaction
+            budget. Open each direction, exercise the critical path, and compare
+            the trade-offs before T-09B selects one.
+          </p>
+        </div>
+        <div class="header-actions">
+          <span class="badge">3 directions</span
+          ><span class="count-chip">4 target viewports</span>
+        </div>
+      </header>
+      <section class="preview-grid" aria-label="Dashboard directions">
+        <article class="preview-card">
+          <div>
+            <p class="eyebrow">01 · focus</p>
+            <h2>Focus Rail</h2>
+            <p>
+              Persistent list context with one calm queue. Details stay
+              progressive so the next action is easy to find.
+            </p>
+          </div>
+          <div class="pill-row">
+            <span class="status-chip todo">Comprehension</span
+            ><span class="status-chip in_progress">Low cognitive load</span>
+          </div>
+          <a class="button primary" href="./directions/focus-rail/index.html"
+            >Open Focus Rail →</a
+          >
+        </article>
+        <article class="preview-card">
+          <div>
+            <p class="eyebrow">02 · state</p>
+            <h2>Status Board</h2>
+            <p>
+              Three lifecycle lanes make work in progress and completed work
+              visible without opening another view.
+            </p>
+          </div>
+          <div class="pill-row">
+            <span class="status-chip in_progress">Throughput</span
+            ><span class="status-chip todo">State visibility</span>
+          </div>
+          <a class="button primary" href="./directions/status-board/index.html"
+            >Open Status Board →</a
+          >
+        </article>
+        <article class="preview-card">
+          <div>
+            <p class="eyebrow">03 · retrieve</p>
+            <h2>Command Inspector</h2>
+            <p>
+              Search and capture share a command spine while a persistent
+              inspector keeps the selected task in reach.
+            </p>
+          </div>
+          <div class="pill-row">
+            <span class="status-chip in_progress">Fast retrieval</span
+            ><span class="status-chip todo">Continuity</span>
+          </div>
+          <a
+            class="button primary"
+            href="./directions/command-inspector/index.html"
+            >Open Command Inspector →</a
+          >
+        </article>
+      </section>
+      <p class="comparison-note">
+        <strong>Fair comparison:</strong> Jordan Lee starts in
+        <em>Launch week</em>, captures a task with a note, changes its status,
+        toggles completed visibility, switches lists, and loads a bounded next
+        page. The fixture and capability set are shared across all three
+        directions.
+      </p>
+    </main>
+  </body>
+</html>

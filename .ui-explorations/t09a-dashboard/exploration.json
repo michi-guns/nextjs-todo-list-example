@@ -1,0 +1,84 @@
+{
+  "id": "t09a-dashboard",
+  "status": "comparing",
+  "target_surface": "authenticated dashboard direction exploration with landing and auth extension notes",
+  "surface_scope": {
+    "dashboard": {
+      "status": "prototyped",
+      "locked_journey": [
+        "open private workspace",
+        "capture task with optional note",
+        "change task status",
+        "toggle completed visibility",
+        "switch lists",
+        "load bounded continuation"
+      ]
+    },
+    "landing": {
+      "status": "extension-notes-only",
+      "locked_journey": [
+        "render Sanity-backed landing view model",
+        "link to sign-up/sign-in"
+      ],
+      "extension_note": "Carry the selected direction's hierarchy and accent into the public landing without adding dashboard controls."
+    },
+    "auth": {
+      "status": "extension-notes-only",
+      "locked_journey": [
+        "sign up",
+        "sign in",
+        "request and consume magic link",
+        "sign out"
+      ],
+      "extension_note": "Reuse the selected direction's tokens and focus treatment in accessible forms; keep Better Auth provider fields out of UI-facing types."
+    }
+  },
+  "direction_count": 3,
+  "spike_depth": "prototype",
+  "goal": "Help the team choose a dashboard information architecture that makes private list and task work clear, fast, and resilient at desktop and narrow viewports.",
+  "primary_user": "A signed-in individual managing personal tasks across a small set of private lists.",
+  "critical_tasks": [
+    "open the private workspace and identify the active list",
+    "capture a task with a note",
+    "change a task status",
+    "show or hide completed tasks",
+    "switch lists without losing context",
+    "load another bounded page of records"
+  ],
+  "constraints": [
+    "preserve personal-list and task terminology",
+    "preserve session-derived private ownership",
+    "preserve todo, in_progress, and done status semantics",
+    "preserve completed-task visibility and filtering behavior",
+    "preserve bounded pagination and destructive-action meaning",
+    "use the same fixture and capabilities in every direction",
+    "keep prototypes isolated from production routes, APIs, schemas, migrations, and dependencies"
+  ],
+  "free_dimensions": [
+    "information architecture",
+    "workflow model",
+    "navigation model",
+    "content hierarchy",
+    "composition",
+    "density",
+    "progressive disclosure",
+    "filter and search presentation",
+    "local interaction details"
+  ],
+  "target_viewports": [
+    { "width": 1440, "height": 900, "purpose": "primary desktop comparison" },
+    { "width": 1024, "height": 768, "purpose": "compact desktop comparison" },
+    { "width": 768, "height": 1024, "purpose": "tablet stress check" },
+    { "width": 320, "height": 800, "purpose": "narrow mobile stress check" }
+  ],
+  "direction_ids": ["focus-rail", "status-board", "command-inspector"],
+  "inspection": {
+    "served_with": "pnpm exec vite .ui-explorations/t09a-dashboard --host 127.0.0.1 --port 4173",
+    "inspected_with": "Playwright CLI / Chromium",
+    "viewport_evidence": "1440x900, 1024x768, 768x1024, and 320x800 for all three directions",
+    "console_errors": 0,
+    "page_overflow_at_target_viewports": false,
+    "decision": "deferred to T-09B"
+  },
+  "implementation_root": ".ui-explorations/t09a-dashboard"
+}

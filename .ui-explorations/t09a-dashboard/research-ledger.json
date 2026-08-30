@@ -1,0 +1,34 @@
+[
+  {
+    "source": "Project DWF / Agent SPEC",
+    "url": "../../.dwf/output/agent/SPEC.md#9-ui",
+    "problem": "A private personal todo workspace must support list navigation, task status changes, completed filtering, and bounded load-more pagination.",
+    "observed_pattern": "The product contract locks the capabilities and behavior while leaving hierarchy, composition, and interaction presentation open.",
+    "relevant_transfer": "Use the same scenario and data in every direction; vary the information architecture rather than inventing business behavior.",
+    "do_not_copy": "Do not treat the current template page or a visual skin as the chosen product direction."
+  },
+  {
+    "source": "Microsoft To Do support",
+    "url": "https://support.microsoft.com/en-US/ToDo/plan-and-connect-with-microsoft-to-do",
+    "problem": "People need a small, focused set of tasks to act on during the day.",
+    "observed_pattern": "The My Day view creates a focused daily work surface while tasks remain available in their broader lists.",
+    "relevant_transfer": "A focus-first direction can reduce cognitive load by making the next action prominent while retaining list context.",
+    "do_not_copy": "The prototype does not add date-based smart lists or Outlook integration that the product contract does not require."
+  },
+  {
+    "source": "Things support",
+    "url": "https://culturedcode.com/things/features/",
+    "problem": "A personal task manager must support both fast capture and deeper organization without exposing every field at once.",
+    "observed_pattern": "Quick Find supports direct navigation, while task details and notes remain available without dominating the primary list.",
+    "relevant_transfer": "A search-first contextual direction can test whether fast retrieval and an inspector improve continuity for returning users.",
+    "do_not_copy": "The prototype does not introduce Things-specific scheduling, tags, areas, or proprietary copy."
+  },
+  {
+    "source": "Todoist help",
+    "url": "https://www.todoist.com/help/todoist/features/customize-views-in-todoist-AoHhBxFdZ",
+    "problem": "As task volume grows, users need to change how they scan and narrow a project view.",
+    "observed_pattern": "List, board, calendar, grouping, sorting, and filtering are presented as distinct view choices for the same task set.",
+    "relevant_transfer": "A status-board direction can make state visibility and throughput the primary hypothesis while keeping the same records.",
+    "do_not_copy": "The prototype does not add calendar, priority, assignee, or collaboration concepts outside the personal-todo baseline."
+  }
+]

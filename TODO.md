@@ -341,10 +341,11 @@ PR: [#14](https://github.com/michi-guns/nextjs-todo-list-example/pull/14) | revi
 
 ### T-09A: Explore and prototype UI directions
 
-- [ ] Define the locked product constraints, critical user scenarios, representative data, target viewports, and free UI dimensions for the landing, auth, and dashboard surfaces.
-- [ ] Produce three materially different UI directions based on different information-architecture or interaction hypotheses, not cosmetic variations.
-- [ ] Prototype the critical scenario with the same realistic fixture data while keeping each direction isolated, removable, and independent of backend or schema changes.
-- [ ] Render and inspect each direction for hierarchy, density, overflow, focus, selected, disabled, error, empty, and responsive states where relevant.
+- [x] Implement the accepted plan in [`docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md`](docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md).
+- [x] Define the locked product constraints, critical user scenarios, representative data, target viewports, and free UI dimensions for the dashboard, with landing/auth extension notes and locked journeys.
+- [x] Produce three materially different UI directions based on different information-architecture or interaction hypotheses, not cosmetic variations.
+- [x] Prototype the critical scenario with the same realistic fixture data while keeping each direction isolated, removable, and independent of backend or schema changes.
+- [x] Render and inspect each direction for hierarchy, density, overflow, focus, selected, disabled, error, empty, and responsive states where relevant.
 
 Recommended agent skills:
 
@@ -353,13 +354,21 @@ Recommended agent skills:
 
 Verification:
 
-- [ ] Each direction has a distinct hypothesis, optimization target, and trade-off.
-- [ ] All directions use the same primary scenario, data burden, required capabilities, and target viewport.
-- [ ] The exploration handoff states any visual-inspection limitation instead of claiming unperformed validation.
+- [x] Each direction has a distinct hypothesis, optimization target, and trade-off.
+- [x] All directions use the same primary scenario, data burden, required capabilities, and target viewport.
+- [x] The exploration handoff states any visual-inspection limitation instead of claiming unperformed validation.
 
 Test contracts: `TST-UI-001`.
 
 Dependencies: T-08.
+
+Plan: [`docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md`](docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md).
+
+Implementation scope: isolated static prototypes and exploration metadata under `.ui-explorations/t09a-dashboard/`; no production routes, backend, schema, migrations, snapshots, dependencies, or business-rule changes.
+
+Verification commands: `python .agents/skills/ui-direction-explorer/scripts/validate-directions.py .ui-explorations/t09a-dashboard`, Vite static preview with Playwright inspection at the agreed viewports, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file formatting checks, and `git diff --check`.
+
+Evidence: [`report.md`](.ui-explorations/t09a-dashboard/report.md) records the shared fixture, research ledger, three direction hypotheses, explicit dashboard-only prototype scope, landing/auth extension notes, and the comparison criteria. `python .agents/skills/ui-direction-explorer/scripts/validate-directions.py .ui-explorations/t09a-dashboard` passes with exactly three directions. The static preview served successfully through Vite; Chromium Playwright inspection covered the launcher and all directions at 1440x900, 1024x768, 768x1024, and 320x800 with zero console errors and no document overflow. Focus Rail task/list capture, Status Board status movement and pagination, Command Inspector search/inspector note editing, `/` and Cmd/Ctrl-K search focus, final-list reload/Inbox recreation, empty/loading/disabled/error/selected/long-content states, and keyboard-visible focus were exercised. `TST-UI-001` is `partial` for this prototype layer; materialized application runtime and end-to-end evidence remain with T-09B/T-10/T-11/T-12A/T-15. Fresh GPT-5.6-Sol review of code tip `b37fa8e` returned no actionable findings. [PR #15](https://github.com/michi-guns/nextjs-todo-list-example/pull/15) is open for merge after closeout metadata review.
 
 ### T-09B: Select and hand off the UI direction
 
