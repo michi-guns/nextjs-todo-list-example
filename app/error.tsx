@@ -6,10 +6,10 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 export default function Error({
-  reset,
+  retry,
 }: {
   readonly error: Error & { digest?: string }
-  readonly reset: () => void
+  readonly retry: () => void
 }) {
   return (
     <main className="flex min-h-svh items-center justify-center bg-background px-4 py-12 text-foreground">
@@ -25,7 +25,7 @@ export default function Error({
           to the landing page.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Button type="button" onClick={reset}>
+          <Button type="button" onClick={retry}>
             Try again
           </Button>
           <Link href="/" className={cn(buttonVariants({ variant: "outline" }))}>
