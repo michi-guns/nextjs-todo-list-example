@@ -256,22 +256,22 @@ Verification commands: focused unit and local PostgreSQL integration tests durin
 
 Evidence: `pnpm test` (10 files, 46 tests), `TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/todo_test pnpm test:integration` (4 files, 15 tests against disposable `postgres:18-alpine`), `pnpm typecheck`, `pnpm lint` (one pre-existing `Geist` warning), `pnpm build`, both Drizzle checks, and `git diff --check` all pass. The affected contracts are `partial` with local unit/integration evidence; T-09 boundary, T-10/T-15 browser, and T-14 reusable-harness evidence remain deferred.
 
-PR: [#10](https://github.com/michi-guns/nextjs-todo-list-example/pull/10) | reviewed commit `cdf6ee1` | pending merge after final tip review.
+PR: [#10](https://github.com/michi-guns/nextjs-todo-list-example/pull/10) | final reviewed tip `2eccfcc` | merged as `1c1b355`.
 
 Dependencies: T-04, T-05.
 
 ### T-07: Implement the tasks capability
 
-- [~] Implement T-07 from the accepted plan in [`docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md`](docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md).
-- [ ] Add framework-independent task rules and repository ports under `src/modules/tasks`.
-- [ ] Implement task reads, create, update, status changes, and delete use cases.
-- [ ] Enforce title and notes normalization, status rules, list ownership, per-list case-insensitive title uniqueness, and patch semantics.
-- [ ] Implement newest-first cursor reads and the `includeCompleted` filter, defaulting to `true`.
+- [x] Implement T-07 from the accepted plan in [`docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md`](docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md).
+- [x] Add framework-independent task rules and repository ports under `src/modules/tasks`.
+- [x] Implement task reads, create, update, status changes, and delete use cases.
+- [x] Enforce title and notes normalization, status rules, list ownership, per-list case-insensitive title uniqueness, and patch semantics.
+- [x] Implement newest-first cursor reads and the `includeCompleted` filter, defaulting to `true`.
 
 Verification:
 
-- [ ] Unit tests cover status transitions, trimming, note clearing, validation, and concurrent patch semantics.
-- [ ] Integration tests cover ownership, duplicate titles, pagination, completed filtering, cascade deletion, and last-successful-write behavior.
+- [x] Unit tests cover status transitions, trimming, note clearing, validation, and patch-field semantics.
+- [x] Integration tests cover ownership, duplicate titles, pagination, completed filtering, cascade deletion, and last-successful-write behavior.
 
 Test contracts: `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, `TST-CONCURRENCY-001`.
 
@@ -280,6 +280,10 @@ Recommended AgentForge skills: `using-agent-skills`, `planning`, `task-breakdown
 Verification commands: focused unit and local PostgreSQL integration tests during implementation; completion gates are `pnpm test`, `TEST_DATABASE_URL=<local PostgreSQL URL> pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text`, and `git diff --check`. Reusable Testcontainers evidence remains with T-14.
 
 Dependencies: T-04, T-05, T-06.
+
+Evidence: `pnpm test` (12 files, 57 tests), `TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55432/todo_test pnpm test:integration` (5 files, 19 tests against disposable `postgres:18-alpine`), `pnpm typecheck`, `pnpm lint` (zero errors and the one pre-existing `Geist` warning), `pnpm build`, both Drizzle checks, and `git diff --check` all pass. The task tests prove framework-independent normalization, status transitions including repeated-status timestamp idempotence, privacy-preserving list reads, ownership, uniqueness, pagination/filtering, cascade, and controlled concurrent writes. No migration was needed because T-07 consumes the existing schema. `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, and `TST-CONCURRENCY-001` are `partial`; T-08/T-09 boundary evidence, T-10/T-15 browser evidence, and T-14 reusable-harness evidence remain deferred.
+
+PR: [#11](https://github.com/michi-guns/nextjs-todo-list-example/pull/11) | final reviewed tip `2253724` | fresh GPT-5.6-Sol review returned no actionable findings.
 
 ### T-08: Add shared pagination and error contracts
 
