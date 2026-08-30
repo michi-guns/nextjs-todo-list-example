@@ -85,7 +85,7 @@ Evidence: `pnpm test` (15 files/67 tests), `pnpm test:integration` without `TEST
 
 ## Next-task dependency checkpoint
 
-The current TODO graph marks T-09A complete and PR #15 merged as `b88f377`, T-09B complete on `main` at `994bca0`, T-16 complete in TODO after final reviewed metadata tip `85d3998` and PR #16 merge commit `5e40bfd` (the hosted evidence itself ran against implementation commit `7837a69`), T-10 complete at reviewed code tip `a25461b`, and T-11 complete at reviewed code tip `7c1b617` pending closeout metadata review. T-12A is now the next safely unblocked implementation candidate; T-15 and T-17 remain blocked by their listed prerequisites. T-16 has no remaining implementation dependency.
+The current TODO graph marks T-09A complete and PR #15 merged as `b88f377`, T-09B complete on `main` at `994bca0`, T-16 complete in TODO after final reviewed metadata tip `85d3998` and PR #16 merge commit `5e40bfd` (the hosted evidence itself ran against implementation commit `7837a69`), T-10 complete at reviewed code tip `a25461b`, and T-11 complete at reviewed code tip `7c1b617` pending closeout metadata review. T-12A and T-15 are now safely unblocked; T-17 remains blocked by their listed prerequisites. T-16 has no remaining implementation dependency.
 
 ## Review loop
 

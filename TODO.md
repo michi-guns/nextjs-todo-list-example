@@ -498,7 +498,7 @@ Evidence: The server-owned root route consumes `getPublishedLandingContent()` an
 
 Review gate: Runtime verification found the magic-link error-code double mapping and corrected it in `bd5a609`. Fresh GPT-5.6-Sol medium review of `bd5a609` found the Next retry callback and long-content wrapping issues and corrected them in `ef6e5e5`; a synthetic long-content check then required the Tailwind 4 `wrap-anywhere` refinement in `7c1b617`. The final fresh review of `7c1b617` returned **No actionable findings**. The repository's direct-main workflow required no PR branch; reviewed code tip `7c1b617` was pushed to `origin/main` before closeout.
 
-Dependency recomputation: T-12A is now safely unblocked because T-10, T-11, T-12, and T-13 are complete. T-15 remains blocked until its listed T-05, T-09, T-10, T-11, and T-14 prerequisites are coupled with its dedicated Playwright/mailbox harness; T-17 remains blocked by T-12A and T-15.
+Dependency recomputation: T-12A and T-15 are now safely unblocked because their listed dependencies are complete; T-12A owns the materialized UI audit, while T-15 owns the dedicated Playwright/mailbox and multi-user lifecycle harness. T-17 remains blocked by T-12A and T-15.
 
 ### T-12: Add the Sanity landing read path
 
