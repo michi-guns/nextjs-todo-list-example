@@ -440,20 +440,22 @@ Verification:
 
 Evidence: Added the server-owned `/dashboard` route, route loading/error states, sign-out action, Focus Rail client composition, semantic input/textarea/label/alert primitives, and the framework-independent pagination state helper with four focused tests. `pnpm test` passes (19 files, 96 tests), `pnpm typecheck` passes, `pnpm lint` passes with only the pre-existing `app/layout.tsx:1:10` `Geist` warning, `pnpm build` passes on Next.js 16.3.1/Turbopack, changed-file Prettier checks pass, and `git diff --check` passes. The Next runtime loop used the disposable local PostgreSQL 18 database `dashboard_t10_20260830` and local mailbox mode without recording credentials: anonymous `/dashboard` requests redirect to `/sign-in?next=%2Fdashboard`; the authenticated browser session exercised Inbox provisioning, list create/select/rename/delete, task create/edit/delete/status, completed-task filtering, both visible cursor continuations, duplicate/blank validation feedback, final-list reload with Inbox recreation, sign-out, keyboard focus return after deletion, and focus-visible styling. Seeded disposable rows made both `Load more` controls continue through their remaining pages without duplicate IDs or order changes. At 320px, 768px, 1024px, and 1440px there was no horizontal document overflow. Axe reported 0 violations (39 passes); browser errors were empty, console output contained only expected React DevTools/HMR messages, Next MCP reported `issues: []`, `configErrors: []`, `sessionErrors: []`, and the route map includes `/dashboard`. T-15 reusable Playwright evidence and the T-11 auth/landing route remain intentionally deferred.
 
-Review gate: implementation review is pending on a fresh GPT-5.6-Sol medium agent before the task is closed and the next dependency graph is recomputed.
+Review gate: fresh GPT-5.6-Sol medium reviews of the implementation tips `8c864b4`, `f90dd92`, `89ea479`, and `a25461b` returned actionable accessibility findings that were fixed in the subsequent tips; the final review of `a25461b` returned **No actionable findings**. T-10 is closed and the dependency graph is recomputed below.
 
 Test contracts: `TST-LISTS-003`, `TST-TASKS-003`, `TST-UI-001`, `TST-E2E-003`.
 
 Dependencies: T-09, T-09B.
 
-Unblock condition: T-09 and T-09B are merged on `main`; T-10 is safely implementable without T-11, T-12A, or T-15. Completing T-10 and reviewing its changed tip should advance browser evidence for the four contracts and re-open the dependency graph for the next safe task.
+Unblock condition: T-09 and T-09B are merged on `main`; T-10 is safely implementable without T-11, T-12A, or T-15. T-10 is now complete at reviewed tip `a25461b`, so T-11 is the next safely implementable task; T-12A and T-15 remain blocked by their listed dependencies.
 
 ### T-11: Build the public landing and auth screens
 
-- [ ] Materialize the selected direction from T-09B across the public landing and authentication surfaces.
-- [ ] Add the public landing route with links into authentication.
-- [ ] Add sign-up, sign-in, magic-link request/consume, and sign-out screens sufficient for the accepted happy paths.
-- [ ] Keep provider payloads and Better Auth records out of UI-facing types.
+- [~] Implement the accepted plan in [`docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md`](docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md).
+- [ ] Materialize the selected Focus Rail direction across the public landing and authentication surfaces without copying private dashboard controls.
+- [ ] Replace the scaffold root route with a server-owned Sanity-backed landing page and explicit provider-failure boundary, linking to sign-up, sign-in, and magic-link entry points.
+- [ ] Add accessible sign-up, sign-in, and magic-link request/consume screens using the installed Better Auth browser client; preserve the existing dashboard sign-out action as the sign-out UX.
+- [ ] Constrain `next` callbacks to safe same-origin paths, default to `/dashboard`, and keep provider payloads, Better Auth records, credentials, mailbox contents, and secrets out of UI-facing types and logs.
+- [ ] Keep auth forms as small client interaction islands with stable validation/error/pending/success states, no duplicate authentication provider, and no schema, migration, or Sanity configuration changes.
 
 Recommended agent skills:
 
@@ -461,16 +463,36 @@ Recommended agent skills:
 - `vercel-composition-patterns` for reusable auth form and landing section composition.
 - `vercel-react-best-practices` for Server Component, Client Component, and interaction-boundary choices.
 - `next-dev-loop` for checking the real landing and auth routes in a running Next.js app.
+- `testing-first-class` for reconciling the affected auth/UI contracts and evidence layers.
+- `test-driven-development` for the redirect/error contract tests before implementation.
+- `source-driven-development` for the installed Better Auth and Next.js APIs.
+- `security-and-hardening` for safe callback handling and provider-boundary isolation.
+- `incremental-implementation` and `git-workflow-and-versioning` for vertical slices and a coherent reviewed tip.
+- `code-review-and-quality` and `verification-before-completion` for the final fresh-review loop and evidence gate.
 
 Verification:
 
-- [ ] The public landing renders the Sanity-backed view model once T-12 is wired.
-- [ ] Auth screens work against the local test database and show stable expected errors.
-- [ ] Forms are keyboard accessible, labels and focus states are clear, and layouts work at the agreed responsive breakpoints.
+- [ ] Focused redirect/error tests pass, and existing auth integration/boundary tests remain green.
+- [ ] The public landing renders the validated Sanity-backed view model; missing/invalid provider content fails through an explicit safe boundary rather than a permanent hardcoded fallback.
+- [ ] Local auth runtime checks cover verification-pending sign-up, verified email/password sign-in, magic-link request/consume, safe redirect to `/dashboard`, and the existing sign-out action without recording credentials or tokens.
+- [ ] Forms are keyboard accessible with labelled controls, visible focus, pending/error/success states, long-content wrapping, and no horizontal overflow at `320px`, `768px`, `1024px`, and `1440px`.
+- [ ] `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier checks, `git diff --check`, and `pnpm sanity:smoke` pass when their named prerequisites are available; unavailable prerequisites are recorded explicitly.
+- [ ] A fresh GPT-5.6-Sol medium reviewer returns **No actionable findings** for the final T-11 tip before task closeout; T-15's dedicated Playwright E2E contracts remain explicitly outstanding.
 
 Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`.
 
 Dependencies: T-02, T-05, T-09B.
+
+Plan: [`docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md`](docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md).
+
+Implementation scope and interfaces:
+
+- Create the server route and error boundary under `app/(marketing)/`, auth route group pages under `app/(auth)/`, and composition-owned landing/auth UI under `components/landing/` and `components/auth/`.
+- Add one client-only Better Auth wrapper under `lib/auth-client.ts` using `createAuthClient` and `magicLinkClient`; do not export provider records or server-only helpers through it.
+- Add a framework-independent safe internal redirect/error helper and focused tests under `src/modules/auth/presentation/` only if the form boundary requires them.
+- Consume `getPublishedLandingContent()` and `LandingContent` from the existing landing application/infrastructure boundary; leave Sanity client/query/configuration and the dashboard implementation untouched.
+
+Evidence target: T-11 owns landing/auth materialized runtime evidence for `TST-UI-001` and the route/form prerequisites for T-15. `TST-AUTH-001`, `TST-AUTH-002`, and `TST-AUTH-003` remain `partial` until the T-15 browser and multi-user evidence is complete; `TST-E2E-001` and `TST-E2E-002` remain `specified` until T-15.
 
 ### T-12: Add the Sanity landing read path
 
