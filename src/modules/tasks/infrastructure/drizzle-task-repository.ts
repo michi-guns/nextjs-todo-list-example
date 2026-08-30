@@ -1,4 +1,4 @@
-import { and, desc, eq, lt, ne, or, sql, type SQL } from "drizzle-orm"
+import { and, eq, lt, ne, or, sql, type SQL } from "drizzle-orm"
 import { type NodePgDatabase } from "drizzle-orm/node-postgres"
 
 import { listsTable } from "../../../../db/schema/lists"
@@ -113,7 +113,10 @@ export function createDrizzleTaskRepository(
         .select()
         .from(tasksTable)
         .where(and(...predicates))
-        .orderBy(desc(tasksTable.createdAt), desc(tasksTable.id))
+        .orderBy(
+          sql`${tasksTable.createdAt} DESC NULLS LAST`,
+          sql`${tasksTable.id} DESC NULLS LAST`
+        )
         .limit(limit + 1)
 
       const hasNextPage = rows.length > limit

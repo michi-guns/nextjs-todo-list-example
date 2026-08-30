@@ -1,0 +1,159 @@
+{
+  "contract": "TST-PERFORMANCE-001",
+  "generatedAt": "2026-08-30T19:06:17.170Z",
+  "measurementScope": {
+    "databaseExecution": "PostgreSQL EXPLAIN ANALYZE Execution Time after warmup",
+    "excluded": [
+      "network latency",
+      "authentication",
+      "rendering",
+      "CMS access",
+      "Neon compute startup"
+    ],
+    "connectionMode": "direct Neon connection"
+  },
+  "plans": [
+    {
+      "expectedIndex": "lists_user_created_at_id_idx",
+      "label": "lists:first-page",
+      "executionTimeMs": 0.064,
+      "indexNames": ["lists_user_created_at_id_idx"],
+      "nodeTypes": ["Limit", "Index Scan"],
+      "sequentialScans": [],
+      "passed": true
+    },
+    {
+      "expectedIndex": "lists_user_created_at_id_idx",
+      "label": "lists:next-page",
+      "executionTimeMs": 0.109,
+      "indexNames": ["lists_user_created_at_id_idx"],
+      "nodeTypes": ["Limit", "Index Scan"],
+      "sequentialScans": [],
+      "passed": true
+    },
+    {
+      "expectedIndex": "tasks_user_list_created_at_id_idx",
+      "label": "tasks:first-page:include-completed",
+      "executionTimeMs": 0.063,
+      "indexNames": ["tasks_user_list_created_at_id_idx"],
+      "nodeTypes": ["Limit", "Index Scan"],
+      "sequentialScans": [],
+      "passed": true
+    },
+    {
+      "expectedIndex": "tasks_user_list_created_at_id_idx",
+      "label": "tasks:next-page:include-completed",
+      "executionTimeMs": 0.062,
+      "indexNames": ["tasks_user_list_created_at_id_idx"],
+      "nodeTypes": ["Limit", "Index Scan"],
+      "sequentialScans": [],
+      "passed": true
+    },
+    {
+      "expectedIndex": "tasks_user_list_created_at_id_idx",
+      "label": "tasks:first-page:hide-completed",
+      "executionTimeMs": 0.061,
+      "indexNames": ["tasks_user_list_created_at_id_idx"],
+      "nodeTypes": ["Limit", "Index Scan"],
+      "sequentialScans": [],
+      "passed": true
+    },
+    {
+      "expectedIndex": "tasks_user_list_created_at_id_idx",
+      "label": "tasks:next-page:hide-completed",
+      "executionTimeMs": 0.085,
+      "indexNames": ["tasks_user_list_created_at_id_idx"],
+      "nodeTypes": ["Limit", "Index Scan"],
+      "sequentialScans": [],
+      "passed": true
+    }
+  ],
+  "privacy": {
+    "primaryCannotSeeSecondaryList": true,
+    "primaryCannotSeeSecondaryTasks": true
+  },
+  "seed": {
+    "primaryListCount": 101,
+    "primaryTaskCount": 10000,
+    "secondaryTaskCount": 10000,
+    "scopedSyntheticUserIds": [
+      "t16-performance-primary",
+      "t16-performance-secondary"
+    ],
+    "listCounts": [
+      {
+        "user_id": "t16-performance-primary",
+        "count": 101
+      },
+      {
+        "user_id": "t16-performance-secondary",
+        "count": 1
+      }
+    ],
+    "taskCounts": [
+      {
+        "user_id": "t16-performance-primary",
+        "count": 10000,
+        "done_count": 2000
+      },
+      {
+        "user_id": "t16-performance-secondary",
+        "count": 10000,
+        "done_count": 0
+      }
+    ]
+  },
+  "target": {
+    "branch": "development",
+    "computeActiveAttested": true,
+    "database": "neondb",
+    "developmentHostGuardPassed": true,
+    "serverVersion": "18.6 (c5250a2)",
+    "serverVersionNum": "180006"
+  },
+  "cursorChecks": {
+    "list": {
+      "pageCount": 2,
+      "pageSizes": [100, 1],
+      "totalItems": 101
+    },
+    "task": {
+      "pageCount": 100,
+      "pageSizes": [
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+        100, 100
+      ],
+      "totalItems": 10000
+    },
+    "pageSize": 100
+  },
+  "warmQuery": {
+    "databaseExecutionTimeMs": {
+      "max": 0.334,
+      "median": 0.066,
+      "min": 0.053,
+      "samples": [
+        0.058, 0.059, 0.067, 0.067, 0.334, 0.133, 0.075, 0.065, 0.053, 0.059
+      ]
+    },
+    "fetchedLimit": 21,
+    "pageSize": 20,
+    "sampleCount": 10,
+    "targetMs": 50,
+    "targetPassed": true,
+    "warmupCount": 3
+  },
+  "reproducibility": {
+    "command": "pnpm neon:performance",
+    "seedReplacement": "exact synthetic user IDs with foreign-key cascade",
+    "rerunnable": true
+  },
+  "result": "passed",
+  "schemaVersion": 1
+}
