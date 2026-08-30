@@ -4,7 +4,8 @@ import { getSanityConfig } from "./config"
 
 /**
  * Shared Node-safe constructor used by the server-only app client and the
- * read-only CLI smoke. Browser-facing code must use `client.ts` instead.
+ * read-only CLI smoke. Application server code should use `client.ts`; browser
+ * code must use neither module.
  */
 export function createSanityClient(
   environment: Record<string, string | undefined> = process.env

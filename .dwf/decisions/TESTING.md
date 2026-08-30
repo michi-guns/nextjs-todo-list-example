@@ -405,7 +405,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Unknown Sanity payloads are validated and mapped into a plain landing view model; optional fields remain optional; missing or invalid required content fails explicitly; raw provider records do not cross the infrastructure boundary.
 - **Required evidence:** Local fixture tests for valid, optional, malformed, and incomplete payloads and mapping failures.
 - **Dependencies:** T-02 Sanity resource and T-12 landing read path.
-- **Evidence:** `pnpm test` passed with 4 test files and 17 tests, including `src/modules/landing/infrastructure/sanity-landing-repository.test.ts` and `src/sanity/config.test.ts`. The fixtures cover valid unknown payloads, optional omission/null, malformed required/optional fields, missing payload, identity mismatch, and provider-field isolation.
+- **Evidence:** `pnpm test` passed with 4 test files and 18 tests, including `src/modules/landing/infrastructure/sanity-landing-repository.test.ts` and `src/sanity/config.test.ts`. The fixtures cover valid unknown payloads, optional omission/null, malformed required/optional fields, missing payload, identity mismatch, provider-field isolation, and the stable query/cache-tag boundary.
 
 <a id="tst-landing-002"></a>
 
@@ -422,7 +422,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The dedicated published landing singleton can be fetched through the real Sanity client and query, validated as unknown input, and mapped into the application view model without mutation.
 - **Required evidence:** A separate read-only live smoke with clear failures for missing configuration, missing content, query failure, validation failure, or mapping failure.
 - **Dependencies:** T-02 dedicated Sanity project/dataset and T-12 application mapping.
-- **Evidence:** `pnpm sanity:smoke` passed against the configured published singleton and reported the mapped fields `blurb`, `headline`, `primaryCtaLabel`, and `secondaryCtaLabel`. The TypeScript smoke imports the canonical reader and performs no mutations.
+- **Evidence:** `pnpm sanity:smoke` passed against the configured published singleton and reported the mapped fields `blurb`, `headline`, `primaryCtaLabel`, and `secondaryCtaLabel`. The TypeScript smoke composes the Node-safe Sanity client factory, shared Sanity source adapter, and landing application use case, and performs no mutations.
 
 <a id="tst-landing-003"></a>
 
