@@ -13,10 +13,10 @@ Continue the repository's AgentForge delivery autonomously through every task th
 ## Repository state at handoff
 
 - Repository: `michi-guns/nextjs-todo-list-example`
-- Current branch: `task/t-08-pagination-errors` from `main` at `9a1fb60` (T-08 implementation and review complete; closeout metadata update in progress)
+- Current branch: `main` at merge commit `ee20cea` (T-08 merged; dependency recomputation and next-task preflight in progress)
 - Base: latest `main` from `origin/main`
 - T-05 PR #7 is merged as `2935283`; T-12 and T-13 are already merged and complete.
-- T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. T-08 PR #12 is pushed at implementation tip `c3044b5`; its first review finding was fixed, and the fresh review of the exact implementation tip returned no actionable findings. T-08 closeout metadata is being reconciled before merge; dependency recomputation follows the merge. T-09/T-09A/T-09B and later UI/application tasks remain blocked until their prerequisites are recomputed, and T-14/T-16 remain blocked by their listed dependencies until then.
+- T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. T-08 PR #12 was independently reviewed through closeout tip `72e999e` with no actionable findings and merged as `ee20cea`. Dependency recomputation now makes T-09, T-09A, T-14, and T-16 candidates by TODO dependencies; each still requires a real-prerequisite preflight before implementation. T-09B and later UI/application tasks remain blocked by their listed dependencies.
 - This is a live checkpoint, not authority: verify the current branch, `HEAD`, remote/PR state, `TODO.md`, accepted plan, and prerequisites before acting, then update this section after every task transition.
 - No secrets, token values, or environment contents belong in commits, logs, or PR bodies.
 
@@ -36,13 +36,17 @@ Affected contracts: `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, and the t
 
 Evidence is recorded in `TODO.md` and `.dwf/decisions/TESTING.md`: the full unit/integration/type/lint/build/Drizzle/diff gates pass, while boundary, browser, and reusable-harness obligations remain honestly `partial` and owned by T-08/T-09/T-10/T-14.
 
-## T-08 acceptance target
+## T-08 completed checkpoint
 
-Add framework-independent shared pagination and error contracts: stable `Page<T>`/page-request types and 20/100 limits, Zod-backed parsing for untrusted pagination parameters, and safe mapping of known application outcomes to the accepted status/envelope. Refactor list/task consumers to use the shared page primitives and add maximum-size (100→101) list/task continuation evidence. Keep capability-specific cursor codecs/domain errors, migrations, routes, actions, and UI unchanged for their owning tasks.
+The framework-independent shared pagination and error contracts are merged: stable `Page<T>`/page-request types and 20/100 limits, Zod-backed parsing for untrusted pagination parameters, and safe mapping of known application outcomes to the accepted status/envelope. List/task consumers use the shared page primitives, and maximum-size (100→101) list/task continuation evidence is covered. Capability-specific cursor codecs/domain errors, migrations, routes, actions, and UI remain with their owning tasks.
 
 Affected contracts: `TST-LISTS-003`, `TST-TASKS-003`, and `TST-BOUNDARY-001`.
 
-Expected evidence: shared unit tests for pagination parsing/page shape/error mapping; local PostgreSQL list/task continuation tests at limit 100; full unit/integration/type/lint/build/Drizzle/diff gates. Achieved evidence is 14 unit-test files/62 tests and 5 local PostgreSQL integration files/21 tests against disposable `postgres:18-alpine`; the exact implementation tip `c3044b5` received no actionable findings from a fresh reviewer. Testcontainers lifecycle and authenticated request evidence remain with T-14/T-09.
+Evidence: 14 unit-test files/62 tests and 5 local PostgreSQL integration files/21 tests against disposable `postgres:18-alpine`; full typecheck, lint (one pre-existing Geist warning), build, both Drizzle checks, changed-file Prettier, and diff gates pass. The implementation tip `c3044b5` and closeout tip `72e999e` each received fresh pragmatic reviews with no actionable findings. Testcontainers lifecycle and authenticated request evidence remain with T-14/T-09.
+
+## Next-task dependency checkpoint
+
+The post-merge TODO graph identifies these dependency-satisfied candidates: T-09 (Server Actions and JSON Route Handlers), T-09A (UI direction exploration), T-14 (PostgreSQL integration harness), and T-16 (Neon performance evidence). Before each implementation, verify its external and local prerequisites, choose the smallest safe slice, and update this checkpoint with the selected branch and plan. T-09B, T-10, T-11, T-12A, T-15, and T-17 remain blocked by their listed dependencies.
 
 ## Review loop
 
