@@ -127,7 +127,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                      | `partial`   |
 | [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                      | `partial`   |
 | [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                | `partial`   |
-| [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration            | T-06, T-14                      | `partial`   |
+| [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration, browser   | T-06, T-10, T-14                | `verified`  |
 | [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14          | `verified`  |
 | [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14          | `verified`  |
 | [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09, T-14                | `verified`  |
@@ -273,19 +273,19 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-LISTS-001 — Inbox and list lifecycle
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Lists
-- **Evidence layers/modes:** Domain, application, infrastructure / unit, integration
+- **Evidence layers/modes:** Domain, application, infrastructure / unit, integration, browser
 - **Verifies product decisions:** D-003
 - **Verifies technical decisions:** TD-005, TD-006, TD-013, TD-017
 - **Edge cases:** [EC-001](EDGE-CASES.md#ec-001)
 - **SPEC:** [2.3 Listless private workspace side effect](../output/agent/SPEC.md#23-listless-private-workspace-side-effect), [4.1 List](../output/agent/SPEC.md#41-list), [5 Lists](../output/agent/SPEC.md#lists)
-- **Owners:** T-06, T-14
+- **Owners:** T-06, T-10, T-14
 - **Contract:** A listless private workspace creates exactly one ordinary `Inbox` atomically and idempotently, including after final-list deletion; any existing list prevents automatic creation; Inbox can later be renamed or deleted.
 - **Required evidence:** Database-free application tests for lifecycle outcomes, PostgreSQL integration for atomic/concurrent creation, and the relevant authenticated journey when the UI exists.
 - **Dependencies:** T-04 schema, T-05 auth boundary, and T-14 real database harness.
-- **Current evidence:** `src/modules/lists/application/list-use-cases.test.ts` and the local PostgreSQL repository suite cover Inbox normalization and lifecycle outcomes. The harness-backed integration suite proves eight concurrent listless calls converge to one Inbox, an existing list prevents automatic creation, final-list deletion permits recreation, and a controlled conflict/read-back interleaving does not create a duplicate after the winner is renamed.
-- **Follow-up:** T-15/T-10 must add the authenticated private-workspace journey before this contract can be `verified`.
+- **Current evidence:** `src/modules/lists/application/list-use-cases.test.ts` and the local PostgreSQL repository suite cover Inbox normalization and lifecycle outcomes. The harness-backed integration suite proves eight concurrent listless calls converge to one Inbox, an existing list prevents automatic creation, final-list deletion permits recreation, and a controlled conflict/read-back interleaving does not create a duplicate after the winner is renamed. T-10's authenticated Next runtime check exercised a listless workspace, Inbox provisioning, final-list deletion, the explicit reload state, and Inbox recreation on the next private-workspace load without exposing credentials.
+- **Follow-up:** None for the accepted baseline; T-15's separate Playwright lifecycle remains tracked by `TST-E2E-001` and does not replace this contract's verified lifecycle evidence.
 
 <a id="tst-lists-002"></a>
 

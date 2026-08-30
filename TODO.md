@@ -442,7 +442,7 @@ Evidence: Added the server-owned `/dashboard` route, route loading/error states,
 
 Review gate: fresh GPT-5.6-Sol medium reviews of the implementation tips `8c864b4`, `f90dd92`, `89ea479`, and `a25461b` returned actionable accessibility findings that were fixed in the subsequent tips; the final review of `a25461b` returned **No actionable findings**. T-10 is closed and the dependency graph is recomputed below.
 
-Test contracts: `TST-LISTS-003`, `TST-TASKS-003`, `TST-UI-001`, `TST-E2E-003`.
+Test contracts: `TST-LISTS-001`, `TST-LISTS-003`, `TST-TASKS-003`, `TST-UI-001`, `TST-E2E-003`.
 
 Dependencies: T-09, T-09B.
 

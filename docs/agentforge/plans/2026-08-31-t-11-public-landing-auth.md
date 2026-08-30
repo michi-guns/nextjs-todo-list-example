@@ -14,7 +14,7 @@
 
 ## Current state and file map
 
-- `app/page.tsx` is still the starter placeholder and must become the public `/` landing route. The existing route groups `app/(marketing)` and `app/(auth)` contain only keep files.
+- `app/page.tsx` is still the starter placeholder and will be replaced in place as the public `/` landing route. The existing `app/(marketing)` group remains a keep-file-only grouping for now; do not add a second `/` page there, because App Router route groups do not create a distinct URL. The landing error boundary should be placed at the root app boundary (or another non-duplicating route boundary) so provider failures remain explicit.
 - `src/modules/landing/infrastructure/sanity-landing-reader.ts` returns the plain `LandingContent` contract through the validated, cache-tagged Sanity repository created by T-12. The page must consume this function rather than importing `next-sanity`, GROQ, or provider types.
 - `lib/auth.ts` and `app/api/auth/[...all]/route.ts` own Better Auth server configuration and default API routes. `app/actions/auth.ts` already exposes the dashboard sign-out action.
 - `src/modules/auth/presentation/current-user.ts` exposes server-only session helpers; auth pages may redirect already-authenticated users, but they must not serialize the current-user record to the browser.
