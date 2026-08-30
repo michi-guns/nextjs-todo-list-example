@@ -58,6 +58,10 @@ completed-filter user, a skip-link user, and two privacy-isolation users. Each
 browser scenario owns a distinct seeded user (or the deliberate two-user pair),
 uses project-qualified names for records it creates, and therefore remains
 independent of scenario order and cross-browser project repetition.
+`seedPlaywrightDatabase(databaseUrl, baseUrl): Promise<PlaywrightSeed>` is the
+only seed entry point, and `PLAYWRIGHT_USERS` is the typed fixture export used
+by the browser helpers; neither export includes connection strings, mailbox
+contents, or generated authentication tokens.
 
 Routine landing requests use a deterministic application-facing fixture only
 when `PLAYWRIGHT_E2E=true` and `NODE_ENV` is not `production`. The normal
@@ -75,8 +79,9 @@ Chromium-only.
 ## Current state and file map
 
 - `e2e/example.spec.ts` is the default `playwright.dev` sample and will be
-  replaced by `e2e/runtime-smoke.spec.ts`, `e2e/fixtures.ts`, and focused todo
-  journey specs.
+  replaced by `e2e/runtime-smoke.spec.ts`, `e2e/fixtures.ts`,
+  `e2e/core-journey.spec.ts`, `e2e/magic-link.spec.ts`,
+  `e2e/privacy.spec.ts`, and `e2e/ui-contract.spec.ts`.
 - `playwright.config.ts` has no base URL, lifecycle, or browser-selection
   policy; it will gain global setup, the fixed local base URL, serial execution,
   and Chromium-first projects.
@@ -98,7 +103,8 @@ Chromium-only.
 - `src/test/playwright-lifecycle.test.ts` and
   `src/test/playwright-seed.test.ts` will hold the focused Vitest checks for
   lifecycle guards and pure seed-plan behavior; the named Playwright smoke
-  test will exercise the actual server/seed boundary.
+  cases `local runtime` and `behavior seed` will exercise the actual
+  server/seed boundary.
 
 ## Dependencies and work order
 
@@ -112,8 +118,10 @@ Chromium-only.
    existing PostgreSQL harness. Add the named `local runtime` case in
    `e2e/runtime-smoke.spec.ts` to prove server readiness and the deterministic
    landing fixture.
-4. Add the seed builder and shared browser fixtures plus
-   `src/test/playwright-seed.test.ts`. Verify that the seed can
+4. Add `scripts/playwright-local/seed.ts` and its
+   `seedPlaywrightDatabase(databaseUrl, baseUrl): Promise<PlaywrightSeed>` API,
+   plus `src/test/playwright-seed.test.ts` and the shared browser fixtures.
+   Verify that the seed can
    create verified Better Auth users and deterministic list/task records without
    logging passwords, tokens, mailbox contents, or connection strings.
 5. Replace the example specs with four serial Chromium scenarios: core
