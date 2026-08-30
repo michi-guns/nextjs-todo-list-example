@@ -314,6 +314,7 @@ PR: [#12](https://github.com/michi-guns/nextjs-todo-list-example/pull/12) | impl
 
 ### T-09: Add Server Actions and JSON Route Handlers
 
+- [~] Implement the accepted plan in [`docs/agentforge/plans/2026-08-30-t-09-server-entry-paths.md`](docs/agentforge/plans/2026-08-30-t-09-server-entry-paths.md).
 - [ ] Add the stable list/task routes from the SPEC: `/api/lists`, `/api/lists/:listId`, `/api/lists/:listId/tasks`, and `/api/tasks/:taskId`.
 - [ ] Make actions and handlers follow authenticate, authorize, validate, use case, map, and revalidate/respond.
 - [ ] Share Zod schemas and application use cases between actions and handlers.
@@ -327,6 +328,14 @@ Verification:
 Test contracts: `TST-AUTH-003`, `TST-BOUNDARY-001`.
 
 Dependencies: T-05, T-06, T-07, T-08.
+
+Implementation scope: capability-owned schemas, view models, JSON Route Handler adapters, and Server Action adapters under `src/modules/lists/presentation` and `src/modules/tasks/presentation`; thin composition wrappers under `app/api/` and `app/actions/`; request/action contract tests. Existing application, infrastructure, auth, schema, migration, snapshot, and UI files remain unchanged unless a type-only composition adjustment is required.
+
+Recommended AgentForge skills: `using-agent-skills`, `planning`, `task-breakdown`, `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, `api-and-interface-design`, `security-and-hardening`, `git-workflow-and-versioning`, `code-review-and-quality`, and `verification-before-completion`.
+
+Verification commands: focused list/task presentation tests during implementation; completion gates are `pnpm test`, `pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, both Drizzle checks, changed-file Prettier checks, and `git diff --check`. Next.js browser/runtime journey evidence remains with T-15 because the dashboard UI is not yet implemented.
+
+Evidence: pending implementation and fresh-review loop. Reconcile `TST-AUTH-003` and `TST-BOUNDARY-001` with authenticated request/action evidence before marking T-09 complete.
 
 ### T-09A: Explore and prototype UI directions
 
