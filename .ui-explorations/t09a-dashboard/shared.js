@@ -224,9 +224,9 @@ function commandTasks(state) {
     })
 }
 
-function renderResultItem(state, task) {
+function renderResultItem(state, task, selectedTaskId = state.selectedTaskId) {
   const list = state.lists.find((item) => item.id === task.listId)
-  return `<button class="result-item ${task.id === state.selectedTaskId ? "selected" : ""}" type="button" data-action="select-task" data-task-id="${escapeHtml(task.id)}" aria-label="${escapeHtml(`${task.title} · ${list?.name ?? "Unknown list"} · ${statusLabel(task.status)}`)}"><span class="task-check ${task.completed ? "checked" : ""}" aria-hidden="true">${task.completed ? "✓" : ""}</span><span><span class="task-title">${escapeHtml(task.title)}</span><span class="result-context">${escapeHtml(list?.name ?? "Unknown list")} · ${statusLabel(task.status)}</span></span><span class="subtle">›</span></button>`
+  return `<button class="result-item ${task.id === selectedTaskId ? "selected" : ""}" type="button" data-action="select-task" data-task-id="${escapeHtml(task.id)}" aria-label="${escapeHtml(`${task.title} · ${list?.name ?? "Unknown list"} · ${statusLabel(task.status)}`)}"><span class="task-check ${task.completed ? "checked" : ""}" aria-hidden="true">${task.completed ? "✓" : ""}</span><span><span class="task-title">${escapeHtml(task.title)}</span><span class="result-context">${escapeHtml(list?.name ?? "Unknown list")} · ${statusLabel(task.status)}</span></span><span class="subtle">›</span></button>`
 }
 
 function renderInspector(state, task) {
@@ -260,7 +260,7 @@ function renderCommand(state) {
         <form class="capture-form with-notes" data-form="task"><label class="sr-only" for="command-task-title">Task title</label><input class="field" id="command-task-title" name="title" maxlength="200" aria-required="true" placeholder="Capture a task…"${pending} /><label class="sr-only" for="command-task-notes">Optional note</label><input class="field" id="command-task-notes" name="notes" maxlength="5000" placeholder="Optional note"${pending} /><button class="button primary" type="submit"${pending}>Capture</button></form>
         ${renderError(state)}
         <div class="section-heading"><div><h3>Results</h3><p class="muted">${matches.length} matching task${matches.length === 1 ? "" : "s"} · local search simulation</p></div>${renderListManager(state)}</div>
-        ${state.loading ? `<div class="state-card loading" role="status"><div><strong>Refreshing index…</strong><span>Keeping the current query and inspector selection.</span></div></div>` : state.lists.length === 0 ? renderReloadState() : matches.length ? `<div class="result-list">${tasks.map((task) => renderResultItem(state, task)).join("")}</div>` : `<div class="state-card"><div><strong>No matching tasks</strong><span>Try another term or capture a new task above.</span></div></div>`}
+        ${state.loading ? `<div class="state-card loading" role="status"><div><strong>Refreshing index…</strong><span>Keeping the current query and inspector selection.</span></div></div>` : state.lists.length === 0 ? renderReloadState() : matches.length ? `<div class="result-list">${tasks.map((task) => renderResultItem(state, task, selectedTask?.id)).join("")}</div>` : `<div class="state-card"><div><strong>No matching tasks</strong><span>Try another term or capture a new task above.</span></div></div>`}
         ${state.lists.length === 0 ? "" : canLoadMore ? `<button class="button load-more" type="button" data-action="load-more">${escapeHtml(state.continuationLabel)}</button>` : `<p class="helper-note">${matches.length ? "End of this page set." : "Search is ready for a new task."}</p>`}
       </div>${renderInspector(state, selectedTask)}</div>
       <details class="danger-zone"><summary>Destructive actions keep their meaning</summary><div class="danger-zone-content"><span>Deleting a task is explicit and removes it from the private fixture.</span><button class="button ghost danger" type="button" data-action="delete-task" data-task-id="${escapeHtml(selectedTask?.id ?? "")}" ${selectedTask ? "" : "disabled"}>Delete selected task</button></div></details>
@@ -464,6 +464,24 @@ function handleInput(event, root, state) {
   }
 }
 
+function handleKeydown(event, root) {
+  if (root.dataset.direction !== "command-inspector") return
+  const target = event.target
+  const isEditing = target.matches?.(
+    "input, textarea, select, [contenteditable='true']"
+  )
+  const commandKey =
+    (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k"
+  const slashKey =
+    !event.metaKey && !event.ctrlKey && event.key === "/" && !isEditing
+  if (!commandKey && !slashKey) return
+  const search = root.querySelector("#command-query")
+  if (!search) return
+  event.preventDefault()
+  search.focus()
+  search.setSelectionRange(search.value.length, search.value.length)
+}
+
 function handleSubmit(event, root, state) {
   event.preventDefault()
   const form = event.target
@@ -531,6 +549,7 @@ export function bootstrap() {
   root.addEventListener("click", (event) => handleClick(event, root, state))
   root.addEventListener("change", (event) => handleChange(event, root, state))
   root.addEventListener("input", (event) => handleInput(event, root, state))
+  document.addEventListener("keydown", (event) => handleKeydown(event, root))
   root.addEventListener(
     "submit",
     (event) => handleSubmit(event, root, state),
