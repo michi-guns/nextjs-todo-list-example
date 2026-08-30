@@ -25,12 +25,12 @@ describe("createLandingContentInvalidationService", () => {
     expect(revalidateTag).toHaveBeenNthCalledWith(
       1,
       LANDING_CONTENT_CACHE_TAG,
-      "max"
+      { expire: 0 }
     )
     expect(revalidateTag).toHaveBeenNthCalledWith(
       2,
       LANDING_CONTENT_CACHE_TAG,
-      "max"
+      { expire: 0 }
     )
   })
 })

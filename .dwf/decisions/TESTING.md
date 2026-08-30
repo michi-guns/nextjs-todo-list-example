@@ -439,7 +439,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A trusted relevant Sanity publish event and an authorized manual recovery request reach one server-only idempotent invalidation service; invalid signatures, irrelevant events, unauthorized recovery, and duplicate delivery do not cause unsafe invalidation.
 - **Required evidence:** Boundary tests for signatures, relevance, authorization, duplication, and shared service routing, plus one real deployed webhook delivery for release evidence.
 - **Dependencies:** T-12 cache identity/read path and the deployed webhook prerequisite.
-- **Evidence:** Local boundary tests pass in `pnpm test` (6 files, 32 tests at the implementation checkpoint) and cover generated valid/invalid Sanity signatures, malformed payloads, irrelevant and draft events, duplicate deliveries, the stable tag/profile, manual authorization, and shared invalidation routing. The deployed webhook-delivery clause remains deferred because this repository has no deployed release candidate; local direct-handler evidence does not replace it.
+- **Evidence:** Local boundary tests pass in `pnpm test` (6 files, 32 tests at the implementation checkpoint) and cover generated valid/invalid Sanity signatures, malformed payloads, irrelevant and draft events, duplicate deliveries, the stable tag with immediate-expiration profile `{ expire: 0 }`, manual authorization, and shared invalidation routing. The deployed webhook-delivery clause remains deferred because this repository has no deployed release candidate; local direct-handler evidence does not replace it.
 
 <a id="tst-ui-001"></a>
 

@@ -8,7 +8,7 @@
 
 **Spec and decisions:** [Agent SPEC §6.2–6.3](../../.dwf/output/agent/SPEC.md#62-runtime), [Agent SPEC §10.4](../../.dwf/output/agent/SPEC.md#104-sanity-verification), [Agent SPEC §14.5](../../.dwf/output/agent/SPEC.md#145-landingsanity-boundary), [TD-023](../../.dwf/decisions/TECHNICAL.md), [TST-LANDING-003](../../.dwf/decisions/TESTING.md#tst-landing-003), and [Sanity data boundary](../../docs/data/sanity.md).
 
-**Global constraints:** Keep provider and operator secrets server-side and out of source, logs, client bundles, and evidence. Keep app routes composition-only and keep webhook payload validation, relevance filtering, and authorization in the landing boundary. Do not add draft reads, live preview, Sanity mutations, rate limiting, persistent webhook storage, or deployment infrastructure. Use the installed Next.js 16 API shape (`revalidateTag(tag, 'max')`) and the existing `landing-content` cache tag. Local acceptance may exercise signed requests directly; the deployed webhook evidence remains dependent on a deployed release candidate.
+**Global constraints:** Keep provider and operator secrets server-side and out of source, logs, client bundles, and evidence. Keep app routes composition-only and keep webhook payload validation, relevance filtering, and authorization in the landing boundary. Do not add draft reads, live preview, Sanity mutations, rate limiting, persistent webhook storage, or deployment infrastructure. Use the installed Next.js 16 API shape (`revalidateTag(tag, { expire: 0 })`) and the existing `landing-content` cache tag so third-party webhook/manual recovery reads expire immediately. Local acceptance may exercise signed requests directly; the deployed webhook evidence remains dependent on a deployed release candidate.
 
 ## Current state and file map
 
@@ -23,7 +23,7 @@
 
 ### Shared invalidation service
 
-Add `src/modules/landing/infrastructure/sanity-invalidation.ts` with a server-only boundary. Its public service calls `revalidateTag(LANDING_CONTENT_CACHE_TAG, 'max')` and exposes a small injectable factory for deterministic tests. The service is intentionally stateless: repeating the same tag invalidation has the same effect, so duplicate deliveries remain safe across processes without an unsafe in-memory deduplication cache.
+Add `src/modules/landing/infrastructure/sanity-invalidation.ts` with a server-only boundary. Its public service calls `revalidateTag(LANDING_CONTENT_CACHE_TAG, { expire: 0 })` and exposes a small injectable factory for deterministic tests. The service is intentionally stateless: repeating the same tag invalidation has the same effect, so duplicate deliveries remain safe across processes without an unsafe in-memory deduplication cache.
 
 ### Webhook boundary
 
@@ -51,7 +51,7 @@ The invalidation service and boundary tests can be developed in one focused slic
 
 Affected contract: `TST-LANDING-003`.
 
-- Focused Vitest tests: service calls the stable tag with the Next.js 16 `'max'` profile; webhook accepts a generated valid Sanity signature only for the published singleton; invalid signatures, malformed payloads, draft/other IDs, and duplicate deliveries do not cause unsafe behavior; manual recovery requires the operator secret and reaches the exact same service.
+- Focused Vitest tests: service calls the stable tag with Next.js 16's immediate-expiration `{ expire: 0 }` profile; webhook accepts a generated valid Sanity signature only for the published singleton; invalid signatures, malformed payloads, draft/other IDs, and duplicate deliveries do not cause unsafe behavior; manual recovery requires the operator secret and reaches the exact same service.
 - `pnpm test` for the complete suite.
 - `pnpm typecheck`, `pnpm lint`, `pnpm build`, and `git diff --check` for the changed route/module graph.
 - A local direct signed-request smoke or focused test must prove the handler path without mutating Sanity. `pnpm sanity:smoke` remains the separate read-only T-12 check and must continue to pass.
@@ -61,7 +61,7 @@ Affected contract: `TST-LANDING-003`.
 
 - Sanity's current webhook signature header and payload parsing are delegated to `next-sanity/webhook`; tests should generate the current `sanity-webhook-signature` format rather than reimplementing verification in application code.
 - The Sanity webhook configuration will filter/projection-limit events to the singleton, but the application boundary still rechecks exact identity because external filters are not a trust boundary.
-- `revalidateTag(..., 'max')` is the current Next.js 16 route-handler API and gives content-oriented stale-while-revalidate semantics. The shared tag is already attached to the T-12 read fetch.
+- `revalidateTag(..., { expire: 0 })` is the current Next.js 16 route-handler profile for third-party webhooks that need immediate expiration. The shared tag is already attached to the T-12 read fetch.
 - Manual recovery is a protected operational endpoint, not a user-facing feature; a bearer secret is the smallest repository-compatible authorization choice until a real operator identity system exists.
 - No deployment is available in this run. Local boundary evidence is sufficient for implementation progress but not for the final deployed-release clause.
 
