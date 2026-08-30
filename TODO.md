@@ -546,9 +546,11 @@ Evidence: `pnpm test` (6 files, 32 tests), `pnpm sanity:smoke`, `pnpm typecheck`
 
 ### T-12A: Audit and refine the materialized UI
 
-- [ ] Review the implemented landing, auth, and dashboard surfaces against the selected direction handoff.
-- [ ] Fix material issues in hierarchy, content density, overflow, responsive behavior, focus management, loading/error/empty states, and interaction clarity.
-- [ ] Confirm the implementation uses project tokens and composable components without adding speculative UI infrastructure.
+- [x] Implement the accepted audit plan in [`docs/agentforge/plans/2026-08-31-t-12a-ui-audit.md`](docs/agentforge/plans/2026-08-31-t-12a-ui-audit.md).
+- [x] Review the implemented landing, auth, and dashboard surfaces against the selected direction handoff and current Web Interface Guidelines.
+- [x] Add a shared, focus-visible skip-to-content affordance for the persistent public/auth/dashboard navigation and hide the decorative landing preview from the accessibility tree.
+- [x] Re-check hierarchy, content density, overflow, responsive behavior, focus management, loading/error/empty states, and interaction clarity; make no speculative changes where the current implementation already satisfies the handoff.
+- [x] Confirm the implementation uses project tokens and composable components without adding speculative UI infrastructure.
 
 Recommended agent skills:
 
@@ -559,13 +561,26 @@ Recommended agent skills:
 
 Verification:
 
-- [ ] The review produces concrete file/line findings or records that no actionable findings remain.
-- [ ] The UI has no new console errors, obvious overflow, inaccessible controls, missing labels, or color-only critical state cues.
-- [ ] The selected direction remains recognizable after implementation and the core product flow remains unchanged.
+- [x] The review produces concrete file/line findings or records that no actionable findings remain.
+- [x] Skip links move focus to the primary content region; the UI has no new console errors, obvious overflow, inaccessible controls, missing labels, or color-only critical state cues.
+- [x] The selected direction remains recognizable after implementation and the core product flow remains unchanged.
+- [x] `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file formatting, `git diff --check`, and Next.js runtime checks pass; integration evidence is rerun after the final code fix.
 
 Test contracts: `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`.
 
 Dependencies: T-10, T-11, T-12, T-13.
+
+Plan: [`docs/agentforge/plans/2026-08-31-t-12a-ui-audit.md`](docs/agentforge/plans/2026-08-31-t-12a-ui-audit.md).
+
+Implementation scope: `components/ui/skip-link.tsx`, the public/auth/dashboard shell compositions, the landing decorative preview semantics, and the required UI/runtime evidence plus testing-ledger reconciliation. No route, domain, persistence, provider, or product-flow changes are in scope.
+
+Task breakdown: (a) add and wire the shared skip-link and content targets, (b) correct the decorative preview landmark semantics, (c) inspect the four contract viewports and keyboard/focus/state behavior in Chromium, (d) reconcile `TST-UI-001`/`TST-E2E-003`, TODO, and the temporary checkpoint, including the T-15-owned authenticated dashboard skip-target follow-up, and (e) complete the fresh GPT-5.6-Sol pragmatic review loop before closeout.
+
+Evidence: The audit found and fixed the missing persistent-navigation skip affordance and the empty labelled decorative preview landmark. `components/ui/skip-link.tsx` is wired to post-navigation content targets in landing, auth, and dashboard shells; the landing target was corrected after review so Enter followed by Tab reaches the primary `Get started` CTA. Chromium inspection of `/`, `/sign-up`, `/sign-in`, and `/magic-link` confirms first-position skip links, target focus, zero axe violations, no browser errors, and `scrollWidth === innerWidth` at `320x800`, `768x1024`, `1024x768`, and `1440x900`; the unauthenticated `/dashboard` check remains correctly session-gated, with its target covered by source/build inspection and T-10's authenticated runtime evidence. The selected Focus Rail hierarchy and existing state behavior remain unchanged; no speculative UI infrastructure or product/provider/domain changes were added.
+
+Verification: `pnpm test` (20 files, 110 tests), `pnpm test:integration` (6 files, 23 tests against one disposable PostgreSQL 18 Testcontainer), `pnpm typecheck`, `pnpm lint` (one pre-existing `app/layout.tsx:1:10` unused `Geist` warning), `pnpm build`, changed-file Prettier checks, and `git diff --check` pass. Next.js runtime compilation/error checks report no issues. Fresh GPT-5.6-Sol review of pushed implementation tip `7c3d320` found one actionable skip-target issue; it was fixed in `a3eed2c`, and a fresh review of exact pushed tip `a3eed2c` returned **No actionable findings**. PR [#17](https://github.com/michi-guns/nextjs-todo-list-example/pull/17) contains the reviewed branch; TST-UI-001 remains `partial` solely for the authenticated dashboard skip-link activation/next-Tab check now owned by T-15, TST-E2E-003 remains `partial`, and TST-E2E-001/002 remain `specified`.
+
+Dependency recomputation: T-15 is now safely unblocked because T-05, T-09, T-10, T-11, and T-14 are complete; T-17 remains blocked by T-15. No other task became safely implementable from this closeout.
 
 ## Checkpoint: core product
 
@@ -573,7 +588,7 @@ Dependencies: T-10, T-11, T-12, T-13.
 - [ ] The full local journey works: sign in, obtain Inbox, create list, create task, change status, sign out.
 - [ ] Lists and tasks are private, validated, paginated, and persisted in PostgreSQL.
 - [ ] The landing page reads Sanity content and cache recovery is protected.
-- [ ] The selected UI direction is materialized and the implemented surfaces have been audited.
+- [x] The selected UI direction is materialized and the implemented surfaces have been audited.
 
 ## Phase 4: verification and release evidence
 
@@ -607,13 +622,14 @@ PR: [#13](https://github.com/michi-guns/nextjs-todo-list-example/pull/13) | impl
 - [ ] Add one local command that starts PostgreSQL, applies migrations, loads deterministic behavior seed data, starts a dedicated Next.js test server, runs Playwright, and tears everything down.
 - [ ] Run the required suite in Chromium and keep Firefox/WebKit as an explicit on-demand run.
 - [ ] Add the magic-link mailbox journey.
+- [ ] Complete the remaining `TST-UI-001` authenticated dashboard skip-link activation and next-Tab check in the harness-owned browser.
 
 Verification:
 
 - [ ] `pnpm exec playwright test` passes against the harness-owned local database in Chromium.
 - [ ] Cross-browser checks remain available separately for release or major UI changes.
 
-Test contracts: `TST-HARNESS-001`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`.
+Test contracts: `TST-HARNESS-001`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`.
 
 Dependencies: T-05, T-09, T-10, T-11, T-14.
 
