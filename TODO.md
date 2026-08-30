@@ -390,19 +390,25 @@ Dependencies: T-02, T-05, T-09B.
 
 ### T-12: Add the Sanity landing read path
 
-- [ ] Add the Sanity client/configuration seat under `src/sanity`.
-- [ ] Validate unknown Sanity payloads and map them to a plain landing view model inside landing infrastructure.
-- [ ] Give published landing reads one stable cache identity.
-- [ ] Remove any temporary fallback after the real CMS read path works.
+- [x] Add the Sanity client/configuration seat under `src/sanity`.
+- [x] Validate unknown Sanity payloads and map them to a plain landing view model inside landing infrastructure.
+- [x] Give published landing reads one stable cache identity.
+- [x] No T-12-specific fallback remains; public landing presentation remains owned by T-11.
 
 Verification:
 
-- [ ] Fixture tests cover valid payloads, optional fields, malformed content, and missing required content.
-- [ ] The separate live read smoke fetches, validates, and maps the published singleton.
+- [x] Fixture tests cover valid, optional, malformed, incomplete, identity-mismatch, and provider-field-isolation payloads.
+- [x] The separate live read smoke fetches, validates, and maps the published singleton through the Node-safe client factory, shared source adapter, and application use case.
 
 Test contracts: `TST-LANDING-001`, `TST-LANDING-002`.
 
 Dependencies: T-02, T-03A.
+
+Plan: [`2026-08-30-t-12-sanity-landing-read-path.md`](docs/agentforge/plans/2026-08-30-t-12-sanity-landing-read-path.md).
+
+Evidence: `pnpm test` (4 files, 19 tests), `pnpm sanity:smoke`, `pnpm typecheck`, `pnpm lint` (one pre-existing `Geist` warning), `pnpm build`, and `git diff --check` all pass. [PR #8](https://github.com/michi-guns/nextjs-todo-list-example/pull/8) was independently reviewed by fresh GPT-5.6-Sol agents until no actionable findings remained.
+
+Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, and `git-workflow-and-versioning`.
 
 ### T-13: Add Sanity freshness and recovery
 
