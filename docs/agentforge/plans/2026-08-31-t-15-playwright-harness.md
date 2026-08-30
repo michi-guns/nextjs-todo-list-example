@@ -75,7 +75,8 @@ Chromium-only.
 ## Current state and file map
 
 - `e2e/example.spec.ts` is the default `playwright.dev` sample and will be
-  replaced by focused todo journey specs plus shared fixtures.
+  replaced by `e2e/runtime-smoke.spec.ts`, `e2e/fixtures.ts`, and focused todo
+  journey specs.
 - `playwright.config.ts` has no base URL, lifecycle, or browser-selection
   policy; it will gain global setup, the fixed local base URL, serial execution,
   and Chromium-first projects.
@@ -94,6 +95,10 @@ Chromium-only.
 - `package.json` currently has only the unconfigured `test:e2e` Playwright
   script; it will receive the lifecycle/cross-browser commands without adding a
   second test framework or remote service.
+- `src/test/playwright-lifecycle.test.ts` and
+  `src/test/playwright-seed.test.ts` will hold the focused Vitest checks for
+  lifecycle guards and pure seed-plan behavior; the named Playwright smoke
+  test will exercise the actual server/seed boundary.
 
 ## Dependencies and work order
 
@@ -101,10 +106,14 @@ Chromium-only.
    its exact work packages, prerequisites, and contract evidence.
 2. Add the deterministic landing fixture and its focused test. This is the
    only application-runtime change and must remain local/test gated.
-3. Add lifecycle helpers and tests for the Playwright harness: reserved-port
-   validation, inherited test environment, server readiness, failure cleanup,
-   mailbox cleanup, and reuse of the existing PostgreSQL harness.
-4. Add the seed builder and shared browser fixtures. Verify that the seed can
+3. Add lifecycle helpers and `src/test/playwright-lifecycle.test.ts` for the
+   Playwright harness: reserved-port validation, inherited test environment,
+   server readiness, failure cleanup, mailbox cleanup, and reuse of the
+   existing PostgreSQL harness. Add the named `local runtime` case in
+   `e2e/runtime-smoke.spec.ts` to prove server readiness and the deterministic
+   landing fixture.
+4. Add the seed builder and shared browser fixtures plus
+   `src/test/playwright-seed.test.ts`. Verify that the seed can
    create verified Better Auth users and deterministic list/task records without
    logging passwords, tokens, mailbox contents, or connection strings.
 5. Replace the example specs with four serial Chromium scenarios: core
@@ -140,6 +149,13 @@ claimed for this shared lifecycle.
 - Focused unit/harness tests must cover test-only landing gating and lifecycle
   error/cleanup behavior. Existing Vitest and PostgreSQL integration suites
   remain required gates; no weaker unit test substitutes for browser evidence.
+- The focused commands are `pnpm exec vitest run
+src/modules/landing/infrastructure/sanity-landing-reader.test.ts
+src/test/playwright-lifecycle.test.ts`, `pnpm exec vitest run
+src/test/playwright-seed.test.ts`, and
+  `pnpm exec playwright test e2e/runtime-smoke.spec.ts --project=chromium
+--grep "local runtime|behavior seed"`; these named cases must not silently
+  run the retired external `playwright.dev` sample.
 - Completion gates: `pnpm test`, `pnpm test:integration`, `pnpm typecheck`,
   `pnpm lint`, `pnpm build`, `pnpm exec prettier --check` for changed files,
   `pnpm exec drizzle-kit check --config drizzle.config.ts`, and
