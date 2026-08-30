@@ -450,12 +450,12 @@ Unblock condition: T-09 and T-09B are merged on `main`; T-10 is safely implement
 
 ### T-11: Build the public landing and auth screens
 
-- [~] Implement the accepted plan in [`docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md`](docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md).
-- [ ] Materialize the selected Focus Rail direction across the public landing and authentication surfaces without copying private dashboard controls.
-- [ ] Replace the scaffold root route with a server-owned Sanity-backed landing page and explicit provider-failure boundary, linking to sign-up, sign-in, and magic-link entry points.
-- [ ] Add accessible sign-up, sign-in, and magic-link request/consume screens using the installed Better Auth browser client; preserve the existing dashboard sign-out action as the sign-out UX.
-- [ ] Constrain `next` callbacks to safe same-origin paths, default to `/dashboard`, and keep provider payloads, Better Auth records, credentials, mailbox contents, and secrets out of UI-facing types and logs.
-- [ ] Keep auth forms as small client interaction islands with stable validation/error/pending/success states, no duplicate authentication provider, and no schema, migration, or Sanity configuration changes.
+- [x] Implement the accepted plan in [`docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md`](docs/agentforge/plans/2026-08-31-t-11-public-landing-auth.md).
+- [x] Materialize the selected Focus Rail direction across the public landing and authentication surfaces without copying private dashboard controls.
+- [x] Replace the scaffold root route with a server-owned Sanity-backed landing page and explicit provider-failure boundary, linking to sign-up, sign-in, and magic-link entry points.
+- [x] Add accessible sign-up, sign-in, and magic-link request/consume screens using the installed Better Auth browser client; preserve the existing dashboard sign-out action as the sign-out UX.
+- [x] Constrain `next` callbacks to safe same-origin paths, default to `/dashboard`, and keep provider payloads, Better Auth records, credentials, mailbox contents, and secrets out of UI-facing types and logs.
+- [x] Keep auth forms as small client interaction islands with stable validation/error/pending/success states, no duplicate authentication provider, and no schema, migration, or Sanity configuration changes.
 
 Recommended agent skills:
 
@@ -472,12 +472,12 @@ Recommended agent skills:
 
 Verification:
 
-- [ ] Focused redirect/error tests pass, and existing auth integration/boundary tests remain green.
-- [ ] The public landing renders the validated Sanity-backed view model; missing/invalid provider content fails through an explicit safe boundary rather than a permanent hardcoded fallback.
-- [ ] Local auth runtime checks cover verification-pending sign-up, verified email/password sign-in, magic-link request/consume, safe redirect to `/dashboard`, and the existing sign-out action without recording credentials or tokens.
-- [ ] Forms are keyboard accessible with labelled controls, visible focus, pending/error/success states, long-content wrapping, and no horizontal overflow at `320px`, `768px`, `1024px`, and `1440px`.
-- [ ] `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier checks, `git diff --check`, and `pnpm sanity:smoke` pass when their named prerequisites are available; unavailable prerequisites are recorded explicitly.
-- [ ] A fresh GPT-5.6-Sol medium reviewer returns **No actionable findings** for the final T-11 tip before task closeout; T-15's dedicated Playwright E2E contracts remain explicitly outstanding.
+- [x] Focused redirect/error tests pass, and existing auth integration/boundary tests remain green.
+- [x] The public landing renders the validated Sanity-backed view model; missing/invalid provider content fails through an explicit safe boundary rather than a permanent hardcoded fallback.
+- [!] The full verification-pending, verified sign-in, magic-link request/consume, and sign-out browser lifecycle remains T-15-owned; T-11 verified the route surfaces, safe `/dashboard` callback default, stable invalid-credential and invalid-token states, and the existing local PostgreSQL auth integration lifecycle without recording credentials or tokens.
+- [x] Forms are keyboard accessible with labelled controls, visible focus tokens, pending/error/success states, long-content wrapping, and no horizontal overflow at `320px`, `768px`, `1024px`, and `1440px`.
+- [x] `pnpm test`, `pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier checks, `git diff --check`, and `pnpm sanity:smoke` pass; lint reports only the pre-existing `app/layout.tsx:1:10` `Geist` warning.
+- [x] A fresh GPT-5.6-Sol medium reviewer returned **No actionable findings** for reviewed code tip `7c1b617`; T-15's dedicated Playwright E2E contracts remain explicitly outstanding.
 
 Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`.
 
@@ -493,6 +493,12 @@ Implementation scope and interfaces:
 - Consume `getPublishedLandingContent()` and `LandingContent` from the existing landing application/infrastructure boundary; leave Sanity client/query/configuration and the dashboard implementation untouched.
 
 Evidence target: T-11 owns landing/auth materialized runtime evidence for `TST-UI-001` and the route/form prerequisites for T-15. `TST-AUTH-001`, `TST-AUTH-002`, and `TST-AUTH-003` remain `partial` until the T-15 browser and multi-user evidence is complete; `TST-E2E-001` and `TST-E2E-002` remain `specified` until T-15.
+
+Evidence: The server-owned root route consumes `getPublishedLandingContent()` and renders the Focus Rail landing view; `app/error.tsx` provides a provider-safe retry boundary using Next.js 16.3.1's `retry` callback. `/sign-up`, `/sign-in`, and `/magic-link` use one Better Auth browser client with the installed magic-link plugin, safe internal redirect handling, stable public error messages, and explicit pending/success states. `pnpm test` passes (20 files, 110 tests); `pnpm test:integration` passes (6 files, 23 tests against disposable local PostgreSQL 18); `pnpm typecheck`, `pnpm build`, changed-file Prettier, and `git diff --check` pass; `pnpm lint` has only the pre-existing Geist warning; and `pnpm sanity:smoke` validates the configured landing singleton. Next MCP reports `issues: []`, `configErrors: []`, and `sessionErrors: []`, and the route map includes `/`, `/sign-up`, `/sign-in`, and `/magic-link`. Chromium inspection confirms labelled landmarks and controls, keyboard traversal, stable invalid-credential and invalid-token messages, zero axe violations on the landing/auth routes, and no horizontal document overflow for all four routes at `320x800`, `768x1024`, `1024x768`, and `1440x900`; a synthetic 500-character headline/CTA check also remains within 320px after the `wrap-anywhere` fix. The deterministic mailbox/browser lifecycle and multi-user isolation remain T-15 obligations.
+
+Review gate: Runtime verification found the magic-link error-code double mapping and corrected it in `bd5a609`. Fresh GPT-5.6-Sol medium review of `bd5a609` found the Next retry callback and long-content wrapping issues and corrected them in `ef6e5e5`; a synthetic long-content check then required the Tailwind 4 `wrap-anywhere` refinement in `7c1b617`. The final fresh review of `7c1b617` returned **No actionable findings**. The repository's direct-main workflow required no PR branch; reviewed code tip `7c1b617` was pushed to `origin/main` before closeout.
+
+Dependency recomputation: T-12A is now safely unblocked because T-10, T-11, T-12, and T-13 are complete. T-15 remains blocked until its listed T-05, T-09, T-10, T-11, and T-14 prerequisites are coupled with its dedicated Playwright/mailbox harness; T-17 remains blocked by T-12A and T-15.
 
 ### T-12: Add the Sanity landing read path
 
