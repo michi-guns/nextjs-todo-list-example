@@ -500,21 +500,27 @@ Dependencies: T-10, T-11, T-12, T-13.
 
 ### T-14: Build the PostgreSQL integration harness
 
-- [~] Implement T-14 from the accepted plan in [`docs/agentforge/plans/2026-08-30-t-14-postgresql-harness.md`](docs/agentforge/plans/2026-08-30-t-14-postgresql-harness.md).
-- [ ] Use `@testcontainers/postgresql` with PostgreSQL 18.
-- [ ] Start one ephemeral container per integration suite, apply versioned migrations, and clean it up on success or failure.
-- [ ] Keep integration tests serial, give each test a unique user/data set, and refuse external database URLs in destructive cleanup.
+- [x] Implement T-14 from the accepted plan in [`docs/agentforge/plans/2026-08-30-t-14-postgresql-harness.md`](docs/agentforge/plans/2026-08-30-t-14-postgresql-harness.md).
+- [x] Use `@testcontainers/postgresql` with PostgreSQL 18.
+- [x] Start one ephemeral container per integration suite, apply versioned migrations, and clean it up on success or failure.
+- [x] Keep integration tests serial, give each test a unique user/data set, and refuse external database URLs in destructive cleanup.
 
 Verification:
 
-- [ ] Docker-backed tests fail clearly when Docker is unavailable rather than silently skipping.
-- [ ] The full repository integration suite passes against the harness-owned database.
+- [x] Docker-backed tests fail clearly when Docker is unavailable rather than silently skipping.
+- [x] The full repository integration suite passes against the harness-owned database.
 
 Test contracts: `TST-HARNESS-001`, `TST-MIGRATION-001`, `TST-PERSISTENCE-001`, `TST-LISTS-001`, `TST-LISTS-002`, `TST-LISTS-003`, `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, `TST-CONCURRENCY-001`.
 
 Dependencies: T-04, T-06, T-07, T-08.
 
 Implementation scope: `src/test/postgres-harness.ts`, `src/test/postgres-global-setup.ts`, `src/test/postgres-test-setup.ts`, `vitest.integration.config.ts`, harness guard/isolation tests, and the required package/README evidence. Existing integration behavior and migrations remain unchanged; Playwright orchestration is T-15.
+
+Plan: [`2026-08-30-t-14-postgresql-harness.md`](docs/agentforge/plans/2026-08-30-t-14-postgresql-harness.md).
+
+Evidence: `pnpm test` (15 files, 67 tests), `pnpm test:integration` without `TEST_DATABASE_URL` (6 files, 23 tests against one disposable `postgres:18-alpine` Testcontainer), `pnpm typecheck`, `pnpm lint` (one pre-existing `Geist` warning), `pnpm build`, `pnpm exec drizzle-kit check`, `pnpm exec drizzle-kit generate` (no schema changes), changed-file Prettier checks, and `git diff --check` all pass. Harness tests cover local URL refusal, migration splitting, startup-failure reporting, migration-failure cleanup, teardown, PostgreSQL 18 catalog visibility, and isolated schemas. The remaining live Docker-daemon outage and Playwright lifecycle evidence belong to T-15; Neon development-branch migration alignment remains with T-01. No migration files or snapshots changed.
+
+PR: [#13](https://github.com/michi-guns/nextjs-todo-list-example/pull/13) | implementation tip `ce8c4dc` received a fresh GPT-5.6-Sol review with no actionable findings; closeout tip review is required before merge.
 
 ### T-15: Replace the example Playwright suite
 

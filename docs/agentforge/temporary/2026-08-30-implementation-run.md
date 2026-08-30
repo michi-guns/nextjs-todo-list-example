@@ -13,10 +13,10 @@ Continue the repository's AgentForge delivery autonomously through every task th
 ## Repository state at handoff
 
 - Repository: `michi-guns/nextjs-todo-list-example`
-- Current branch: `main` at merge commit `ee20cea` (T-08 merged; dependency recomputation and next-task preflight in progress)
-- Base: latest `main` from `origin/main`
+- Current branch: `task/t-14-postgresql-harness` at implementation commit `ce8c4dc` (PR #13 open; implementation review complete with no actionable findings; ledger closeout is being prepared)
+- Base: `main` at `3eff3ad` from `origin/main`
 - T-05 PR #7 is merged as `2935283`; T-12 and T-13 are already merged and complete.
-- T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. T-08 PR #12 was independently reviewed through closeout tip `72e999e` with no actionable findings and merged as `ee20cea`. Dependency recomputation now makes T-09, T-09A, T-14, and T-16 candidates by TODO dependencies; each still requires a real-prerequisite preflight before implementation. T-09B and later UI/application tasks remain blocked by their listed dependencies.
+- T-06 PR #10 is merged as `1c1b355`; its implementation commit `cdf6ee1` and closeout tip `2eccfcc` each received fresh GPT-5.6-Sol reviews with no actionable findings. T-07 PR #11 is merged as `cce883c`; its implementation tip `2253724` and closeout metadata tips received fresh GPT-5.6-Sol reviews, with all actionable findings fixed and the final current-tip review returning no actionable findings. T-08 PR #12 was independently reviewed through closeout tip `72e999e` with no actionable findings and merged as `ee20cea`. T-14 implementation commit `ce8c4dc` is pushed in PR #13 and has received a fresh GPT-5.6-Sol review with no actionable findings; merge and dependency recomputation remain. After T-14 merges, T-09, T-09A, and T-16 remain candidate tasks by TODO dependencies. T-09B and later UI/application tasks remain blocked by their listed dependencies.
 - This is a live checkpoint, not authority: verify the current branch, `HEAD`, remote/PR state, `TODO.md`, accepted plan, and prerequisites before acting, then update this section after every task transition.
 - No secrets, token values, or environment contents belong in commits, logs, or PR bodies.
 
@@ -24,7 +24,7 @@ Continue the repository's AgentForge delivery autonomously through every task th
 
 - Use only repository-local AgentForge skills and DWF contracts.
 - For behavior changes, use `testing-first-class`, then `test-driven-development`, with incremental slices.
-- Follow the completed T-07 plan at `docs/agentforge/plans/2026-08-30-t-07-tasks-capability.md`; implement only from the accepted `docs/agentforge/plans/2026-08-30-t-08-pagination-errors.md` plan and its `TODO.md` breakdown.
+- Preserve the completed T-07/T-08 plans and implement only from the accepted current-task plan and its `TODO.md` breakdown.
 - No recursive deletes. Routine reads, edits, tests, commits, pushes, PRs, merges, and branch cleanup are authorized for this run.
 - Do not broaden a task or reopen accepted product/technical decisions without a concrete contract gap.
 
@@ -44,9 +44,17 @@ Affected contracts: `TST-LISTS-003`, `TST-TASKS-003`, and `TST-BOUNDARY-001`.
 
 Evidence: 14 unit-test files/62 tests and 5 local PostgreSQL integration files/21 tests against disposable `postgres:18-alpine`; full typecheck, lint (one pre-existing Geist warning), build, both Drizzle checks, changed-file Prettier, and diff gates pass. The implementation tip `c3044b5` and closeout tip `72e999e` each received fresh pragmatic reviews with no actionable findings. Testcontainers lifecycle and authenticated request evidence remain with T-14/T-09.
 
+## T-14 completed checkpoint
+
+The reusable PostgreSQL integration harness is implemented: `@testcontainers/postgresql` starts one disposable `postgres:18-alpine` container in Vitest global setup, applies the committed migration chain, injects its local URI through `project.provide`/`inject`, runs integration files serially, and tears the container down on success or setup failure. Existing per-file schema isolation and migrations remain unchanged.
+
+Affected contracts: `TST-HARNESS-001`, `TST-MIGRATION-001`, `TST-PERSISTENCE-001`, `TST-LISTS-001`, `TST-LISTS-002`, `TST-LISTS-003`, `TST-TASKS-001`, `TST-TASKS-002`, `TST-TASKS-003`, and `TST-CONCURRENCY-001`.
+
+Evidence: `pnpm test` (15 files/67 tests), `pnpm test:integration` without `TEST_DATABASE_URL` (6 files/23 tests against one disposable PostgreSQL 18 Testcontainer), typecheck, build, Drizzle check/generate, lint with the existing Geist warning only, changed-file Prettier checks, and diff checks pass. Harness unit/integration tests cover local-target refusal, startup/migration failure reporting and cleanup, migration visibility, serial shared-container compatibility, and schema isolation. T-14 implementation tip `ce8c4dc` received a fresh GPT-5.6-Sol review with no actionable findings. TST-HARNESS-001 remains `partial` for the live daemon-outage and Playwright lifecycle clauses; TST-MIGRATION-001 remains `partial` pending Neon development-branch alignment.
+
 ## Next-task dependency checkpoint
 
-The post-merge TODO graph identifies these dependency-satisfied candidates: T-09 (Server Actions and JSON Route Handlers), T-09A (UI direction exploration), T-14 (PostgreSQL integration harness), and T-16 (Neon performance evidence). Before each implementation, verify its external and local prerequisites, choose the smallest safe slice, and update this checkpoint with the selected branch and plan. T-09B, T-10, T-11, T-12A, T-15, and T-17 remain blocked by their listed dependencies.
+The post-T-14 TODO graph should identify these dependency-satisfied candidates after merge: T-09 (Server Actions and JSON Route Handlers), T-09A (UI direction exploration), and T-16 (Neon performance evidence). Before each implementation, verify its external and local prerequisites, choose the smallest safe slice, and update this checkpoint with the selected branch and plan. T-09B, T-10, T-11, T-12A, T-15, and T-17 remain blocked by their listed dependencies.
 
 ## Review loop
 
