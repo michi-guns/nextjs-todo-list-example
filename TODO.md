@@ -341,6 +341,7 @@ PR: [#14](https://github.com/michi-guns/nextjs-todo-list-example/pull/14) | revi
 
 ### T-09A: Explore and prototype UI directions
 
+- [~] Implement the accepted plan in [`docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md`](docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md).
 - [ ] Define the locked product constraints, critical user scenarios, representative data, target viewports, and free UI dimensions for the landing, auth, and dashboard surfaces.
 - [ ] Produce three materially different UI directions based on different information-architecture or interaction hypotheses, not cosmetic variations.
 - [ ] Prototype the critical scenario with the same realistic fixture data while keeping each direction isolated, removable, and independent of backend or schema changes.
@@ -360,6 +361,14 @@ Verification:
 Test contracts: `TST-UI-001`.
 
 Dependencies: T-08.
+
+Plan: [`docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md`](docs/agentforge/plans/2026-08-30-t-09a-ui-direction-exploration.md).
+
+Implementation scope: isolated static prototypes and exploration metadata under `.ui-explorations/t09a-dashboard/`; no production routes, backend, schema, migrations, snapshots, dependencies, or business-rule changes.
+
+Verification commands: `python .agents/skills/ui-direction-explorer/scripts/validate-directions.py .ui-explorations/t09a-dashboard`, Vite static preview with Playwright inspection at the agreed viewports, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file formatting checks, and `git diff --check`.
+
+Evidence: pending implementation, browser inspection, portfolio comparison, and fresh-review loop. `TST-UI-001` remains progressive because materialized UI/runtime evidence belongs to T-09B/T-10/T-11/T-12A.
 
 ### T-09B: Select and hand off the UI direction
 
