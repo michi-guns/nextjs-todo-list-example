@@ -36,7 +36,7 @@ T-09B affected `TST-UI-001`, which remains `partial`: T-09A/T-09B provide protot
 - Use only repository-local AgentForge skills and DWF contracts.
 - For behavior changes, use `testing-first-class`, then `test-driven-development`, with incremental slices.
 - Preserve the completed T-07/T-08 plans and implement only from the accepted current-task plan and its `TODO.md` breakdown.
-- No recursive deletes. Routine reads, edits, tests, commits, pushes, PRs, merges, and branch cleanup are authorized for this run.
+- No recursive deletes. Routine reads, edits, tests, commits, pushes, PRs, merges, and non-destructive branch inspection are authorized for this run; deleting a local or remote branch still requires the explicit confirmation required by `AGENTS.md`.
 - Do not broaden a task or reopen accepted product/technical decisions without a concrete contract gap.
 
 ## T-07 completed checkpoint
