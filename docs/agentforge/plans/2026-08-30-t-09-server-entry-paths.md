@@ -2,7 +2,7 @@
 
 > AgentForge plan. Use `task-breakdown` after this plan is accepted.
 
-**Status:** Accepted
+**Status:** Completed
 
 **Goal:** Expose the settled list and task application operations through authenticated, validated Server Actions and same-origin JSON Route Handlers with stable success and error contracts.
 
@@ -53,3 +53,7 @@ The list and task adapters are conceptually parallel after the shared contract i
 ## Handoff to task breakdown
 
 Turn this plan into one fresh-review delivery task, T-09, with these independently verifiable slices: (a) shared boundary/action result primitives and list schemas/view models plus red list route/action tests, (b) list adapters and thin App Router composition, (c) task schemas/query parsing/view models plus red task route/action tests, (d) task adapters and thin App Router composition, and (e) full verification, TST ledger reconciliation, TODO/checkpoint evidence, and the required fresh GPT-5.6-Sol review loop. Preserve all explicit scope exclusions and the exact route/body/status contracts above.
+
+## Implementation evidence
+
+The plan was implemented in `b4292b5` and the same-origin mutation guard was added in `6604141`. Fresh GPT-5.6-Sol reviews of the implementation tip found no actionable findings. `pnpm test` passed with 17 files and 85 tests; `pnpm test:integration` passed with 6 files and 23 tests against the disposable PostgreSQL 18 Testcontainer; typecheck, lint (zero errors and one pre-existing `Geist` warning), production build, both Drizzle checks, changed-file Prettier checks, and `git diff --check main..6604141` all passed. The route/action tests cover the accepted authentication, ownership, validation, pagination, conflict, privacy-preserving not-found, safe view-model, revalidation, and same-origin mutation contracts. No schema, migration, snapshot, dependency, UI, or authentication-provider changes were made.

@@ -128,13 +128,13 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                      | `partial`   |
 | [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                | `partial`   |
 | [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration            | T-06, T-14                      | `partial`   |
-| [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14          | `partial`   |
+| [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14          | `verified`  |
 | [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14          | `partial`   |
-| [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09, T-14                | `partial`   |
-| [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14          | `partial`   |
+| [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09, T-14                | `verified`  |
+| [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14          | `verified`  |
 | [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14          | `partial`   |
 | [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                | `partial`   |
-| [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                      | `partial`   |
+| [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                      | `verified`  |
 | [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                            | `verified`  |
 | [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                      | `verified`  |
 | [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence        | T-13                            | `partial`   |
@@ -267,8 +267,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Anonymous requests cannot read or mutate private data; authenticated operations derive the owner from the Better Auth session; another user's identifiers produce the ordinary privacy-preserving not-found outcome; bearer tokens and cross-origin credentials do not broaden the baseline API.
 - **Required evidence:** Application and request-boundary tests, plus a browser scenario proving that private data remains isolated between users.
 - **Dependencies:** T-05 session helpers, T-09 entry paths, and T-15 browser harness.
-- **Current evidence:** `src/modules/auth/auth.integration.test.ts` proves the current-user boundary fails closed without a session and ignores a client-supplied `x-user-id`; private list/task entry paths, cross-origin/bearer behavior, and browser isolation are not implemented in this slice.
-- **Follow-up:** T-09 must add application/request-boundary ownership and privacy tests, and T-15 must add the multi-user Chromium scenario before this contract can be `verified`.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` proves the current-user boundary fails closed without a session and ignores a client-supplied `x-user-id`. The T-09 list/task request and action suites prove session-derived owner propagation, anonymous `401` outcomes, privacy-preserving `404` outcomes, rejection of spoofed owner fields, rejection of bearer-only access, and rejection of foreign-origin mutations. Browser isolation remains outstanding.
+- **Follow-up:** T-15 must add the multi-user Chromium scenario before this contract can be `verified`.
 
 <a id="tst-lists-001"></a>
 
@@ -292,7 +292,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-LISTS-002 — List validation, CRUD, uniqueness, and cascade
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Lists
 - **Evidence layers/modes:** Domain, application, infrastructure, boundary / unit, integration, contract
 - **Verifies product decisions:** D-003, D-004
@@ -303,8 +303,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** List names are trimmed and limited to 1–80 characters, list CRUD is owner-scoped, duplicate names conflict case-insensitively after trimming, and deleting a list removes its tasks through the relational cascade.
 - **Required evidence:** Domain/application validation tests, PostgreSQL constraint and cascade tests, and request-boundary conflict/invalid-input tests.
 - **Dependencies:** T-04 schema, T-06 use cases, and T-09 entry paths.
-- **Current evidence:** The application suite proves trimming, 1–80 validation, owner forwarding, privacy-preserving not-found mapping, and conflict preservation. The harness-backed PostgreSQL suite proves owner-scoped CRUD, case-insensitive uniqueness, cross-owner privacy, and list-to-task cascade deletion.
-- **Follow-up:** T-09 must add request-boundary `409`/`422`/privacy tests before this contract can be `verified`.
+- **Current evidence:** The application suite proves trimming, 1–80 validation, owner forwarding, privacy-preserving not-found mapping, and conflict preservation. The harness-backed PostgreSQL suite proves owner-scoped CRUD, case-insensitive uniqueness, cross-owner privacy, and list-to-task cascade deletion. `src/modules/lists/presentation/list-entry.test.ts` proves request-boundary success, `409`, `422`, privacy-preserving `404`, authentication, safe mapping, and same-origin mutation behavior.
+- **Follow-up:** No remaining evidence is required for the accepted baseline.
 
 <a id="tst-lists-003"></a>
 
@@ -321,14 +321,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** List reads default to 20, accept 1–100, return oldest-first deterministic pages with opaque context-bound cursors, fetch at most `limit + 1` rows, and expose a next page only when one exists.
 - **Required evidence:** Application and PostgreSQL pagination tests, malformed/cross-context cursor and limit boundary tests, and a browser-visible `Load more` check.
 - **Dependencies:** T-04 indexes, T-06 repository/use case, T-08 shared pagination contract, and T-14 harness.
-- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. T-08 shared pagination tests cover default 20, accepted 1/100, invalid limits, blank and repeated URL parameters, and the stable page shape. The harness-backed PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, bounded `limit + 1` repository reads, and maximum-page continuation from 100 records to the 101st record. T-09 boundary mapping and T-10 browser `Load more` remain outstanding.
-- **Follow-up:** T-09 must add request-level boundary response-shape tests and T-10 must verify browser-visible pagination before this contract can be `verified`.
+- **Current evidence:** Application and cursor tests cover default and boundary limits, opaque cursor validation, malformed values, and scope context. T-08 shared pagination tests cover default 20, accepted 1/100, invalid limits, blank and repeated URL parameters, and the stable page shape. The harness-backed PostgreSQL suite proves oldest-first continuation, the `createdAt`/`id` tie-breaker when timestamps match, cross-owner cursor rejection, terminal cursors, bounded `limit + 1` repository reads, and maximum-page continuation from 100 records to the 101st record. `src/modules/lists/presentation/list-entry.test.ts` proves the request-level paginated response shape and invalid-input mapping. T-10 browser `Load more` remains outstanding.
+- **Follow-up:** T-10 must verify browser-visible pagination before this contract can be `verified`.
 
 <a id="tst-tasks-001"></a>
 
 ### TST-TASKS-001 — Task lifecycle, statuses, titles, and notes
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Tasks
 - **Evidence layers/modes:** Domain, application, boundary / unit, integration, contract
 - **Verifies product decisions:** D-004
@@ -339,14 +339,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Tasks validate trimmed titles and optional notes, start as `todo`, support direct transitions among valid statuses, treat repeated status as a no-op, preserve or clear notes according to patch semantics, and keep completed tasks stored and visible by default.
 - **Required evidence:** Domain/application tests for status, trimming, note, and patch rules, plus boundary tests for invalid inputs and expected outcomes.
 - **Dependencies:** T-06 list use cases, T-07 task use cases, and T-09 entry paths.
-- **Current evidence:** `pnpm test` covers task title and notes normalization, all three valid statuses, direct and repeated status application, default creation status, explicit note clearing, page validation, and privacy/conflict outcome mapping. The harness-backed PostgreSQL suite proves status transitions, repeated-status `updatedAt` preservation, and completed-task storage/filter behavior.
-- **Follow-up:** T-09 must add boundary validation and outcome tests before this contract can be `verified`.
+- **Current evidence:** `pnpm test` covers task title and notes normalization, all three valid statuses, direct and repeated status application, default creation status, explicit note clearing, page validation, and privacy/conflict outcome mapping. The harness-backed PostgreSQL suite proves status transitions, repeated-status `updatedAt` preservation, and completed-task storage/filter behavior. `src/modules/tasks/presentation/task-entry.test.ts` proves authenticated request/action validation and outcome mapping, including safe task view models and same-origin mutation rejection.
+- **Follow-up:** No remaining evidence is required for the accepted baseline.
 
 <a id="tst-tasks-002"></a>
 
 ### TST-TASKS-002 — Task ownership, relationships, uniqueness, and cascade
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Tasks and persistence
 - **Evidence layers/modes:** Application, infrastructure, boundary / integration, contract
 - **Verifies product decisions:** D-001, D-003, D-004
@@ -357,8 +357,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A task can be created or changed only within an owned list, task titles are unique case-insensitively within one list but may repeat in another, and deleting the parent list cascades to its tasks.
 - **Required evidence:** Application ownership tests, PostgreSQL foreign-key/unique/cascade tests, and boundary not-found/conflict tests.
 - **Dependencies:** T-04 schema, T-07 use cases, and T-14 harness.
-- **Current evidence:** The task unit suite covers application mapping for missing task lists and conflict/not-found outcomes. The harness-backed PostgreSQL suite proves owned-list membership on insert and reads, privacy-preserving `list_not_found` for missing or foreign-owned lists, owner-scoped task reads and mutations, case-insensitive per-list title uniqueness, same-title isolation across lists, and list-to-task cascade deletion.
-- **Follow-up:** T-09 must add boundary `404`/`409` mappings before this contract can be `verified`.
+- **Current evidence:** The task unit suite covers application mapping for missing task lists and conflict/not-found outcomes. The harness-backed PostgreSQL suite proves owned-list membership on insert and reads, privacy-preserving `list_not_found` for missing or foreign-owned lists, owner-scoped task reads and mutations, case-insensitive per-list title uniqueness, same-title isolation across lists, and list-to-task cascade deletion. `src/modules/tasks/presentation/task-entry.test.ts` proves boundary `404`/`409` mappings, owner propagation, and safe action/route responses.
+- **Follow-up:** No remaining evidence is required for the accepted baseline.
 
 <a id="tst-tasks-003"></a>
 
@@ -375,8 +375,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Task reads default to completed tasks included, support explicit hiding without changing stored state or the relative order of visible tasks, return newest-first deterministic bounded pages, and restart pagination when list or filter context changes.
 - **Required evidence:** Application and PostgreSQL filter/order/cursor tests, boundary validation tests, and a browser check for filtering and `Load more`.
 - **Dependencies:** T-07 task repository/use case, T-08 pagination contract, T-10 UI, and T-14 harness.
-- **Current evidence:** Task application/cursor tests cover default completed-task visibility, explicit filter validation, page limits, opaque cursor validation, and context mismatches. T-08 shared pagination tests cover the common default/maximum/invalid URL limit and cursor contract. The harness-backed PostgreSQL suite proves newest-first ordering, same-timestamp `createdAt`/`id` tie-breaking, continuation and terminal cursors, stable relative order after hiding `done`, cross-context cursor rejection, bounded `limit + 1` reads, and maximum-page continuation from 100 records to the 101st record. T-09 boundary validation and T-10 browser `Load more`/filter evidence remain outstanding.
-- **Follow-up:** T-09 must add request-level boundary validation tests and T-10 must verify browser-visible filtering and pagination before this contract can be `verified`.
+- **Current evidence:** Task application/cursor tests cover default completed-task visibility, explicit filter validation, page limits, opaque cursor validation, and context mismatches. T-08 shared pagination tests cover the common default/maximum/invalid URL limit and cursor contract. The harness-backed PostgreSQL suite proves newest-first ordering, same-timestamp `createdAt`/`id` tie-breaking, continuation and terminal cursors, stable relative order after hiding `done`, cross-context cursor rejection, bounded `limit + 1` reads, and maximum-page continuation from 100 records to the 101st record. `src/modules/tasks/presentation/task-entry.test.ts` proves request-level filter/pagination validation and response mapping. T-10 browser `Load more`/filter evidence remains outstanding.
+- **Follow-up:** T-10 must verify browser-visible filtering and pagination before this contract can be `verified`.
 
 <a id="tst-concurrency-001"></a>
 
@@ -400,7 +400,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-BOUNDARY-001 — Server entry-path contracts
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Server boundaries
 - **Evidence layers/modes:** Boundary / request contract, integration
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
@@ -411,8 +411,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** JSON Route Handlers and Server Actions authenticate, authorize, validate with shared Zod rules, call shared use cases, and map success, pagination, unauthenticated, privacy-preserving not-found, conflict, and invalid-input outcomes consistently.
 - **Required evidence:** Request-level JSON contract tests and a smaller Server Action adapter suite. Business rules remain primarily covered below the entry path.
 - **Dependencies:** T-05 auth, T-06/T-07 use cases, and T-08 shared contracts.
-- **Current evidence:** T-08 shared error-contract tests cover the accepted 401/404/409/422 mappings, canonical `{ error: { code, message } }` envelopes, safe handling of unknown errors, and non-leaking canonical messages when an arbitrary error spoofs a known code. Request-level JSON Route Handler and Server Action tests remain outstanding in T-09.
-- **Follow-up:** T-09 must add authenticated request/action tests for success, pagination, privacy-preserving 404, conflict 409, invalid-input 422, and authentication outcomes before this contract can be `verified`.
+- **Current evidence:** T-08 shared error-contract tests cover the accepted 401/404/409/422 mappings, canonical `{ error: { code, message } }` envelopes, safe handling of unknown errors, and non-leaking canonical messages when an arbitrary error spoofs a known code. `src/modules/lists/presentation/list-entry.test.ts` and `src/modules/tasks/presentation/task-entry.test.ts` add authenticated request/action coverage for success, pagination/filtering, privacy-preserving `404`, conflict `409`, invalid-input `422`, authentication outcomes, safe view models, revalidation, and same-origin mutation rejection. The focused suites contain 18 tests; the full unit suite and disposable PostgreSQL integration suite also pass.
+- **Follow-up:** No remaining evidence is required for the accepted baseline. Next.js browser/runtime journey checks remain with T-15 because the dashboard UI is not yet implemented.
 
 <a id="tst-landing-001"></a>
 
