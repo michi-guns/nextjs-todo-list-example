@@ -37,7 +37,7 @@ export interface TaskWorkspaceProps {
   readonly onCreateTask: (title: string, notes: string) => Promise<boolean>
   readonly onUpdateTask: (taskId: string, patch: TaskPatch) => Promise<boolean>
   readonly onRequestDeleteTask: (taskId: string) => void
-  readonly onLoadMore: () => Promise<boolean>
+  readonly onLoadMore: () => Promise<number>
   readonly onRetryLoad: () => void
 }
 
@@ -58,6 +58,17 @@ export function TaskWorkspace({
 }: TaskWorkspaceProps) {
   const controlsDisabled = pendingOperation !== null
   const isLoadingMore = pendingOperation === "load-more-tasks"
+  const [paginationAnnouncement, setPaginationAnnouncement] = useState("")
+  const paginationStatusRef = useRef<HTMLParagraphElement>(null)
+
+  function announcePagination(added: number) {
+    setPaginationAnnouncement(
+      added > 0
+        ? `Loaded ${added} more ${added === 1 ? "task" : "tasks"}.`
+        : "No new tasks were loaded."
+    )
+    requestAnimationFrame(() => paginationStatusRef.current?.focus())
+  }
 
   return (
     <section className="min-w-0 flex-1" aria-labelledby="workspace-heading">
@@ -119,8 +130,18 @@ export function TaskWorkspace({
                 loading={isLoadingMore}
                 disabled={controlsDisabled}
                 onLoadMore={onLoadMore}
+                onLoaded={announcePagination}
               />
             ) : null}
+            <p
+              ref={paginationStatusRef}
+              tabIndex={-1}
+              role="status"
+              aria-live="polite"
+              className="sr-only"
+            >
+              {paginationAnnouncement}
+            </p>
           </>
         ) : (
           <div
@@ -498,22 +519,22 @@ function TaskRow({
 interface LoadMoreTasksProps {
   readonly loading: boolean
   readonly disabled: boolean
-  readonly onLoadMore: () => Promise<boolean>
+  readonly onLoadMore: () => Promise<number>
+  readonly onLoaded: (added: number) => void
 }
 
-function LoadMoreTasks({ loading, disabled, onLoadMore }: LoadMoreTasksProps) {
-  const buttonRef = useRef<HTMLButtonElement>(null)
-
+function LoadMoreTasks({
+  loading,
+  disabled,
+  onLoadMore,
+  onLoaded,
+}: LoadMoreTasksProps) {
   async function handleLoadMore() {
-    const loaded = await onLoadMore()
-    if (loaded) {
-      requestAnimationFrame(() => buttonRef.current?.focus())
-    }
+    onLoaded(await onLoadMore())
   }
 
   return (
     <Button
-      ref={buttonRef}
       type="button"
       variant="outline"
       className="self-start"

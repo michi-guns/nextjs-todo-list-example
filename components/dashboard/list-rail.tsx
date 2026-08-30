@@ -18,7 +18,7 @@ export interface ListRailProps {
   readonly onCreateList: (name: string) => Promise<boolean>
   readonly onRenameList: (listId: string, name: string) => Promise<boolean>
   readonly onRequestDeleteList: (listId: string) => void
-  readonly onLoadMore: () => Promise<boolean>
+  readonly onLoadMore: () => Promise<number>
 }
 
 export function ListRail({
@@ -37,8 +37,10 @@ export function ListRail({
   const [editName, setEditName] = useState("")
   const createInputRef = useRef<HTMLInputElement>(null)
   const loadMoreRef = useRef<HTMLButtonElement>(null)
+  const paginationStatusRef = useRef<HTMLParagraphElement>(null)
   const listButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
   const lastSelectedIdRef = useRef<string | null>(selectedListId)
+  const [paginationAnnouncement, setPaginationAnnouncement] = useState("")
 
   useEffect(() => {
     if (
@@ -78,10 +80,15 @@ export function ListRail({
   }
 
   async function handleLoadMore() {
-    const loaded = await onLoadMore()
-    if (loaded) {
-      requestAnimationFrame(() => loadMoreRef.current?.focus())
-    }
+    const added = await onLoadMore()
+    setPaginationAnnouncement(
+      added > 0
+        ? `Loaded ${added} more ${added === 1 ? "list" : "lists"}.`
+        : "No new lists were loaded."
+    )
+    requestAnimationFrame(() =>
+      (loadMoreRef.current ?? paginationStatusRef.current)?.focus()
+    )
   }
 
   const isCreating = pendingOperation === "create-list"
@@ -242,6 +249,15 @@ export function ListRail({
             {isLoadingMore ? "Loading lists…" : "Load more lists"}
           </Button>
         ) : null}
+        <p
+          ref={paginationStatusRef}
+          tabIndex={-1}
+          role="status"
+          aria-live="polite"
+          className="sr-only"
+        >
+          {paginationAnnouncement}
+        </p>
       </div>
     </aside>
   )

@@ -296,7 +296,7 @@ export function DashboardClient({
     completed: boolean,
     cursor: string | undefined,
     mode: "replace" | "append"
-  ): Promise<boolean> {
+  ): Promise<number> {
     const version =
       mode === "replace"
         ? ++taskRequestVersion.current
@@ -310,19 +310,21 @@ export function DashboardClient({
         taskPagePath(listId, completed, cursor),
         isTask
       )
-      if (version !== taskRequestVersion.current) return false
+      if (version !== taskRequestVersion.current) return 0
 
-      setTaskPage((current) =>
+      const nextPage =
         mode === "append"
-          ? appendPage(current, page, (task) => task.id)
-          : resetPage(current, page)
-      )
-      return true
+          ? appendPage(taskPage, page, (task) => task.id)
+          : resetPage(taskPage, page)
+      setTaskPage(nextPage)
+      return mode === "append"
+        ? nextPage.items.length - taskPage.items.length
+        : page.items.length
     } catch (error) {
       if (version === taskRequestVersion.current) {
         setTaskLoadError(unexpectedErrorMessage(error))
       }
-      return false
+      return 0
     } finally {
       if (version === taskRequestVersion.current) {
         setTaskLoading(false)
@@ -346,22 +348,24 @@ export function DashboardClient({
     await loadTasksPage(selectedListId, completed, undefined, "replace")
   }
 
-  async function handleListLoadMore(): Promise<boolean> {
+  async function handleListLoadMore(): Promise<number> {
     const cursor = listPage.nextCursor
-    if (!cursor) return false
+    if (!cursor) return 0
 
     setNotice(null)
     setPendingOperation("load-lists")
     try {
       const page = await fetchPage(listPagePath(cursor), isList)
-      setListPage((current) => {
-        const appended = appendPage(current, page, (list) => list.id)
-        return { ...appended, items: [...appended.items].sort(compareLists) }
-      })
-      return true
+      const appended = appendPage(listPage, page, (list) => list.id)
+      const ordered = {
+        ...appended,
+        items: [...appended.items].sort(compareLists),
+      }
+      setListPage(ordered)
+      return ordered.items.length - listPage.items.length
     } catch (error) {
       setErrorNotice(unexpectedErrorMessage(error))
-      return false
+      return 0
     } finally {
       setPendingOperation(null)
     }
@@ -673,39 +677,43 @@ export function DashboardClient({
                 </Alert>
               ) : null}
             </div>
-            <TaskWorkspace
-              selectedList={selectedList}
-              tasks={taskPage.items}
-              nextCursor={taskPage.nextCursor}
-              includeCompleted={includeCompleted}
-              loading={taskLoading}
-              loadError={taskLoadError}
-              pendingOperation={pendingOperation}
-              onToggleCompleted={(value) => void handleToggleCompleted(value)}
-              onCreateTask={handleCreateTask}
-              onUpdateTask={handleUpdateTask}
-              onRequestDeleteTask={requestDeleteTask}
-              onLoadMore={() =>
-                selectedListId
-                  ? loadTasksPage(
+            {finalListState ? (
+              <FinalListWorkspace />
+            ) : (
+              <TaskWorkspace
+                selectedList={selectedList}
+                tasks={taskPage.items}
+                nextCursor={taskPage.nextCursor}
+                includeCompleted={includeCompleted}
+                loading={taskLoading}
+                loadError={taskLoadError}
+                pendingOperation={pendingOperation}
+                onToggleCompleted={(value) => void handleToggleCompleted(value)}
+                onCreateTask={handleCreateTask}
+                onUpdateTask={handleUpdateTask}
+                onRequestDeleteTask={requestDeleteTask}
+                onLoadMore={() =>
+                  selectedListId
+                    ? loadTasksPage(
+                        selectedListId,
+                        includeCompleted,
+                        taskPage.nextCursor ?? undefined,
+                        "append"
+                      )
+                    : Promise.resolve(0)
+                }
+                onRetryLoad={() => {
+                  if (selectedListId) {
+                    void loadTasksPage(
                       selectedListId,
                       includeCompleted,
-                      taskPage.nextCursor ?? undefined,
-                      "append"
+                      undefined,
+                      "replace"
                     )
-                  : Promise.resolve(false)
-              }
-              onRetryLoad={() => {
-                if (selectedListId) {
-                  void loadTasksPage(
-                    selectedListId,
-                    includeCompleted,
-                    undefined,
-                    "replace"
-                  )
-                }
-              }}
-            />
+                  }
+                }}
+              />
+            )}
           </main>
         </div>
         {!hasLists && !finalListState ? (
@@ -752,6 +760,25 @@ function FinalListState({ reloadRef }: FinalListStateProps) {
         </Button>
       </div>
     </aside>
+  )
+}
+
+function FinalListWorkspace() {
+  return (
+    <main className="flex min-w-0 flex-1 flex-col">
+      <div className="mx-auto flex w-full max-w-4xl min-w-0 flex-col gap-4 p-4 sm:p-6 lg:p-10">
+        <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+          Workspace reset
+        </p>
+        <h1 className="text-3xl font-semibold tracking-tight wrap-break-word sm:text-4xl">
+          Reload to recreate Inbox
+        </h1>
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+          Use the focused Reload workspace control in the sidebar to start a
+          fresh private list.
+        </p>
+      </div>
+    </main>
   )
 }
 
