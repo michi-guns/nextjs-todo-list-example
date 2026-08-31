@@ -677,7 +677,7 @@ Evidence: focused landing/lifecycle Vitest (7 tests), the named Chromium `local 
 
 #### T-15.2 — Add the deterministic behavior seed and browser fixtures
 
-Status: in progress.
+Status: complete at reviewed tip `7c59536`.
 
 - Files: `scripts/playwright-local/seed.ts`, `e2e/fixtures.ts`, `e2e/runtime-smoke.spec.ts`, `e2e/global-setup.ts`, and `src/test/playwright-seed.test.ts`.
 - Interfaces: `seedPlaywrightDatabase(databaseUrl: string, baseUrl: string): Promise<PlaywrightSeed>` creates verified scenario users through the real Better Auth handler and local mailbox; `PLAYWRIGHT_USERS` exposes typed `{ email, password, listName }` fixture data to specs; the seed inserts parameterized fixed-ID/timestamp lists and tasks through the harness-owned loopback connection without logging passwords, tokens, mailbox contents, or URLs.
@@ -687,7 +687,11 @@ Status: in progress.
 - Dependencies/unblock: T-15.1; T-15.3 consumes the exported fixtures.
 - Recommended skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `security-and-hardening`, and `git-workflow-and-versioning`.
 
+Evidence: the seed-plan Vitest checks (3 tests), the named Chromium `behavior seed` smoke, the full Vitest suite (23 files, 120 tests), and the local PostgreSQL integration suite (23 tests) pass. The seed creates six Better Auth-verified scenario users through the local mailbox, inserts parameterized fixed-ID/timestamp list/task records, and clears the mailbox before browser control. Fresh GPT-5.6-Sol review of `7c59536` returned **No actionable findings**. `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, and the browser contracts remain partial until the full journeys run.
+
 #### T-15.3 — Replace the example suite with Chromium journeys
+
+Status: in progress.
 
 - Files: replace `e2e/example.spec.ts` with `e2e/core-journey.spec.ts`, `e2e/magic-link.spec.ts`, `e2e/privacy.spec.ts`, and `e2e/ui-contract.spec.ts`; add `e2e/fixtures.ts` and extend `e2e/runtime-smoke.spec.ts` only with the named seed smoke case.
 - Interfaces: `signInWithPassword(page: Page, user: PlaywrightSeedUser): Promise<void>` and `readMagicLinkWithRetry(email: string): Promise<MagicLinkMessage>` are the only shared browser helpers; use stable accessible labels and existing route/action boundaries; read the local mailbox only through `readLatestMagicLink()`/`clearMagicLinkMailbox()`; do not reach into Drizzle repositories or provider records.
