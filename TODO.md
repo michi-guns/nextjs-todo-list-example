@@ -677,7 +677,7 @@ Evidence: focused landing/lifecycle Vitest (7 tests), the named Chromium `local 
 
 #### T-15.2 — Add the deterministic behavior seed and browser fixtures
 
-Status: complete at reviewed tip `7c59536`.
+Status: complete at corrected reviewed tip `6f841a3` (closeout review `f73223c`).
 
 - Files: `scripts/playwright-local/seed.ts`, `e2e/fixtures.ts`, `e2e/runtime-smoke.spec.ts`, `e2e/global-setup.ts`, and `src/test/playwright-seed.test.ts`.
 - Interfaces: `seedPlaywrightDatabase(databaseUrl: string, baseUrl: string): Promise<PlaywrightSeed>` creates verified scenario users through the real Better Auth handler and local mailbox; `PLAYWRIGHT_USERS` exposes typed `{ email, password, listName }` fixture data to specs; the seed inserts parameterized fixed-ID/timestamp lists and tasks through the harness-owned loopback connection without logging passwords, tokens, mailbox contents, or URLs.
@@ -687,7 +687,7 @@ Status: complete at reviewed tip `7c59536`.
 - Dependencies/unblock: T-15.1; T-15.3 consumes the exported fixtures.
 - Recommended skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `security-and-hardening`, and `git-workflow-and-versioning`.
 
-Evidence: the seed-plan Vitest checks (4 tests), the named Chromium `behavior seed` smoke, the full Vitest suite (23 files, 120 tests at the pre-correction checkpoint), and the local PostgreSQL integration suite (23 tests) pass. The seed creates six Better Auth-verified scenario users through the local mailbox, leaves the core user listless so the application provisions the ordinary `Inbox`, inserts parameterized fixed-ID/timestamp records for the other scenarios, and clears the mailbox before browser control. Fresh GPT-5.6-Sol review of `7c59536` returned **No actionable findings**; the core Inbox coverage correction is verified by the focused test and is pending the fresh review of the corrected tip.
+Evidence: the seed-plan Vitest checks (4 tests), the named Chromium `behavior seed` smoke, the full Vitest suite (23 files, 121 tests), and the local PostgreSQL integration suite (23 tests) pass. The seed creates six Better Auth-verified scenario users through the local mailbox, leaves the core user listless so the application provisions the ordinary `Inbox`, inserts parameterized fixed-ID/timestamp records for the other scenarios, and clears the mailbox before browser control. Fresh GPT-5.6-Sol reviews of `7c59536` and corrected tip `6f841a3` returned **No actionable findings**; the final closeout tip `f73223c` also returned **No actionable findings**.
 
 #### T-15.3 — Replace the example suite with Chromium journeys
 
@@ -705,19 +705,19 @@ Evidence: the exact Chromium run passes all seven journeys: deterministic landin
 
 #### T-15.4 — Add opt-in browsers and close out the task
 
-Status: in progress; the core Inbox coverage correction is pending its fresh review.
+Status: complete at final reviewed closeout tip `f73223c`; merged as PR #18 (`3c4b0d5`).
 
 - Files: `scripts/playwright-local/run.ts`, `package.json`, `playwright.config.ts`, `tsconfig.json`, the four named `e2e/*.spec.ts` files, `TODO.md`, `.dwf/decisions/TESTING.md`, `docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md`, and `docs/agentforge/temporary/2026-08-30-implementation-run.md`.
 - Interfaces: default direct Playwright invocation remains Chromium-only; `run.ts` sets `PLAYWRIGHT_CROSS_BROWSER=true` only for `pnpm test:e2e:cross-browser`, and `playwright.config.ts` expands the project list to Firefox/WebKit when that exact switch is true while retaining the same local lifecycle and no unknown-server reuse.
 - Acceptance: the opt-in command is documented and selectable, all required gates pass, affected contracts and evidence are reconciled honestly, and the dependency graph is recomputed so T-17 is unblocked only after the final reviewed tip.
 - Contracts/evidence: reconcile all eight T-15 contracts; keep `TST-HARNESS-001` partial if Docker-outage evidence is not observed, and mark browser contracts verified only when the landing assertion and all required journeys pass.
 - Checks: `pnpm test`, `pnpm test:integration`, `pnpm exec playwright test`, optional `pnpm test:e2e:cross-browser`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm exec prettier --check package.json playwright.config.ts tsconfig.json e2e/fixtures.ts e2e/runtime-smoke.spec.ts e2e/core-journey.spec.ts e2e/magic-link.spec.ts e2e/privacy.spec.ts e2e/ui-contract.spec.ts e2e/global-setup.ts scripts/playwright-local/run.ts scripts/playwright-local/seed.ts src/modules/landing/infrastructure/sanity-landing-reader.ts src/modules/landing/infrastructure/sanity-landing-reader.test.ts src/test/playwright-lifecycle.test.ts src/test/playwright-seed.test.ts TODO.md docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, and `git diff --check`.
-- Dependencies/unblock: T-15.3; the corrected core Inbox journey must receive a fresh GPT-5.6-Sol review before T-15 is complete.
+- Dependencies/unblock: T-15.3; the corrected core Inbox journey and final closeout metadata received fresh GPT-5.6-Sol reviews with no actionable findings, so T-15 is complete and T-17 is unblocked.
 - Recommended skills: `code-review-and-quality`, `verification-before-completion`, `git-workflow-and-versioning`, `testing-first-class`, and `unslop`.
 
-Evidence: the corrected focused seed tests pass 4/4; `pnpm test` passes 23 files/121 tests; `pnpm test:integration` passes 6 files/23 tests against one disposable PostgreSQL 18 Testcontainer; `pnpm test:e2e` passes all 7 serial Chromium journeys against the harness-owned database and dedicated Next.js server, including automatic core `Inbox` provisioning; project selection with `PLAYWRIGHT_CROSS_BROWSER=true` lists the same 7 journeys for Chromium, Firefox, and WebKit (21 tests total); `pnpm typecheck`, `pnpm lint` (only the pre-existing `app/layout.tsx:1:10` unused `Geist` warning), `pnpm build`, scoped Prettier, `pnpm exec drizzle-kit check --config drizzle.config.ts`, and `git diff --check` pass. Cleanup leaves no port 3100 or task-owned PostgreSQL container. The prior implementation tip `c606d54` received a fresh GPT-5.6-Sol medium review with no actionable findings; the corrected tip is pending fresh review. `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, and `TST-E2E-003` remain verified by the corrected execution evidence; `TST-HARNESS-001` remains partial only for the live Docker-outage observation.
+Evidence: the corrected focused seed tests pass 4/4; `pnpm test` passes 23 files/121 tests; `pnpm test:integration` passes 6 files/23 tests against one disposable PostgreSQL 18 Testcontainer; `pnpm test:e2e` passes all 7 serial Chromium journeys against the harness-owned database and dedicated Next.js server, including automatic core `Inbox` provisioning; project selection with `PLAYWRIGHT_CROSS_BROWSER=true` lists the same 7 journeys for Chromium, Firefox, and WebKit (21 tests total); `pnpm typecheck`, `pnpm lint` (only the pre-existing `app/layout.tsx:1:10` unused `Geist` warning), `pnpm build`, scoped Prettier, `pnpm exec drizzle-kit check --config drizzle.config.ts`, and `git diff --check` pass. Cleanup leaves no port 3100 or task-owned PostgreSQL container. Fresh GPT-5.6-Sol reviews of corrected implementation tip `6f841a3` and final closeout tip `f73223c` returned **No actionable findings**. PR #18 merged as `3c4b0d5`. `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, and `TST-E2E-003` are verified; `TST-HARNESS-001` remains partial only for the live Docker-outage observation.
 
-Dependency checkpoint: T-15's core Inbox coverage correction is implemented and verified locally but remains in closeout review; T-17 stays blocked until the corrected tip is reviewed and T-15 merges. `TST-HARNESS-001` remains `partial` only for the unobserved live Docker-daemon outage; the browser lifecycle evidence is complete.
+Dependency checkpoint: T-15 is complete at final reviewed closeout tip `f73223c` and merged as PR #18 (`3c4b0d5`); T-17 is now the next safely unblocked task. `TST-HARNESS-001` remains `partial` only for the unobserved live Docker-daemon outage; the browser lifecycle evidence is complete.
 
 ### T-16: Produce Neon performance evidence
 
@@ -758,7 +758,7 @@ Verification:
 
 Test contracts: reconcile every active baseline contract in [`TESTING.md`](.dwf/decisions/TESTING.md) before closing this task.
 
-Dependencies: T-12A, T-14, T-15, T-16.
+Dependencies: T-12A, T-14, T-15, T-16 (all complete on `main` after PR #18 merged as `3c4b0d5`).
 
 ## Explicitly out of scope for this baseline
 
