@@ -4,6 +4,8 @@ This file tracks implementation delivery for the starter baseline. The [DWF READ
 
 The [Testing Decisions and Test Contracts ledger](.dwf/decisions/TESTING.md) owns test policy, `TST-*` obligations, statuses, dependencies, and evidence expectations. This file assigns those contracts to delivery tasks; it does not redefine them.
 
+Historical task sections preserve the status and dependency snapshot recorded when each task closed. They are not current contract statuses; use the current baseline, the T-17 closeout section, and [`TESTING.md`](.dwf/decisions/TESTING.md) for present-day reconciliation.
+
 Status markers:
 
 - `[ ]` Not started
@@ -57,11 +59,11 @@ This is a temporary delivery protocol for the current implementation run. The DW
 ## Current baseline
 
 - [x] DWF product and technical contracts reviewed.
-- [x] Repository is a scaffold with empty capability folders, not a working todo app.
+- [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` exits successfully, but currently finds no test files.
-- [ ] Meaningful test, migration, Sanity, and browser evidence exists. Track the obligation set in [`TESTING.md`](.dwf/decisions/TESTING.md).
+- [x] `pnpm test` passes 23 files and 121 tests.
+- [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
 
@@ -167,10 +169,10 @@ Recommended AgentForge skills:
 Verification:
 
 - [x] A new versioned migration applies to an empty local PostgreSQL database/schema through the available integration lane.
-- [!] PostgreSQL 18 Testcontainers migration evidence is blocked until the reusable T-14 harness exists; the local integration check does not replace that obligation.
-- [!] The prior two-step migration chain remains recorded on the agent-owned Neon development branch; the consolidated files were verified on a fresh local PostgreSQL database, and the cloud branch was not destructively reset.
+- [!] Historical T-04 closeout: PostgreSQL 18 Testcontainers migration evidence was blocked until the reusable T-14 harness existed; the local integration check did not replace that obligation.
+- [!] Historical T-04 closeout: the prior two-step migration chain remained recorded on the agent-owned Neon development branch; the consolidated files were verified on a fresh local PostgreSQL database, and the cloud branch was not destructively reset.
 - [x] Integration coverage proves uniqueness, cascade deletion, and required indexes/constraints.
-- [!] The consolidated migration's final catalog exposes UUIDv7 defaults on the fresh local PostgreSQL database; applying this rewritten history to Neon requires a separately approved branch realignment.
+- [!] Historical T-04 closeout: the consolidated migration's final catalog exposed UUIDv7 defaults on the fresh local PostgreSQL database; applying this rewritten history to Neon required a separately approved branch realignment.
 - [x] Integration coverage proves database-generated native UUID IDs while preserving uniqueness, cascade deletion, and required indexes/constraints.
 
 Test contracts: `TST-MIGRATION-001`, `TST-PERSISTENCE-001`.
@@ -214,13 +216,13 @@ Dependencies: T-04.
 
 Verification:
 
-- [!] Private list/task reads and mutations are deferred to T-09; the current `requireUser()` boundary fails closed for unauthenticated requests.
+- [!] Historical T-05 closeout: private list/task reads and mutations were deferred to T-09; the `requireUser()` boundary already failed closed for unauthenticated requests.
 - [x] The local/test mailbox flow can request, read, and consume email-verification and magic links; both same-account lifecycle orders are covered.
 - [x] Authenticated code never accepts a client-provided owner id.
 
 Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`.
 
-Evidence: `pnpm test` (6 unit tests), `pnpm test:integration` against disposable local PostgreSQL 18 (8 tests), and `pnpm exec drizzle-kit migrate` plus catalog inspection all pass. The auth contracts remain `partial` until T-09 adds private entry paths and T-15 records the required Chromium journeys.
+Evidence at T-05 closeout: `pnpm test` (6 unit tests), `pnpm test:integration` against disposable local PostgreSQL 18 (8 tests), and `pnpm exec drizzle-kit migrate` plus catalog inspection all passed. The auth contracts were `partial` until T-09 added private entry paths and T-15 recorded the required Chromium journeys; current statuses are reconciled in `TESTING.md`.
 
 PR: [#7](https://github.com/michi-guns/nextjs-todo-list-example/pull/7) | final task commit `d241a75` | merged as `2935283`
 
@@ -474,10 +476,10 @@ Verification:
 
 - [x] Focused redirect/error tests pass, and existing auth integration/boundary tests remain green.
 - [x] The public landing renders the validated Sanity-backed view model; missing/invalid provider content fails through an explicit safe boundary rather than a permanent hardcoded fallback.
-- [!] The full verification-pending, verified sign-in, magic-link request/consume, and sign-out browser lifecycle remains T-15-owned; T-11 verified the route surfaces, safe `/dashboard` callback default, stable invalid-credential and invalid-token states, and the existing local PostgreSQL auth integration lifecycle without recording credentials or tokens.
+- [!] Historical T-11 closeout: the full verification-pending, verified sign-in, magic-link request/consume, and sign-out browser lifecycle remained T-15-owned; T-11 verified the route surfaces, safe `/dashboard` callback default, stable invalid-credential and invalid-token states, and the existing local PostgreSQL auth integration lifecycle without recording credentials or tokens. T-15 later completed the browser lifecycle evidence.
 - [x] Forms are keyboard accessible with labelled controls, visible focus tokens, pending/error/success states, long-content wrapping, and no horizontal overflow at `320px`, `768px`, `1024px`, and `1440px`.
 - [x] `pnpm test`, `pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier checks, `git diff --check`, and `pnpm sanity:smoke` pass; lint reports only the pre-existing `app/layout.tsx:1:10` `Geist` warning.
-- [x] A fresh GPT-5.6-Sol medium reviewer returned **No actionable findings** for reviewed code tip `7c1b617`; T-15's dedicated Playwright E2E contracts remain explicitly outstanding.
+- [x] A fresh GPT-5.6-Sol medium reviewer returned **No actionable findings** for reviewed code tip `7c1b617`; at T-11 closeout, T-15's dedicated Playwright E2E contracts were explicitly outstanding and were later completed by T-15.
 
 Test contracts: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`.
 
@@ -492,9 +494,9 @@ Implementation scope and interfaces:
 - Add a framework-independent safe internal redirect/error helper and focused tests under `src/modules/auth/presentation/` only if the form boundary requires them.
 - Consume `getPublishedLandingContent()` and `LandingContent` from the existing landing application/infrastructure boundary; leave Sanity client/query/configuration and the dashboard implementation untouched.
 
-Evidence target: T-11 owns landing/auth materialized runtime evidence for `TST-UI-001` and the route/form prerequisites for T-15. `TST-AUTH-001`, `TST-AUTH-002`, and `TST-AUTH-003` remain `partial` until the T-15 browser and multi-user evidence is complete; `TST-E2E-001` and `TST-E2E-002` remain `specified` until T-15.
+Evidence target at T-11 planning/closeout: T-11 owned landing/auth materialized runtime evidence for `TST-UI-001` and the route/form prerequisites for T-15. `TST-AUTH-001`, `TST-AUTH-002`, and `TST-AUTH-003` were `partial` until the T-15 browser and multi-user evidence was complete; `TST-E2E-001` and `TST-E2E-002` were `specified` until T-15. Current statuses are reconciled in `TESTING.md`.
 
-Evidence: The server-owned root route consumes `getPublishedLandingContent()` and renders the Focus Rail landing view; `app/error.tsx` provides a provider-safe retry boundary using Next.js 16.3.1's `retry` callback. `/sign-up`, `/sign-in`, and `/magic-link` use one Better Auth browser client with the installed magic-link plugin, safe internal redirect handling, stable public error messages, and explicit pending/success states. `pnpm test` passes (20 files, 110 tests); `pnpm test:integration` passes (6 files, 23 tests against disposable local PostgreSQL 18); `pnpm typecheck`, `pnpm build`, changed-file Prettier, and `git diff --check` pass; `pnpm lint` has only the pre-existing Geist warning; and `pnpm sanity:smoke` validates the configured landing singleton. Next MCP reports `issues: []`, `configErrors: []`, and `sessionErrors: []`, and the route map includes `/`, `/sign-up`, `/sign-in`, and `/magic-link`. Chromium inspection confirms labelled landmarks and controls, keyboard traversal, stable invalid-credential and invalid-token messages, zero axe violations on the landing/auth routes, and no horizontal document overflow for all four routes at `320x800`, `768x1024`, `1024x768`, and `1440x900`; a synthetic 500-character headline/CTA check also remains within 320px after the `wrap-anywhere` fix. The deterministic mailbox/browser lifecycle and multi-user isolation remain T-15 obligations.
+Evidence at T-11 closeout: The server-owned root route consumes `getPublishedLandingContent()` and renders the Focus Rail landing view; `app/error.tsx` provides a provider-safe retry boundary using Next.js 16.3.1's `retry` callback. `/sign-up`, `/sign-in`, and `/magic-link` use one Better Auth browser client with the installed magic-link plugin, safe internal redirect handling, stable public error messages, and explicit pending/success states. `pnpm test` passed (20 files, 110 tests); `pnpm test:integration` passed (6 files, 23 tests against disposable local PostgreSQL 18); `pnpm typecheck`, `pnpm build`, changed-file Prettier, and `git diff --check` passed; `pnpm lint` had only the pre-existing Geist warning; and `pnpm sanity:smoke` validated the configured landing singleton. Next MCP reported `issues: []`, `configErrors: []`, and `sessionErrors: []`, and the route map included `/`, `/sign-up`, `/sign-in`, and `/magic-link`. Chromium inspection confirmed labelled landmarks and controls, keyboard traversal, stable invalid-credential and invalid-token messages, zero axe violations on the landing/auth routes, and no horizontal document overflow for all four routes at `320x800`, `768x1024`, `1024x768`, and `1440x900`; a synthetic 500-character headline/CTA check also remained within 320px after the `wrap-anywhere` fix. The deterministic mailbox/browser lifecycle and multi-user isolation were T-15 obligations at that historical closeout and were later verified.
 
 Review gate: Runtime verification found the magic-link error-code double mapping and corrected it in `bd5a609`. Fresh GPT-5.6-Sol medium review of `bd5a609` found the Next retry callback and long-content wrapping issues and corrected them in `ef6e5e5`; a synthetic long-content check then required the Tailwind 4 `wrap-anywhere` refinement in `7c1b617`. The final fresh review of `7c1b617` returned **No actionable findings**. The repository's direct-main workflow required no PR branch; reviewed code tip `7c1b617` was pushed to `origin/main` before closeout.
 
@@ -746,19 +748,51 @@ Evidence: [`docs/agentforge/evidence/t16-neon-performance.json`](docs/agentforge
 
 ### T-17: Finish documentation and final quality gates
 
-- [ ] Update README setup instructions for the actual environment categories, local database harness, Sanity, and magic-link mailbox.
-- [ ] Document any implementation-specific migration, test, and recovery commands without committing secrets.
-- [ ] Run the final gates: `pnpm typecheck`, `pnpm lint`, `pnpm test`, affected Playwright tests, migration checks, and `git diff --check`.
-- [ ] Review the implementation against the [SPEC definition of done](.dwf/output/agent/SPEC.md#13-definition-of-done-engineering-checklist).
+- [x] **T-17.1: Document setup and environment boundaries**
+  - Files: `README.md`; preserve the canonical DWF links and leave `.env.local` untracked.
+  - Interfaces: document the current `DATABASE_URL`, optional `DATABASE_URL_UNPOOLED`, `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_LOCAL_MAILBOX`, `BETTER_AUTH_MAILBOX_DIR`, `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `NEXT_PUBLIC_SANITY_API_VERSION`, `SANITY_REVALIDATE_SECRET`, and `SANITY_MANUAL_RECOVERY_SECRET` categories without values.
+  - Acceptance: a new contributor can install dependencies, configure local application/auth values, understand the direct migration URL, run the app, identify the separate Sanity live smoke, and understand the test-only mailbox and deterministic Playwright landing fixture.
+  - Contracts/evidence: preserve the environment and local-quality obligations in `TST-FOUNDATION-001`, `TST-HARNESS-001`, `TST-AUTH-002`, `TST-LANDING-002`, and `TST-E2E-002`; no executable behavior changes or new test contract is introduced.
+  - Checks: changed-file Prettier check and `git diff --check` passed; fresh GPT-5.6-Sol review of the corrected README found no actionable findings.
+  - Dependencies: accepted plan `docs/agentforge/plans/2026-08-31-t-17-documentation-quality.md`; no source or external-service prerequisite.
+  - Recommended AgentForge skills: `documentation-and-adrs`, `unslop`, `git-workflow-and-versioning`.
+
+- [x] **T-17.2: Add implementation command and recovery runbook**
+  - Files: new `docs/runbooks/local-development-and-verification.md`; `docs/runbooks/index.md`; keep `docs/runbooks/failed-database-migration.md` and `docs/runbooks/sanity-integration-failure.md` authoritative for detailed failure response.
+  - Interfaces: copyable PowerShell commands for `pnpm install`, `pnpm dev`, Drizzle check/generate/migrate, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, `pnpm test:e2e:cross-browser`, and `pnpm sanity:smoke`; links to the existing recovery endpoints/runbooks.
+  - Acceptance: commands use placeholders rather than credentials; migration guidance follows TD-025 (consolidate only safely recreatable pre-release history and use forward migrations for shared/production history); routine database cleanup cannot target Neon or another external database; no production deployment is implied.
+  - Contracts/evidence: document the evidence boundaries for `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-LANDING-002`, and `TST-LANDING-003` without changing their status until verification reconciliation.
+  - Checks: changed-file Prettier check, relative-link check, and `git diff --check` passed; fresh GPT-5.6-Sol review found one omission and one fallback-wording ambiguity, both fixed and re-reviewed with no actionable findings.
+  - Dependencies: T-17.1 for navigation/terminology; existing runbooks and package scripts.
+  - Recommended AgentForge skills: `documentation-and-adrs`, `migration-history-workflow`, `unslop`, `git-workflow-and-versioning`.
+
+- [x] **T-17.3: Run final gates and reconcile delivery evidence**
+  - Files: `TODO.md`; `.dwf/decisions/TESTING.md` only where final evidence requires a factual reconciliation; `docs/agentforge/temporary/2026-08-30-implementation-run.md`; accepted T-17 plan status.
+  - Interfaces: no runtime interface changes; reconcile active `TST-*` IDs, exact command results, known warnings, optional cross-browser/deployment checks, and the dependency graph.
+  - Acceptance: SPEC definition of done is reviewed item by item; all required local checks have evidence; skipped checks and remaining partial/deferred contracts are explicit; T-17 is marked complete only after a clean fresh GPT-5.6-Sol proportional review.
+  - Contracts/evidence: reconcile every active contract in `.dwf/decisions/TESTING.md`; do not mark hosted migration, Docker-outage, concurrent, or deployed-Sanity evidence verified unless the required evidence actually exists.
+  - Checks: `pnpm typecheck`; `pnpm lint`; `pnpm test`; `pnpm test:integration`; `pnpm test:e2e`; `pnpm exec drizzle-kit check --config drizzle.config.ts`; `pnpm exec prettier --check` for changed files; `pnpm build`; `git diff --check`. Verify cross-browser project selection separately when useful, but keep its execution optional.
+  - Dependencies: T-17.1 and T-17.2; Docker and Chromium are required for the named local suites, while Sanity credentials are required only for `pnpm sanity:smoke`.
+  - Recommended AgentForge skills: `code-review-and-quality`, `verification-before-completion`, `documentation-and-adrs`, `unslop`, `git-workflow-and-versioning`.
 
 Verification:
 
-- [ ] All required local acceptance items have evidence.
-- [ ] Skipped checks, pre-existing warnings, and remaining risks are recorded.
+- [x] All required local acceptance items have evidence: `pnpm typecheck`, `pnpm lint`, `pnpm test` (23 files/121 tests), `pnpm test:integration` (6 files/23 tests against one disposable PostgreSQL 18 Testcontainer), `pnpm test:e2e` (7 serial Chromium journeys), `pnpm sanity:smoke`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm build`, changed-file Prettier, relative-link checks, and `git diff --check`.
+- [x] Skipped checks, pre-existing warnings, and remaining risks are recorded: the opt-in cross-browser command was not executed in Firefox/WebKit, but project selection exposes 21 tests; lint retains only the pre-existing `app/layout.tsx:1:10` unused `Geist` warning; `TST-MIGRATION-001` is blocked on an explicitly authorized non-default Neon branch realignment, `TST-HARNESS-001` remains partial for the unobserved Docker-outage scenario, and `TST-LANDING-003` remains partial for deployed webhook delivery. `TST-CONCURRENCY-001` is verified by the existing application and PostgreSQL commit-ordering/disjoint-field evidence.
+- [x] A fresh GPT-5.6-Sol reviewer found no actionable findings on the final metadata tip after the historical-status reconciliation.
 
 Test contracts: reconcile every active baseline contract in [`TESTING.md`](.dwf/decisions/TESTING.md) before closing this task.
 
 Dependencies: T-12A, T-14, T-15, T-16 (all complete on `main` after PR #18 merged as `3c4b0d5`).
+
+Plan: [`2026-08-31-t-17-documentation-quality.md`](docs/agentforge/plans/2026-08-31-t-17-documentation-quality.md).
+
+Dependency checkpoint: T-17.1, T-17.2, and T-17.3 are complete at the final
+reviewed documentation tip. No other safely unblocked implementation task
+remains in the current TODO graph. Neon migration evidence is blocked on an
+explicitly authorized branch realignment before the agent-owned branch
+expires; harness outage observation and deployed Sanity delivery are
+release/deployment evidence conditions, not unblocked implementation work.
 
 ## Explicitly out of scope for this baseline
 

@@ -121,7 +121,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | ID                                          | Contract                                                                             | Primary evidence                                       | Owner                                 | Status     |
 | ------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------- | ---------- |
 | [TST-FOUNDATION-001](#tst-foundation-001)   | Shared database runtime works across local PostgreSQL and Neon                       | Unit, local integration, hosted smoke                  | T-03                                  | `verified` |
-| [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                      | `partial`  |
+| [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                      | `blocked`  |
 | [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks          | T-14, T-15                            | `partial`  |
 | [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration and hosted query-plan evidence  | T-04, T-06, T-07, T-14, T-16          | `verified` |
 | [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                            | `verified` |
@@ -133,7 +133,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09, T-14                      | `verified` |
 | [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14                | `verified` |
 | [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14                | `verified` |
-| [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                      | `partial`  |
+| [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                      | `verified` |
 | [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                            | `verified` |
 | [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                                  | `verified` |
 | [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                            | `verified` |
@@ -166,7 +166,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-MIGRATION-001 — Versioned migration chain
 
-- **Status:** `partial`
+- **Status:** `blocked`
 - **Capability:** Database migration foundation
 - **Evidence layers/modes:** Infrastructure / migration integration, hosted smoke
 - **Verifies product decisions:** D-003, D-004, D-009
@@ -178,7 +178,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Required evidence:** Harness-owned empty-database migration run and non-destructive Neon development-branch migration smoke.
 - **Dependencies:** T-04 schema work, T-14 Testcontainers harness, and the existing T-01 Neon development branch.
 - **Current evidence:** T-04's `pnpm test:integration` applied the complete consolidated versioned chain to an isolated schema in a fresh disposable local `postgres:18-alpine` container. The T-14 harness now applies that same chain to the empty database of one harness-owned PostgreSQL 18 Testcontainer per integration suite. `pnpm exec drizzle-kit migrate` applied the chain to a fresh local migration database, and catalog inspection confirmed native UUID list/task keys with `uuidv7()` defaults, text owner FKs, the `task_status` enum, cursor/unique indexes, and cascading foreign keys. The agent-owned Neon `development` branch still records the pre-consolidation two-step chain and was not destructively reset in this slice.
-- **Follow-up:** T-01 must separately realign and smoke-test the reviewed consolidated chain on the non-default Neon development branch before this contract can be `verified`.
+- **Follow-up:** Blocked until the owner explicitly authorizes safe realignment of the agent-owned non-default Neon development branch, or provisions a fresh non-default branch, before its 2026-09-02 expiry. Then apply and smoke-test the reviewed consolidated chain there. Do not destructively reset or rewrite a shared/production target.
 
 <a id="tst-harness-001"></a>
 
@@ -202,7 +202,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-PERSISTENCE-001 — Relational invariants and repository mappings
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Persistence
 - **Evidence layers/modes:** Domain, application, infrastructure / unit, integration
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
@@ -214,6 +214,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Required evidence:** PostgreSQL integration cases against the real migrations, including concurrent uniqueness and cascade behavior, plus query-shape assertions where the contract requires them.
 - **Dependencies:** T-04 schema, T-14 harness, and T-16 hosted query-plan evidence.
 - **Current evidence:** T-04's focused integration suite passed three real-database cases covering database-generated native UUID IDs, Drizzle `Date` mappings, nullable notes and native status values, owner-scoped case-insensitive list/task uniqueness, list-to-task cascade deletion, cascading foreign keys, and the required cursor-index column order/direction. The complete T-06/T-07 repository suite runs through the T-14 harness and covers ownership, concurrent uniqueness, bounded cursor reads, cascade behavior, repository mappings, and query-shape guards. T-16's redacted Neon development-branch evidence confirms both composite indexes on representative owner/list data, no lists/tasks sequential scans, and cursor/warm-query behavior. The task repository states explicit `NULLS LAST` ordering so the task index ordering is usable without changing result semantics for the `NOT NULL` columns.
+- **Follow-up:** No remaining evidence is required for the accepted baseline.
 
 <a id="tst-auth-001"></a>
 
@@ -381,7 +382,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-CONCURRENCY-001 — Last-successful-write behavior
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Concurrent mutations
 - **Evidence layers/modes:** Application, infrastructure / integration
 - **Verifies product decisions:** D-007
@@ -393,7 +394,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Required evidence:** Application tests using realistic concurrent operations and PostgreSQL integration tests for commit ordering and disjoint-field preservation.
 - **Dependencies:** T-06/T-07 mutation paths and T-14 real database harness.
 - **Current evidence:** The harness-backed PostgreSQL suite proves controlled same-row list rename commit ordering (the later committed write is retained), concurrent Inbox uniqueness and its conflict/read-back race, task same-field commit ordering, task disjoint-field preservation, and repeated status timestamp idempotence. The task application suite proves that patch inputs preserve omitted-versus-submitted fields.
-- **Follow-up:** Keep this contract `partial` until the full concurrency acceptance evidence is reconciled; the reusable harness prerequisite is satisfied.
+- **Follow-up:** No remaining evidence is required for the accepted baseline. The application patch tests and harness-backed PostgreSQL commit-ordering/disjoint-field tests cover the required concurrent-write behavior.
 
 <a id="tst-boundary-001"></a>
 
@@ -411,7 +412,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Required evidence:** Request-level JSON contract tests and a smaller Server Action adapter suite. Business rules remain primarily covered below the entry path.
 - **Dependencies:** T-05 auth, T-06/T-07 use cases, and T-08 shared contracts.
 - **Current evidence:** T-08 shared error-contract tests cover the accepted 401/404/409/422 mappings, canonical `{ error: { code, message } }` envelopes, safe handling of unknown errors, and non-leaking canonical messages when an arbitrary error spoofs a known code. `src/modules/lists/presentation/list-entry.test.ts` and `src/modules/tasks/presentation/task-entry.test.ts` add authenticated request/action coverage for success, pagination/filtering, privacy-preserving `404`, conflict `409`, invalid-input `422`, authentication outcomes, safe view models, revalidation, same-origin mutation rejection, and expected task action errors. The focused suites contain 19 tests; the full unit suite and disposable PostgreSQL integration suite also pass.
-- **Follow-up:** No remaining evidence is required for the accepted baseline. Next.js browser/runtime journey checks remain with T-15 because the dashboard UI is not yet implemented.
+- **Follow-up:** No remaining evidence is required for the accepted baseline. The dedicated T-15 Playwright lifecycle separately records the dashboard browser/runtime journeys.
 
 <a id="tst-landing-001"></a>
 
@@ -477,7 +478,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Owners:** T-09A, T-09B, T-10, T-11, T-12A, T-15
 - **Contract:** The selected UI direction remains recognizable in the materialized landing, auth, and dashboard surfaces, and the critical controls and states remain usable at the agreed viewports with keyboard reachability, visible focus, loading, empty, error, disabled, selected, long-content, and overflow behavior.
 - **Required evidence:** Fair prototype inspection during exploration, browser/runtime inspection during materialization, and focused browser acceptance for critical interactions. This is not a requirement for a complete React component unit-test matrix.
-- **Dependencies:** T-09A/T-09B design work and the implemented surfaces in T-10/T-11; the remaining authenticated activation/next-Tab check for the T-12A dashboard skip target depends on the T-15 browser harness.
+- **Dependencies:** T-09A/T-09B design work and the implemented surfaces in T-10/T-11. T-12A's dashboard skip-target activation and next-Tab check are complete through the T-15 browser harness.
 - **Evidence:** T-09A's isolated static prototype uses one fixture and three materially different directions. Structural validation passes with exactly three manifests; Chromium Playwright inspection covers all directions at 1440x900, 1024x768, 768x1024, and 320x800 with zero console errors and no document overflow. Prototype evidence covers task/list capture, status changes, completed filtering, list switching, bounded continuation, keyboard-visible focus and search shortcuts, explicit final-list reload/Inbox recreation, loading/disabled, empty, validation-error, selected, and long-content states. T-09B selects Focus Rail based on the locked list-sidebar/task-panel contract, first-open comprehension, narrow-viewport evidence, and lower implementation complexity; [`handoff.md`](../../.ui-explorations/t09a-dashboard/handoff.md) records the rejected alternatives, reusable primitives, responsive/accessibility rules, and required state matrix. T-10 materializes the selected dashboard direction and its state matrix in Next.js: authenticated browser coverage exercised create/select/rename/delete, task capture/edit/status/delete, completed filtering, both cursor continuations, validation/conflict/recoverable states, final-list reload/Inbox recreation, keyboard focus return, and long-content wrapping. Axe reported zero violations at the authenticated dashboard route and the four agreed viewports had no horizontal overflow. T-11 materializes the server-owned landing and three auth routes with labelled controls, explicit error/pending/success states, safe callback handling, and the Focus Rail public/auth shell. T-12A adds one shared focus-visible skip link wired to the landing, auth, and dashboard content targets and hides the decorative landing preview from the accessibility tree; Chromium inspection of `/`, `/sign-up`, `/sign-in`, and `/magic-link` confirms the skip link is first in the accessibility tree, activation focuses the target, axe reports zero violations, browser errors are absent, and `scrollWidth` equals `innerWidth` at 320x800, 768x1024, 1024x768, and 1440x900. The unauthenticated dashboard check remains session-gated to `/sign-in`; source/build inspection and T-10's earlier authenticated runtime evidence cover the existing dashboard behavior, while T-15's deterministic Chromium suite exercises the authenticated dashboard skip-link activation and next logical Tab stop and confirms the deterministic landing content. Together these checks cover the selected direction's required critical controls, states, keyboard behavior, and overflow requirements; the separate TST-E2E-* contracts record the other T-15 journeys.
 
 <a id="tst-e2e-001"></a>
