@@ -584,10 +584,10 @@ Dependency recomputation: T-15 is now safely unblocked because T-05, T-09, T-10,
 
 ## Checkpoint: core product
 
-- [ ] Password and magic-link sign-in work locally.
-- [ ] The full local journey works: sign in, obtain Inbox, create list, create task, change status, sign out.
-- [ ] Lists and tasks are private, validated, paginated, and persisted in PostgreSQL.
-- [ ] The landing page reads Sanity content and cache recovery is protected.
+- [x] Password and magic-link sign-in work locally.
+- [x] The full local journey works: sign in, obtain Inbox, create list, create task, change status, sign out.
+- [x] Lists and tasks are private, validated, paginated, and persisted in PostgreSQL.
+- [x] The landing page reads Sanity content and cache recovery is protected.
 - [x] The selected UI direction is materialized and the implemented surfaces have been audited.
 
 ## Phase 4: verification and release evidence
@@ -618,20 +618,106 @@ PR: [#13](https://github.com/michi-guns/nextjs-todo-list-example/pull/13) | impl
 
 ### T-15: Replace the example Playwright suite
 
-- [ ] Replace the `playwright.dev` tests with the accepted todo journey under `e2e/`.
-- [ ] Add one local command that starts PostgreSQL, applies migrations, loads deterministic behavior seed data, starts a dedicated Next.js test server, runs Playwright, and tears everything down.
-- [ ] Run the required suite in Chromium and keep Firefox/WebKit as an explicit on-demand run.
-- [ ] Add the magic-link mailbox journey.
-- [ ] Complete the remaining `TST-UI-001` authenticated dashboard skip-link activation and next-Tab check in the harness-owned browser.
+- [x] Implement the accepted plan in [`docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md`](docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md).
+- [x] Replace the example suite's `playwright.dev` checks with the accepted local todo journeys and shared browser helpers.
+- [x] Make `pnpm exec playwright test` own one loopback PostgreSQL 18 Testcontainer, the committed migration chain, deterministic behavior seed, local/test mailbox, dedicated Next.js test server, serial Chromium run, and cleanup on pass or failure.
+- [x] Keep the normal project Chromium-only and add an explicit `pnpm test:e2e:cross-browser` (Firefox/WebKit) opt-in without reusing an unknown running server or external database.
+- [x] Add password sign-in/sign-out, Inbox/list/task/status, visible list/task pagination, completed-task filtering, two-user privacy isolation, and the remaining authenticated dashboard skip-link/next-Tab checks.
+- [x] Add the local mailbox request/read/consume magic-link journey with mailbox cleanup before execution.
+- [x] Keep deterministic landing content test-only and application-facing; do not require Sanity credentials or network access for routine Playwright.
+
+Recommended AgentForge skills:
+
+- `using-agent-skills`, `planning`, and `task-breakdown` for the accepted plan and dependency-ordered delivery units.
+- `testing-first-class` and `test-driven-development` for the affected durable contracts and red/green browser/runtime loop.
+- `incremental-implementation` for the lifecycle, seed, and journey vertical slices.
+- `playwright-cli` and `browser-testing-with-devtools` for real Chromium interaction, focus, console, network, and responsive evidence.
+- `source-driven-development` for the installed Next.js, Better Auth, Testcontainers, and Playwright APIs.
+- `security-and-hardening` for local-only database/mailbox guards and private-data assertions.
+- `git-workflow-and-versioning`, `code-review-and-quality`, and `verification-before-completion` for coherent commits, the fresh proportional reviewer loop, and evidence-backed closeout.
 
 Verification:
 
-- [ ] `pnpm exec playwright test` passes against the harness-owned local database in Chromium.
-- [ ] Cross-browser checks remain available separately for release or major UI changes.
+- [x] Focused landing-fixture and lifecycle tests pass; failures during server, migration, seed, or browser startup report the prerequisite and clean up the container/process/mailbox.
+- [x] `pnpm exec playwright test` passes in Chromium against the harness-owned local database and leaves no server, container, mailbox, or browser test artifact that belongs outside the ignored paths.
+- [x] The browser evidence covers the deterministic landing fixture, core authenticated journey, magic-link mailbox journey, two-user privacy isolation, seeded pagination/filtering, and dashboard skip-link activation followed by the next logical tab stop.
+- [!] The optional cross-browser run was not executed in this routine gate; the runner's `PLAYWRIGHT_CROSS_BROWSER=true` project selection was verified to expose all seven journeys in Firefox and WebKit when those browsers are installed.
+- [x] `pnpm test`, `pnpm test:integration`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file `pnpm exec prettier --check`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, and `git diff --check` pass. The only lint output is the pre-existing `app/layout.tsx:1:10` unused `Geist` warning.
 
 Test contracts: `TST-HARNESS-001`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`.
 
-Dependencies: T-05, T-09, T-10, T-11, T-14.
+Dependencies: T-05, T-09, T-10, T-11, T-12, T-12A, T-14 (all complete on `main`; T-12 is also transitive through the T-12A landing prerequisite).
+
+Plan: [`docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md`](docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md).
+
+Implementation scope and interfaces:
+
+- `playwright.config.ts` and `e2e/global-setup.ts` own the fixed loopback base URL, serial browser projects, lifecycle startup/readiness, inherited test environment, and cleanup; they consume `startPostgresHarness()` rather than duplicating Testcontainers logic.
+- `next.config.ts` selects the ignored `.next-playwright` build directory only under `PLAYWRIGHT_E2E=true`, allowing the dedicated test server to coexist safely with an unrelated default Next dev server.
+- `eslint.config.mjs` ignores the generated `.next-playwright` directory so the standard lint gate remains source-only.
+- `scripts/playwright-local/seed.ts` owns the explicit Better Auth-backed users and parameterized deterministic lists/tasks; `scripts/playwright-local/run.ts` owns the cross-browser project-selection wrapper.
+- `e2e/fixtures.ts` and the journey specs own stable labels/selectors and browser outcomes only; they do not import provider records, credentials, or application database internals beyond the ignored local mailbox reader.
+- `src/modules/landing/infrastructure/sanity-landing-reader.ts` receives only a `PLAYWRIGHT_E2E=true` + non-production fixture branch; the normal Sanity path and all domain/persistence/migration behavior remain unchanged.
+
+Task breakdown: the following four delivery units are independently reviewable and must each leave an executable, verifiable tip.
+
+#### T-15.1 — Add the guarded local test runtime
+
+Status: complete at reviewed tip `4ccafe1`.
+
+- Files: `src/modules/landing/infrastructure/sanity-landing-reader.ts`, `src/modules/landing/infrastructure/sanity-landing-reader.test.ts`, `playwright.config.ts`, `e2e/global-setup.ts`, `e2e/runtime-smoke.spec.ts`, `src/test/playwright-lifecycle.test.ts`, and `tsconfig.json`.
+- Interfaces: consume `startPostgresHarness()` and `stopPostgresHarness()`; expose the fixed `http://127.0.0.1:3100` base URL, inherited `NODE_ENV=development`, `DATABASE_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_LOCAL_MAILBOX`, `BETTER_AUTH_MAILBOX_DIR`, and `PLAYWRIGHT_E2E` values to the server and workers.
+- Acceptance: a setup/teardown smoke can start the harness-owned container and dedicated Next.js server, wait for a local landing response, and clean up on success or startup/migration/server failure; the Sanity reader uses deterministic content only under the non-production E2E switch and never in production.
+- Contracts/evidence: `TST-HARNESS-001`, `TST-E2E-003`; prove local URL guarding, server readiness, failure cleanup, and the fixture gate. Keep `TST-HARNESS-001` partial until the required live Docker-unavailable observation exists.
+- Checks: `pnpm exec vitest run src/modules/landing/infrastructure/sanity-landing-reader.test.ts src/test/playwright-lifecycle.test.ts`; `pnpm exec playwright test e2e/runtime-smoke.spec.ts --project=chromium --grep "local runtime"`; `pnpm typecheck`; and `pnpm lint`. The named smoke test must assert only server readiness and deterministic landing content, not seeded application data.
+- Dependencies/unblock: T-12, T-12A, and T-14; T-15.2 consumes the lifecycle seam.
+- Recommended skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, `security-and-hardening`, and `git-workflow-and-versioning`.
+
+Evidence: focused landing/lifecycle Vitest (7 tests), the named Chromium `local runtime` smoke, `pnpm typecheck`, scoped Prettier, and `git diff --check` pass; `pnpm lint` has only the pre-existing `app/layout.tsx:1:10` Geist warning. The isolated `.next-playwright` directory prevents a competing default Next dev lock and repeated runs leave `tsconfig.json` clean. Fresh GPT-5.6-Sol review of `4ccafe1` returned **No actionable findings**. `TST-E2E-003` remains partial until the seeded browser journeys; `TST-HARNESS-001` remains partial pending the required live Docker-unavailable observation.
+
+#### T-15.2 — Add the deterministic behavior seed and browser fixtures
+
+Status: complete at reviewed tip `7c59536`.
+
+- Files: `scripts/playwright-local/seed.ts`, `e2e/fixtures.ts`, `e2e/runtime-smoke.spec.ts`, `e2e/global-setup.ts`, and `src/test/playwright-seed.test.ts`.
+- Interfaces: `seedPlaywrightDatabase(databaseUrl: string, baseUrl: string): Promise<PlaywrightSeed>` creates verified scenario users through the real Better Auth handler and local mailbox; `PLAYWRIGHT_USERS` exposes typed `{ email, password, listName }` fixture data to specs; the seed inserts parameterized fixed-ID/timestamp lists and tasks through the harness-owned loopback connection without logging passwords, tokens, mailbox contents, or URLs.
+- Acceptance: the seed is repeatable on a fresh container, contains a listless core user whose first dashboard load must provision the ordinary `Inbox`, pagination/completed-filter, skip-link, magic-link, and two privacy users, includes another user's records, and clears the mailbox before handing control to Playwright; no Neon or Sanity network is contacted.
+- Contracts/evidence: `TST-HARNESS-001`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`; prove verified seeded sign-in data and safe mailbox boundaries without replacing browser evidence.
+- Checks: `pnpm exec vitest run src/test/playwright-seed.test.ts`; `pnpm exec playwright test e2e/runtime-smoke.spec.ts --project=chromium --grep "behavior seed"` to inspect only non-secret seeded labels/counts through the browser; `pnpm test`; and `pnpm test:integration`.
+- Dependencies/unblock: T-15.1; T-15.3 consumes the exported fixtures.
+- Recommended skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `security-and-hardening`, and `git-workflow-and-versioning`.
+
+Evidence: the seed-plan Vitest checks (4 tests), the named Chromium `behavior seed` smoke, the full Vitest suite (23 files, 120 tests at the pre-correction checkpoint), and the local PostgreSQL integration suite (23 tests) pass. The seed creates six Better Auth-verified scenario users through the local mailbox, leaves the core user listless so the application provisions the ordinary `Inbox`, inserts parameterized fixed-ID/timestamp records for the other scenarios, and clears the mailbox before browser control. Fresh GPT-5.6-Sol review of `7c59536` returned **No actionable findings**; the core Inbox coverage correction is verified by the focused test and is pending the fresh review of the corrected tip.
+
+#### T-15.3 — Replace the example suite with Chromium journeys
+
+Status: complete at reviewed implementation tip `2efa151`.
+
+- Files: replace `e2e/example.spec.ts` with `e2e/core-journey.spec.ts`, `e2e/magic-link.spec.ts`, `e2e/privacy.spec.ts`, and `e2e/ui-contract.spec.ts`; add `e2e/fixtures.ts` and extend `e2e/runtime-smoke.spec.ts` only with the named seed smoke case.
+- Interfaces: `signInWithPassword(page: Page, user: PlaywrightSeedUser): Promise<void>` and `readMagicLinkWithRetry(email: string): Promise<MagicLinkMessage>` are the only shared browser helpers; use stable accessible labels and existing route/action boundaries; read the local mailbox only through `readLatestMagicLink()`/`clearMagicLinkMailbox()`; do not reach into Drizzle repositories or provider records.
+- Acceptance: serial Chromium journeys assert the deterministic landing copy, password sign-in/automatic `Inbox` provisioning/list/task/status/sign-out and private-route redirect, seeded list/task pagination and completed filtering, two-user UI/API privacy isolation, magic-link request/read/consume, and dashboard skip-link activation followed by the next logical tab stop. Created names are project-qualified so an opt-in cross-browser repetition is order-independent.
+- Contracts/evidence: `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, `TST-E2E-003`; record real browser URLs/outcomes and no weaker substitute.
+- Checks: `pnpm exec playwright test` in Chromium, with console errors and unexpected network failures treated as test failures; preserve traces/reports only in ignored paths.
+- Dependencies/unblock: T-15.2; T-15.4 consumes the complete journey evidence.
+- Recommended skills: `playwright-cli`, `browser-testing-with-devtools`, `testing-first-class`, `test-driven-development`, `incremental-implementation`, and `security-and-hardening`.
+
+Evidence: the exact Chromium run passes all seven journeys: deterministic landing, password sign-in/list/task/status/sign-out/private redirect, local mailbox magic-link request/read/consume, two-user UI/API privacy isolation, both cursor continuations with pre/post assertions, completed-task filtering, and dashboard skip-link activation followed by the next tab stop. Browser diagnostics fail on console errors, page errors, and unexpected request failures; the external `playwright.dev` sample is removed. Fresh GPT-5.6-Sol review of `2efa151` returned **No actionable findings**.
+
+#### T-15.4 — Add opt-in browsers and close out the task
+
+Status: in progress; the core Inbox coverage correction is pending its fresh review.
+
+- Files: `scripts/playwright-local/run.ts`, `package.json`, `playwright.config.ts`, `tsconfig.json`, the four named `e2e/*.spec.ts` files, `TODO.md`, `.dwf/decisions/TESTING.md`, `docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md`, and `docs/agentforge/temporary/2026-08-30-implementation-run.md`.
+- Interfaces: default direct Playwright invocation remains Chromium-only; `run.ts` sets `PLAYWRIGHT_CROSS_BROWSER=true` only for `pnpm test:e2e:cross-browser`, and `playwright.config.ts` expands the project list to Firefox/WebKit when that exact switch is true while retaining the same local lifecycle and no unknown-server reuse.
+- Acceptance: the opt-in command is documented and selectable, all required gates pass, affected contracts and evidence are reconciled honestly, and the dependency graph is recomputed so T-17 is unblocked only after the final reviewed tip.
+- Contracts/evidence: reconcile all eight T-15 contracts; keep `TST-HARNESS-001` partial if Docker-outage evidence is not observed, and mark browser contracts verified only when the landing assertion and all required journeys pass.
+- Checks: `pnpm test`, `pnpm test:integration`, `pnpm exec playwright test`, optional `pnpm test:e2e:cross-browser`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, `pnpm exec prettier --check package.json playwright.config.ts tsconfig.json e2e/fixtures.ts e2e/runtime-smoke.spec.ts e2e/core-journey.spec.ts e2e/magic-link.spec.ts e2e/privacy.spec.ts e2e/ui-contract.spec.ts e2e/global-setup.ts scripts/playwright-local/run.ts scripts/playwright-local/seed.ts src/modules/landing/infrastructure/sanity-landing-reader.ts src/modules/landing/infrastructure/sanity-landing-reader.test.ts src/test/playwright-lifecycle.test.ts src/test/playwright-seed.test.ts TODO.md docs/agentforge/plans/2026-08-31-t-15-playwright-harness.md`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, and `git diff --check`.
+- Dependencies/unblock: T-15.3; the corrected core Inbox journey must receive a fresh GPT-5.6-Sol review before T-15 is complete.
+- Recommended skills: `code-review-and-quality`, `verification-before-completion`, `git-workflow-and-versioning`, `testing-first-class`, and `unslop`.
+
+Evidence: the corrected focused seed tests pass 4/4; `pnpm test` passes 23 files/121 tests; `pnpm test:integration` passes 6 files/23 tests against one disposable PostgreSQL 18 Testcontainer; `pnpm test:e2e` passes all 7 serial Chromium journeys against the harness-owned database and dedicated Next.js server, including automatic core `Inbox` provisioning; project selection with `PLAYWRIGHT_CROSS_BROWSER=true` lists the same 7 journeys for Chromium, Firefox, and WebKit (21 tests total); `pnpm typecheck`, `pnpm lint` (only the pre-existing `app/layout.tsx:1:10` unused `Geist` warning), `pnpm build`, scoped Prettier, `pnpm exec drizzle-kit check --config drizzle.config.ts`, and `git diff --check` pass. Cleanup leaves no port 3100 or task-owned PostgreSQL container. The prior implementation tip `c606d54` received a fresh GPT-5.6-Sol medium review with no actionable findings; the corrected tip is pending fresh review. `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`, `TST-UI-001`, `TST-E2E-001`, `TST-E2E-002`, and `TST-E2E-003` remain verified by the corrected execution evidence; `TST-HARNESS-001` remains partial only for the live Docker-outage observation.
+
+Dependency checkpoint: T-15's core Inbox coverage correction is implemented and verified locally but remains in closeout review; T-17 stays blocked until the corrected tip is reviewed and T-15 merges. `TST-HARNESS-001` remains `partial` only for the unobserved live Docker-daemon outage; the browser lifecycle evidence is complete.
 
 ### T-16: Produce Neon performance evidence
 

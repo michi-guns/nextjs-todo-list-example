@@ -118,31 +118,31 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ## Test contract index
 
-| ID                                          | Contract                                                                             | Primary evidence                                       | Owner                                 | Status      |
-| ------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------- | ----------- |
-| [TST-FOUNDATION-001](#tst-foundation-001)   | Shared database runtime works across local PostgreSQL and Neon                       | Unit, local integration, hosted smoke                  | T-03                                  | `verified`  |
-| [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                      | `partial`   |
-| [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks          | T-14, T-15                            | `partial`   |
-| [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration and hosted query-plan evidence  | T-04, T-06, T-07, T-14, T-16          | `verified`  |
-| [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                            | `partial`   |
-| [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                            | `partial`   |
-| [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                      | `partial`   |
-| [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration, browser   | T-06, T-10, T-14                      | `verified`  |
-| [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14                | `verified`  |
-| [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14                | `verified`  |
-| [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09, T-14                      | `verified`  |
-| [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14                | `verified`  |
-| [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14                | `verified`  |
-| [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                      | `partial`   |
-| [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                            | `verified`  |
-| [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                                  | `verified`  |
-| [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                            | `verified`  |
-| [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence        | T-13                                  | `partial`   |
-| [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance              | T-09A, T-09B, T-10, T-11, T-12A, T-15 | `partial`   |
-| [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                    | T-15                                  | `specified` |
-| [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                    | T-15                                  | `specified` |
-| [TST-E2E-003](#tst-e2e-003)                 | Browser-visible privacy, pagination, filtering, and mutation feedback work together  | Playwright Chromium, on-demand cross-browser           | T-10, T-12A, T-15                     | `partial`   |
-| [TST-PERFORMANCE-001](#tst-performance-001) | Representative Neon queries use the intended indexes and meet the agreed warm target | Query plans and controlled performance evidence        | T-16                                  | `verified`  |
+| ID                                          | Contract                                                                             | Primary evidence                                       | Owner                                 | Status     |
+| ------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------- | ---------- |
+| [TST-FOUNDATION-001](#tst-foundation-001)   | Shared database runtime works across local PostgreSQL and Neon                       | Unit, local integration, hosted smoke                  | T-03                                  | `verified` |
+| [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke | T-01, T-04, T-14                      | `partial`  |
+| [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks          | T-14, T-15                            | `partial`  |
+| [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration and hosted query-plan evidence  | T-04, T-06, T-07, T-14, T-16          | `verified` |
+| [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                       | T-05, T-15                            | `verified` |
+| [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                        | T-05, T-15                            | `verified` |
+| [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                      | T-05, T-09, T-15                      | `verified` |
+| [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration, browser   | T-06, T-10, T-14                      | `verified` |
+| [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary              | T-04, T-06, T-09, T-14                | `verified` |
+| [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                  | T-06, T-08, T-10, T-14                | `verified` |
+| [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                          | T-07, T-09, T-14                      | `verified` |
+| [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                      | T-04, T-07, T-09, T-14                | `verified` |
+| [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                  | T-07, T-08, T-10, T-14                | `verified` |
+| [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                 | T-06, T-07, T-14                      | `partial`  |
+| [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                           | T-08, T-09                            | `verified` |
+| [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                    | T-12                                  | `verified` |
+| [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                   | T-02, T-12                            | `verified` |
+| [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence        | T-13                                  | `partial`  |
+| [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance              | T-09A, T-09B, T-10, T-11, T-12A, T-15 | `verified` |
+| [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                    | T-15                                  | `verified` |
+| [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                    | T-15                                  | `verified` |
+| [TST-E2E-003](#tst-e2e-003)                 | Browser-visible privacy, pagination, filtering, and mutation feedback work together  | Playwright Chromium, on-demand cross-browser           | T-10, T-12A, T-15                     | `verified` |
+| [TST-PERFORMANCE-001](#tst-performance-001) | Representative Neon queries use the intended indexes and meet the agreed warm target | Query plans and controlled performance evidence        | T-16                                  | `verified` |
 
 ## Test contracts
 
@@ -195,8 +195,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Database-backed tests use one harness-owned PostgreSQL 18 container per suite, run serially while sharing it, create unique users and mutable records, remain order-independent, clean up after failures, and refuse destructive cleanup against external URLs.
 - **Required evidence:** Docker-unavailable failure, state-isolation test, failure cleanup, external-URL refusal, and the equivalent Playwright lifecycle check.
 - **Dependencies:** T-14 harness orchestration and T-15 browser orchestration.
-- **Current evidence:** `pnpm test:integration` starts one disposable `postgres:18-alpine` container in global setup, applies the complete migration chain, injects its local URI into the existing integration seam, runs six files serially, and tears the container down. Harness unit tests cover loopback URL refusal, migration statement splitting, injected startup failure reporting, migration-failure cleanup, and normal teardown; a harness integration test confirms PostgreSQL 18 catalog visibility and isolated schemas. A live Docker-daemon outage and the equivalent Playwright lifecycle remain unobserved.
-- **Follow-up:** T-15 must reuse the lifecycle for the dedicated Next.js/Playwright run; retain the live-daemon outage check as release evidence if the environment supports it.
+- **Current evidence:** `pnpm test:integration` starts one disposable `postgres:18-alpine` container in global setup, applies the complete migration chain, injects its local URI into the existing integration seam, runs six files serially, and tears the container down. Harness unit tests cover loopback URL refusal, migration statement splitting, injected startup failure reporting, migration-failure cleanup, and normal teardown; a harness integration test confirms PostgreSQL 18 catalog visibility and isolated schemas. The dedicated Playwright lifecycle starts the same harness-owned local container, applies the committed migrations, seeds deterministic records, starts a fixed loopback Next.js server, and cleans up the server process tree, temporary mailbox, and container on success; the run leaves no port or test container behind. A live Docker-daemon outage remains unobserved.
+- **Follow-up:** Retain the live-daemon outage check as release evidence if the environment supports it; no other T-15 lifecycle evidence remains outstanding.
 
 <a id="tst-persistence-001"></a>
 
@@ -219,7 +219,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-AUTH-001 — Email/password session lifecycle
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Authentication
 - **Evidence layers/modes:** Application, boundary, end-to-end / integration, browser
 - **Verifies product decisions:** D-001, D-002
@@ -230,14 +230,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** A user can sign up, sign in, retain a valid session for private operations, and sign out so later private operations are unauthenticated.
 - **Required evidence:** Auth boundary tests for session outcomes and a Chromium browser journey using the real local database.
 - **Dependencies:** T-05 Better Auth boundary and T-15 browser harness.
-- **Current evidence:** `src/modules/auth/auth.integration.test.ts` passes against a disposable local PostgreSQL 18 database for email/password sign-up, local email verification, sign-in, current-user resolution, sign-out, the resulting unauthenticated state, and preservation of the password credential when the same verified account later uses a magic link. T-11 adds the server-rendered sign-up/sign-in surfaces, safe `/dashboard` callback handling, stable invalid-credential feedback, and labelled keyboard-reachable controls. The verified browser lifecycle remains outstanding.
-- **Follow-up:** T-15 must run the Chromium journey through the Next.js route and record the real-browser evidence before this contract can be `verified`.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` passes against a disposable local PostgreSQL 18 database for email/password sign-up, local email verification, sign-in, current-user resolution, sign-out, the resulting unauthenticated state, and preservation of the password credential when the same verified account later uses a magic link. T-11 adds the server-rendered sign-up/sign-in surfaces, safe `/dashboard` callback handling, stable invalid-credential feedback, and labelled keyboard-reachable controls. The deterministic Playwright seed signs up and verifies six scenario users through the real Better Auth handler; the Chromium core journey signs in the seeded core user, reaches Inbox, creates a list and task, changes status, signs out, and confirms the private dashboard redirects to sign-in. The full local Chromium run passes 7/7 journeys against the harness-owned database and dedicated Next.js server.
+- **Follow-up:** None for the accepted local/test session contract; remote email delivery and production deployment remain outside this task.
 
 <a id="tst-auth-002"></a>
 
 ### TST-AUTH-002 — Magic-link local/test lifecycle
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Authentication
 - **Evidence layers/modes:** Infrastructure, boundary, end-to-end / mailbox integration, browser
 - **Verifies product decisions:** D-002
@@ -248,14 +248,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** In explicitly enabled local/test mode, a requested magic link is captured in the temporary mailbox, can be read deterministically, and can be consumed once to establish the expected session.
 - **Required evidence:** Mailbox integration test and a real browser request/read/consume journey. The mailbox must be unavailable outside local/test mode.
 - **Dependencies:** T-05 mailbox boundary and T-15 browser harness.
-- **Current evidence:** `src/modules/auth/auth.integration.test.ts` passes the request/read/consume/replay flow against disposable local PostgreSQL 18, and `src/modules/auth/infrastructure/local-mailbox.test.ts` proves explicit test-mode gating and safe cleanup. T-11 adds the `/magic-link` request surface, Better Auth plugin callback wiring, and stable invalid-token error handoff; the deterministic browser request/read/consume journey remains outstanding.
-- **Follow-up:** T-15 must run the Chromium mailbox journey with cleanup before execution; production/shared email delivery remains outside T-05.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` passes the request/read/consume/replay flow against disposable local PostgreSQL 18, and `src/modules/auth/infrastructure/local-mailbox.test.ts` proves explicit test-mode gating and safe cleanup. T-11 adds the `/magic-link` request surface, Better Auth plugin callback wiring, and stable invalid-token error handoff. The deterministic Chromium journey requests a link through the UI, reads only the temporary local mailbox, visits the captured URL, reaches the seeded Magic Inbox, and clears the mailbox in cleanup; the full 7/7 local browser run passes.
+- **Follow-up:** None for the accepted local/test mailbox contract; production/shared email delivery remains outside T-05.
 
 <a id="tst-auth-003"></a>
 
 ### TST-AUTH-003 — Private authorization and owner identity
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Authentication and authorization
 - **Evidence layers/modes:** Application, boundary, end-to-end / contract, integration, browser
 - **Verifies product decisions:** D-001, D-002
@@ -266,8 +266,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** Anonymous requests cannot read or mutate private data; authenticated operations derive the owner from the Better Auth session; another user's identifiers produce the ordinary privacy-preserving not-found outcome; bearer tokens and cross-origin credentials do not broaden the baseline API.
 - **Required evidence:** Application and request-boundary tests, plus a browser scenario proving that private data remains isolated between users.
 - **Dependencies:** T-05 session helpers, T-09 entry paths, and T-15 browser harness.
-- **Current evidence:** `src/modules/auth/auth.integration.test.ts` proves the current-user boundary fails closed without a session and rejects bearer-only access even when paired with a client-supplied `x-user-id`. The T-09 list/task request and action suites prove session-derived owner propagation, anonymous `401` outcomes, privacy-preserving `404` outcomes, rejection of spoofed body fields, and rejection of foreign-origin mutations. Browser isolation remains outstanding.
-- **Follow-up:** T-15 must add the multi-user Chromium scenario before this contract can be `verified`.
+- **Current evidence:** `src/modules/auth/auth.integration.test.ts` proves the current-user boundary fails closed without a session and rejects bearer-only access even when paired with a client-supplied `x-user-id`. The T-09 list/task request and action suites prove session-derived owner propagation, anonymous `401` outcomes, privacy-preserving `404` outcomes, rejection of spoofed body fields, and rejection of foreign-origin mutations. The deterministic Chromium privacy journey signs in two seeded users, confirms each sees only its own list/task, and confirms a private task endpoint for the other user returns the ordinary `404` outcome; the full local browser run passes 7/7 journeys.
+- **Follow-up:** None for the accepted local/test ownership contract; broader authorization models remain outside the baseline.
 
 <a id="tst-lists-001"></a>
 
@@ -468,7 +468,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-UI-001 — Selected UI direction and usable states
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Product UI
 - **Evidence layers/modes:** UI / prototype inspection, runtime inspection, browser acceptance
 - **Verifies product decisions:** D-001, D-002, D-003, D-004, D-009
@@ -478,13 +478,13 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The selected UI direction remains recognizable in the materialized landing, auth, and dashboard surfaces, and the critical controls and states remain usable at the agreed viewports with keyboard reachability, visible focus, loading, empty, error, disabled, selected, long-content, and overflow behavior.
 - **Required evidence:** Fair prototype inspection during exploration, browser/runtime inspection during materialization, and focused browser acceptance for critical interactions. This is not a requirement for a complete React component unit-test matrix.
 - **Dependencies:** T-09A/T-09B design work and the implemented surfaces in T-10/T-11; the remaining authenticated activation/next-Tab check for the T-12A dashboard skip target depends on the T-15 browser harness.
-- **Evidence:** T-09A's isolated static prototype uses one fixture and three materially different directions. Structural validation passes with exactly three manifests; Chromium Playwright inspection covers all directions at 1440x900, 1024x768, 768x1024, and 320x800 with zero console errors and no document overflow. Prototype evidence covers task/list capture, status changes, completed filtering, list switching, bounded continuation, keyboard-visible focus and search shortcuts, explicit final-list reload/Inbox recreation, loading/disabled, empty, validation-error, selected, and long-content states. T-09B selects Focus Rail based on the locked list-sidebar/task-panel contract, first-open comprehension, narrow-viewport evidence, and lower implementation complexity; [`handoff.md`](../../.ui-explorations/t09a-dashboard/handoff.md) records the rejected alternatives, reusable primitives, responsive/accessibility rules, and required state matrix. T-10 materializes the selected dashboard direction and its state matrix in Next.js: authenticated browser coverage exercised create/select/rename/delete, task capture/edit/status/delete, completed filtering, both cursor continuations, validation/conflict/recoverable states, final-list reload/Inbox recreation, keyboard focus return, and long-content wrapping. Axe reported zero violations at the authenticated dashboard route and the four agreed viewports had no horizontal overflow. T-11 materializes the server-owned landing and three auth routes with labelled controls, explicit error/pending/success states, safe callback handling, and the Focus Rail public/auth shell. T-12A adds one shared focus-visible skip link wired to the landing, auth, and dashboard content targets and hides the decorative landing preview from the accessibility tree; Chromium inspection of `/`, `/sign-up`, `/sign-in`, and `/magic-link` confirms the skip link is first in the accessibility tree, activation focuses the target, axe reports zero violations, browser errors are absent, and `scrollWidth` equals `innerWidth` at 320x800, 768x1024, 1024x768, and 1440x900. The unauthenticated dashboard check remains session-gated to `/sign-in`; source/build inspection and T-10's earlier authenticated runtime evidence cover the existing dashboard behavior but do not exercise the newly added skip target. The remaining TST-UI-001 evidence is an authenticated dashboard skip-link activation/next-Tab check owned by T-15; T-15's other end-to-end browser journeys remain under the separate `TST-E2E-*` contracts.
+- **Evidence:** T-09A's isolated static prototype uses one fixture and three materially different directions. Structural validation passes with exactly three manifests; Chromium Playwright inspection covers all directions at 1440x900, 1024x768, 768x1024, and 320x800 with zero console errors and no document overflow. Prototype evidence covers task/list capture, status changes, completed filtering, list switching, bounded continuation, keyboard-visible focus and search shortcuts, explicit final-list reload/Inbox recreation, loading/disabled, empty, validation-error, selected, and long-content states. T-09B selects Focus Rail based on the locked list-sidebar/task-panel contract, first-open comprehension, narrow-viewport evidence, and lower implementation complexity; [`handoff.md`](../../.ui-explorations/t09a-dashboard/handoff.md) records the rejected alternatives, reusable primitives, responsive/accessibility rules, and required state matrix. T-10 materializes the selected dashboard direction and its state matrix in Next.js: authenticated browser coverage exercised create/select/rename/delete, task capture/edit/status/delete, completed filtering, both cursor continuations, validation/conflict/recoverable states, final-list reload/Inbox recreation, keyboard focus return, and long-content wrapping. Axe reported zero violations at the authenticated dashboard route and the four agreed viewports had no horizontal overflow. T-11 materializes the server-owned landing and three auth routes with labelled controls, explicit error/pending/success states, safe callback handling, and the Focus Rail public/auth shell. T-12A adds one shared focus-visible skip link wired to the landing, auth, and dashboard content targets and hides the decorative landing preview from the accessibility tree; Chromium inspection of `/`, `/sign-up`, `/sign-in`, and `/magic-link` confirms the skip link is first in the accessibility tree, activation focuses the target, axe reports zero violations, browser errors are absent, and `scrollWidth` equals `innerWidth` at 320x800, 768x1024, 1024x768, and 1440x900. The unauthenticated dashboard check remains session-gated to `/sign-in`; source/build inspection and T-10's earlier authenticated runtime evidence cover the existing dashboard behavior, while T-15's deterministic Chromium suite exercises the authenticated dashboard skip-link activation and next logical Tab stop and confirms the deterministic landing content. Together these checks cover the selected direction's required critical controls, states, keyboard behavior, and overflow requirements; the separate TST-E2E-* contracts record the other T-15 journeys.
 
 <a id="tst-e2e-001"></a>
 
 ### TST-E2E-001 — Core authenticated todo journey
 
-- **Status:** `specified`
+- **Status:** `verified`
 - **Capability:** Core todo journey
 - **Evidence layers/modes:** End-to-end / Playwright Chromium
 - **Verifies product decisions:** D-001, D-002, D-003, D-004, D-009
@@ -494,12 +494,13 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** In a real Chromium browser, a user can sign up or sign in, obtain the Inbox, create a list, create a task, change its status, and sign out; private data remains protected after sign-out.
 - **Required evidence:** Playwright run against the harness-owned PostgreSQL 18 database, deterministic behavior seed, and dedicated Next.js test server.
 - **Dependencies:** T-05, T-09, T-10, T-11, T-14, and the T-15 orchestration.
+- **Evidence:** `e2e/core-journey.spec.ts` passes in the serial Chromium run against the harness-owned PostgreSQL 18 container and dedicated loopback Next.js server. The seeded user signs in, reaches Inbox, creates a project-qualified list and task, changes the task to completed, signs out, and is redirected from `/dashboard` to `/sign-in`; the full local run passes 7/7 journeys with browser diagnostics clean.
 
 <a id="tst-e2e-002"></a>
 
 ### TST-E2E-002 — Magic-link browser journey
 
-- **Status:** `specified`
+- **Status:** `verified`
 - **Capability:** Authentication
 - **Evidence layers/modes:** End-to-end / Playwright Chromium
 - **Verifies product decisions:** D-002
@@ -510,12 +511,13 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The browser can request a magic link, read the deterministic local/test mailbox, visit the captured URL, and continue as the authenticated user.
 - **Required evidence:** Playwright Chromium scenario with mailbox cleanup before execution and no dependency on remote email delivery.
 - **Dependencies:** T-05 mailbox flow and T-15 browser orchestration.
+- **Evidence:** `e2e/magic-link.spec.ts` passes in Chromium: the seeded magic-link user requests a link through the UI, the test reads only the temporary local mailbox, visits the captured URL, reaches the Magic Inbox, and clears the mailbox in cleanup. The full local run passes 7/7 journeys without remote email delivery.
 
 <a id="tst-e2e-003"></a>
 
 ### TST-E2E-003 — Browser-visible capability behavior
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Authenticated product UI
 - **Evidence layers/modes:** UI, end-to-end / Playwright Chromium, on-demand cross-browser
 - **Verifies product decisions:** D-001, D-003, D-004, D-009
@@ -526,7 +528,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Contract:** The browser-visible dashboard preserves private ownership, list/task creation and mutation feedback, completed-task filtering, and visible cursor pagination with deterministic landing content.
 - **Required evidence:** Chromium Playwright scenarios against the local harness; Firefox and WebKit remain explicit on-demand compatibility evidence, not routine database-backed duplication.
 - **Dependencies:** T-10 dashboard, T-12A UI audit, and T-15 Playwright harness.
-- **Evidence:** T-10's authenticated Next.js browser loop covers the dashboard portion of this contract with private-session gating, mutation feedback, completed filtering, visible list/task cursor pagination, duplicate-safe continuation, and final-list reset behavior. T-12A audits the materialized Focus Rail composition, shared skip-link wiring, public/auth accessibility tree, responsive overflow, and unchanged state/interaction boundaries; its browser session was intentionally unauthenticated and did not claim repeatable private-data evidence. Full contract status remains `partial` until T-15's reusable Playwright harness provides the required repeatable end-to-end evidence.
+- **Evidence:** T-10's authenticated Next.js browser loop covers the dashboard portion of this contract with private-session gating, mutation feedback, completed filtering, visible list/task cursor pagination, duplicate-safe continuation, and final-list reset behavior. T-12A audits the materialized Focus Rail composition, shared skip-link wiring, public/auth accessibility tree, responsive overflow, and unchanged state/interaction boundaries. T-15's deterministic Chromium suite adds repeatable local-harness evidence for the landing fixture, two-user privacy isolation, list/task pagination, completed filtering, status mutation feedback, and dashboard keyboard skip-link behavior; the full local run passes 7/7 journeys with browser diagnostics clean. The opt-in runner's project list selects the same seven journeys for Firefox and WebKit when `PLAYWRIGHT_CROSS_BROWSER=true`; those optional engines were not executed in this routine gate.
 
 <a id="tst-performance-001"></a>
 
