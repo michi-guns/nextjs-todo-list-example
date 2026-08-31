@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test"
+import { expect, test as base, type Page } from "@playwright/test"
 
 import {
   clearMagicLinkMailbox,
@@ -13,6 +13,40 @@ import {
 export type PlaywrightSeedUser = PlaywrightUserFixture
 
 export { PLAYWRIGHT_USERS }
+
+export { expect }
+
+export const test = base.extend<{ browserDiagnostics: void }>({
+  browserDiagnostics: [
+    async ({ page }, use, testInfo) => {
+      const failures: string[] = []
+
+      page.on("console", (message) => {
+        if (message.type() === "error") {
+          failures.push(`console: ${message.text()}`)
+        }
+      })
+      page.on("pageerror", (error) => {
+        failures.push(`pageerror: ${error.message}`)
+      })
+      page.on("requestfailed", (request) => {
+        const failure = request.failure()?.errorText
+        if (failure === "net::ERR_ABORTED") return
+        failures.push(
+          `requestfailed: ${request.method()} ${request.url()} (${failure ?? "unknown"})`
+        )
+      })
+
+      await use()
+
+      expect(
+        failures,
+        `Unexpected browser diagnostics in ${testInfo.title}`
+      ).toEqual([])
+    },
+    { auto: true },
+  ],
+})
 
 export async function signInWithPassword(
   page: Page,

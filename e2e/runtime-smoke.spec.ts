@@ -1,6 +1,4 @@
-import { expect, test } from "@playwright/test"
-
-import { PLAYWRIGHT_USERS, signInWithPassword } from "./fixtures"
+import { expect, PLAYWRIGHT_USERS, signInWithPassword, test } from "./fixtures"
 
 test("local runtime serves deterministic landing content", async ({ page }) => {
   const response = await page.goto("/")
