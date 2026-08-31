@@ -89,6 +89,8 @@ Chromium-only.
 - `next.config.ts` will use the ignored `.next-playwright` directory only when
   `PLAYWRIGHT_E2E=true`, so the dedicated test server does not contend with an
   unrelated development server's default `.next` lock.
+- `tsconfig.json` will retain the Next-generated type include paths for both
+  default and Playwright build directories, keeping repeated runs clean.
 - `eslint.config.mjs` ignores that generated test directory so routine linting
   only evaluates checked-in source.
 - `src/test/postgres-harness.ts` already starts PostgreSQL 18, applies every
