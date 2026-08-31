@@ -1,6 +1,6 @@
 # T-15 — Replace the example Playwright suite
 
-**Status:** Accepted
+**Status:** Completed
 
 ## Goal
 
