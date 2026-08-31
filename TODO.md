@@ -663,6 +663,8 @@ Task breakdown: the following four delivery units are independently reviewable a
 
 #### T-15.1 — Add the guarded local test runtime
 
+Status: complete at reviewed tip `4ccafe1`.
+
 - Files: `src/modules/landing/infrastructure/sanity-landing-reader.ts`, `src/modules/landing/infrastructure/sanity-landing-reader.test.ts`, `playwright.config.ts`, `e2e/global-setup.ts`, `e2e/runtime-smoke.spec.ts`, `src/test/playwright-lifecycle.test.ts`, and `tsconfig.json`.
 - Interfaces: consume `startPostgresHarness()` and `stopPostgresHarness()`; expose the fixed `http://127.0.0.1:3100` base URL, inherited `NODE_ENV=development`, `DATABASE_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_LOCAL_MAILBOX`, `BETTER_AUTH_MAILBOX_DIR`, and `PLAYWRIGHT_E2E` values to the server and workers.
 - Acceptance: a setup/teardown smoke can start the harness-owned container and dedicated Next.js server, wait for a local landing response, and clean up on success or startup/migration/server failure; the Sanity reader uses deterministic content only under the non-production E2E switch and never in production.
@@ -671,7 +673,11 @@ Task breakdown: the following four delivery units are independently reviewable a
 - Dependencies/unblock: T-12, T-12A, and T-14; T-15.2 consumes the lifecycle seam.
 - Recommended skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `source-driven-development`, `security-and-hardening`, and `git-workflow-and-versioning`.
 
+Evidence: focused landing/lifecycle Vitest (7 tests), the named Chromium `local runtime` smoke, `pnpm typecheck`, scoped Prettier, and `git diff --check` pass; `pnpm lint` has only the pre-existing `app/layout.tsx:1:10` Geist warning. The isolated `.next-playwright` directory prevents a competing default Next dev lock and repeated runs leave `tsconfig.json` clean. Fresh GPT-5.6-Sol review of `4ccafe1` returned **No actionable findings**. `TST-E2E-003` remains partial until the seeded browser journeys; `TST-HARNESS-001` remains partial pending the required live Docker-unavailable observation.
+
 #### T-15.2 — Add the deterministic behavior seed and browser fixtures
+
+Status: in progress.
 
 - Files: `scripts/playwright-local/seed.ts`, `e2e/fixtures.ts`, `e2e/runtime-smoke.spec.ts`, `e2e/global-setup.ts`, and `src/test/playwright-seed.test.ts`.
 - Interfaces: `seedPlaywrightDatabase(databaseUrl: string, baseUrl: string): Promise<PlaywrightSeed>` creates verified scenario users through the real Better Auth handler and local mailbox; `PLAYWRIGHT_USERS` exposes typed `{ email, password, listName }` fixture data to specs; the seed inserts parameterized fixed-ID/timestamp lists and tasks through the harness-owned loopback connection without logging passwords, tokens, mailbox contents, or URLs.
