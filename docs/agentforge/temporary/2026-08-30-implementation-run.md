@@ -93,7 +93,7 @@ The accepted plan [`2026-08-31-t-12a-ui-audit.md`](../plans/2026-08-31-t-12a-ui-
 
 T-12A evidence includes `pnpm test` (20 files/110 tests), `pnpm test:integration` (6 files/23 tests against one disposable PostgreSQL 18 Testcontainer), typecheck, lint with only the pre-existing `Geist` warning, build, changed-file Prettier, `git diff --check`, Next.js runtime checks, and Chromium inspection of the four public/auth routes at `320x800`, `768x1024`, `1024x768`, and `1440x900`. The browser audit confirms skip-link target focus, next-Tab behavior, zero axe violations, no browser errors, and no horizontal overflow; the unauthenticated dashboard remains session-gated, with its new target covered by source/build inspection and T-10's earlier authenticated runtime evidence for unchanged behavior. T-15 subsequently adds the authenticated dashboard skip-link/next-Tab and repeatable Playwright/mailbox/privacy evidence; the affected TST-UI-001 and TST-E2E-* contracts are now reconciled as verified in the testing ledger.
 
-After T-12A merges, recompute TODO dependencies and start T-15 from the latest `main`; T-17 remains blocked by T-15.
+After T-12A merged, dependencies were recomputed and T-15 was started from the synchronized `main`; T-15 is now complete and T-17 is unblocked as recorded in the current checkpoint below.
 
 ## T-15 closeout checkpoint
 
