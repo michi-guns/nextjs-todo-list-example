@@ -53,7 +53,8 @@ The behavior seed is a small, explicit fixture in `scripts/playwright-local/`.
 It creates six independently usable scenario users through the real Better
 Auth handler and local email-verification mailbox, then inserts deterministic
 lists/tasks with fixed names, timestamps, and UUIDs through a parameterized
-local PostgreSQL connection. The fixture includes a core user, a pagination /
+local PostgreSQL connection. The fixture includes a listless core user (so the
+first dashboard load must provision the ordinary `Inbox`), a pagination /
 completed-filter user, a skip-link user, a magic-link user, and two
 privacy-isolation users. Each browser scenario owns a distinct seeded user (or
 the deliberate two-user pair), uses project-qualified names for records it

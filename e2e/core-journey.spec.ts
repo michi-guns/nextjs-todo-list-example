@@ -10,7 +10,7 @@ test("core password journey creates a list and task, changes status, and signs o
 
   await signInWithPassword(page, PLAYWRIGHT_USERS.core)
   await expect(
-    page.getByRole("heading", { name: PLAYWRIGHT_USERS.core.listName })
+    page.getByRole("heading", { name: "Inbox", exact: true })
   ).toBeVisible()
 
   const suffix = `${test.info().project.name}-${test.info().retry}`

@@ -28,7 +28,7 @@ export const PLAYWRIGHT_USERS: Readonly<
   core: {
     email: "playwright-core@example.test",
     password: PLAYWRIGHT_PASSWORD,
-    listName: "Core Inbox",
+    listName: "Inbox",
   },
   pagination: {
     email: "playwright-pagination@example.test",
@@ -137,7 +137,6 @@ function createTask(
 }
 
 export function createPlaywrightSeedPlan(): PlaywrightSeedPlan {
-  const coreList = createList("core", 1, PLAYWRIGHT_USERS.core.listName, 0)
   const paginationLists = Array.from({ length: 21 }, (_, index) =>
     createList(
       "pagination",
@@ -174,7 +173,6 @@ export function createPlaywrightSeedPlan(): PlaywrightSeedPlan {
   )
 
   const lists = [
-    coreList,
     ...paginationLists,
     skipList,
     magicList,
@@ -196,15 +194,6 @@ export function createPlaywrightSeedPlan(): PlaywrightSeedPlan {
   })
 
   const tasks = [
-    createTask(
-      "core",
-      coreList.id,
-      600,
-      "Core seeded task",
-      "todo",
-      0,
-      "A deterministic core task."
-    ),
     ...paginationTasks,
     createTask(
       "skipLink",

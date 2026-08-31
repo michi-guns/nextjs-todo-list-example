@@ -23,8 +23,8 @@ describe("Playwright behavior seed plan", () => {
     const listIds = plan.lists.map((list) => list.id)
     const taskIds = plan.tasks.map((task) => task.id)
 
-    expect(plan.lists).toHaveLength(26)
-    expect(plan.tasks).toHaveLength(26)
+    expect(plan.lists).toHaveLength(25)
+    expect(plan.tasks).toHaveLength(25)
     expect(new Set(listIds).size).toBe(listIds.length)
     expect(new Set(taskIds).size).toBe(taskIds.length)
     expect(listIds.every((id) => /^[0-9a-f-]{36}$/.test(id))).toBe(true)
@@ -38,6 +38,14 @@ describe("Playwright behavior seed plan", () => {
     ).toHaveLength(21)
     expect(plan.tasks.some((task) => task.status === "done")).toBe(true)
     expect(plan.tasks.some((task) => task.status === "todo")).toBe(true)
+  })
+
+  it("leaves the core user listless so the application provisions Inbox", () => {
+    const plan = createPlaywrightSeedPlan()
+
+    expect(PLAYWRIGHT_USERS.core.listName).toBe("Inbox")
+    expect(plan.lists.some((list) => list.userKey === "core")).toBe(false)
+    expect(plan.tasks.some((task) => task.userKey === "core")).toBe(false)
   })
 
   it("keeps list and task ownership keys aligned", () => {
