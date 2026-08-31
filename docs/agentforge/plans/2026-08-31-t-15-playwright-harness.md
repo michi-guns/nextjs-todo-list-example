@@ -105,9 +105,10 @@ Chromium-only.
 - `app/(auth)/*`, `components/auth/*`, and `components/dashboard/*` expose the
   stable labels, controls, actions, and skip-link target needed by the browser
   specs. Their product behavior is not being redesigned.
-- `package.json` currently has only the unconfigured `test:e2e` Playwright
-  script; it will receive the lifecycle/cross-browser commands without adding a
-  second test framework or remote service.
+- `package.json` keeps `test:e2e` as the Chromium-first Playwright
+  script; it also adds the explicit
+  cross-browser wrapper without adding a second test framework or remote
+  service.
 - `src/test/playwright-lifecycle.test.ts` and
   `src/test/playwright-seed.test.ts` will hold the focused Vitest checks for
   lifecycle guards and pure seed-plan behavior; the named Playwright smoke

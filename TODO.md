@@ -691,7 +691,7 @@ Evidence: the seed-plan Vitest checks (3 tests), the named Chromium `behavior se
 
 #### T-15.3 — Replace the example suite with Chromium journeys
 
-Status: in progress.
+Status: complete at reviewed tip `2efa151`.
 
 - Files: replace `e2e/example.spec.ts` with `e2e/core-journey.spec.ts`, `e2e/magic-link.spec.ts`, `e2e/privacy.spec.ts`, and `e2e/ui-contract.spec.ts`; add `e2e/fixtures.ts` and extend `e2e/runtime-smoke.spec.ts` only with the named seed smoke case.
 - Interfaces: `signInWithPassword(page: Page, user: PlaywrightSeedUser): Promise<void>` and `readMagicLinkWithRetry(email: string): Promise<MagicLinkMessage>` are the only shared browser helpers; use stable accessible labels and existing route/action boundaries; read the local mailbox only through `readLatestMagicLink()`/`clearMagicLinkMailbox()`; do not reach into Drizzle repositories or provider records.
@@ -701,7 +701,11 @@ Status: in progress.
 - Dependencies/unblock: T-15.2; T-15.4 consumes the complete journey evidence.
 - Recommended skills: `playwright-cli`, `browser-testing-with-devtools`, `testing-first-class`, `test-driven-development`, `incremental-implementation`, and `security-and-hardening`.
 
+Evidence: the exact Chromium run passes all seven journeys: deterministic landing, password sign-in/list/task/status/sign-out/private redirect, local mailbox magic-link request/read/consume, two-user UI/API privacy isolation, both cursor continuations with pre/post assertions, completed-task filtering, and dashboard skip-link activation followed by the next tab stop. Browser diagnostics fail on console errors, page errors, and unexpected request failures; the external `playwright.dev` sample is removed. Fresh GPT-5.6-Sol review of `2efa151` returned **No actionable findings**.
+
 #### T-15.4 — Add opt-in browsers and close out the task
+
+Status: in progress.
 
 - Files: `scripts/playwright-local/run.ts`, `package.json`, `playwright.config.ts`, `tsconfig.json`, the four named `e2e/*.spec.ts` files, `TODO.md`, `.dwf/decisions/TESTING.md`, and `docs/agentforge/temporary/2026-08-30-implementation-run.md`.
 - Interfaces: default direct Playwright invocation remains Chromium-only; `run.ts` sets `PLAYWRIGHT_CROSS_BROWSER=true` only for `pnpm test:e2e:cross-browser`, and `playwright.config.ts` expands the project list to Firefox/WebKit when that exact switch is true while retaining the same local lifecycle and no unknown-server reuse.

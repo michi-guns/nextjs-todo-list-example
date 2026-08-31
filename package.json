@@ -11,6 +11,7 @@
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:cross-browser": "tsx scripts/playwright-local/run.ts --cross-browser",
     "better-auth-mcp": "tsx scripts/better-auth-mcp/cli.ts",
     "sanity:smoke": "tsx scripts/verify-sanity.ts",
     "neon:performance": "node scripts/verify-neon-performance/cli.mjs",
