@@ -4,6 +4,7 @@ import os from "node:os"
 import path from "node:path"
 
 import { clearMagicLinkMailbox } from "../src/modules/auth/infrastructure/local-mailbox"
+import { seedPlaywrightDatabase } from "../scripts/playwright-local/seed"
 import {
   startPostgresHarness,
   stopPostgresHarness,
@@ -190,6 +191,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       createPlaywrightRuntimeEnvironment(harness.databaseUrl, mailboxDirectory)
     )
 
+    await seedPlaywrightDatabase(harness.databaseUrl, PLAYWRIGHT_BASE_URL)
     server = startNextServer()
     await Promise.race([
       waitForServerReady(PLAYWRIGHT_BASE_URL),
