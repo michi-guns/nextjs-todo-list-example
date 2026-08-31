@@ -584,10 +584,10 @@ Dependency recomputation: T-15 is now safely unblocked because T-05, T-09, T-10,
 
 ## Checkpoint: core product
 
-- [ ] Password and magic-link sign-in work locally.
-- [ ] The full local journey works: sign in, obtain Inbox, create list, create task, change status, sign out.
-- [ ] Lists and tasks are private, validated, paginated, and persisted in PostgreSQL.
-- [ ] The landing page reads Sanity content and cache recovery is protected.
+- [x] Password and magic-link sign-in work locally.
+- [x] The full local journey works: sign in, obtain Inbox, create list, create task, change status, sign out.
+- [x] Lists and tasks are private, validated, paginated, and persisted in PostgreSQL.
+- [x] The landing page reads Sanity content and cache recovery is protected.
 - [x] The selected UI direction is materialized and the implemented surfaces have been audited.
 
 ## Phase 4: verification and release evidence
