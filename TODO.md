@@ -1,6 +1,6 @@
 # Delivery TODO
 
-This file tracks implementation delivery for the starter baseline. The [DWF README](.dwf/README.md), [Agent PRD](.dwf/output/agent/PRD.md), [Agent SPEC](.dwf/output/agent/SPEC.md), and decision ledgers remain authoritative.
+This file tracks implementation delivery for the starter baseline and the post-baseline environment and delivery workstream. The [DWF README](.dwf/README.md), [Agent PRD](.dwf/output/agent/PRD.md), [Agent SPEC](.dwf/output/agent/SPEC.md), and decision ledgers remain authoritative.
 
 The [Testing Decisions and Test Contracts ledger](.dwf/decisions/TESTING.md) owns test policy, `TST-*` obligations, statuses, dependencies, and evidence expectations. This file assigns those contracts to delivery tasks; it does not redefine them.
 
@@ -788,11 +788,231 @@ Dependencies: T-12A, T-14, T-15, T-16 (all complete on `main` after PR #18 merge
 Plan: [`2026-08-31-t-17-documentation-quality.md`](docs/agentforge/plans/2026-08-31-t-17-documentation-quality.md).
 
 Dependency checkpoint: T-17.1, T-17.2, and T-17.3 are complete at the final
-reviewed documentation tip. No other safely unblocked implementation task
-remains in the current TODO graph. Neon migration evidence is blocked on an
-explicitly authorized branch realignment before the agent-owned branch
-expires; harness outage observation and deployed Sanity delivery are
-release/deployment evidence conditions, not unblocked implementation work.
+reviewed documentation tip. The baseline is complete. T-18.1 has now recorded
+the environment choices and canonical DWF/testing-ledger contracts; T-18.2
+and T-18.3 are the next unblocked implementation subtasks. Neon migration
+evidence remains blocked on an explicitly authorized branch realignment;
+harness outage observation and deployed Sanity delivery remain evidence
+conditions rather than reasons to alter the baseline.
+
+## Phase 5: environment and delivery pipeline
+
+This phase records the next proposed workstream. It deliberately separates
+design decisions, local development, durable hosted development, automatic CI,
+manual Preview delivery, manual Production release, pipeline verification, and
+documentation. T-18 through T-25 are the core environment workstream; T-26
+through T-29 are follow-on improvements that should not be pulled into the
+initial deployment foundation without a new scope decision.
+
+### T-18: Establish the environment contract and fail-closed target guardrails
+
+- [ ] Complete T-18 after all four contract, guardrail, and focused-test subtasks are accepted. This is the design and safety gate for the workstream.
+
+- Files: `.dwf/CONTEXT.md`, `.dwf/decisions/TECHNICAL.md`, `.dwf/decisions/TESTING.md`, `.dwf/output/agent/PRD.md`, `.dwf/output/agent/SPEC.md`, `docs/agentforge/plans/2026-08-31-t-18-environment-delivery-pipeline.md`, `docs/architecture/`, `docs/runbooks/`, `scripts/environment/`, `src/test/`, and `TODO.md`, limited to the smallest files selected by the subtasks below.
+- Interfaces: application-owned `APP_ENV` values `local`, `development`, `preview`, and `production`; explicit pooled runtime versus direct migration database roles; expected database branch/project identity; environment-specific application origin, Better Auth URL/secret, Sanity dataset/policy, mail transport, mutation permissions, and destructive-operation permissions; redacted target diagnostics; exact-ref input and resolved commit output for delivery commands.
+- Acceptance: the four run contexts are defined without overloading Next.js `NODE_ENV`; every environment has an explicit target contract; local database reset and remote migration/deployment commands fail closed before mutation when their target is missing, mismatched, remote, production, or otherwise unsafe; secrets are never printed or committed; the current Neon `main` default used by `.env.local` is not silently promoted to Development or Production; unresolved Preview Sanity, Preview mail, and Production database choices are recorded as decisions rather than guessed in code.
+- Contracts/evidence: T-18.1 must add or amend the canonical decision-ledger entries and formalize the `TST-ENV-001`, `TST-PIPELINE-001`, `TST-PREVIEW-001`, and `TST-RELEASE-001` contracts before implementation adds their behavior. Preserve and reconcile existing `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-LANDING-002`, and `TST-LANDING-003` honestly.
+- Checks: read the applicable DWF and installed framework guidance; run focused environment tests introduced by T-18.4; `pnpm typecheck`; `pnpm lint`; `pnpm test`; changed-file Prettier checks; and `git diff --check`. Do not claim hosted or production evidence from local tests.
+- Dependencies/unblock: baseline T-17 is complete. T-18.1 must complete before T-18.2/T-18.3; T-18.4 depends on the accepted contract and guard implementation. T-19, T-20, T-21, T-22, and T-23 depend on the applicable T-18 subtasks.
+- Recommended AgentForge skills: `planning`, `spec-driven-development`, `testing-first-class`, `test-driven-development`, `documentation-and-adrs`, `security-and-hardening`, `neon-postgres`, `neon-postgres-branches`, `ci-cd-and-automation`, and `git-workflow-and-versioning`.
+- Plan: [`2026-08-31-t-18-environment-delivery-pipeline.md`](docs/agentforge/plans/2026-08-31-t-18-environment-delivery-pipeline.md).
+
+#### T-18.1: Reconcile authority, settle open environment choices, and add test contracts
+
+- [x] Complete T-18.1 before implementing environment profiles or deployment workflows.
+- Files: `.dwf/CONTEXT.md`, `.dwf/decisions/TECHNICAL.md`, `.dwf/decisions/TESTING.md`, `.dwf/output/agent/PRD.md`, `.dwf/output/agent/SPEC.md` only where an accepted decision or contract genuinely belongs, `docs/agentforge/plans/2026-08-31-t-18-environment-delivery-pipeline.md`, and `TODO.md`.
+- Interfaces: a written environment matrix and decision record covering Local, Development, Preview, and Production; a resolved answer for Preview Sanity source/dataset, Preview email delivery or controlled-account strategy, and the Production database project/branch; canonical `TST-ENV-001`, `TST-PIPELINE-001`, `TST-PREVIEW-001`, and `TST-RELEASE-001` definitions with evidence boundaries and dependency links.
+- Acceptance: the stale scaffold snapshot in `.dwf/CONTEXT.md` is reconciled or explicitly superseded with verified current-state evidence; the chosen design preserves local Docker PostgreSQL plus hosted Sanity; durable Neon Development is distinguished from ephemeral isolated Preview branches; Production is not assumed to be Neon `main` until schema/migration alignment and protection are explicitly approved; manual Preview and manual exact-ref Production are stated as requirements; all unresolved choices have an owner, rationale, and follow-up rather than an implementation default hidden in environment variables.
+- Contracts/evidence: update the canonical testing ledger before executable implementation. Keep hosted boundary evidence (Neon/Vercel/Sanity) separate from unit or local harness evidence, and leave existing partial/blocked statuses unchanged unless new evidence actually resolves them.
+- Verification: `TD-026` records the four-profile matrix and resolves Preview Sanity to the dedicated non-production dataset, Preview mail to a controlled verified account, and Production to a separately provisioned protected Neon project/branch. The generated Agent/Human SPEC projections and `.dwf/CONTEXT.md` now distinguish the runnable local baseline from unprovisioned hosted targets. `TST-ENV-001`, `TST-PIPELINE-001`, `TST-PREVIEW-001`, and `TST-RELEASE-001` are canonical `specified` contracts with local versus hosted evidence boundaries; existing partial/blocked contract statuses are unchanged.
+- Checks: decision/contract consistency review against PRD, SPEC, technical/product ledgers, and the accepted plan; `pnpm sanity:smoke` (read-only Sanity smoke passed); changed-file Prettier checks; relative-link check; and `git diff --check`.
+- Dependencies/unblock: T-17; complete. This subtask unblocks T-18.2 and T-18.3. It does not provision, reset, or migrate any Neon branch.
+- Recommended AgentForge skills: `planning`, `spec-driven-development`, `documentation-and-adrs`, `testing-first-class`, `neon-postgres-branches`, `ci-cd-and-automation`, and `unslop`.
+
+#### T-18.2: Define profile, secret, and command contracts
+
+- [ ] Complete T-18.2 after T-18.1 accepts the environment matrix and canonical contracts.
+- Files: the selected environment configuration seat under `scripts/environment/` (or an explicitly documented equivalent), non-secret `.env.example`/profile documentation, `package.json` only for truthful command aliases, `README.md`/runbook references only when required to expose the contract, and focused tests.
+- Interfaces: typed profile parsing and validation; `APP_ENV`/`NODE_ENV` separation; runtime `DATABASE_URL` and migration `DATABASE_URL_UNPOOLED` roles; expected database target identity; Better Auth origin/secret; Sanity project/dataset/API version and write/revalidation policy; mail transport; Vercel/GitHub environment ownership; redacted `environment:inspect`-style diagnostics; exact-ref argument shape for preview/release commands.
+- Acceptance: profiles reject missing required values, production secrets in non-production profiles, local mailbox use in deployed profiles, unapproved remote targets for local reset, pooled URLs used for migrations, direct URLs used as runtime defaults where pooling is required, invalid origins, and ambiguous target identity; every profile documents which operations are allowed; diagnostics show names and safe metadata only.
+- Contracts/evidence: implement the contract described by `TST-ENV-001` after T-18.1 records it; preserve existing Better Auth, Sanity, migration, and harness boundaries. No provider-swapping framework is introduced.
+- Checks: focused profile/validation tests, `pnpm typecheck`, `pnpm lint`, changed-file Prettier checks, and `git diff --check`.
+- Dependencies/unblock: T-18.1. T-19 through T-23 consume this contract; no task may duplicate ad hoc environment parsing.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `security-and-hardening`, `api-and-interface-design`, `source-driven-development`, and `git-workflow-and-versioning`.
+
+#### T-18.3: Implement target classification and fail-closed guards
+
+- [ ] Complete T-18.3 after T-18.2 defines the profile and target interfaces.
+- Files: the selected `scripts/environment/` guard implementation, migration/reset/seed/deployment command adapters as needed, `db/` only if a target assertion must be enforced at the existing boundary, focused tests, and command documentation.
+- Interfaces: target classifier that checks provider/project/branch identity rather than trusting a friendly branch name; guard functions for local reset, migration, seed replacement, preview cleanup, and Production deployment; safe error codes/messages; resolved-ref/target evidence objects with secrets redacted.
+- Acceptance: a stale Neon `main` value cannot be used by a Local command; a Preview or Development command cannot mutate Production; a Production command cannot proceed with an unapproved or unresolved ref; a migration command cannot silently fall back from the direct URL to a pooled URL when direct access is required; every refusal happens before mutation and explains the smallest corrective action; guards work in PowerShell and CI command paths where both are supported.
+- Contracts/evidence: `TST-ENV-001` and the relevant existing migration/harness contracts; prove refusal paths with disposable/local targets and static command tests, not by experimenting against Production.
+- Checks: focused guard suite, negative target-matrix tests, `pnpm typecheck`, `pnpm lint`, changed-file Prettier checks, and `git diff --check`.
+- Dependencies/unblock: T-18.1 and T-18.2. T-19, T-20, T-22, and T-23 must use these guards rather than bypassing them.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `security-and-hardening`, `neon-postgres`, `neon-postgres-branches`, `ci-cd-and-automation`, and `git-workflow-and-versioning`.
+
+#### T-18.4: Prove the environment contract with focused tests
+
+- [ ] Complete T-18.4 after T-18.2 and T-18.3 are implemented and reviewed.
+- Files: `src/test/` or the chosen environment test seat, any test fixtures under `scripts/`, `.dwf/decisions/TESTING.md` only for evidence reconciliation, and `TODO.md` evidence.
+- Interfaces: deterministic test matrix for profile parsing, target classification, safe redaction, pooled/direct role selection, exact-ref resolution, and refusal-before-mutation behavior; no test fixture may require a Production credential or reset a shared Neon branch.
+- Acceptance: tests cover valid Local/Development/Preview/Production profiles, missing and conflicting variables, wrong branch/project identity, invalid origin, secret leakage, local mailbox rejection for deployed contexts, exact tags/SHAs/ambiguous refs, and destructive-command refusal; the suite is fast enough for local and CI use and does not weaken existing integration/E2E boundaries.
+- Contracts/evidence: establish the executable local portion of `TST-ENV-001`; record which Preview/Production claims remain boundary evidence for T-22/T-23/T-24 rather than pretending unit tests prove them.
+- Checks: focused test command introduced by this subtask; `pnpm test`; `pnpm typecheck`; changed-file Prettier checks; `git diff --check`.
+- Dependencies/unblock: T-18.1, T-18.2, and T-18.3. Completion unblocks the local, hosted development, and CI tasks.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `security-and-hardening`, `verification-before-completion`, and `git-workflow-and-versioning`.
+
+### T-19: Establish persistent Local Docker PostgreSQL while retaining hosted Sanity
+
+- [ ] Complete T-19 with a repeatable local Docker workflow and runtime evidence.
+- Files: `docker-compose.yml` or a repository-local equivalent under `scripts/local-postgres/`, `package.json`, `.env.example`/local setup documentation, `README.md`, `docs/runbooks/local-development-and-verification.md`, and local lifecycle tests.
+- Interfaces: explicit `pnpm dev:local` and database lifecycle commands for start/readiness/migrate/seed/stop; loopback-only local database target; the existing real Sanity client/configuration; the existing local/test mailbox; existing Testcontainers and Playwright flows remain available and are not silently redirected to Neon.
+- Acceptance: a contributor can start a persistent PostgreSQL 18 container, apply the committed migration chain, seed safe local data, run the app, authenticate through the local mailbox, exercise todo behavior, and read the real hosted Sanity landing path; local reset refuses every remote target; interrupted startup, migration failure, and seed failure leave a recoverable state; local commands never require Neon or Vercel credentials.
+- Contracts/evidence: `TST-ENV-001`, `TST-FOUNDATION-001`, `TST-HARNESS-001`, `TST-MIGRATION-001` where local evidence applies, `TST-AUTH-002`, `TST-LANDING-002`, and `TST-E2E-001`–`TST-E2E-003`; record Docker-daemon outage evidence only if observed.
+- Checks: focused local lifecycle tests; `pnpm typecheck`; `pnpm lint`; `pnpm test`; `pnpm test:integration`; the relevant local browser smoke; `pnpm build`; changed-file Prettier checks; and `git diff --check`.
+- Dependencies/unblock: T-18 complete; Docker is a required prerequisite for runtime verification. T-19 and T-20 may be developed in parallel after the shared contract, but T-21 consumes their stable command boundaries.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `security-and-hardening`, `next-dev-loop`, `browser-testing-with-devtools`, and `git-workflow-and-versioning`.
+
+### T-20: Establish a durable Neon Development target
+
+- [ ] Complete T-20 only after an owner-authorized durable Neon Development target exists.
+- Files: environment/profile adapters, Neon branch/connection helpers under `scripts/`, safe Development seed scripts/fixtures, migration smoke tests, `README.md`, `docs/runbooks/`, and redacted evidence under `docs/agentforge/evidence/` when hosted verification is performed.
+- Interfaces: owner-authorized durable Neon Development project/branch; pooled runtime URL and direct migration URL; safe non-production seed modes for ordinary development, browser behavior, and performance; branch identity assertion; migration smoke and redacted target inspection commands.
+- Acceptance: the developer can run the Next.js process locally against the durable Neon Development branch while using hosted Sanity; Drizzle migrations use the direct endpoint and application traffic uses the pooled endpoint; the target is not the temporary agent branch and does not expire unexpectedly; Development seed modes are deterministic and never reset Production or personal records; schema/migration evidence is captured on the authorized non-default target.
+- Contracts/evidence: close or advance `TST-MIGRATION-001` only with the required branch-first evidence; preserve `TST-PERFORMANCE-001`'s guarded Development target behavior; reconcile `TST-FOUNDATION-001`, `TST-PERSISTENCE-001`, and `TST-ENV-001` where applicable. The currently observed temporary Development branch expires on 2026-09-02 and cannot satisfy this task without explicit durable replacement/authorization.
+- Checks: Neon target/branch inspection; direct migration smoke; safe seed and rollback/refusal tests; `pnpm neon:performance` where relevant; `pnpm test`; `pnpm test:integration`; `pnpm typecheck`; `pnpm lint`; `pnpm build`; redacted evidence review; and `git diff --check`.
+- Dependencies/unblock: T-18; owner-authorized durable Neon target and credentials are required. Do not reset or consolidate the current Neon `main` branch as a shortcut.
+- Recommended AgentForge skills: `neon`, `neon-postgres`, `neon-postgres-branches`, `migration-history-workflow`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, and `git-workflow-and-versioning`.
+
+### T-21: Add automatic CI quality gates with no deployment side effects
+
+- [ ] Complete T-21 with a real quality-gate run and no deployment side effects.
+- Files: `.github/workflows/ci.yml` and any minimal repository scripts/configuration needed for existing quality gates; `README.md`/quality-gate docs only for truthful command references; no deployment workflow in this task.
+- Interfaces: automatic push/PR quality workflow; pinned or policy-approved actions; Node/pnpm/cache setup; existing typecheck, lint, unit, integration, build, migration-shape, and browser checks selected according to available CI prerequisites; explicit artifact and secret boundaries.
+- Acceptance: CI verifies the selected commit without deploying to Vercel, creating Neon Preview branches, mutating Sanity, or requiring Production secrets; failures are visible and actionable; Docker/browser prerequisites are declared; CI does not become an implicit every-PR Preview deployment; workflow permissions and concurrency are least-privilege and documented.
+- Contracts/evidence: `TST-FOUNDATION-001`, `TST-HARNESS-001`, `TST-E2E-001`–`TST-E2E-003`, `TST-ENV-001`, and the CI portion of `TST-PIPELINE-001`; distinguish workflow syntax/static evidence from an actually executed run.
+- Checks: workflow syntax/action policy check; a real CI run on the task commit; equivalent local gates `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, `pnpm build`, changed-file Prettier, and `git diff --check` as prerequisites allow.
+- Dependencies/unblock: T-18 and the stable local test command boundary from T-19; T-20 is required if CI runs hosted Development smoke, otherwise CI must stay disposable/local.
+- Recommended AgentForge skills: `ci-cd-and-automation`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, `source-driven-development`, and `git-workflow-and-versioning`.
+
+Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 must be reviewed before a hosted Preview workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
+
+### T-21.5: Establish the minimum Production mail foundation
+
+- [ ] Complete T-21.5 before T-23 can release Production.
+- Files: the existing Better Auth mail boundary, a thin owner-approved remote mail adapter/configuration, non-secret profile documentation, focused auth/environment tests, and redacted delivery/health evidence.
+- Interfaces: provider-backed `sendVerificationEmail` and `sendMagicLink` callbacks; explicit Production mail transport selection; protected provider configuration; fail-closed missing-configuration behavior; safe diagnostics that never expose message content, tokens, or credentials.
+- Acceptance: Production verification and magic-link sends use the approved remote transport; local/test mailbox settings are rejected in Preview and Production; missing or invalid Production mail configuration blocks release before deployment; non-Production profiles cannot use Production credentials; no provider-swapping framework is introduced.
+- Contracts/evidence: `TD-027`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-ENV-001`, `TST-PIPELINE-001`, and `TST-RELEASE-001`; keep local mailbox evidence separate from remote delivery evidence.
+- Checks: focused mail/profile tests; `pnpm test`; `pnpm typecheck`; `pnpm lint`; changed-file Prettier checks; `git diff --check`; and a controlled provider delivery/health smoke when the owner-authorized provider is available.
+- Dependencies/unblock: T-18.2 through T-18.4 and owner approval/provisioning of the Production mail provider. T-23 is blocked until this task's minimum foundation is verified; T-27 consumes it for broader authentication completion and abuse resistance.
+- Recommended AgentForge skills: `better-auth-best-practices`, `email-and-password-best-practices`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, `source-driven-development`, and `git-workflow-and-versioning`.
+
+### T-22: Add manually triggered, fully functional Vercel Preview delivery
+
+- [ ] Complete T-22 only after the owner authorizes a controlled hosted Preview run.
+- Files: `.github/workflows/deploy-preview.yml`, explicit deploy/branch/seed/smoke helpers under `scripts/deploy/` or equivalent thin adapters, preview environment configuration documentation, and redacted Preview evidence under `docs/agentforge/evidence/`.
+- Interfaces: `workflow_dispatch` inputs for an exact branch/tag/SHA and a safe preview identifier; resolved immutable commit SHA; isolated temporary Neon branch derived from durable Development; direct migration and safe seed sequence; Vercel Preview deployment; deployment-origin `BETTER_AUTH_URL`; non-production auth/mail/Sanity configuration; explicit cleanup/expiry path; workflow outputs for URL, deployment id, branch id, expiry, SHA, and redacted smoke result.
+- Acceptance: a client receives an ephemeral Preview that supports authentication, list/task mutations, landing content, and the relevant browser smoke path; Preview database writes are isolated from Development and Production; data is sanitized or deterministic; local filesystem mail is rejected and the selected remote-safe mail or controlled-account strategy works; the requested ref is resolved and displayed; cleanup is repeatable and does not delete another preview; no automatic Preview is created for ordinary PR activity.
+- Contracts/evidence: `TST-PIPELINE-001`, `TST-PREVIEW-001`, `TST-ENV-001`, `TST-AUTH-001`–`TST-AUTH-003`, `TST-LANDING-002`/`TST-LANDING-003` as applicable, and `TST-E2E-001`–`TST-E2E-003`; real Neon/Vercel evidence is required for hosted claims and must be redacted.
+- Checks: workflow validation; a controlled manual run from a known branch/tag/SHA; branch isolation assertion; direct migration/seed verification; deployed browser/API smoke; cleanup/expiry verification; workflow artifact review; and `git diff --check`. Never use Production as a test target.
+- Dependencies/unblock: T-18, T-20, and T-21; T-18.1 has resolved the Preview Sanity and mail strategy, while Vercel/Neon resources and the non-production dataset still require owner authorization and provisioning. Do not enable the workflow until the owner explicitly authorizes the hosted run.
+- Recommended AgentForge skills: `ci-cd-and-automation`, `neon-postgres-branches`, `neon-postgres`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, `browser-testing-with-devtools`, `next-dev-loop`, and `git-workflow-and-versioning`.
+
+### T-23: Add manually approved exact-ref Production release
+
+- [ ] Complete T-23 only after the Production target, migration policy, and protected approval path are accepted.
+- Files: `.github/workflows/deploy-production.yml`, release/ref/migration/smoke helpers under `scripts/deploy/`, protected environment configuration documentation, production runbook, and redacted release evidence under `docs/agentforge/evidence/`.
+- Interfaces: `workflow_dispatch` input accepting a tag or commit SHA; exact-ref resolution and verification; required CI evidence for the resolved SHA; protected GitHub `production` Environment approval; direct forward migration; Vercel production deployment of the exact SHA; post-deploy smoke; release record containing SHA, migration result, deployment id, rollback reference, and operator/time metadata without secrets.
+- Acceptance: no branch name or mutable “latest” alias can silently change the deployed commit; Production secrets are unavailable to CI/Preview jobs; migration runs separately from app boot through the direct endpoint; a failed deployment reports whether the database migration already succeeded and does not assume a database down-migration is safe; application rollback guidance names a compatible commit/ref and explicitly handles migration compatibility; the chosen Production Neon project/branch is protected and never reset by routine developer commands.
+- Contracts/evidence: `TST-RELEASE-001`, `TST-PIPELINE-001`, `TST-ENV-001`, `TST-MIGRATION-001`, `TST-LANDING-003`, and the relevant authentication/browser contracts; mark hosted contracts verified only after real protected-environment evidence.
+- Checks: workflow/ref-resolution tests; protected-environment approval evidence; controlled release rehearsal in an explicitly non-Production target where possible; real Production deployment only after owner approval; post-deploy smoke; redacted release artifact; `pnpm build`; and `git diff --check`.
+- Dependencies/unblock: T-18, T-20, T-21, and T-21.5; T-18.1 has resolved the Production target policy and migration-history boundary, while the protected project/branch and minimum mail transport still require owner provisioning and approval. This task must not promote the current Neon `main` merely because it is the existing `.env.local` target.
+- Recommended AgentForge skills: `ci-cd-and-automation`, `shipping-and-launch`, `migration-history-workflow`, `neon-postgres`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, `observability-and-instrumentation`, and `git-workflow-and-versioning`.
+
+Dependency checkpoint: T-22 and T-23 require the environment decisions, CI evidence, and hosted credentials/approvals they name. Neither task is unblocked by local unit tests alone. Do not claim the template's deployment pipeline is proven until T-24 covers both the simulated negative paths and the required disposable/controlled hosted boundaries.
+
+### T-24: Prove the complete environment and delivery pipeline
+
+This is the dedicated template-level pipeline test task. Its purpose is to
+prove that the environment setup is correct, not merely that individual
+commands compile.
+
+- [ ] Complete T-24 with layered local, static, and required disposable/controlled hosted evidence.
+- Files: `src/test/environment/`, `src/test/pipeline/` or the repository's established test seat, workflow/static validation fixtures, disposable Neon/Vercel/Sanity adapters or controlled evidence helpers, `package.json`, `.github/workflows/`, `docs/agentforge/evidence/`, `.dwf/decisions/TESTING.md`, and `TODO.md`.
+- Interfaces: a layered pipeline test command; profile/target matrix; exact-ref resolver; branch creation/identity/expiry/cleanup lifecycle; migration and seed sequencing; preview deployment contract; production approval/secret-scope contract; redacted evidence schema; failure-injection hooks that stop before shared/Production mutation.
+- Acceptance: tests cover every environment profile and forbidden cross-target combination; local reset cannot reach Neon; Development and Preview are isolated; Preview branch creation, migration, deterministic/sanitized seed, app configuration, functional smoke, cleanup, and expiry are traceable; the selected tag/SHA resolves to one immutable commit; automatic PR deployment is absent; migration/seed/deploy failures report state and clean up safely; Production workflow requires protected approval and cannot be exercised by non-production credentials; tests prove the full application path for a Preview when the controlled hosted prerequisite is available.
+- Contracts/evidence: formalize and reconcile `TST-PIPELINE-001`, `TST-PREVIEW-001`, and `TST-RELEASE-001`, plus `TST-ENV-001`; retain existing contract statuses when a boundary is unavailable. Layered tests may mock provider APIs for orchestration logic, but must include real disposable Neon/Vercel/browser evidence for claims those mocks cannot establish. Never run test cleanup or failure injection against Production.
+- Checks: focused pipeline suite; workflow syntax/static checks; `pnpm test`; `pnpm test:integration`; `pnpm test:e2e`; `pnpm typecheck`; `pnpm lint`; `pnpm build`; controlled Preview lifecycle run; controlled release/ref-resolution rehearsal; redacted evidence review; changed-file Prettier; and `git diff --check`.
+- Dependencies/unblock: T-18 through T-23. Neon/Vercel/Sanity credentials and disposable targets are required only for their named boundary tests; absent prerequisites must be reported, not replaced with a weaker claim.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `ci-cd-and-automation`, `security-and-hardening`, `browser-testing-with-devtools`, `next-dev-loop`, `verification-before-completion`, and `git-workflow-and-versioning`.
+
+### T-25: Carefully document the complete environment and delivery system
+
+This is the dedicated documentation task. It should leave a derived
+application operator able to understand, run, verify, preview, release, and
+recover the template without reading hidden agent context or guessing which
+database a command targets.
+
+- [ ] Complete T-25 after the implemented environment and pipeline behavior has truthful evidence.
+- Files: `README.md`, `docs/index.md`, `docs/architecture/environments.md`, `docs/runbooks/local-development-and-verification.md`, new Preview and Production release/recovery runbooks under `docs/runbooks/`, `docs/development/quality-gates.md`, `.dwf/CONTEXT.md` and supporting DWF/decision references only where T-18.1 authorizes reconciliation, `.env.example`-style non-secret templates, and `TODO.md` evidence links.
+- Interfaces: environment matrix; copyable Local/Development/Preview/Production setup commands; pooled/direct database explanation; Sanity and email boundaries; secret ownership/naming categories without values; Neon branch policy; manual workflow inputs; exact-ref and resolved-SHA behavior; seed modes; cleanup/expiry; approval gates; migration and rollback/recovery procedure; troubleshooting; evidence redaction rules; and a small architecture diagram or sequence showing the delivery lifecycle.
+- Acceptance: documentation is internally consistent with the canonical DWF decisions and implemented commands; it clearly says Local uses Docker PostgreSQL plus hosted Sanity, Development is a local app against durable Neon, Preview is a manually requested ephemeral fully functional deployment, and Production is an approved exact-ref release; it warns that pooled URLs are for runtime and direct URLs for migrations; it explains why an existing Neon `main` branch is not automatically Production; no credentials, tokens, or invented private links appear; stale scaffold statements are corrected or explicitly labeled historical; every operational command names its target and safety boundary.
+- Contracts/evidence: reconcile documentation obligations for `TST-ENV-001`, `TST-PIPELINE-001`, `TST-PREVIEW-001`, `TST-RELEASE-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-LANDING-002`, and `TST-LANDING-003` without changing statuses absent evidence.
+- Checks: link check; copy/paste review of commands; changed-file Prettier; `git diff --check`; documentation review against PRD/SPEC/decision ledgers; and a fresh proportional review of the final documentation tip.
+- Dependencies/unblock: T-18 through T-24 for final truth, though a short design draft may be prepared after T-18.1. Documentation must be updated when later implementation changes the command surface.
+- Recommended AgentForge skills: `documentation-and-adrs`, `writing-guidelines`, `unslop`, `testing-first-class`, `verification-before-completion`, and `git-workflow-and-versioning`.
+
+### T-26: Add runtime safety and observability hardening
+
+- [ ] Complete T-26 as a separately scoped post-baseline hardening task.
+- Files: application startup/configuration boundaries, health/readiness endpoints or checks, structured logging/metrics/tracing adapters, deployment smoke helpers, security headers/error handling, focused tests, and observability runbooks.
+- Interfaces: sanitized startup target summary; readiness that distinguishes app, database, and CMS dependencies; correlation/request identifiers; structured failure events for migration/deployment/runtime target mismatch; no secret-bearing logs; release evidence links.
+- Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
+- Contracts/evidence: add or reconcile the smallest observability/security contracts after the core pipeline is accepted; preserve current route behavior and existing `TST-*` obligations.
+- Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
+- Dependencies/unblock: T-24 and T-25; production-like observability requirements must be agreed before implementation.
+- Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
+
+### T-27: Complete authentication product flows and abuse resistance
+
+- [ ] Complete T-27 only after the mail/environment decisions and product scope are accepted.
+- Files: Better Auth configuration/routes, email verification and password-reset UI/routes, mail provider adapters, rate-limit/abuse controls, tests, and security/runbook documentation.
+- Interfaces: verified-email lifecycle, password-reset token lifecycle, safe error messages, expiration/replay behavior, remote-safe Preview mail strategy if still applicable, and account-abuse telemetry/limits.
+- Acceptance: verification and reset flows are usable and secure, tokens are single-use and time-bounded, user enumeration is minimized, Preview does not send uncontrolled mail, and the flows work against Local, Development, Preview, and Production profiles according to their mail policy.
+- Contracts/evidence: add security/auth contracts through the canonical testing ledger; preserve `TST-AUTH-001`–`TST-AUTH-003` and do not mark remote mail evidence from local mailbox tests.
+- Checks: TDD-focused auth tests, integration/browser journeys, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, and `git diff --check`.
+- Dependencies/unblock: T-21.5's minimum Production mail foundation, T-18's mail policy, and T-24's environment test boundaries; product acceptance is required before implementation. T-27 must not be the first task to establish the mail transport required by T-23.
+- Recommended AgentForge skills: `better-auth-best-practices`, `email-and-password-best-practices`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
+
+### T-28: Add Sanity authenticated preview and live authoring
+
+- [ ] Complete T-28 only after an explicit product decision moves the deferred Sanity capabilities into scope.
+- Files: Sanity presentation/preview routes and configuration, authenticated Draft Mode/Visual Editing/Live integration, webhook/revalidation handling, browser tests, and Sanity runbooks.
+- Interfaces: authenticated preview session, Preview/Development/Production dataset policy, webhook validation and recovery, live content refresh, and safe separation of editor credentials from public read configuration.
+- Acceptance: the selected Sanity live-authoring capability is explicit, authenticated, tested against the chosen dataset policy, and does not expose editor credentials; deployed webhook delivery/recovery evidence is real before its contract is marked verified.
+- Contracts/evidence: extend the canonical Sanity contracts after the T-18.1 dataset decision; preserve `TST-LANDING-002` and `TST-LANDING-003` evidence boundaries.
+- Checks: focused Sanity tests, real deployed webhook/live smoke when credentials are available, browser verification, `pnpm test`, `pnpm typecheck`, `pnpm lint`, and `git diff --check`.
+- Dependencies/unblock: T-22, T-24, and an explicit product decision to move the current deferred Sanity capabilities into scope.
+- Recommended AgentForge skills: `sanity-best-practices`, `sanity-migration`, `browser-testing-with-devtools`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
+
+### T-29: Publish the derived-application extension and replacement guide
+
+- [ ] Complete T-29 only after the core environment and delivery pipeline is reviewed.
+- Files: `docs/architecture/`, a derived-application guide/example, replacement-seam documentation for domain/UI/CMS/deployment adapters, and template verification notes.
+- Interfaces: documented seams for domain modules, UI surfaces, repositories, auth/mail, Sanity, database provider/branch policy, and delivery workflows; a minimal adaptation checklist that does not create a second framework.
+- Acceptance: a derived app can identify what to replace versus retain, inherit the environment safety and test pipeline, and prove its own profile/preview/release setup; guidance remains opinionated and concrete rather than becoming a provider-agnostic abstraction catalogue.
+- Contracts/evidence: add a template-derivation contract only if the DWF scope requires it; reuse `TST-ENV-001` and `TST-PIPELINE-001` as the safety baseline rather than creating duplicate authorities.
+- Checks: documentation link/command review, adaptation smoke example, changed-file Prettier, and `git diff --check`.
+- Dependencies/unblock: T-25 and the reviewed implementation of T-18 through T-24; product scope approval is required before adding a maintained example app.
+- Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
+
+Final post-baseline dependency checkpoint: T-18.1 is complete and unblocks
+T-18.2 and T-18.3. T-18.4 remains ordered behind those implementations;
+T-19 through T-25 remain ordered behind the contract and their named
+prerequisites; T-26 through T-29 are recorded follow-ons. No workflow, Neon
+branch mutation, Vercel deployment, or Production operation is authorized by
+this backlog entry alone.
 
 ## Explicitly out of scope for this baseline
 
@@ -802,5 +1022,4 @@ release/deployment evidence conditions, not unblocked implementation work.
 - Recurring tasks, subtasks, tags, attachments, comments, or payments.
 - Polished email verification and password-reset product flows.
 - Sanity Live, Draft Mode, Presentation Tool, and visual editing. These are deferred until after the webhook and manual-recovery baseline.
-- GitHub Actions CI and deployed Vercel preview evidence.
 - Speculative database indexes, Redis, application-level query caching, and provider-swapping abstractions.

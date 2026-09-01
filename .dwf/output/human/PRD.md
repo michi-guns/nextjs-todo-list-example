@@ -18,7 +18,7 @@ anonymous visitor
   → sign out
 ```
 
-The starter uses modern recommended practices and production-minded safeguards, but it is not a turnkey production SaaS. It favors the simplest robust implementation and accepts extra complexity only when a small investment clearly improves reusable quality or prevents meaningful rework. Vercel is its intended hosting target, although deployment is not required to complete the current starter baseline.
+The starter uses modern recommended practices and production-minded safeguards, but it is not a turnkey production SaaS. It favors the simplest robust implementation and accepts extra complexity only when a small investment clearly improves reusable quality or prevents meaningful rework. Vercel is its intended hosting target. The local starter baseline remains independently verifiable, while the accepted T-18 through T-25 workstream adds automatic CI and manually operated Preview/Production delivery when hosted prerequisites are provisioned.
 
 ## Product boundary
 
@@ -76,5 +76,11 @@ The local starter baseline is complete when it supports:
 15. representative Neon seed data and lightweight evidence that the main paginated database queries use their intended indexes and meet the agreed warm-query target.
 16. last-successful-write behavior for concurrent list and task edits without bypassing normal safeguards.
 17. automatic published-content invalidation through a trusted Sanity webhook plus protected manual recovery.
+
+The separate delivery workstream also defines automatic repository CI with no
+deployment side effects, manually requested isolated Preview delivery, and
+manually approved exact-ref Production release. Hosted credentials, targets,
+and approvals are explicit prerequisites rather than assumptions from local
+configuration.
 
 The exact implementation contract is in the [Agent SPEC](../agent/SPEC.md). It must implement the [Agent PRD](../agent/PRD.md) and may not weaken it.

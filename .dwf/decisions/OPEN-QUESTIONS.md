@@ -36,8 +36,8 @@ Evidence: [Better Auth magic-link documentation](https://better-auth.com/docs/pl
 ## OQ-002 — Sanity project and document evidence
 
 - **Status:** ANSWERED
-- **Blocking:** YES for the real landing integration — the answer is that no usable Sanity resource is currently configured
-- **Source:** repository files and local environment-key inspection on 2026-08-19
+- **Blocking:** NO for the real landing read path — the configured singleton smoke is verified; deployed webhook delivery remains partial under `TST-LANDING-003`
+- **Source:** repository files, configured non-secret environment-key inspection, and the read-only `pnpm sanity:smoke` on 2026-09-01
 - **Related:** D-005, D-008, TD-023, EC-007, OD-005
 
 ### Exact Question
@@ -52,9 +52,13 @@ The technical contract names the landing fields, but the repository currently ha
 
 Project configuration and a non-secret local/test document shape.
 
-### Answer
+### Historical answer (2026-08-19)
 
 No Sanity project, dataset, document type, or published landing document is currently available from this workspace. The package manifest has no Sanity dependency, the source tree has no Sanity client or schema configuration, and the local environment contains no Sanity configuration keys. A project resource must be provisioned before the real landing integration can be verified; OD-005 settles that it will be a dedicated project and dataset with one singleton landing document.
+
+### Current answer (2026-09-01)
+
+The repository now contains the Sanity dependency, client/configuration, validated landing read path, and dedicated landing singleton integration. The read-only `pnpm sanity:smoke` command fetched, validated, and mapped the published singleton fields `headline`, `blurb`, `primaryCtaLabel`, and `secondaryCtaLabel`. The configured project and dataset identifiers remain environment configuration and are not committed as secret material. The deployed webhook-delivery portion remains partial under `TST-LANDING-003`; it does not block the local landing read path or the T-18 environment contract.
 
 <a id="oq-003"></a>
 
