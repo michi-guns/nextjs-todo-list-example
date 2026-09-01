@@ -790,7 +790,9 @@ Plan: [`2026-08-31-t-17-documentation-quality.md`](docs/agentforge/plans/2026-08
 Dependency checkpoint: T-17.1, T-17.2, and T-17.3 are complete at the final
 reviewed documentation tip. The baseline is complete. T-18.1 has now recorded
 the environment choices and canonical DWF/testing-ledger contracts; T-18.2 and
-T-18.3 are complete, and T-18.4 is the next unblocked implementation subtask.
+T-18.3 and T-18.4 are complete. T-19 and T-20 are now the next unblocked
+environment work items after the shared contract, subject to their named
+local Docker and owner-authorized durable-target prerequisites.
 Neon migration evidence remains blocked on an explicitly authorized branch
 realignment; harness outage observation and deployed Sanity delivery remain
 evidence conditions rather than reasons to alter the baseline.
