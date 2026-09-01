@@ -50,6 +50,28 @@ Sanity is used only for landing content through a dedicated project and dataset 
 
 Live draft preview is an accepted later phase. It will use authenticated Next.js Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live so editors can read drafts, click through to source fields, and see changes while editing. It is not part of the initial webhook and manual-recovery delivery.
 
+## Environment and delivery
+
+The application uses an explicit `APP_ENV` value: `local`, `development`,
+`preview`, or `production`. Next.js continues to own `NODE_ENV`; the local
+test harness may pair `APP_ENV=local` with `NODE_ENV=test`. The full matrix and
+guard contract are in [`TD-026`](../../decisions/TECHNICAL.md#td-026) and the
+[Agent SPEC](../agent/SPEC.md#11-environment-and-delivery-contract).
+
+| Profile     | Database                                                                                          | Sanity and mail                                                                                                                           | Operations                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Local       | Persistent Docker PostgreSQL 18; direct URL for runtime and migration                             | Dedicated published `production` dataset read-only; temporary file mailbox allowed only in local/test                                     | Migrate, synthetic seed, and reset only after loopback/harness ownership checks                                              |
+| Development | Durable owner-authorized non-default Neon branch; pooled runtime URL and direct migration URL     | Dedicated published `production` dataset read-only; local mailbox may be used by the developer-owned process                              | Direct migration and scoped synthetic seed; no reset or Production deploy                                                    |
+| Preview     | Temporary Neon branch derived from durable Development; pooled runtime and direct migration roles | Dedicated non-production `preview` dataset read-only; controlled pre-seeded verified account; no local mailbox or arbitrary outbound mail | Manual exact-ref workflow, branch-scoped migration/seed, smoke, cleanup, and expiry                                          |
+| Production  | Separately provisioned protected Neon project/branch; pooled runtime URL and direct migration URL | Dedicated published `production` dataset read-only plus webhook/recovery; owner-approved provider; no local mailbox                       | Manual exact tag/SHA workflow after CI evidence and protected approval; forward migration, deploy, smoke, rollback reference |
+
+The current linked Neon default `main` is not silently promoted to Development
+or Production. The exact durable Development and protected Production
+identities are provisioning prerequisites, not fallback values. Diagnostics may
+show safe target names and metadata, but never connection strings, credentials,
+tokens, mailbox URLs, or auth secrets. Preview and Production delivery are
+manual; CI verifies the repository without deployment side effects.
+
 ## Required application behavior
 
 The minimum application APIs cover:
@@ -86,6 +108,8 @@ Use layered proof:
 - a representative Neon development seed plus `EXPLAIN ANALYZE` evidence for the core cursor queries;
 - correct maximum-size cursor pages and sub-50-ms warm database execution for a 20-record page;
 - pnpm typecheck, lint, tests, and local commit hooks.
+- environment-profile, target-classification, redaction, and refusal-before-mutation tests;
+- controlled Preview lifecycle evidence and protected exact-ref Production evidence for their respective delivery contracts.
 
 A full React component unit-test matrix and a per-commit performance benchmark are not required for the current starter baseline. The 50-ms target measures only warm database execution, not network, authentication, rendering, CMS access, or Neon compute startup.
 
@@ -93,4 +117,12 @@ Routine repository integration and Playwright tests use a harness-owned local Po
 
 ## Current implementation prerequisites
 
-No tracked design choice remains open. The current Neon HTTP adapter still needs to be replaced by the settled node-postgres runtime during implementation. Current-state inspection found no configured Sanity resource and confirmed that the linked Neon database contains the applied scaffold migration but not the planned `lists` or `tasks` schema. A dedicated Sanity resource and a non-default Neon development branch still need to be provisioned during implementation. These prerequisites remain visible in the factual-question ledger and project context.
+The environment direction and target-safety choices are accepted in
+[`TD-026`](../../decisions/TECHNICAL.md#td-026). Resource prerequisites remain
+separate: the ignored local environment still points at the linked Neon
+default `main`; the current agent-owned Neon `development` branch expires on
+2026-09-02 and is not a durable shared target; a protected Production Neon
+project/branch and Preview deployment resources have not been exercised; and
+the non-production Sanity dataset and remote Production mail provider still
+require owner-led provisioning. These facts do not authorize reset, promotion,
+deployment, or Production access.

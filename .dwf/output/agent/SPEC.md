@@ -169,6 +169,7 @@ Conceptual model (names may match Drizzle tables closely):
 - Apply the new reviewed migrations to the Neon development branch and verify the hosted upgrade path.
 - Apply the same reviewed migration to the default branch only after verification succeeds.
 - `drizzle-kit push` may support local exploration but does not count as migration verification.
+- Environment-aware migration commands must classify the target before mutation, use the direct `DATABASE_URL_UNPOOLED` role for Neon, and fail closed rather than falling back to a pooled remote `DATABASE_URL`. A `DATABASE_URL` fallback is permitted only after the target is proven to be direct local PostgreSQL.
 - Exact Neon branch name, lifetime, and migration-promotion command remain implementation or delivery choices.
 
 ### 3.4 Required indexes and constraints
@@ -447,26 +448,97 @@ The individual test obligations for this contract are owned by the [Testing Deci
 - Husky + lint-staged on commit (eslint/prettier as configured in `package.json`).
 - Scripts: `pnpm test`, `pnpm exec playwright test`, `pnpm typecheck`, `pnpm lint`.
 
+### 10.7 Environment and delivery evidence
+
+- Unit and static tests must cover the four `APP_ENV` profiles, required and conflicting configuration, origin validation, database target classification, pooled/runtime versus direct/migration role selection, safe redaction, local-mailbox restrictions, exact-ref resolution, and refusal before mutation.
+- Local Testcontainers and unit evidence can prove profile and guard behavior only. It cannot prove a Neon branch, Vercel deployment, Sanity dataset, protected Environment approval, Production secret scope, or deployed browser path.
+- CI may run automatically for repository verification, but it must not deploy, create Preview branches, mutate Sanity, or access Production secrets. Preview and Production workflows are manual and must emit the resolved commit and redacted target/deployment evidence.
+- Preview evidence requires an isolated temporary Neon branch, direct migration, deterministic or sanitized seed, deployment-origin auth configuration, controlled verified-account authentication, application/browser smoke, and identity-checked cleanup/expiry. Production evidence additionally requires exact-ref CI gating, protected approval, forward migration, deployment, post-deploy smoke, and a rollback reference.
+- Missing hosted prerequisites leave the affected contract `specified` or `blocked` with a named follow-up; they must not be represented as verified by local tests or by a weaker mock.
+
 ---
 
-## 11. Environment (categories only)
+## 11. Environment and delivery contract
 
-Do not commit secrets. Typical categories:
+The application uses an explicit `APP_ENV` with the values `local`,
+`development`, `preview`, and `production`. Do not overload `NODE_ENV`: Next.js
+continues to own `development`, `production`, and `test`. The local harness may
+use `APP_ENV=local` with `NODE_ENV=test`.
 
-- Pooled application database URL and direct migration database URL (Neon)
-- Ephemeral local database URL supplied by the Testcontainers harness; never committed
-- Better Auth secret + URL
-- Explicit local/test mailbox enablement and optional temporary path (non-secret)
-- Production magic-link email provider settings if deployment later requires them
-- Sanity project id, dataset, server read token, API version, webhook signature secret, and manual-recovery authorization
+Every profile must validate an application origin and matching
+`BETTER_AUTH_URL`, a non-empty Better Auth secret appropriate to the profile,
+the intended database provider/project/branch identity, the runtime and
+migration URL roles, the Sanity project/dataset and mutation policy, the mail
+policy, the secret namespace/owner, and the operations permitted for that
+profile. A friendly branch label alone is not target identity.
 
-Document exact variable names in README when wiring — not in this SPEC body if still unstable.
+| Profile     | Application and database target                                                                                                                                  | Sanity policy                                                                                                           | Mail policy                                                                                     | Permitted operations                                                                                                                                      |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local       | Explicit loopback origin; persistent Docker PostgreSQL 18; direct local `DATABASE_URL` and `DATABASE_URL_UNPOOLED`                                               | Dedicated project's published `production` dataset, read-only; local signed webhook/recovery checks may be exercised    | Temporary file-backed mailbox only in an explicitly enabled local/test process                  | Local migration, synthetic seed, and reset only after loopback/harness ownership is proven; no deployment                                                 |
+| Development | Explicit local origin; owner-authorized durable non-default Neon branch; pooled runtime `DATABASE_URL`, direct migration `DATABASE_URL_UNPOOLED`                 | Dedicated project's published `production` dataset, read-only                                                           | Local mailbox may be used by the developer-owned process; no production delivery                | Direct migration and scoped synthetic seed; no reset or Production deployment                                                                             |
+| Preview     | Deployment-assigned origin mirrored by `BETTER_AUTH_URL`; temporary Neon branch derived from durable Development, with pooled runtime and direct migration roles | Dedicated project's non-production `preview` dataset, read-only; no live authoring or CMS writes                        | Controlled pre-seeded verified account; local mailbox prohibited and no arbitrary outbound mail | Manual exact-ref preview, branch-scoped migration/seed, smoke, and identity-checked cleanup/expiry                                                        |
+| Production  | Canonical HTTPS origin; separately provisioned protected Neon project and branch, with pooled runtime and direct migration roles                                 | Dedicated project's published `production` dataset, read-only runtime plus the trusted webhook/manual recovery boundary | Owner-approved production provider; local mailbox prohibited; release blocked until configured  | Manual exact tag/SHA release after CI evidence and protected approval; forward migration, deployment, smoke, and application rollback reference; no reset |
+
+For Local and Development, the origin is an explicitly configured local
+process origin even though their database targets differ. `APP_ENV=development`
+does not authorize destructive reset of the durable Neon branch. For Preview,
+the controlled-account strategy covers the deployed authentication smoke;
+arbitrary sign-up and magic-link delivery require a later remote-mail decision.
+
+The current linked Neon project's default `main` is neither the durable
+Development target nor the Production target by implication. Development must
+name an owner-authorized durable non-default branch. Production must name a
+separately provisioned protected project and branch; its concrete identity is
+an owner-led prerequisite for the delivery tasks. The current temporary
+agent-owned development branch is not a durable shared target.
+
+`DATABASE_URL` is the application runtime role and `DATABASE_URL_UNPOOLED` is
+the direct migration role. Neon migrations require the latter and must refuse
+pooled-only configuration. Local direct PostgreSQL may use the same value for
+both roles. The application and tooling may report safe labels such as
+`appEnv=preview databaseTarget=neon-preview`, but never print a connection
+string, token, password, mailbox URL, auth secret, or provider credential.
+
+Preview delivery is manual and exact-ref based:
+
+```text
+workflow_dispatch(ref, preview-id)
+  → resolve and record one immutable commit SHA
+  → create and identify a temporary branch from durable Development
+  → migrate through the direct URL and seed safe non-production data
+  → deploy that SHA to Vercel Preview with its deployment-origin auth URL
+  → run functional smoke and report URL, deployment id, branch id, expiry, SHA
+  → clean up only the identity-matched branch, with an explicit expiry path
+```
+
+Production delivery is manual and protected:
+
+```text
+workflow_dispatch(ref = tag-or-sha)
+  → resolve one immutable commit SHA and verify required CI evidence
+  → wait for protected Production approval
+  → run the reviewed forward migration through the direct Production URL
+  → deploy the same SHA to Vercel Production and run post-deploy smoke
+  → record migration result, deployment id, rollback reference, and metadata
+```
+
+Migration remains separate from application boot. A failed application
+deployment may use an application rollback reference, but the workflow must
+not assume that a database down-migration is safe. CI has no deployment side
+effect, and Preview/Production jobs receive only their scoped secrets.
 
 ---
 
 ## 12. Implementation notes vs current scaffold
 
-As of writing, the repo already has partial scaffold (Next app router root `app/`, shadcn, root `db`, Drizzle config, Vitest/Playwright/Husky). The current database client uses Drizzle's Neon HTTP adapter; the target replaces it with the node-postgres boundary settled in OD-022. This SPEC describes the **target**. Grow toward `src/modules/*` and `src/sanity/`; avoid inventing a parallel architecture in `lib/`. The canonical design authority is `.dwf/`; Delivery artifacts, when created, belong outside `.dwf/`.
+As of writing, the repo contains the runnable authenticated todo baseline: the
+Next app router under `app/`, capability modules under `src/modules/`, the
+shared node-postgres/Drizzle database boundary, the Sanity landing integration,
+and the Vitest/Playwright/Husky quality tooling. This SPEC describes that
+validated baseline and the accepted environment/delivery contract in section 11. Extend the existing `src/modules/*` and `src/sanity/` boundaries; do not
+reintroduce the old scaffold or a parallel architecture in `lib/`. The
+canonical design authority is `.dwf/`; Delivery artifacts, when created,
+belong outside `.dwf/`.
 
 ---
 
@@ -564,7 +636,12 @@ The implementation must prove domain invariants, application use cases with port
 
 ### 14.8 Delivery boundary
 
-The Delivery System consumes this SPEC and the PRD. It owns Roadmap, Milestones, Phases, dependencies, readiness, lifecycle, acceptance, verification, evidence, and implementation handoff. It must not add task-level decomposition or rewrite this technical contract.
+The Delivery System consumes this SPEC and the PRD. It owns Roadmap,
+Milestones, Phases, dependencies, readiness, lifecycle, acceptance,
+verification, evidence, and implementation handoff. Its CI, Preview, and
+Production workflows must implement the environment and target boundaries in
+[section 11](#11-environment-and-delivery-contract); they must not add
+task-level decomposition or rewrite this technical contract.
 
 ### 14.9 Boundary type sketches
 
@@ -659,4 +736,15 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 
 ### 14.10 Current factual implementation prerequisites
 
-No tracked design choice remains open. Current external-resource and deployed-schema facts remain in [`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md); answered absence of a resource does not silently satisfy an implementation prerequisite.
+The environment direction and target-safety choices are accepted in
+[`TD-026`](../../decisions/TECHNICAL.md#td-026), and no tracked design choice
+remains open for this contract. Provisioning facts remain separate: the
+current `.env.local` points at the linked Neon default `main`, the existing
+agent-owned Neon `development` branch expires on 2026-09-02 and is not a
+durable shared target, the separately protected Production Neon project/branch
+has not been provisioned, and Preview Vercel/Neon resources and the dedicated
+non-production Sanity dataset have not been exercised. These facts and their
+follow-ups remain in
+[`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md) and
+the project context; they do not authorize reset, promotion, deployment, or
+Production access.

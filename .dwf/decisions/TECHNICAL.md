@@ -310,3 +310,57 @@ branch-first Neon workflow before promotion. If the state is unknown or
 contradictory, stop and resolve it with the owner rather than guessing. This
 policy does not authorize destructive file or database operations; explicit
 confirmation remains required before rewriting files or realigning targets.
+
+<a id="td-026"></a>
+
+## TD-026 — Explicit environment profiles and delivery target guardrails
+
+- **Status:** ACCEPTED
+- **Related product decisions:** D-009
+- **Related resolutions:** [OD-003](OPEN-DECISIONS.md#od-003), [OD-005](OPEN-DECISIONS.md#od-005), [OD-006](OPEN-DECISIONS.md#od-006), [OD-021](OPEN-DECISIONS.md#od-021), [OD-025](OPEN-DECISIONS.md#od-025)
+- **Source:** T-18.1 environment and delivery contract reconciliation
+
+The application owns an explicit `APP_ENV` with the values `local`,
+`development`, `preview`, and `production`. `NODE_ENV` remains reserved for
+Next.js and may be `test` alongside `APP_ENV=local` for the local harness. A
+profile is valid only when its application origin, Better Auth URL and secret,
+database target identity, Sanity policy, mail policy, and permitted operations
+agree with the profile below. The current linked Neon `main` target is not
+silently promoted to either Development or Production.
+
+| Profile     | Application and database target                                                                                                                                  | Sanity policy                                                                                                                    | Mail policy                                                                                       | Permitted operations                                                                                                                                      |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local       | Explicit loopback origin; persistent Docker PostgreSQL 18; direct local `DATABASE_URL` and `DATABASE_URL_UNPOOLED`                                               | Dedicated project's published `production` dataset, read-only; local signed webhook/recovery checks may be exercised             | Temporary file-backed mailbox only in an explicitly enabled local/test process                    | Local migration, synthetic seed, and reset only after loopback/harness ownership is proven; no deployment                                                 |
+| Development | Explicit local origin; owner-authorized durable non-default Neon branch; pooled runtime `DATABASE_URL`, direct migration `DATABASE_URL_UNPOOLED`                 | Dedicated project's published `production` dataset, read-only                                                                    | Local mailbox may be used by the developer-owned process; no production delivery                  | Direct migration and scoped synthetic seed; no reset or Production deployment                                                                             |
+| Preview     | Deployment-assigned origin mirrored by `BETTER_AUTH_URL`; temporary Neon branch derived from durable Development, with pooled runtime and direct migration roles | Dedicated project's non-production `preview` dataset, read-only; no live authoring or CMS writes                                 | Controlled pre-seeded verified account; local mailbox prohibited and no arbitrary outbound mail   | Manual exact-ref preview, branch-scoped migration/seed, smoke, and identity-checked cleanup/expiry                                                        |
+| Production  | Canonical HTTPS origin; separately provisioned protected Neon project and branch, with pooled runtime and direct migration roles                                 | Dedicated project's published `production` dataset, read-only runtime plus the existing trusted webhook/manual recovery boundary | Owner-approved production provider; local mailbox prohibited; release is blocked until configured | Manual exact tag/SHA release after CI evidence and protected approval; forward migration, deployment, smoke, and application rollback reference; no reset |
+
+The Preview choice is intentionally the non-production Sanity dataset and a
+controlled-account authentication path. It keeps Preview isolated from
+published editorial content and avoids sending uncontrolled mail while the
+remote provider decision remains outside this task. The repository/Sanity
+owner provisions the Preview dataset for T-22; the authentication/release
+operator owns the controlled verified account and any later T-27 mail-provider
+decision. The Production choice is a separate protected Neon project/branch
+rather than the current project's default `main`; the database/release owner
+provisions and approves its concrete identity through T-20/T-23. Until those
+owners complete provisioning, the affected delivery tasks remain unready and
+must not invent a target or transport.
+
+Neon migration tooling must use the direct `DATABASE_URL_UNPOOLED` role and
+must fail closed when only a pooled remote URL is available. A fallback to
+`DATABASE_URL` is permitted only after the target is proven to be direct local
+PostgreSQL. Profile and delivery diagnostics may print redacted names and
+safe metadata such as `appEnv=preview databaseTarget=neon-preview`, but never
+connection strings, credentials, mailbox URLs, auth secrets, or tokens.
+
+Preview delivery is manual `workflow_dispatch(ref, preview-id)`: resolve and
+record one immutable commit, create and identify its temporary branch, migrate
+and seed it, deploy the selected commit to Vercel Preview, run functional
+smoke coverage, and report cleanup/expiry metadata. Production delivery is
+manual `workflow_dispatch(ref=tag-or-sha)`: resolve the immutable commit,
+verify CI evidence, require the protected Production approval, run a reviewed
+forward migration separately from application boot, deploy the same commit,
+run smoke checks, and record migration/deployment/rollback evidence. CI has
+no deployment side effect, and no non-production workflow may access
+Production secrets or mutate a Production target.
