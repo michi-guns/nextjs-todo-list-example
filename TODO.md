@@ -869,6 +869,7 @@ Verification:
 - [x] `pnpm exec vitest run src/test/environment` passes 3 files and 93 tests; `pnpm test` passes 26 files and 214 tests.
 - [x] `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), changed-file Prettier checks, and `git diff --check` pass.
 - [x] Local tests prove only profile and guard behavior. Hosted provider identity, Vercel/Sanity boundaries, protected secrets, and Production mail remain future evidence for T-20, T-21.5, T-22, T-23, and T-24; no shared or Production target was mutated.
+- [x] PR: [#22](https://github.com/michi-guns/nextjs-todo-list-example/pull/22) is open from `task/T-18.4-environment-contract-tests`; final implementation tip `19c1d8b` received fresh GPT-5.6-Sol review with no actionable findings.
 
 ### T-19: Establish persistent Local Docker PostgreSQL while retaining hosted Sanity
 
