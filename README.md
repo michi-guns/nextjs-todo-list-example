@@ -29,10 +29,15 @@ pnpm install
 
 Create an ignored `.env.local` with values appropriate for your environment.
 This is a shape, not a credential source. Replace every placeholder locally
-and never commit the file.
+and never commit the file. The complete profile matrix and hosted boundaries are
+in the [environment profiles runbook](docs/runbooks/environment-profiles.md).
 
 ```dotenv
+APP_ENV=local
+NODE_ENV=development
+
 # Application database. The app uses DATABASE_URL.
+DATABASE_PROVIDER=local-postgres
 DATABASE_URL=postgresql://user:password@localhost:5432/todo
 
 # Direct connection for Drizzle migrations. For Neon, use the non-default
@@ -50,9 +55,14 @@ NEXT_PUBLIC_SANITY_API_VERSION=2026-08-27
 # Server-only secrets for the Sanity webhook and manual recovery route.
 SANITY_REVALIDATE_SECRET=replace-with-a-webhook-secret
 SANITY_MANUAL_RECOVERY_SECRET=replace-with-an-operator-secret
+SANITY_WRITE_POLICY=local-recovery
 
 # Required for local/test auth-link flows. Captures verification and magic links.
+APP_MAIL_TRANSPORT=local-mailbox
 BETTER_AUTH_LOCAL_MAILBOX=true
+
+DEPLOYMENT_OWNER=local
+SECRET_NAMESPACE=local
 # Optional location under the OS temp directory or ignored project directory.
 BETTER_AUTH_MAILBOX_DIR=.local/better-auth-mailbox
 ```
@@ -123,6 +133,7 @@ production build locally.
 | `pnpm test:integration`                                                           | Start one disposable PostgreSQL 18 Testcontainer, apply migrations, run serial integration tests, and clean up. |
 | `pnpm test:e2e`                                                                   | Start the local database/server/mailbox lifecycle and run the seven Chromium journeys.                          |
 | `pnpm test:e2e:cross-browser`                                                     | Opt in to the same journeys in Chromium, Firefox, and WebKit.                                                   |
+| `pnpm environment:inspect`                                                        | Validate the selected profile and print redacted target diagnostics.                                            |
 | `pnpm sanity:smoke`                                                               | Read, validate, and map the published Sanity landing singleton without mutating it.                             |
 | `pnpm neon:performance`                                                           | Run the guarded, opt-in Neon development-branch performance evidence lane.                                      |
 | `pnpm exec drizzle-kit check --config drizzle.config.ts`                          | Validate migration metadata and history.                                                                        |
@@ -140,15 +151,25 @@ for copyable PowerShell examples, browser selection, and recovery guidance.
 | -------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`                   | App runtime and migration fallback | PostgreSQL URL for the running app.                                                                                     |
 | `DATABASE_URL_UNPOOLED`          | Drizzle Kit                        | Required for Neon migrations. Use a direct development-branch URL; fallback to `DATABASE_URL` is for direct local URLs. |
+| `APP_ENV`                        | Environment profile parser         | Explicit application profile: `local`, `development`, `preview`, or `production`.                                       |
+| `NODE_ENV`                       | Next.js and profile parser         | Runtime mode only: `development`, `test`, or `production`; it does not select a database target.                        |
+| `DATABASE_PROVIDER`              | Environment profile parser         | `local-postgres` for Local; `neon` for Development, Preview, and Production.                                            |
+| `DATABASE_PROJECT_ID`            | Environment profile parser         | Expected Neon project identity for remote profiles.                                                                     |
+| `DATABASE_BRANCH`                | Environment profile parser         | Expected Neon branch identity for remote profiles.                                                                      |
 | `BETTER_AUTH_URL`                | Better Auth                        | Canonical local/deployed auth origin.                                                                                   |
-| `BETTER_AUTH_SECRET`             | Better Auth                        | Keep private. Required in production.                                                                                   |
+| `BETTER_AUTH_SECRET`             | Better Auth                        | Keep private. Required for every explicit environment profile.                                                          |
 | `BETTER_AUTH_LOCAL_MAILBOX`      | Local/test auth links              | Required for local auth-link flows; must be `true` and only works in development/test.                                  |
 | `BETTER_AUTH_MAILBOX_DIR`        | Local/test auth links              | Optional path under the OS temp directory or ignored `.local/better-auth-mailbox`.                                      |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Sanity client and Studio           | Public project identifier.                                                                                              |
 | `NEXT_PUBLIC_SANITY_DATASET`     | Sanity client and Studio           | Published dataset name.                                                                                                 |
 | `NEXT_PUBLIC_SANITY_API_VERSION` | Sanity client and Studio           | Optional API version; the code has a current default.                                                                   |
+| `SANITY_WRITE_POLICY`            | Environment profile parser         | `read-only`, `local-recovery`, or `production-recovery`, matching the selected profile.                                 |
 | `SANITY_REVALIDATE_SECRET`       | Sanity webhook route               | Server-only webhook secret.                                                                                             |
 | `SANITY_MANUAL_RECOVERY_SECRET`  | Sanity recovery route              | Server-only operator secret.                                                                                            |
+| `APP_MAIL_TRANSPORT`             | Environment profile parser         | Local mailbox, controlled account, or remote provider policy.                                                           |
+| `APP_MAIL_PROVIDER`              | Environment profile parser         | Safe provider-name metadata for the remote transport.                                                                   |
+| `DEPLOYMENT_OWNER`               | Environment profile parser         | `local`, `github`, or `vercel`, constrained by profile.                                                                 |
+| `SECRET_NAMESPACE`               | Environment profile parser         | Profile-scoped secret namespace; never a secret value.                                                                  |
 
 Do not commit `.env*`, credentials, tokens, captured URLs, mailbox files, or
 generated test reports. The normal Playwright command sets its own temporary
