@@ -741,13 +741,14 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 ### 14.10 Current factual implementation prerequisites
 
 The environment direction and target-safety choices are accepted in
-[`TD-026`](../../decisions/TECHNICAL.md#td-026), and no tracked design choice
+[`TD-026`](../../decisions/TECHNICAL.md#td-026) and [`TD-027`](../../decisions/TECHNICAL.md#td-027), and no tracked design choice
 remains open for this contract. Provisioning facts remain separate: the
 current `.env.local` points at the linked Neon default `main`, the existing
 agent-owned Neon `development` branch expires on 2026-09-02 and is not a
 durable shared target, the separately protected Production Neon project/branch
-has not been provisioned, and Preview Vercel/Neon resources and the dedicated
-non-production Sanity dataset have not been exercised. These facts are
+and remote Production mail provider have not been provisioned, and Preview
+Vercel/Neon resources and the dedicated non-production Sanity dataset have not
+been exercised. These facts are
 recorded in [`../../CONTEXT.md`](../../CONTEXT.md), with follow-ups tracked in
 [`../../../TODO.md`](../../../TODO.md). They do not authorize reset, promotion,
 deployment, or Production access.
