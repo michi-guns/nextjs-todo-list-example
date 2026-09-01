@@ -866,7 +866,7 @@ initial deployment foundation without a new scope decision.
 
 Verification:
 
-- [x] `pnpm exec vitest run src/test/environment` passes 3 files and 91 tests; `pnpm test` passes 26 files and 210 tests.
+- [x] `pnpm exec vitest run src/test/environment` passes 3 files and 91 tests; `pnpm test` passes 26 files and 212 tests.
 - [x] `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), changed-file Prettier checks, and `git diff --check` pass.
 - [x] Local tests prove only profile and guard behavior. Hosted provider identity, Vercel/Sanity boundaries, protected secrets, and Production mail remain future evidence for T-20, T-21.5, T-22, T-23, and T-24; no shared or Production target was mutated.
 
