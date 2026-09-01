@@ -158,38 +158,84 @@ const productionApproval = {
   approved: true,
 }
 
-it("refuses a mutable Development profile pointed at the default Neon main branch", () => {
-  const parsed = parseEnvironmentProfile(developmentEnvironment())
+it.each([
+  ["development", developmentEnvironment],
+  ["preview", () => neonEnvironment("preview")],
+] as const)(
+  "refuses a mutable %s profile pointed at the default Neon main branch",
+  (appEnv, createEnvironment) => {
+    const parsed = parseEnvironmentProfile(createEnvironment())
+    const migrationUrl =
+      "postgresql://migration:migration-password@ep-main.neon.tech:5432/todo"
+    const profile: EnvironmentProfile = {
+      ...parsed,
+      database: {
+        ...parsed.database,
+        branch: "main",
+        migrationUrl,
+      },
+    }
+    const target: DatabaseTargetIdentity = {
+      provider: "neon",
+      projectId: "project-id",
+      branch: "main",
+      host: "ep-main.neon.tech",
+    }
+    const connection: DatabaseConnectionObservation = {
+      target: { ...target, host: "ep-main.neon.tech" },
+      role: "direct",
+      url: migrationUrl,
+    }
+
+    expect(profile.appEnv).toBe(appEnv)
+    expect(() =>
+      assertMigrationAllowed({ profile, target, connection })
+    ).toThrowError(
+      expect.objectContaining<Partial<EnvironmentGuardError>>({
+        code: "target_mismatch",
+        message: expect.stringContaining("default main branch"),
+      })
+    )
+  }
+)
+
+it("allows a separately identified Production target whose branch is named main", () => {
+  const parsed = parseEnvironmentProfile(neonEnvironment("production"))
   const migrationUrl =
-    "postgresql://migration:migration-password@ep-main.neon.tech:5432/todo"
+    "postgresql://migration:migration-password@ep-protected-production.neon.tech:5432/todo"
   const profile: EnvironmentProfile = {
     ...parsed,
     database: {
       ...parsed.database,
+      projectId: "protected-production-project",
       branch: "main",
       migrationUrl,
     },
   }
   const target: DatabaseTargetIdentity = {
     provider: "neon",
-    projectId: "project-id",
+    projectId: "protected-production-project",
     branch: "main",
-    host: "ep-main.neon.tech",
-  }
-  const connection: DatabaseConnectionObservation = {
-    target: { ...target, host: "ep-main.neon.tech" },
-    role: "direct",
-    url: migrationUrl,
+    host: "ep-protected-production.neon.tech",
   }
 
-  expect(() =>
-    assertMigrationAllowed({ profile, target, connection })
-  ).toThrowError(
-    expect.objectContaining<Partial<EnvironmentGuardError>>({
-      code: "target_mismatch",
-      message: expect.stringContaining("default main branch"),
-    })
-  )
+  const evidence = assertMigrationAllowed({
+    profile,
+    target,
+    connection: directConnection(profile, target),
+    resolvedRef: resolvedRef("tag"),
+    approval: productionApproval,
+  })
+
+  expect(evidence).toMatchObject({
+    appEnv: "production",
+    database: {
+      provider: "neon",
+      projectId: "protected-production-project",
+      branch: "main",
+      role: "direct",
+    },
+  })
 })
 
 describe("TST-ENV-001 profile matrix", () => {
