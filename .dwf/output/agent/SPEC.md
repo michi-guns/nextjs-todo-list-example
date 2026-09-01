@@ -419,7 +419,10 @@ The individual test obligations for this contract are owned by the [Testing Deci
 - Playwright does not depend on Neon credentials or a developer's already-running application server.
 - Routine Playwright uses deterministic test-only landing content through the application-facing landing contract and does not require Sanity credentials or network access. This source is unavailable in deployed runtime modes.
 - Exact process wrapper, Playwright project and script names, browser-selection mechanism, ports, and seed-builder APIs remain implementation choices.
-- CI: **not required** for the currently accepted starter baseline.
+- CI is an accepted separate delivery workstream. When implemented, it runs
+  repository verification without deployment, Preview-branch creation, Sanity
+  mutation, or Production-secret access; it does not replace the local baseline
+  or become an automatic Preview deployment.
 
 ### 10.4 Sanity verification
 
@@ -453,7 +456,7 @@ The individual test obligations for this contract are owned by the [Testing Deci
 - Unit and static tests must cover the four `APP_ENV` profiles, required and conflicting configuration, origin validation, database target classification, pooled/runtime versus direct/migration role selection, safe redaction, local-mailbox restrictions, exact-ref resolution, and refusal before mutation.
 - Local Testcontainers and unit evidence can prove profile and guard behavior only. It cannot prove a Neon branch, Vercel deployment, Sanity dataset, protected Environment approval, Production secret scope, or deployed browser path.
 - CI may run automatically for repository verification, but it must not deploy, create Preview branches, mutate Sanity, or access Production secrets. Preview and Production workflows are manual and must emit the resolved commit and redacted target/deployment evidence.
-- Preview evidence requires an isolated temporary Neon branch, direct migration, deterministic or sanitized seed, deployment-origin auth configuration, controlled verified-account authentication, application/browser smoke, and identity-checked cleanup/expiry. Production evidence additionally requires exact-ref CI gating, protected approval, forward migration, deployment, post-deploy smoke, and a rollback reference.
+- Preview evidence requires an isolated temporary Neon branch, direct migration, deterministic or sanitized seed, deployment-origin auth configuration, controlled verified-account authentication, application/browser smoke, and identity-checked cleanup/expiry. Production evidence additionally requires exact-ref CI gating, protected approval, the minimum configured Production mail transport, forward migration, deployment, post-deploy smoke, and a rollback reference.
 - Missing hosted prerequisites leave the affected contract `specified` or `blocked` with a named follow-up; they must not be represented as verified by local tests or by a weaker mock.
 
 ---
@@ -516,6 +519,7 @@ Production delivery is manual and protected:
 ```text
 workflow_dispatch(ref = tag-or-sha)
   → resolve one immutable commit SHA and verify required CI evidence
+  → verify the minimum configured Production mail transport
   → wait for protected Production approval
   → run the reviewed forward migration through the direct Production URL
   → deploy the same SHA to Vercel Production and run post-deploy smoke
@@ -743,8 +747,7 @@ current `.env.local` points at the linked Neon default `main`, the existing
 agent-owned Neon `development` branch expires on 2026-09-02 and is not a
 durable shared target, the separately protected Production Neon project/branch
 has not been provisioned, and Preview Vercel/Neon resources and the dedicated
-non-production Sanity dataset have not been exercised. These facts and their
-follow-ups remain in
-[`../../decisions/OPEN-QUESTIONS.md`](../../decisions/OPEN-QUESTIONS.md) and
-the project context; they do not authorize reset, promotion, deployment, or
-Production access.
+non-production Sanity dataset have not been exercised. These facts are
+recorded in [`../../CONTEXT.md`](../../CONTEXT.md), with follow-ups tracked in
+[`../../../TODO.md`](../../../TODO.md). They do not authorize reset, promotion,
+deployment, or Production access.

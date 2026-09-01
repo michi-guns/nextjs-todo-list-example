@@ -55,8 +55,9 @@ Live draft preview is an accepted later phase. It will use authenticated Next.js
 The application uses an explicit `APP_ENV` value: `local`, `development`,
 `preview`, or `production`. Next.js continues to own `NODE_ENV`; the local
 test harness may pair `APP_ENV=local` with `NODE_ENV=test`. The full matrix and
-guard contract are in [`TD-026`](../../decisions/TECHNICAL.md#td-026) and the
-[Agent SPEC](../agent/SPEC.md#11-environment-and-delivery-contract).
+guard contract are in [`TD-026`](../../decisions/TECHNICAL.md#td-026); the
+Production mail prerequisite is in [`TD-027`](../../decisions/TECHNICAL.md#td-027);
+and the implementation contract is in the [Agent SPEC](../agent/SPEC.md#11-environment-and-delivery-contract).
 
 | Profile     | Database                                                                                          | Sanity and mail                                                                                                                           | Operations                                                                                                                   |
 | ----------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -67,7 +68,9 @@ guard contract are in [`TD-026`](../../decisions/TECHNICAL.md#td-026) and the
 
 The current linked Neon default `main` is not silently promoted to Development
 or Production. The exact durable Development and protected Production
-identities are provisioning prerequisites, not fallback values. Diagnostics may
+identities are provisioning prerequisites, not fallback values. Production
+release also requires the minimum owner-approved remote mail transport; the
+local mailbox is never a deployed fallback. Diagnostics may
 show safe target names and metadata, but never connection strings, credentials,
 tokens, mailbox URLs, or auth secrets. Preview and Production delivery are
 manual; CI verifies the repository without deployment side effects.

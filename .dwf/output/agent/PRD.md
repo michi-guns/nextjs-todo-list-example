@@ -7,7 +7,7 @@
 
 This projection is generated from the durable DWF Workspace. It is the precise observable product contract; it does not own decision rationale or implementation mechanisms.
 
-This repository is a **public, standalone, opinionated Next.js starter** implemented as a complete personal-todo reference application on the selected [Next.js stack](../../../docs/architecture/stack.md). Vercel is the intended hosting target, although deployment remains optional for starter-baseline completion. The reference domain is intentionally simple; the reusable foundations are production-minded.
+This repository is a **public, standalone, opinionated Next.js starter** implemented as a complete personal-todo reference application on the selected [Next.js stack](../../../docs/architecture/stack.md). Vercel is the intended hosting target. The locally verifiable starter baseline remains independently complete, while the accepted T-18 through T-25 workstream adds automatic CI quality gates and manually operated Preview and Production delivery paths when their hosted prerequisites are provisioned. The reference domain is intentionally simple; the reusable foundations are production-minded.
 
 ---
 
@@ -41,9 +41,10 @@ A todo list is a universally understood reference domain, so the architecture an
 7. Validate inputs with **Zod** at server boundaries.
 8. Use **shadcn/ui** with a richer dashboard-style signed-in shell that demonstrates a replaceable, high-quality product UI.
 9. Prove **Vitest** unit coverage, real local PostgreSQL integration coverage, and **Playwright** happy paths.
-10. Use **Husky + lint-staged** for local quality; no GitHub Actions CI is required for the currently accepted starter baseline.
+10. Use **Husky + lint-staged** for local quality and automatic repository CI quality gates with no deployment side effects.
 11. Demonstrate that the core cursor reads are index-backed and comfortably fast on a representative Neon development dataset.
 12. Prefer current stable best practices and high-leverage production safeguards without adding speculative framework machinery.
+13. Provide manually requested isolated Preview and manually approved exact-ref Production delivery paths with explicit target, secret, approval, migration, smoke, and evidence boundaries.
 
 ## 3. Non-goals (explicit)
 
@@ -62,7 +63,7 @@ Out of scope for the current todo reference baseline:
 - Shared lists between users
 - Offline / PWA
 - Multi-region production operations
-- GitHub Actions CI matrix
+- A generic GitHub Actions CI matrix for interchangeable stacks or providers
 
 ## 4. Users and permissions
 
@@ -152,7 +153,9 @@ The starter baseline is complete when all of the following are true **locally**:
 16. Concurrent list and task edits use last-successful-write behavior without weakening ownership, validation, or uniqueness enforcement.
 17. A trusted Sanity webhook automatically refreshes published landing content, and an authorized operator can trigger the same cache invalidation for recovery.
 
-Deployed Vercel preview is **optional**, not required for the currently accepted starter baseline.
+Deployed Vercel Preview is not required to establish the locally verifiable
+starter baseline, but it is part of the accepted T-18 through T-25 delivery
+workstream when its named hosted prerequisites are provisioned.
 
 ## 8. Success metrics (qualitative)
 

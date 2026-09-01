@@ -95,3 +95,20 @@ Published landing-content changes automatically invalidate the affected public c
 This repository's product is an opinionated, production-minded Next.js starter implemented as a complete personal-todo reference application. A derived application should be able to replace mostly the domain and UI while retaining or adapting the cross-cutting foundations. The starter provides one preferred stack and architecture rather than abstractions for interchangeable frameworks, databases, authentication systems, or content platforms.
 
 The todo reference baseline remains locally verifiable through the complete authenticated journey and agreed boundary, persistence, integration, browser, migration, and quality evidence. Use current stable best practices and the simplest design that is genuinely robust. Add modest complexity when it produces a clear, reusable gain in safety, correctness, operability, maintainability, or avoided rework; do not spend baseline implementation time on speculative abstraction or low-leverage polish. Deployment and CI remain separate explicit scope decisions.
+
+<a id="d-010"></a>
+
+## D-010 — Environment and delivery workstream
+
+- **Status:** ACCEPTED
+- **Source:** T-18 delivery-scope acceptance following T-18.1 review
+- **Related:** [D-009](#d-009), [TD-026](TECHNICAL.md#td-026), [TD-027](TECHNICAL.md#td-027), [TST-PIPELINE-001](TESTING.md#tst-pipeline-001), [Agent PRD](../output/agent/PRD.md#2-goals)
+
+The repository accepts a separate T-18 through T-25 environment and delivery
+workstream in addition to the locally verifiable starter baseline. The
+workstream includes automatic repository CI quality gates with no deployment
+side effects, a manually requested isolated Preview path, and a manually
+approved exact-ref Production release path. Hosted resources, credentials, and
+protected approvals remain explicit prerequisites; local configuration must
+never imply them. CI cannot access Production secrets or create Preview
+deployments, and ordinary pull requests do not create deployed Previews.

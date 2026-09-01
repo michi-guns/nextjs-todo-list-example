@@ -52,6 +52,10 @@ T-18.1 resolves the remaining choices as the explicit contract in
    Production. The concrete project/branch identity remains an owner-led
    provisioning prerequisite for T-20/T-23 and cannot be hidden in code or an
    environment-variable fallback.
+4. **Minimum Production mail foundation:** before T-23, T-21.5 establishes an
+   owner-approved remote transport for the existing Better Auth verification
+   and magic-link callbacks. The local mailbox remains prohibited in deployed
+   profiles; T-27 owns the broader authentication and abuse-resistance work.
 
 The matrix and guard semantics are canonical in TD-026 and the generated
 [Agent SPEC environment contract](../../../.dwf/output/agent/SPEC.md#11-environment-and-delivery-contract).
@@ -59,29 +63,32 @@ No later task should guess these choices in code.
 
 Ownership and follow-up are explicit: the repository/Sanity owner provisions
 the dedicated Preview dataset for T-22; the authentication/release operator
-owns the controlled Preview account and any later remote-mail decision in
-T-27; and the database/release owner provisions and approves the protected
-Production Neon project/branch through T-20/T-23. Until those external
-resources exist, the affected tasks remain unready; this plan does not
-authorize mutation, promotion, or deployment.
+owns the controlled Preview account; T-21.5 owns the minimum Production mail
+foundation; T-27 owns later remote Preview mail and broader auth work; and the
+database/release owner provisions and approves the protected Production Neon
+project/branch through T-20/T-23. Until those external resources exist, the
+affected tasks remain unready; this plan does not authorize mutation,
+promotion, or deployment.
 
 ## Capability map
 
-| Capability id             | Responsibility                                                                                 | Depends on                                                                    |
-| ------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `environment-contract`    | Names, profiles, secrets, target classification, and fail-closed safety rules                  | Current DWF and baseline evidence                                             |
-| `local-runtime`           | Persistent Docker PostgreSQL development mode while retaining hosted Sanity                    | `environment-contract`                                                        |
-| `neon-development`        | Durable Neon development target, direct/pooled URLs, migration and seed workflow               | `environment-contract`, owner-authorized Neon target                          |
-| `continuous-verification` | Automatic CI quality gates with no deployment side effects                                     | `environment-contract`, existing test harness                                 |
-| `preview-delivery`        | Manually triggered, fully functional Vercel preview with isolated seeded Neon branch           | `neon-development`, `continuous-verification`, preview email/Sanity decisions |
-| `production-release`      | Manually approved exact-ref release, migration, deployment, smoke, and rollback evidence       | `environment-contract`, `continuous-verification`, production target          |
-| `pipeline-verification`   | Tests and controlled evidence for the complete environment and delivery lifecycle              | All delivery capabilities                                                     |
-| `documentation`           | One coherent contributor/operator guide and reconciled current-state documentation             | All accepted environment decisions; implementation evidence                   |
-| `post-baseline-hardening` | Runtime safety, observability, auth completion, Sanity live authoring, and derivation guidance | Pipeline baseline, with each item separately scoped                           |
+| Capability id             | Responsibility                                                                                 | Depends on                                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `environment-contract`    | Names, profiles, secrets, target classification, and fail-closed safety rules                  | Current DWF and baseline evidence                                                       |
+| `local-runtime`           | Persistent Docker PostgreSQL development mode while retaining hosted Sanity                    | `environment-contract`                                                                  |
+| `neon-development`        | Durable Neon development target, direct/pooled URLs, migration and seed workflow               | `environment-contract`, owner-authorized Neon target                                    |
+| `continuous-verification` | Automatic CI quality gates with no deployment side effects                                     | `environment-contract`, existing test harness                                           |
+| `production-mail`         | Minimum owner-approved remote mail transport for Production auth callbacks                     | `environment-contract`, Better Auth boundary, provider approval                         |
+| `preview-delivery`        | Manually triggered, fully functional Vercel preview with isolated seeded Neon branch           | `neon-development`, `continuous-verification`, preview email/Sanity decisions           |
+| `production-release`      | Manually approved exact-ref release, migration, deployment, smoke, and rollback evidence       | `environment-contract`, `continuous-verification`, `production-mail`, production target |
+| `pipeline-verification`   | Tests and controlled evidence for the complete environment and delivery lifecycle              | All delivery capabilities                                                               |
+| `documentation`           | One coherent contributor/operator guide and reconciled current-state documentation             | All accepted environment decisions; implementation evidence                             |
+| `post-baseline-hardening` | Runtime safety, observability, auth completion, Sanity live authoring, and derivation guidance | Pipeline baseline, with each item separately scoped                                     |
 
 **Build order:** `environment-contract` → `local-runtime` and
-`neon-development` → `continuous-verification` → `preview-delivery` →
-`production-release` → `pipeline-verification` → `documentation`.
+`neon-development` → `continuous-verification` → `production-mail` →
+`preview-delivery` → `production-release` → `pipeline-verification` →
+`documentation`.
 `post-baseline-hardening` follows the verified delivery baseline and is kept
 separate so it cannot expand the deployment task into a second product.
 
@@ -94,9 +101,10 @@ The current baseline remains governed by:
 - [Agent SPEC](../../../.dwf/output/agent/SPEC.md), especially the database
   connection, migration, Sanity, testing, and delivery boundaries;
 - [Product Decisions](../../../.dwf/decisions/PRODUCT.md), especially D-001,
-  D-002, D-005, and D-009;
+  D-002, D-005, D-009, and D-010;
 - [Technical Decisions](../../../.dwf/decisions/TECHNICAL.md), especially
-  TD-005, TD-009, TD-011, TD-014, TD-015, TD-018, TD-019, TD-023, and TD-025;
+  TD-005, TD-009, TD-011, TD-014, TD-015, TD-018, TD-019, TD-023, TD-025,
+  TD-026, and TD-027;
 - [Testing Decisions and Test Contracts](../../../.dwf/decisions/TESTING.md),
   especially `TST-FOUNDATION-001`, `TST-MIGRATION-001`,
   `TST-HARNESS-001`, `TST-LANDING-002`, `TST-LANDING-003`, and
@@ -277,19 +285,22 @@ boundaries that are easy for a derived application to replace.
    authorization or a newly provisioned non-default branch.
 4. **T-21** adds automatic CI without deployment side effects. It consumes the
    existing local harness and the T-18 configuration/test contracts.
-5. **T-22** adds manual full-stack Preview. It depends on durable development,
+5. **T-21.5** establishes the minimum Production mail transport and its
+   profile/release evidence. It must finish before T-23, while T-27 remains
+   responsible for broader authentication completion and abuse resistance.
+6. **T-22** adds manual full-stack Preview. It depends on durable development,
    CI, selected Preview email/Sanity choices, and Vercel/Neon credentials.
-6. **T-23** adds manual Production release. It depends on CI, a defined
-   production database target, exact-ref policy, and a release candidate or
-   equivalent hosted evidence path.
-7. **T-24** proves the complete pipeline with layered tests and controlled
+7. **T-23** adds manual Production release. It depends on CI, the minimum
+   Production mail foundation, a defined production database target, exact-ref
+   policy, and a release candidate or equivalent hosted evidence path.
+8. **T-24** proves the complete pipeline with layered tests and controlled
    disposable hosted evidence. It must not use production as a test target.
-8. **T-25** documents the implemented behavior and reconciles stale current
+9. **T-25** documents the implemented behavior and reconciles stale current
    state, commands, secrets, failure handling, and evidence boundaries.
-9. **T-26** through **T-29** are intentionally later post-baseline work:
-   runtime observability/safety, authentication completion, Sanity live
-   authoring, and a derivation guide. They must not block the core environment
-   foundation unless an accepted production risk makes them prerequisites.
+10. **T-26** through **T-29** are intentionally later post-baseline work:
+    runtime observability/safety, authentication completion, Sanity live
+    authoring, and a derivation guide. They must not block the core environment
+    foundation unless an accepted production risk makes them prerequisites.
 
 ## Verification strategy
 
@@ -330,6 +341,9 @@ intended to prove.
 
 - Exercise the workflow in a protected production environment only after the
   production target and migration history are explicitly approved.
+- Verify the minimum owner-approved Production mail transport and its protected
+  configuration before approval or deployment. A controlled Preview account or
+  local mailbox does not satisfy this check.
 - Prove tag/SHA resolution, required approval, direct migration sequencing,
   Vercel production deployment, post-deploy smoke, failure reporting, and
   rollback reference. Do not run a destructive rollback experiment against a
@@ -390,6 +404,8 @@ Create the following ordered delivery tasks in `TODO.md`:
 - **T-20:** Durable Neon Development target, direct/pooled configuration,
   migration smoke, and safe development seed.
 - **T-21:** Automatic CI quality gates with no deployment trigger.
+- **T-21.5:** Minimum owner-approved Production mail transport and Better Auth
+  callback wiring required before Production release.
 - **T-22:** Manually triggered full-stack Vercel Preview with isolated seeded
   Neon branch and cleanup.
 - **T-23:** Manually approved exact-ref Production release with migration,

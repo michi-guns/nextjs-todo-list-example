@@ -897,6 +897,17 @@ initial deployment foundation without a new scope decision.
 
 Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 must be reviewed before a hosted Preview workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
 
+### T-21.5: Establish the minimum Production mail foundation
+
+- [ ] Complete T-21.5 before T-23 can release Production.
+- Files: the existing Better Auth mail boundary, a thin owner-approved remote mail adapter/configuration, non-secret profile documentation, focused auth/environment tests, and redacted delivery/health evidence.
+- Interfaces: provider-backed `sendVerificationEmail` and `sendMagicLink` callbacks; explicit Production mail transport selection; protected provider configuration; fail-closed missing-configuration behavior; safe diagnostics that never expose message content, tokens, or credentials.
+- Acceptance: Production verification and magic-link sends use the approved remote transport; local/test mailbox settings are rejected in Preview and Production; missing or invalid Production mail configuration blocks release before deployment; non-Production profiles cannot use Production credentials; no provider-swapping framework is introduced.
+- Contracts/evidence: `TD-027`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-ENV-001`, `TST-PIPELINE-001`, and `TST-RELEASE-001`; keep local mailbox evidence separate from remote delivery evidence.
+- Checks: focused mail/profile tests; `pnpm test`; `pnpm typecheck`; `pnpm lint`; changed-file Prettier checks; `git diff --check`; and a controlled provider delivery/health smoke when the owner-authorized provider is available.
+- Dependencies/unblock: T-18.2 through T-18.4 and owner approval/provisioning of the Production mail provider. T-23 is blocked until this task's minimum foundation is verified; T-27 consumes it for broader authentication completion and abuse resistance.
+- Recommended AgentForge skills: `better-auth-best-practices`, `email-and-password-best-practices`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, `source-driven-development`, and `git-workflow-and-versioning`.
+
 ### T-22: Add manually triggered, fully functional Vercel Preview delivery
 
 - [ ] Complete T-22 only after the owner authorizes a controlled hosted Preview run.
@@ -916,7 +927,7 @@ Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 must be revie
 - Acceptance: no branch name or mutable “latest” alias can silently change the deployed commit; Production secrets are unavailable to CI/Preview jobs; migration runs separately from app boot through the direct endpoint; a failed deployment reports whether the database migration already succeeded and does not assume a database down-migration is safe; application rollback guidance names a compatible commit/ref and explicitly handles migration compatibility; the chosen Production Neon project/branch is protected and never reset by routine developer commands.
 - Contracts/evidence: `TST-RELEASE-001`, `TST-PIPELINE-001`, `TST-ENV-001`, `TST-MIGRATION-001`, `TST-LANDING-003`, and the relevant authentication/browser contracts; mark hosted contracts verified only after real protected-environment evidence.
 - Checks: workflow/ref-resolution tests; protected-environment approval evidence; controlled release rehearsal in an explicitly non-Production target where possible; real Production deployment only after owner approval; post-deploy smoke; redacted release artifact; `pnpm build`; and `git diff --check`.
-- Dependencies/unblock: T-18, T-20, and T-21; T-18.1 has resolved the Production target policy and migration-history boundary, while the protected project/branch still requires owner provisioning and approval. This task must not promote the current Neon `main` merely because it is the existing `.env.local` target.
+- Dependencies/unblock: T-18, T-20, T-21, and T-21.5; T-18.1 has resolved the Production target policy and migration-history boundary, while the protected project/branch and minimum mail transport still require owner provisioning and approval. This task must not promote the current Neon `main` merely because it is the existing `.env.local` target.
 - Recommended AgentForge skills: `ci-cd-and-automation`, `shipping-and-launch`, `migration-history-workflow`, `neon-postgres`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, `observability-and-instrumentation`, and `git-workflow-and-versioning`.
 
 Dependency checkpoint: T-22 and T-23 require the environment decisions, CI evidence, and hosted credentials/approvals they name. Neither task is unblocked by local unit tests alone. Do not claim the template's deployment pipeline is proven until T-24 covers both the simulated negative paths and the required disposable/controlled hosted boundaries.
@@ -971,7 +982,7 @@ database a command targets.
 - Acceptance: verification and reset flows are usable and secure, tokens are single-use and time-bounded, user enumeration is minimized, Preview does not send uncontrolled mail, and the flows work against Local, Development, Preview, and Production profiles according to their mail policy.
 - Contracts/evidence: add security/auth contracts through the canonical testing ledger; preserve `TST-AUTH-001`–`TST-AUTH-003` and do not mark remote mail evidence from local mailbox tests.
 - Checks: TDD-focused auth tests, integration/browser journeys, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, and `git diff --check`.
-- Dependencies/unblock: T-18's mail decision and T-24's environment test boundaries; product acceptance is required before implementation.
+- Dependencies/unblock: T-21.5's minimum Production mail foundation, T-18's mail policy, and T-24's environment test boundaries; product acceptance is required before implementation. T-27 must not be the first task to establish the mail transport required by T-23.
 - Recommended AgentForge skills: `better-auth-best-practices`, `email-and-password-best-practices`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 ### T-28: Add Sanity authenticated preview and live authoring

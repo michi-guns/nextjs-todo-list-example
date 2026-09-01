@@ -559,15 +559,15 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Status:** `specified`
 - **Capability:** Environment contract and target guardrails
 - **Evidence layers/modes:** Configuration / unit, static guard, local target checks, and hosted target inspection when available
-- **Verifies product decisions:** D-009
-- **Verifies technical decisions:** TD-009, TD-011, TD-014, TD-019, TD-025, TD-026
+- **Verifies product decisions:** D-009, D-010
+- **Verifies technical decisions:** TD-009, TD-011, TD-014, TD-019, TD-025, TD-026, TD-027
 - **Edge cases:** [EC-020](EDGE-CASES.md#ec-020), [EC-021](EDGE-CASES.md#ec-021), [EC-025](EDGE-CASES.md#ec-025)
 - **SPEC:** [3.3 Migration workflow](../output/agent/SPEC.md#33-migration-workflow), [10.2 PostgreSQL integration](../output/agent/SPEC.md#102-postgresql-integration), [10.3 Playwright](../output/agent/SPEC.md#103-playwright), [10.4 Sanity verification](../output/agent/SPEC.md#104-sanity-verification), [11 Environment and delivery contract](../output/agent/SPEC.md#11-environment-and-delivery-contract), [10.7 Environment and delivery evidence](../output/agent/SPEC.md#107-environment-and-delivery-evidence)
-- **Owners:** T-18.2, T-18.3, T-18.4, T-19, T-20, T-21, T-22, T-23, T-24
+- **Owners:** T-18.2, T-18.3, T-18.4, T-19, T-20, T-21, T-21.5, T-22, T-23, T-24
 - **Contract:** An explicit `APP_ENV` profile selects a matching application origin, Better Auth configuration, database provider/project/branch identity, pooled runtime and direct migration roles, Sanity dataset/policy, mail policy, secret namespace, and permitted operations. Profile parsing and target guards reject missing, conflicting, cross-environment, remote-reset, pooled-migration, local-mailbox-in-deployment, invalid-origin, and ambiguous-target combinations before mutation. Diagnostics expose only redacted target names and safe metadata.
-- **Required evidence:** A deterministic profile matrix for valid Local, Development, Preview, and Production configurations; negative tests for missing/conflicting variables, wrong project/branch identity, invalid origins, pooled/direct role inversion, local mailbox use in deployed contexts, and secret-bearing output; plus local/CI command tests proving refusal before destructive or deployment mutation. Hosted Neon/Vercel/Sanity identity and protected-secret evidence remains boundary evidence for T-20/T-22/T-23/T-24 and cannot be replaced by local tests.
-- **Dependencies:** T-18.1's accepted TD-026 contract, followed by the profile implementation in T-18.2 and target guards in T-18.3. The local and hosted target prerequisites are owned by T-19/T-20/T-22/T-23.
-- **Current evidence:** The contract is recorded in TD-026; no executable profile parser or target guard exists yet. This remains `specified` until T-18.2–T-18.4 produce and run the required local evidence.
+- **Required evidence:** A deterministic profile matrix for valid Local, Development, Preview, and Production configurations; negative tests for missing/conflicting variables, wrong project/branch identity, invalid origins, pooled/direct role inversion, local mailbox use in deployed contexts, missing Production mail transport, and secret-bearing output; plus local/CI command tests proving refusal before destructive or deployment mutation. Hosted Neon/Vercel/Sanity identity, protected-secret, and Production mail-transport evidence remains boundary evidence for T-20/T-21.5/T-22/T-23/T-24 and cannot be replaced by local tests.
+- **Dependencies:** T-18.1's accepted TD-026 contract, followed by the profile implementation in T-18.2 and target guards in T-18.3. The local, hosted-target, and Production-mail prerequisites are owned by T-19/T-20/T-21.5/T-22/T-23.
+- **Current evidence:** The contract is recorded in TD-026 and TD-027; no executable profile parser or target guard exists yet. This remains `specified` until T-18.2–T-18.4 produce and run the required local evidence.
 
 <a id="tst-pipeline-001"></a>
 
@@ -576,14 +576,14 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Status:** `specified`
 - **Capability:** Delivery pipeline
 - **Evidence layers/modes:** Workflow/static validation, orchestration tests, controlled disposable/hosted boundary evidence
-- **Verifies product decisions:** D-009
-- **Verifies technical decisions:** TD-019, TD-025, TD-026
+- **Verifies product decisions:** D-009, D-010
+- **Verifies technical decisions:** TD-019, TD-025, TD-026, TD-027
 - **SPEC:** [11 Environment and delivery contract](../output/agent/SPEC.md#11-environment-and-delivery-contract), [10.7 Environment and delivery evidence](../output/agent/SPEC.md#107-environment-and-delivery-evidence), [14.8 Delivery boundary](../output/agent/SPEC.md#148-delivery-boundary)
-- **Owners:** T-21, T-22, T-23, T-24
-- **Contract:** Delivery workflows resolve the requested ref to one immutable commit, select the intended non-production or Production target, keep direct migration separate from application boot, run only permitted seed/cleanup operations, preserve isolation, and report success or partial failure with redacted evidence. CI has no deployment side effect; Preview and Production are manual workflows; non-production work cannot reach Production data or secrets.
+- **Owners:** T-21, T-21.5, T-22, T-23, T-24
+- **Contract:** Delivery workflows resolve the requested ref to one immutable commit, select the intended non-production or Production target, keep direct migration separate from application boot, run only permitted seed/cleanup operations, preserve isolation, and report success or partial failure with redacted evidence. CI has no deployment side effect; Preview and Production are manual workflows; Production release waits for the minimum configured mail transport; non-production work cannot reach Production data or secrets.
 - **Required evidence:** Static workflow checks for trigger and permission boundaries; deterministic orchestration tests for ref resolution, target selection, sequencing, cleanup, expiry, and failure state; a controlled Preview lifecycle; and a controlled exact-ref release rehearsal plus protected Production evidence where authorized. Mocks may prove orchestration decisions but not Neon/Vercel/browser/Production claims.
-- **Dependencies:** T-18.1–T-18.4 environment contract and guards, T-19/T-20 stable local and Development targets, T-21 CI, and owner-authorized T-22/T-23 hosted prerequisites.
-- **Current evidence:** The manual workflow contract is recorded in TD-026; no workflow or delivery adapter exists yet. CI, Preview, and Production evidence remain future obligations owned by their delivery tasks.
+- **Dependencies:** T-18.1–T-18.4 environment contract and guards, T-19/T-20 stable local and Development targets, T-21 CI, T-21.5 Production mail foundation, and owner-authorized T-22/T-23 hosted prerequisites.
+- **Current evidence:** The manual workflow and Production-mail prerequisite contracts are recorded in TD-026 and TD-027; no workflow or delivery adapter exists yet. CI, Preview, and Production evidence remain future obligations owned by their delivery tasks.
 
 <a id="tst-preview-001"></a>
 
@@ -592,7 +592,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Status:** `specified`
 - **Capability:** Preview delivery
 - **Evidence layers/modes:** Controlled Neon branch, Vercel Preview, application/browser smoke, and redacted workflow artifact
-- **Verifies product decisions:** D-001, D-002, D-003, D-004, D-005, D-009
+- **Verifies product decisions:** D-001, D-002, D-003, D-004, D-005, D-009, D-010
 - **Verifies technical decisions:** TD-005, TD-018, TD-019, TD-023, TD-026
 - **SPEC:** [2 Auth](../output/agent/SPEC.md#2-auth-better-auth), [6 Sanity](../output/agent/SPEC.md#6-sanity-landing-only), [11 Environment and delivery contract](../output/agent/SPEC.md#11-environment-and-delivery-contract), [10.7 Environment and delivery evidence](../output/agent/SPEC.md#107-environment-and-delivery-evidence)
 - **Owners:** T-22, T-24
@@ -608,13 +608,13 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Status:** `specified`
 - **Capability:** Production release
 - **Evidence layers/modes:** Ref-resolution tests, protected workflow rehearsal, direct migration/deployment evidence, post-deploy smoke
-- **Verifies product decisions:** D-009
-- **Verifies technical decisions:** TD-019, TD-025, TD-026
+- **Verifies product decisions:** D-009, D-010
+- **Verifies technical decisions:** TD-019, TD-025, TD-026, TD-027
 - **SPEC:** [3.3 Migration workflow](../output/agent/SPEC.md#33-migration-workflow), [11 Environment and delivery contract](../output/agent/SPEC.md#11-environment-and-delivery-contract), [10.7 Environment and delivery evidence](../output/agent/SPEC.md#107-environment-and-delivery-evidence), [14.8 Delivery boundary](../output/agent/SPEC.md#148-delivery-boundary)
-- **Owners:** T-23, T-24
-- **Contract:** A manually approved Production workflow accepts a tag or full commit SHA, resolves and records one immutable commit, verifies required CI evidence for that commit, waits for protected Production approval, runs a reviewed forward migration through the direct Production URL separately from application boot, deploys the same commit, runs post-deployment smoke, and records the migration result, deployment identity, rollback reference, and operator/time metadata without secrets. Production cannot be reset by routine commands, and application rollback never assumes a database down-migration is safe.
-- **Required evidence:** Ref-resolution and refusal tests; protected Environment and secret-scope configuration evidence; a controlled non-Production rehearsal where possible; and real Production migration/deployment/smoke evidence only after owner authorization. A rehearsal cannot be presented as Production proof.
-- **Dependencies:** TD-026, T-18 guards, durable Development/CI evidence from T-20/T-21, an owner-approved protected Production Neon project/branch, Vercel Production access, and the forward-only migration policy in TD-025.
+- **Owners:** T-21.5, T-23, T-24
+- **Contract:** A manually approved Production workflow accepts a tag or full commit SHA, resolves and records one immutable commit, verifies required CI evidence and the minimum configured Production mail transport for that commit, waits for protected Production approval, runs a reviewed forward migration through the direct Production URL separately from application boot, deploys the same commit, runs post-deployment smoke, and records the migration result, deployment identity, rollback reference, and operator/time metadata without secrets. Production cannot be reset by routine commands, and application rollback never assumes a database down-migration is safe.
+- **Required evidence:** Ref-resolution and refusal tests; minimum Production mail adapter/configuration and redacted delivery/health evidence; protected Environment and secret-scope configuration evidence; a controlled non-Production rehearsal where possible; and real Production migration/deployment/smoke evidence only after owner authorization. A rehearsal cannot be presented as Production proof.
+- **Dependencies:** TD-026 and TD-027, T-18 guards, durable Development/CI evidence from T-20/T-21, the minimum Production mail foundation from T-21.5, an owner-approved protected Production Neon project/branch, Vercel Production access, and the forward-only migration policy in TD-025.
 - **Current evidence:** The Production target is deliberately not provisioned or selected in the current workspace. This contract remains `specified` and must not be marked `verified` from local or Preview evidence.
 
 ## SPEC traceability map
