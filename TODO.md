@@ -789,11 +789,11 @@ Plan: [`2026-08-31-t-17-documentation-quality.md`](docs/agentforge/plans/2026-08
 
 Dependency checkpoint: T-17.1, T-17.2, and T-17.3 are complete at the final
 reviewed documentation tip. The baseline is complete. T-18.1 has now recorded
-the environment choices and canonical DWF/testing-ledger contracts; T-18.2
-and T-18.3 are the next unblocked implementation subtasks. Neon migration
-evidence remains blocked on an explicitly authorized branch realignment;
-harness outage observation and deployed Sanity delivery remain evidence
-conditions rather than reasons to alter the baseline.
+the environment choices and canonical DWF/testing-ledger contracts; T-18.2 and
+T-18.3 are complete, and T-18.4 is the next unblocked implementation subtask.
+Neon migration evidence remains blocked on an explicitly authorized branch
+realignment; harness outage observation and deployed Sanity delivery remain
+evidence conditions rather than reasons to alter the baseline.
 
 ## Phase 5: environment and delivery pipeline
 
@@ -843,12 +843,13 @@ initial deployment foundation without a new scope decision.
 
 #### T-18.3: Implement target classification and fail-closed guards
 
-- [ ] Complete T-18.3 after T-18.2 defines the profile and target interfaces.
+- [x] Complete T-18.3 after T-18.2 defines the profile and target interfaces.
 - Files: the selected `scripts/environment/` guard implementation, migration/reset/seed/deployment command adapters as needed, `db/` only if a target assertion must be enforced at the existing boundary, focused tests, and command documentation.
 - Interfaces: target classifier that checks provider/project/branch identity rather than trusting a friendly branch name; guard functions for local reset, migration, seed replacement, preview cleanup, and Production deployment; safe error codes/messages; resolved-ref/target evidence objects with secrets redacted.
-- Acceptance: a stale Neon `main` value cannot be used by a Local command; a Preview or Development command cannot mutate Production; a Production command cannot proceed with an unapproved or unresolved ref; a migration command cannot silently fall back from the direct URL to a pooled URL when direct access is required; every refusal happens before mutation and explains the smallest corrective action; guards work in PowerShell and CI command paths where both are supported.
-- Contracts/evidence: `TST-ENV-001` and the relevant existing migration/harness contracts; prove refusal paths with disposable/local targets and static command tests, not by experimenting against Production.
-- Checks: focused guard suite, negative target-matrix tests, `pnpm typecheck`, `pnpm lint`, changed-file Prettier checks, and `git diff --check`.
+- Acceptance: a stale Neon `main` value cannot be used by a Local command; a Preview or Development command cannot mutate Production; a Production migration or deployment command cannot proceed with an unapproved or unresolved ref; a migration command cannot silently fall back from the direct URL to a pooled URL when direct access is required; every refusal happens before mutation and explains the smallest corrective action. The guard module is runtime-neutral for the future PowerShell and CI adapters; no state-changing command adapter exists in this slice.
+- Contracts/evidence: `TST-ENV-001` and the relevant existing migration/harness contracts; prove refusal paths with focused guard tests and disposable/local target fixtures, not by experimenting against Production. TST-ENV-001 remains `partial` because hosted target identity, protected secrets, and Production mail evidence belong to later delivery tasks.
+- Verification: `scripts/environment/guards.ts` now validates supplied Local/Neon identities and exposes pre-mutation guards for reset, migration, seed replacement, Preview cleanup/deployment, and Production deployment. Production migration shares the exact-ref/protected-approval proof with deployment. `src/test/environment/guards.test.ts` passes 37 focused tests, including project/branch and endpoint mismatch, required Neon endpoint evidence, harness-ownership correlation, pooled URL fallback, explicit-port/database and endpoint-override query rejection, exact resolved ref kind/SHA, Preview ID correlation, Production migration approval, redacted evidence, localhost/loopback equivalence, and mutation non-invocation on refusal. Provider authenticity and hosted identity evidence remain future adapter/task boundaries.
+- Checks: focused guard suite, negative target-matrix tests, `pnpm typecheck`, changed-file ESLint, changed-file Prettier checks, and `git diff --check` pass. No hosted or Production evidence was claimed.
 - Dependencies/unblock: T-18.1 and T-18.2. T-19, T-20, T-22, and T-23 must use these guards rather than bypassing them.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `security-and-hardening`, `neon-postgres`, `neon-postgres-branches`, `ci-cd-and-automation`, and `git-workflow-and-versioning`.
 
@@ -1008,8 +1009,8 @@ database a command targets.
 - Dependencies/unblock: T-25 and the reviewed implementation of T-18 through T-24; product scope approval is required before adding a maintained example app.
 - Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
 
-Final post-baseline dependency checkpoint: T-18.1 is complete and unblocks
-T-18.2 and T-18.3. T-18.4 remains ordered behind those implementations;
+Final post-baseline dependency checkpoint: T-18.1, T-18.2, and T-18.3 are
+complete. T-18.4 is the next unblocked implementation subtask;
 T-19 through T-25 remain ordered behind the contract and their named
 prerequisites; T-26 through T-29 are recorded follow-ons. No workflow, Neon
 branch mutation, Vercel deployment, or Production operation is authorized by
