@@ -855,7 +855,7 @@ initial deployment foundation without a new scope decision.
 
 #### T-18.4: Prove the environment contract with focused tests
 
-- [ ] Complete T-18.4 after T-18.2 and T-18.3 are implemented and reviewed.
+- [~] Complete T-18.4 after T-18.2 and T-18.3 are implemented and reviewed.
 - Files: `src/test/` or the chosen environment test seat, any test fixtures under `scripts/`, `.dwf/decisions/TESTING.md` only for evidence reconciliation, and `TODO.md` evidence.
 - Interfaces: deterministic test matrix for profile parsing, target classification, safe redaction, pooled/direct role selection, exact-ref resolution, and refusal-before-mutation behavior; no test fixture may require a Production credential or reset a shared Neon branch.
 - Acceptance: tests cover valid Local/Development/Preview/Production profiles, missing and conflicting variables, wrong branch/project identity, invalid origin, secret leakage, local mailbox rejection for deployed contexts, exact tags/SHAs/ambiguous refs, and destructive-command refusal; the suite is fast enough for local and CI use and does not weaken existing integration/E2E boundaries.

@@ -658,6 +658,18 @@ function assertProfileDatabaseRoles(
       "database"
     )
   }
+
+  if (
+    (profile.appEnv === "development" || profile.appEnv === "preview") &&
+    profile.database.branch?.toLowerCase() === "main"
+  ) {
+    fail(
+      "target_mismatch",
+      `${profile.appEnv} cannot use the default main branch; reload a profile for an owner-authorized non-default target`,
+      operation,
+      "branch"
+    )
+  }
 }
 
 function assertOperation(
