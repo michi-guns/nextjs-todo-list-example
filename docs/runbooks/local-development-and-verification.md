@@ -72,6 +72,31 @@ After seeding, sign in as `local-dev@example.test` with
 Integration and Playwright suites keep their own disposable Testcontainers
 databases. They do not use this Compose volume.
 
+## Durable Neon Development
+
+The Development profile uses the durable non-default Neon branch `development`
+in project `curly-dust-60603928`. Create it once, then migrate and seed through
+the repository command. Do not reset `main`.
+
+```powershell
+pnpm neon:development -- provision
+pnpm neon:development -- inspect
+pnpm neon:development -- migrate
+pnpm neon:development -- seed
+```
+
+`provision` does not require Development URLs. `inspect`, `migrate`, and
+`seed` do: set `APP_ENV=development`, `DATABASE_PROVIDER=neon`,
+`DATABASE_PROJECT_ID=curly-dust-60603928`, `DATABASE_BRANCH=development`, a
+pooled `DATABASE_URL`, and a direct `DATABASE_URL_UNPOOLED` with explicit port
+and database path. Ordinary seed creates verified `dev-user@example.test` with
+password `Dev-user-password-123!`. `seed --mode behavior` adds 21 extra lists
+and 21 extra tasks for pagination. `seed --mode performance` runs
+`pnpm neon:performance`. There is no reset command.
+
+After the profile is configured, `pnpm dev` uses the pooled Development URL
+and hosted Sanity. Auth links still go to the local mailbox.
+
 ## Application commands
 
 Start the development server after applying the schema:

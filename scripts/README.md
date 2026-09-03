@@ -52,6 +52,29 @@ The adapter binds `127.0.0.1:5432` only, calls the environment guards before
 migrate/seed/reset, and never uses Neon or Vercel credentials. Integration and
 Playwright Testcontainers remain separate.
 
+## Neon Development target
+
+`scripts/neon-development/` owns the durable non-default Neon `development`
+branch in project `curly-dust-60603928`. The command is
+`pnpm neon:development -- <subcommand>`.
+
+```powershell
+pnpm neon:development -- provision
+pnpm neon:development -- inspect
+pnpm neon:development -- migrate
+pnpm neon:development -- seed
+pnpm neon:development -- seed --mode behavior
+pnpm neon:development -- seed --mode performance
+```
+
+`provision` creates branch `development` from `main` with no expiration when
+it is missing. It does not reset `main` and does not accept `reset`.
+`inspect`, `migrate`, and `seed` require a Development profile whose
+`DATABASE_PROJECT_ID` and `DATABASE_BRANCH` match that target, with pooled
+`DATABASE_URL` and direct `DATABASE_URL_UNPOOLED` values that include an
+explicit port and database path. Ordinary seed replaces only
+`dev-user@example.test`. Performance seed reuses `pnpm neon:performance`.
+
 ## Neon performance evidence
 
 The T-16 benchmark is deliberately opt-in and targets only the non-default
