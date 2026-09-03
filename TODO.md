@@ -43,6 +43,8 @@ This is a temporary delivery protocol for the current implementation run. The DW
    findings, rerun affected checks, and spawn a new reviewer for each
    changed tip.
 6. Mark the task `[x]`, update any checkpoint it satisfies, and commit remaining evidence.
+   If that creates a new tip, spawn a new reviewer against it. Do not push or
+   open a PR until the reviewed commit is the current branch/PR tip.
 7. Push the branch with its upstream configured.
 8. Open a pull request from the task branch into `main`. The PR body must include:
    - a concise summary of the behavior delivered;

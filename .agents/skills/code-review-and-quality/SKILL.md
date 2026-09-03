@@ -248,8 +248,10 @@ context instead of spawning.
    not invite speculative perfection or scope expansion.
 5. Classify findings as required by `AGENTS.md`: actionable, contract
    conflict/design gap, optional/nit, or noise. Fix in-scope actionable
-   findings; a code or test change invalidates the previous approval and
-   requires a new spawn against the new tip.
+   findings. Any later commit, including docs-only evidence or tracker
+   closeout, invalidates the previous approval and requires a new spawn
+   against the new tip. Do not push or open a PR until the reviewed
+   commit is the current branch/PR tip.
 
 Completed plans that name GPT-5.6-Sol mean this spawn, not that named model.
 
