@@ -98,6 +98,10 @@ For any implementation or behavior-changing task in this repository, use the pro
   - commit and **push directly to `main`**, or
   - use short-lived branches and merge locally / on GitHub however is convenient.
 - Keep commits coherent and messages clear enough to skim history.
+- When opening a pull request, start the body with the **Why this change**
+  section from [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
+  Write it for product owners and other non-engineers, not as a technical
+  changelog.
 - Do not force-push `main` unless the operator explicitly asks.
 - Do not rewrite shared history casually.
 - Secrets stay out of git (`.env*`, tokens, credentials).

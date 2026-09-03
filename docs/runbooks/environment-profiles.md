@@ -64,8 +64,9 @@ the authority and path must carry the guarded endpoint identity. Guarded
 mutation URLs must also include an explicit port and database path, so
 `PGPORT` and `PGDATABASE` cannot silently select a different endpoint.
 
-State-changing command adapters call the operation-specific assertion before
-opening the mutation boundary:
+The Local Docker adapter in `scripts/local-postgres/` is the first
+state-changing command adapter. It calls these assertions before migrate, seed,
+or reset. Preview and Production adapters remain future work.
 
 | Guard                               | Required safety boundary                                                                                                                                                    |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -77,21 +78,19 @@ opening the mutation boundary:
 | `assertProductionDeploymentAllowed` | Production profile, matching target, provider-resolved `tag` or full `commit` ref, and protected approval for that exact SHA                                                |
 
 `executeAfterGuard` runs the assertion completely before invoking the supplied
-mutation callback. The repository does not yet have state-changing migration,
-reset, seed, or deployment adapters; later PowerShell and GitHub workflow
-adapters must call these assertions before opening their mutation boundaries.
-Guard failures use stable safe error codes such as
-`target_unresolved`, `target_mismatch`, `connection_role_mismatch`,
-`ref_unresolved`, and `approval_required`. Returned evidence contains only
-profile, provider, project/branch, operation, preview, and resolved-SHA
-metadata; connection strings, credentials, mailbox values, and secrets are
-never copied into it.
+mutation callback. Local Docker migrate, seed, and reset go through that
+boundary. Later PowerShell and GitHub workflow adapters must call the same
+assertions before opening their mutation boundaries. Guard failures use
+stable safe error codes such as `target_unresolved`, `target_mismatch`,
+`connection_role_mismatch`, `ref_unresolved`, and `approval_required`.
+Returned evidence contains only profile, provider, project/branch, operation,
+preview, and resolved-SHA metadata; connection strings, credentials, mailbox
+values, and secrets are never copied into it.
 
-The module is runtime-neutral and can be called from those adapters through
-`tsx`; it does not connect to a provider or mutate data by itself. T-20/T-22/T-23
-must provide the actual Neon/Vercel/provider observations and ref-resolution
-implementation; those tasks must call these guards rather than recreate target
-checks.
+The guard module remains runtime-neutral. Local Docker commands in
+`scripts/local-postgres/` call it before mutation. T-20/T-22/T-23 must provide
+the actual Neon/Vercel/provider observations and ref-resolution implementation;
+those tasks must call these guards rather than recreate target checks.
 
 ## Variables
 
