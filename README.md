@@ -111,6 +111,27 @@ URLs.
 Sign in as `local-dev@example.test` with password `Local-dev-password-123!`
 after seeding. Auth links still go to the local mailbox.
 
+### Point the local app at durable Neon Development
+
+Development is a local Next.js process against the durable non-default Neon
+`development` branch. It is not the default `main` branch and it does not
+expire.
+
+```powershell
+pnpm neon:development -- provision
+pnpm neon:development -- inspect
+pnpm neon:development -- migrate
+pnpm neon:development -- seed
+```
+
+Set `APP_ENV=development`, `DATABASE_PROVIDER=neon`,
+`DATABASE_PROJECT_ID=curly-dust-60603928`, and `DATABASE_BRANCH=development`.
+Use the pooled endpoint for `DATABASE_URL` and the direct endpoint for
+`DATABASE_URL_UNPOOLED`, including an explicit port and database path. Then
+run `pnpm dev`. Sign in as `dev-user@example.test` with
+`Dev-user-password-123!` after ordinary seed. These commands refuse `main`,
+expiring branches, and pooled migration URLs. They do not reset Neon.
+
 ### Apply the committed schema
 
 Inspect and apply migrations before opening the app against a new database.
@@ -159,6 +180,10 @@ production build locally.
 | `pnpm test:e2e`                                                                   | Start the local database/server/mailbox lifecycle and run the seven Chromium journeys.                          |
 | `pnpm test:e2e:cross-browser`                                                     | Opt in to the same journeys in Chromium, Firefox, and WebKit.                                                   |
 | `pnpm environment:inspect`                                                        | Validate the selected profile and print redacted target diagnostics.                                            |
+| `pnpm neon:development -- provision`                                              | Create the durable non-default Neon `development` branch if it is missing.                                      |
+| `pnpm neon:development -- inspect`                                                | Print redacted Development project, branch, and endpoint identity.                                              |
+| `pnpm neon:development -- migrate`                                                | Apply committed migrations through the direct Development URL.                                                  |
+| `pnpm neon:development -- seed`                                                   | Replace only the synthetic Development user and a small Inbox dataset.                                          |
 | `pnpm sanity:smoke`                                                               | Read, validate, and map the published Sanity landing singleton without mutating it.                             |
 | `pnpm neon:performance`                                                           | Run the guarded, opt-in Neon development-branch performance evidence lane.                                      |
 | `pnpm exec drizzle-kit check --config drizzle.config.ts`                          | Validate migration metadata and history.                                                                        |

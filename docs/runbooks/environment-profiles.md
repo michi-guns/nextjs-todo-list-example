@@ -65,8 +65,10 @@ mutation URLs must also include an explicit port and database path, so
 `PGPORT` and `PGDATABASE` cannot silently select a different endpoint.
 
 The Local Docker adapter in `scripts/local-postgres/` is the first
-state-changing command adapter. It calls these assertions before migrate, seed,
-or reset. Preview and Production adapters remain future work.
+state-changing command adapter. The Development adapter in
+`scripts/neon-development/` is the hosted non-default branch adapter. Both
+call these assertions before migrate or seed. Local reset stays loopback-only.
+Preview and Production adapters remain future work.
 
 | Guard                               | Required safety boundary                                                                                                                                                    |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -88,8 +90,9 @@ preview, and resolved-SHA metadata; connection strings, credentials, mailbox
 values, and secrets are never copied into it.
 
 The guard module remains runtime-neutral. Local Docker commands in
-`scripts/local-postgres/` call it before mutation. T-20/T-22/T-23 must provide
-the actual Neon/Vercel/provider observations and ref-resolution implementation;
+`scripts/local-postgres/` and Development commands in
+`scripts/neon-development/` call it before mutation. T-22/T-23 must provide
+the Vercel/Preview/Production observations and ref-resolution implementation;
 those tasks must call these guards rather than recreate target checks.
 
 ## Variables

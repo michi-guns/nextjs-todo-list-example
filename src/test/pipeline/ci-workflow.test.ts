@@ -70,6 +70,7 @@ describe("CI quality workflow contract", () => {
 
     expect(workflow).not.toMatch(/pnpm sanity:smoke/)
     expect(workflow).not.toMatch(/pnpm neon:performance/)
+    expect(workflow).not.toMatch(/pnpm neon:development/)
     expect(workflow).not.toMatch(/test:e2e:cross-browser/)
     expect(workflow).not.toMatch(/vercel/i)
     expect(workflow).not.toMatch(/neon\s+connection-string/i)

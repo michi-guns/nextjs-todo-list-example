@@ -1,0 +1,31 @@
+{
+  "task": "T-20",
+  "projectId": "curly-dust-60603928",
+  "branch": "development",
+  "default": false,
+  "expiresAt": null,
+  "inspect": "appEnv=development\nprojectId=curly-dust-60603928\nbranch=development\nbranchId=br-super-leaf-axfwoi2e\ndefault=false\nexpiresAt=none\nruntimeHost=ep-redacted.c-4.us-east-2.aws.neon.tech\nmigrationHost=ep-redacted.c-4.us-east-2.aws.neon.tech\ndatabase=neondb\nport=5432",
+  "catalog": {
+    "tables": ["account", "lists", "session", "tasks", "users", "verification"],
+    "migrationCount": 2,
+    "migrationHashes": [
+      "ae21574142e0f83319b9f92cbc5b10be19a1c57c9cae09f8fb5635141720fcd2",
+      "bf3011b938543dc45e42a7ed154e01c9a75fb3ff78b1701ed883c66c08d4edae"
+    ],
+    "listsIdType": "uuid",
+    "listsIdDefault": "uuidv7()"
+  },
+  "runtimeHostRedacted": "ep-redacted.c-4.us-east-2.aws.neon.tech",
+  "migrationHostRedacted": "ep-redacted.c-4.us-east-2.aws.neon.tech",
+  "mutatedMain": false,
+  "mainCatalog": {
+    "tables": ["account", "posts_table", "session", "users", "verification"],
+    "migrationCount": 1
+  },
+  "ordinarySeed": {
+    "email": "dev-user@example.test",
+    "verified": true,
+    "lists": 1,
+    "tasks": 2
+  }
+}

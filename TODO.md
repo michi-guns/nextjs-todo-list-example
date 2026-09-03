@@ -808,13 +808,10 @@ Dependencies: T-12A, T-14, T-15, T-16 (all complete on `main` after PR #18 merge
 Plan: [`2026-08-31-t-17-documentation-quality.md`](docs/agentforge/plans/2026-08-31-t-17-documentation-quality.md).
 
 Dependency checkpoint: T-17.1, T-17.2, and T-17.3 are complete at the final
-reviewed documentation tip. The baseline is complete. T-18.1 has now recorded
-the environment choices and canonical DWF/testing-ledger contracts; T-18.2,
-T-18.3, T-18.4, and T-19 are complete. T-20 remains the next unblocked
-hosted-development item, subject to an owner-authorized durable Neon target.
-Neon migration evidence remains blocked on an explicitly authorized branch
-realignment; harness outage observation and deployed Sanity delivery remain
-evidence conditions rather than reasons to alter the baseline.
+reviewed documentation tip. The baseline is complete. T-18.1 through T-18.4,
+T-19, T-20, and T-21 are complete. Harness outage observation and deployed
+Sanity delivery remain evidence conditions rather than reasons to alter the
+baseline.
 
 ## Phase 5: environment and delivery pipeline
 
@@ -916,7 +913,7 @@ Verification:
 
 ### T-20: Establish a durable Neon Development target
 
-- [ ] Complete T-20 only after an owner-authorized durable Neon Development target exists.
+- [x] Complete T-20 only after an owner-authorized durable Neon Development target exists.
 - Files: environment/profile adapters, Neon branch/connection helpers under `scripts/`, safe Development seed scripts/fixtures, migration smoke tests, `README.md`, `docs/runbooks/`, and redacted evidence under `docs/agentforge/evidence/` when hosted verification is performed.
 - Interfaces: owner-authorized durable Neon Development project/branch; pooled runtime URL and direct migration URL; safe non-production seed modes for ordinary development, browser behavior, and performance; branch identity assertion; migration smoke and redacted target inspection commands.
 - Acceptance: the developer can run the Next.js process locally against the durable Neon Development branch while using hosted Sanity; Drizzle migrations use the direct endpoint and application traffic uses the pooled endpoint; the target is not the temporary agent branch and does not expire unexpectedly; Development seed modes are deterministic and never reset Production or personal records; schema/migration evidence is captured on the authorized non-default target.
@@ -924,6 +921,17 @@ Verification:
 - Checks: Neon target/branch inspection; direct migration smoke; safe seed and rollback/refusal tests; `pnpm neon:performance` where relevant; `pnpm test`; `pnpm test:integration`; `pnpm typecheck`; `pnpm lint`; `pnpm build`; redacted evidence review; and `git diff --check`.
 - Dependencies/unblock: T-18; owner-authorized durable Neon target and credentials are required. Do not reset or consolidate the current Neon `main` branch as a shortcut.
 - Recommended AgentForge skills: `neon`, `neon-postgres`, `neon-postgres-branches`, `migration-history-workflow`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, and `git-workflow-and-versioning`.
+- Plan: [`2026-09-03-t-20-durable-neon-development.md`](docs/agentforge/plans/2026-09-03-t-20-durable-neon-development.md).
+
+Verification:
+
+- [x] `pnpm exec vitest run scripts/neon-development/core.test.ts` passes 11 focused tests for command parsing, identity matching, expiry/main/project refusal, pooled-migration refusal, provision-without-URLs, and redacted inspect output.
+- [x] `pnpm neon:development -- provision` created durable branch `development` (`br-super-leaf-axfwoi2e`) in project `curly-dust-60603928` from `main` with no expiration.
+- [x] Direct migrate applied the second committed hash; catalog exposed `lists`/`tasks` UUID columns with `uuidv7()` defaults. Ordinary seed created verified `dev-user@example.test` with 1 list and 2 tasks. Read-only `main` still has `posts_table` and one migration.
+- [x] `pnpm test` passes 29 files and 244 tests; `pnpm test:integration` passes 6 files and 23 tests against one disposable PostgreSQL 18 Testcontainer.
+- [x] `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, changed-file Prettier checks, and `git diff --check` pass.
+- [x] `pnpm neon:performance` was not rerun; `TST-PERFORMANCE-001` remains verified by the existing T-16 evidence against the previous `development` branch name. The new branch uses the same name and committed schema.
+- [ ] Fresh proportional review of the implementation tip.
 
 ### T-21: Add automatic CI quality gates with no deployment side effects
 
@@ -946,7 +954,7 @@ Verification:
 - [x] Fresh proportional review of implementation tip `e50a641` found no actionable findings. Optional nits about test-name tightness and `persist-credentials: false` were deferred.
 - [x] PR: [#25](https://github.com/michi-guns/nextjs-todo-list-example/pull/25) is open from `task/T-21-ci-quality-gates`.
 
-Dependency checkpoint: T-18.1 through T-18.4, T-19, and T-21 are complete. T-20 remains blocked on an owner-authorized durable Neon Development target. T-21.5 remains blocked on an owner-approved Production mail provider. T-20, T-21.5, and T-21 must still be in place before a hosted Preview workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
+Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 remains blocked on an owner-approved Production mail provider. T-21.5 must still be in place before a Production release workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
 
 ### T-21.5: Establish the minimum Production mail foundation
 
@@ -1059,12 +1067,11 @@ database a command targets.
 - Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
 
 Final post-baseline dependency checkpoint: T-18.1 through T-18.4, the
-parent T-18 contract gate, T-19, and T-21 are complete. T-20 remains blocked
-on an owner-authorized durable Neon target. T-21.5 remains blocked on an
-owner-approved Production mail provider. T-22 through T-25 remain ordered
-behind those named prerequisites; T-26 through T-29 are recorded follow-ons.
-No Preview workflow, Neon branch mutation, Vercel deployment, or Production
-operation is authorized by this backlog entry alone.
+parent T-18 contract gate, T-19, T-20, and T-21 are complete. T-21.5 remains
+blocked on an owner-approved Production mail provider. T-22 through T-25 remain
+ordered behind those named prerequisites; T-26 through T-29 are recorded
+follow-ons. No Preview workflow, Vercel deployment, or Production operation is
+authorized by this backlog entry alone.
 
 ## Explicitly out of scope for this baseline
 
