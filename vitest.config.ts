@@ -16,6 +16,7 @@ export default defineConfig({
       "scripts/verify-neon-performance/**/*.test.mjs",
       "scripts/local-postgres/**/*.test.ts",
       "scripts/neon-development/**/*.test.ts",
+      "scripts/deploy/**/*.test.ts",
     ],
     exclude: [
       "**/node_modules/**",

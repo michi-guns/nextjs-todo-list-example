@@ -969,7 +969,7 @@ Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete.
 
 ### T-22: Add manually triggered, fully functional Vercel Preview delivery
 
-- [ ] Complete T-22 only after the owner authorizes a controlled hosted Preview run.
+- [~] Complete T-22 only after the owner authorizes a controlled hosted Preview run.
 - Files: `.github/workflows/deploy-preview.yml`, explicit deploy/branch/seed/smoke helpers under `scripts/deploy/` or equivalent thin adapters, preview environment configuration documentation, and redacted Preview evidence under `docs/agentforge/evidence/`.
 - Interfaces: `workflow_dispatch` inputs for an exact branch/tag/SHA and a safe preview identifier; resolved immutable commit SHA; isolated temporary Neon branch derived from durable Development; direct migration and safe seed sequence; Vercel Preview deployment; deployment-origin `BETTER_AUTH_URL`; non-production auth/mail/Sanity configuration; explicit cleanup/expiry path; workflow outputs for URL, deployment id, branch id, expiry, SHA, and redacted smoke result.
 - Acceptance: a client receives an ephemeral Preview that supports authentication, list/task mutations, landing content, and the relevant browser smoke path; Preview database writes are isolated from Development and Production; data is sanitized or deterministic; local filesystem mail is rejected and the selected remote-safe mail or controlled-account strategy works; the requested ref is resolved and displayed; cleanup is repeatable and does not delete another preview; no automatic Preview is created for ordinary PR activity.
@@ -977,6 +977,14 @@ Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete.
 - Checks: workflow validation; a controlled manual run from a known branch/tag/SHA; branch isolation assertion; direct migration/seed verification; deployed browser/API smoke; cleanup/expiry verification; workflow artifact review; and `git diff --check`. Never use Production as a test target.
 - Dependencies/unblock: T-18, T-20, and T-21; T-18.1 has resolved the Preview Sanity and mail strategy, while Vercel/Neon resources and the non-production dataset still require owner authorization and provisioning. Do not enable the workflow until the owner explicitly authorizes the hosted run.
 - Recommended AgentForge skills: `ci-cd-and-automation`, `neon-postgres-branches`, `neon-postgres`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, `browser-testing-with-devtools`, `next-dev-loop`, and `git-workflow-and-versioning`.
+- Plan: [`2026-09-03-t-22-preview-delivery.md`](docs/agentforge/plans/2026-09-03-t-22-preview-delivery.md).
+
+Verification:
+
+- [x] `pnpm exec vitest run scripts/deploy/preview/core.test.ts src/test/pipeline/preview-workflow.test.ts src/modules/auth/infrastructure/auth-mail.test.ts` passes 3 files and 18 tests.
+- [x] `pnpm test` passes 32 files and 260 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, changed-file Prettier, and `git diff --check` pass.
+- [x] Dedicated Sanity `preview` dataset exists with published `landingPage`. GitHub Environment `preview` exists. Repository variable `NEXT_PUBLIC_SANITY_PROJECT_ID` is set.
+- [ ] Controlled hosted deploy/cleanup is blocked on a Vercel project plus GitHub Environment `preview` secrets: `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and Preview `BETTER_AUTH_SECRET`. Do not run the workflow until those secrets exist. Vercel Git auto-deploy must stay disabled.
 
 ### T-23: Add manually approved exact-ref Production release
 

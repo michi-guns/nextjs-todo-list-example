@@ -184,6 +184,8 @@ production build locally.
 | `pnpm neon:development -- inspect`                                                | Print redacted Development project, branch, and endpoint identity.                                              |
 | `pnpm neon:development -- migrate`                                                | Apply committed migrations through the direct Development URL.                                                  |
 | `pnpm neon:development -- seed`                                                   | Replace only the synthetic Development user and a small Inbox dataset.                                          |
+| `pnpm preview -- deploy --ref <ref> --preview-id <id>`                            | Create an isolated expiring Neon branch, migrate, seed the controlled Preview account, and deploy that SHA.     |
+| `pnpm preview -- cleanup --preview-id <id>`                                       | Delete only the matching Preview Neon branch after identity checks.                                             |
 | `pnpm sanity:smoke`                                                               | Read, validate, and map the published Sanity landing singleton without mutating it.                             |
 | `pnpm neon:performance`                                                           | Run the guarded, opt-in Neon development-branch performance evidence lane.                                      |
 | `pnpm exec drizzle-kit check --config drizzle.config.ts`                          | Validate migration metadata and history.                                                                        |
@@ -205,6 +207,12 @@ Preview branches, mutate Sanity, or use Production secrets.
 `pnpm sanity:smoke` and `pnpm neon:performance` stay local or owner-authorized
 commands. Docker and Chromium are required on the harness runner; GitHub-hosted
 Ubuntu provides both.
+
+Manual Preview uses [`.github/workflows/deploy-preview.yml`](.github/workflows/deploy-preview.yml)
+with `workflow_dispatch` only. It is not created for ordinary pull requests.
+The GitHub `preview` Environment must hold Preview-scoped secrets; Production
+secrets stay out of that workflow. Operators should disable Vercel Git
+auto-deploy so this workflow remains the Preview source of truth.
 
 ## Environment boundaries
 

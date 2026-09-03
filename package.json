@@ -18,6 +18,7 @@
     "better-auth-mcp": "tsx scripts/better-auth-mcp/cli.ts",
     "environment:inspect": "tsx scripts/environment/cli.ts inspect",
     "neon:development": "tsx scripts/neon-development/cli.ts",
+    "preview": "tsx scripts/deploy/preview/cli.ts",
     "sanity:smoke": "tsx scripts/verify-sanity.ts",
     "neon:performance": "node scripts/verify-neon-performance/cli.mjs",
     "lint": "eslint",

@@ -1,0 +1,77 @@
+name: Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Exact branch, tag, or commit SHA
+        required: true
+        type: string
+      preview-id:
+        description: Isolated preview identifier
+        required: true
+        type: string
+      action:
+        description: deploy or cleanup
+        required: true
+        type: choice
+        options:
+          - deploy
+          - cleanup
+        default: deploy
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ inputs.preview-id }}
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    name: Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: preview
+    env:
+      HUSKY: "0"
+      APP_ENV: preview
+      NODE_ENV: production
+      BETTER_AUTH_URL: https://preview.example.test
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      DATABASE_PROVIDER: neon
+      DATABASE_PROJECT_ID: curly-dust-60603928
+      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+      NEXT_PUBLIC_SANITY_DATASET: preview
+      NEXT_PUBLIC_SANITY_API_VERSION: "2026-08-27"
+      SANITY_WRITE_POLICY: read-only
+      APP_MAIL_TRANSPORT: controlled-account
+      DEPLOYMENT_OWNER: github
+      SECRET_NAMESPACE: preview
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          runtime: node@24
+          cache: true
+      - name: Install Neon and Vercel CLIs
+        run: npm install --global neonctl vercel
+      - name: Deploy preview
+        if: ${{ inputs.action == 'deploy' }}
+        run: pnpm preview -- deploy --ref "$REF" --preview-id "$PREVIEW_ID"
+        env:
+          REF: ${{ inputs.ref }}
+          PREVIEW_ID: ${{ inputs.preview-id }}
+      - name: Cleanup preview
+        if: ${{ inputs.action == 'cleanup' }}
+        run: pnpm preview -- cleanup --preview-id "$PREVIEW_ID"
+        env:
+          PREVIEW_ID: ${{ inputs.preview-id }}

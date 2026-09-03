@@ -68,7 +68,8 @@ The Local Docker adapter in `scripts/local-postgres/` is the first
 state-changing command adapter. The Development adapter in
 `scripts/neon-development/` is the hosted non-default branch adapter. Both
 call these assertions before migrate or seed. Local reset stays loopback-only.
-Preview and Production adapters remain future work.
+The Preview adapter in `scripts/deploy/preview/` is the first state-changing
+Preview command adapter. Production adapters remain future work.
 
 | Guard                               | Required safety boundary                                                                                                                                                    |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -90,10 +91,11 @@ preview, and resolved-SHA metadata; connection strings, credentials, mailbox
 values, and secrets are never copied into it.
 
 The guard module remains runtime-neutral. Local Docker commands in
-`scripts/local-postgres/` and Development commands in
-`scripts/neon-development/` call it before mutation. T-22/T-23 must provide
-the Vercel/Preview/Production observations and ref-resolution implementation;
-those tasks must call these guards rather than recreate target checks.
+`scripts/local-postgres/`, Development commands in
+`scripts/neon-development/`, and Preview commands in
+`scripts/deploy/preview/` call it before mutation. T-23 must still provide the
+Production observations and protected-approval path; that task must call these
+guards rather than recreate target checks.
 
 ## Variables
 
