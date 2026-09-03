@@ -35,6 +35,23 @@ pnpm example-task -- enable
 Keep the package manifest to one command per script. Put reusable logic in
 `core.ts`, keep the CLI thin, and keep tests focused on the core behavior.
 
+## Local Docker PostgreSQL
+
+`scripts/local-postgres/` owns the persistent Local PostgreSQL 18 Compose
+project. The lifecycle command is `pnpm local:postgres -- <subcommand>`.
+`pnpm dev:local` is the required alias for the `dev` subcommand.
+
+```powershell
+pnpm local:postgres -- start
+pnpm local:postgres -- migrate
+pnpm local:postgres -- seed
+pnpm dev:local
+```
+
+The adapter binds `127.0.0.1:5432` only, calls the environment guards before
+migrate/seed/reset, and never uses Neon or Vercel credentials. Integration and
+Playwright Testcontainers remain separate.
+
 ## Neon performance evidence
 
 The T-16 benchmark is deliberately opt-in and targets only the non-default

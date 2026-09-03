@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:local": "tsx scripts/local-postgres/cli.ts dev",
+    "local:postgres": "tsx scripts/local-postgres/cli.ts",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",

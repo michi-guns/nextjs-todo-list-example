@@ -1,0 +1,24 @@
+name: todo-local
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: todo-local-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: todo
+      POSTGRES_PASSWORD: todo-local
+      POSTGRES_DB: todo
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - todo_local_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todo -d todo"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+      start_period: 5s
+
+volumes:
+  todo_local_pgdata:

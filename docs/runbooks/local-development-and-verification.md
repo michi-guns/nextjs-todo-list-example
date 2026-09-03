@@ -8,8 +8,10 @@ authorize changes to a shared database.
 ## Prerequisites
 
 - Node.js and pnpm matching the repository toolchain.
-- PostgreSQL 18 reachable through `DATABASE_URL` for a manually run app.
-- Docker for the Testcontainers-owned integration and Playwright suites.
+- Docker for Local PostgreSQL, the Testcontainers-owned integration suite, and
+  Playwright.
+- PostgreSQL 18 for a manually run app comes from `pnpm local:postgres -- start`
+  unless you already have a matching loopback database.
 - Sanity project and published landing singleton values for the read-only live
   smoke.
 
@@ -26,10 +28,11 @@ Install dependencies and create the local environment file described in the
 pnpm install
 ```
 
-For a manually run app, set `DATABASE_URL` to a reachable PostgreSQL 18
-database and set `BETTER_AUTH_URL` to the app origin. Set
-`BETTER_AUTH_SECRET` to a local random value. Normal landing requests also
-need `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET`.
+For a manually run app, set `DATABASE_URL` and `DATABASE_URL_UNPOOLED` to
+`postgresql://todo:todo-local@127.0.0.1:5432/todo`, the Local Docker target, and set
+`BETTER_AUTH_URL` to the app origin. Set `BETTER_AUTH_SECRET` to a local
+random value. Normal landing requests also need
+`NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET`.
 
 Set `BETTER_AUTH_LOCAL_MAILBOX=true` for local auth-link flows. The current
 Better Auth send callbacks write both verification and magic-link URLs to the
@@ -38,6 +41,36 @@ in development/test. `BETTER_AUTH_MAILBOX_DIR` is optional and may point below
 the OS temporary directory or the ignored `.local/better-auth-mailbox` path.
 The Playwright harness sets its own temporary mailbox and does not reuse this
 directory.
+
+## Local Docker PostgreSQL
+
+Start the persistent loopback PostgreSQL 18 container, apply the committed
+migrations, and load the synthetic local user:
+
+```powershell
+pnpm local:postgres -- start
+pnpm local:postgres -- migrate
+pnpm local:postgres -- seed
+pnpm dev:local
+```
+
+`pnpm dev:local` is start, readiness, migrate, then `pnpm dev`. It does not
+seed. The container keeps running after you stop the Next.js process.
+`pnpm local:postgres -- stop` keeps the volume.
+`pnpm local:postgres -- reset` deletes only this Compose volume after the
+command proves the configured URL is `127.0.0.1:5432/todo`. A Neon URL, a
+different local port, or a missing Local profile fails before Docker volumes
+are removed.
+
+If start, migrate, or seed fails, the container is left in place so you can
+fix the cause and retry the failed command. Do not point these commands at
+Neon or Vercel.
+
+After seeding, sign in as `local-dev@example.test` with
+`Local-dev-password-123!`. Landing content still comes from hosted Sanity.
+
+Integration and Playwright suites keep their own disposable Testcontainers
+databases. They do not use this Compose volume.
 
 ## Application commands
 
