@@ -927,8 +927,8 @@ Verification:
 
 ### T-21: Add automatic CI quality gates with no deployment side effects
 
-- [~] Complete T-21 with a real quality-gate run and no deployment side effects.
-- Files: `.github/workflows/ci.yml`; `src/test/pipeline/ci-workflow.test.ts`; `package.json` `packageManager` only; README, `docs/runbooks/local-development-and-verification.md`, and `docs/development/quality-gates.md` for truthful command references; `TODO.md` and `.dwf/decisions/TESTING.md` evidence. No deployment workflow in this task.
+- [x] Complete T-21 with a real quality-gate run and no deployment side effects.
+- Files: `.github/workflows/ci.yml`; `src/test/pipeline/ci-workflow.test.ts`; `package.json` `packageManager` only; README, `docs/runbooks/local-development-and-verification.md`, and `docs/development/quality-gates.md` for truthful command references; `app/page.tsx` `dynamic = "force-dynamic"` so production builds do not prerender Sanity; `TODO.md` and `.dwf/decisions/TESTING.md` evidence. No deployment workflow in this task.
 - Interfaces: automatic `push`/`pull_request` quality workflow on `main`; SHA-pinned `actions/checkout` and `pnpm/setup`; Node 24 plus pnpm 11 from `packageManager`; `quality` job for typecheck, lint, unit tests, `drizzle-kit check`, and build; `harness` job for `pnpm test:integration` and Chromium `pnpm test:e2e`; Playwright report artifact on the harness job only; no GitHub secrets.
 - Acceptance: CI verifies the selected commit without deploying to Vercel, creating Neon Preview branches, mutating Sanity, or requiring Production secrets; failures are visible and actionable; Docker and Chromium are declared on the harness job; CI does not become an implicit every-PR Preview deployment; workflow permissions and concurrency are least-privilege and documented.
 - Contracts/evidence: `TST-FOUNDATION-001`, `TST-HARNESS-001`, `TST-E2E-001`–`TST-E2E-003`, `TST-ENV-001`, and the CI portion of `TST-PIPELINE-001`; distinguish workflow syntax/static evidence from an actually executed run.
@@ -937,7 +937,16 @@ Verification:
 - Recommended AgentForge skills: `ci-cd-and-automation`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, `source-driven-development`, and `git-workflow-and-versioning`.
 - Plan: [`2026-09-03-t-21-ci-quality-gates.md`](docs/agentforge/plans/2026-09-03-t-21-ci-quality-gates.md).
 
-Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 must be reviewed before a hosted Preview workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
+Verification:
+
+- [x] `pnpm exec vitest run src/test/pipeline/ci-workflow.test.ts` passes 5 focused tests for trigger, permission, SHA pins, local-only commands, and loopback compile-time placeholders.
+- [x] `pnpm test` passes 28 files and 233 tests; `pnpm test:integration` passes 6 files and 23 tests against one disposable PostgreSQL 18 Testcontainer; `pnpm test:e2e` passes 7 serial Chromium journeys.
+- [x] `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build` with CI placeholders, `pnpm exec drizzle-kit check --config drizzle.config.ts`, changed-file Prettier checks, and `git diff --check` pass.
+- [x] GitHub Actions run [33746137734](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/33746137734) on commit `e50a641` succeeded: Quality in 1m25s and Harness in 2m0s. No Vercel, Neon, Sanity mutation, or Production secret was used.
+- [x] Fresh proportional review of implementation tip `e50a641` found no actionable findings. Optional nits about test-name tightness and `persist-credentials: false` were deferred.
+- [x] PR: [#25](https://github.com/michi-guns/nextjs-todo-list-example/pull/25) is open from `task/T-21-ci-quality-gates`.
+
+Dependency checkpoint: T-18.1 through T-18.4, T-19, and T-21 are complete. T-20 remains blocked on an owner-authorized durable Neon Development target. T-21.5 remains blocked on an owner-approved Production mail provider. T-20, T-21.5, and T-21 must still be in place before a hosted Preview workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
 
 ### T-21.5: Establish the minimum Production mail foundation
 
@@ -1050,10 +1059,12 @@ database a command targets.
 - Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
 
 Final post-baseline dependency checkpoint: T-18.1 through T-18.4, the
-parent T-18 contract gate, and T-19 are complete. T-20 through T-25 remain
-ordered behind the contract and their named prerequisites; T-26 through T-29
-are recorded follow-ons. No workflow, Neon branch mutation, Vercel
-deployment, or Production operation is authorized by this backlog entry alone.
+parent T-18 contract gate, T-19, and T-21 are complete. T-20 remains blocked
+on an owner-authorized durable Neon target. T-21.5 remains blocked on an
+owner-approved Production mail provider. T-22 through T-25 remain ordered
+behind those named prerequisites; T-26 through T-29 are recorded follow-ons.
+No Preview workflow, Neon branch mutation, Vercel deployment, or Production
+operation is authorized by this backlog entry alone.
 
 ## Explicitly out of scope for this baseline
 
