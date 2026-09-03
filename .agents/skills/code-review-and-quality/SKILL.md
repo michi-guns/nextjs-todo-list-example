@@ -221,6 +221,40 @@ Human makes the final call
 
 This catches issues that a single model might miss — different models have different blind spots.
 
+## Independent closeout review
+
+After a non-trivial task's latest artifact is ready, spawn a reviewer
+sub-agent. The implementing agent must not review that artifact in its own
+context instead of spawning.
+
+1. Spawn a sub-agent in a fresh context against the exact latest commit or
+   artifact, the governing DWF contracts, and the changed files.
+2. Use this harness's most capable model. Do not pin a vendor-specific model
+   name from an older plan.
+3. Set reasoning effort as follows:
+
+   | Harness                      | Reasoning effort                        |
+   | ---------------------------- | --------------------------------------- |
+   | Grok                         | `high`                                  |
+   | Codex                        | `xhigh`                                 |
+   | Claude Code                  | `xhigh`                                 |
+   | GLM, Kimi, Qwen, and similar | the highest setting the harness exposes |
+
+   If the spawn API has a reasoning or effort parameter, set it to that
+   value. If it does not, still select the most capable model and state the
+   required effort in the reviewer prompt.
+
+4. Ask for reasonable, proportional, pragmatic, actionable findings only. Do
+   not invite speculative perfection or scope expansion.
+5. Classify findings as required by `AGENTS.md`: actionable, contract
+   conflict/design gap, optional/nit, or noise. Fix in-scope actionable
+   findings. Any later commit, including docs-only evidence or tracker
+   closeout, invalidates the previous approval and requires a new spawn
+   against the new tip. Do not push or open a PR until the reviewed
+   commit is the current branch/PR tip.
+
+Completed plans that name GPT-5.6-Sol mean this spawn, not that named model.
+
 **Example prompt for a review agent:**
 
 ```

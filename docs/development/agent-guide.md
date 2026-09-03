@@ -28,4 +28,4 @@ For multi-step work, use the AgentForge `planning` skill before `task-breakdown`
 
 ## Before completion
 
-Run relevant type checks, linting, tests, builds, and migration checks. Update current-state documents, indexes, and ADRs when architecture or behavior changes.
+Run relevant type checks, linting, tests, builds, and migration checks. Update current-state documents, indexes, and ADRs when architecture or behavior changes. For a non-trivial task, spawn the independent closeout reviewer required by [`AGENTS.md`](../../AGENTS.md) rather than reviewing the artifact in the implementing agent's own context.

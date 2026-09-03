@@ -35,9 +35,18 @@ This is a temporary delivery protocol for the current implementation run. The DW
 1. Complete the task acceptance criteria and record the verification evidence in the task or its linked artifact.
 2. Reconcile every referenced `TST-*` contract. Mark it `verified`, `partial`, `blocked`, `deferred`, or `retired` with the exact evidence or a linked follow-up; never silently omit a future integration or E2E obligation.
 3. Run the focused checks plus the proportionate project quality gates. Do not claim a check passed when it was skipped.
-4. Mark the task `[x]`, update any checkpoint it satisfies, and commit the complete task with a descriptive message such as `feat: implement lists capability`.
-5. Push the branch with its upstream configured.
-6. Open a pull request from the task branch into `main`. Use
+4. Commit the complete task with a descriptive message such as `feat: implement lists capability`.
+5. Spawn the independent closeout reviewer required by `AGENTS.md`: a fresh
+   sub-agent on this harness's most capable model, at Grok `high`, Codex or
+   Claude Code `xhigh`, or the highest available effort on GLM, Kimi, Qwen,
+   and similar harnesses. Point it at that exact commit. Fix actionable
+   findings, rerun affected checks, and spawn a new reviewer for each
+   changed tip.
+6. Mark the task `[x]`, update any checkpoint it satisfies, and commit remaining evidence.
+   If that creates a new tip, spawn a new reviewer against it. Do not push or
+   open a PR until the reviewed commit is the current branch/PR tip.
+7. Push the branch with its upstream configured.
+8. Open a pull request from the task branch into `main`. Use
    [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
    The PR body must include:
    - a **Why this change** section at the top, written for product owners,
@@ -50,7 +59,7 @@ This is a temporary delivery protocol for the current implementation run. The DW
    - the affected `TST-*` IDs and their status;
    - acceptance criteria and verification commands/results;
    - known limitations, follow-up tasks, and any external prerequisites.
-7. Report the terminal handoff in this format:
+9. Report the terminal handoff in this format:
 
    `T-XX | PR #N | <PR title> | <clickable GitHub URL>`
 
