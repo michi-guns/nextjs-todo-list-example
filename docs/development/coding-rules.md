@@ -7,3 +7,4 @@
 - Do not put authorization only in UI controls.
 - Do not expose secrets or commit `.env` values.
 - Prefer the smallest abstraction that improves clarity or testability.
+- Follow the agent-first stack rule in [`TD-028`](../../.dwf/decisions/TECHNICAL.md#td-028): current documented defaults, with Drizzle, Better Auth, and Zod 4 as named exceptions.

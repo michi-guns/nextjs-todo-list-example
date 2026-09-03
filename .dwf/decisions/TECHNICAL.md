@@ -390,3 +390,40 @@ completion work, including password-reset product flows, abuse controls, and
 any later decision to support arbitrary Preview mail delivery. T-23 depends on
 T-21.5; a controlled verified Preview account does not satisfy the Production
 mail prerequisite.
+
+<a id="td-028"></a>
+
+## TD-028 — Agent-first current stack, with named exceptions
+
+- **Status:** ACCEPTED
+- **Related product decisions:** [D-009](PRODUCT.md#d-009)
+- **Related technical decisions:** [TD-004](#td-004), [TD-005](#td-005), [TD-008](#td-008)
+- **Related rules:** [RULE-010](../RULES.md#rule-010), [RULE-011](../RULES.md#rule-011), [RULE-012](../RULES.md#rule-012)
+- **Source:** owner stack-selection guidance for coding-agent authors
+
+This starter is written for coding agents as the primary authors, then reviewed
+by humans. Pick the current, well-documented default of each accepted
+technology: the APIs the installed versions in this repository actually teach.
+
+Do not revive older framework modes because they dominate training data. Do not
+require preview flags, experimental compiler options, or last-week surfaces as
+baseline unless a Technical Decision already accepted them.
+
+The in-repo illustration is Next.js. Use the App Router as this installed Next.js
+version documents it: Server Components for reads, Server Actions for UI
+mutations, and Route Handlers for JSON, auth, and webhooks. Do not fall back to
+the Pages Router. Do not make Cache Components, `'use cache'`, or other opt-in
+Next.js experiments a baseline requirement until this repository's installed
+Next.js documentation treats them as the default.
+
+These packages are accepted exceptions. Keep them. Do not replace them with
+more-familiar alternatives, and do not freeze an older major because tutorials
+still use it:
+
+- Drizzle ORM and Drizzle Kit, including the installed 1.x line
+- Better Auth
+- Zod 4
+
+When those APIs differ from older tutorials, follow this repository's code and
+the installed package documentation. Do not turn the starter into a configurable
+multi-stack framework.

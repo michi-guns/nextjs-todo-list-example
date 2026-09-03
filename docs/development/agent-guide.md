@@ -18,7 +18,7 @@ For multi-step work, use the AgentForge `planning` skill before `task-breakdown`
 
 - Prefer small vertical slices.
 - Keep cross-cutting foundations independent from todo-specific concepts so derived applications can replace mostly domain and UI code.
-- Use current stable, recommended APIs and the simplest genuinely robust implementation. Add complexity only for a clear reusable benefit; do not build speculative provider-swapping abstractions.
+- Use current documented APIs of the accepted stack, optimized for coding agents. Keep Drizzle, Better Auth, and Zod 4. See [`TD-028`](../../.dwf/decisions/TECHNICAL.md#td-028). Add complexity only for a clear reusable benefit; do not build speculative provider-swapping abstractions.
 - Keep domain code framework-independent.
 - Validate untrusted input with Zod.
 - Keep Drizzle and Sanity behind infrastructure adapters.

@@ -89,12 +89,12 @@ Published landing-content changes automatically invalidate the affected public c
 
 - **Status:** ACCEPTED
 - **Source:** current product-intent realignment
-- **Related:** [Agent PRD](../output/agent/PRD.md#1-product-purpose-and-reuse-contract)
+- **Related:** [Agent PRD](../output/agent/PRD.md#1-product-purpose-and-reuse-contract), [TD-028](TECHNICAL.md#td-028)
 - **Supersedes:** D-006
 
 This repository's product is an opinionated, production-minded Next.js starter implemented as a complete personal-todo reference application. A derived application should be able to replace mostly the domain and UI while retaining or adapting the cross-cutting foundations. The starter provides one preferred stack and architecture rather than abstractions for interchangeable frameworks, databases, authentication systems, or content platforms.
 
-The todo reference baseline remains locally verifiable through the complete authenticated journey and agreed boundary, persistence, integration, browser, migration, and quality evidence. Use current stable best practices and the simplest design that is genuinely robust. Add modest complexity when it produces a clear, reusable gain in safety, correctness, operability, maintainability, or avoided rework; do not spend baseline implementation time on speculative abstraction or low-leverage polish. Deployment and CI remain separate explicit scope decisions.
+The todo reference baseline remains locally verifiable through the complete authenticated journey and agreed boundary, persistence, integration, browser, migration, and quality evidence. Use current documented best practices of the accepted stack and the simplest design that is genuinely robust, following [TD-028](TECHNICAL.md#td-028). Add modest complexity when it produces a clear, reusable gain in safety, correctness, operability, maintainability, or avoided rework; do not spend baseline implementation time on speculative abstraction or low-leverage polish. Deployment and CI remain separate explicit scope decisions.
 
 <a id="d-010"></a>
 

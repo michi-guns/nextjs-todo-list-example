@@ -6,6 +6,7 @@
 - A derived application is expected to replace mostly the domain and UI while retaining or adapting cross-cutting foundations such as authentication, persistence, CMS integration, validation, testing, documentation, and local quality tooling.
 - The starter deliberately presents one preferred stack and architecture rather than becoming a configurable multi-stack framework.
 - Design and implementation optimize for high reusable quality without excessive build time: use the simplest robust modern approach and add complexity only when it has a clear safety, correctness, operability, maintainability, or avoided-rework payoff.
+- Stack selection follows [TD-028](decisions/TECHNICAL.md#td-028) and [RULE-012](RULES.md#rule-012): current documented defaults for coding-agent authors, with Drizzle, Better Auth, and Zod 4 kept as named exceptions.
 
 ## Repository landscape
 

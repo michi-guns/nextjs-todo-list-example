@@ -85,7 +85,8 @@ app (routes) → module presentation / application APIs
 
 - Keep cross-cutting foundations reusable without importing todo-specific concepts into them.
 - Keep domain and UI responsibilities replaceable through the existing capability boundaries.
-- Follow the current stable and recommended APIs for the installed stack, including the repository's required local Next.js documentation check.
+- Follow the current documented APIs for the installed stack, including the repository's required local Next.js documentation check. Prefer those APIs over stale tutorial modes and over unaccepted experimental surfaces ([TD-028](../../decisions/TECHNICAL.md#td-028), [RULE-012](../../RULES.md#rule-012)).
+- Keep Drizzle ORM and Drizzle Kit, Better Auth, and Zod 4. Do not replace them with more-familiar alternatives, and do not freeze an older major because tutorials still use it.
 - Prefer the simplest implementation that meets the accepted safety, correctness, operability, maintainability, and verification contract.
 - Add modest complexity when it prevents meaningful rework or supplies a reusable safeguard. Do not build provider-swapping abstractions, speculative extension systems, or low-leverage machinery.
 

@@ -2,7 +2,7 @@
 
 This repository is a public, opinionated Next.js starter implemented as a complete authenticated todo reference application. It combines a modern stack, a domain-centered modular monolith, reusable cross-cutting foundations, and an AI-friendly documentation system. Derived applications should mainly replace domain and UI code rather than rebuild those foundations.
 
-The starter is production-minded without becoming a universal framework or turnkey SaaS. It uses the simplest robust approach and spends extra complexity only where the reusable payoff is clear.
+The starter is production-minded without becoming a universal framework or turnkey SaaS. It uses the simplest robust approach and spends extra complexity only where the reusable payoff is clear. Stack choices follow the agent-first current-default rule, with Drizzle, Better Auth, and Zod 4 kept as named exceptions ([`TD-028`](../../.dwf/decisions/TECHNICAL.md#td-028)).
 
 ## Responsibilities
 

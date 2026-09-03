@@ -66,4 +66,10 @@ Keep cross-cutting foundations reusable beyond the todo domain, and keep todo-sp
 
 ## RULE-011 — Maximize quality per implementation effort
 
-Use current stable APIs, recommended practices, secure defaults, and production-minded failure handling. Choose the simplest implementation that is genuinely robust. Accept modest extra complexity when it clearly prevents meaningful rework or improves reusable safety, correctness, operability, or maintainability. Reject speculative abstractions, low-leverage polish, and time-heavy machinery whose value is not part of the accepted baseline.
+Use current documented APIs, recommended practices, secure defaults, and production-minded failure handling. Choose the simplest implementation that is genuinely robust. Accept modest extra complexity when it clearly prevents meaningful rework or improves reusable safety, correctness, operability, or maintainability. Reject speculative abstractions, low-leverage polish, and time-heavy machinery whose value is not part of the accepted baseline.
+
+<a id="rule-012"></a>
+
+## RULE-012 — Agent-first current stack
+
+Prefer the current documented default of the accepted stack so coding agents can follow installed-version docs. Do not revive stale framework modes, and do not require unaccepted experimental surfaces. Keep Drizzle, Better Auth, and Zod 4 even when they are ahead of common tutorials. See [TD-028](decisions/TECHNICAL.md#td-028).
