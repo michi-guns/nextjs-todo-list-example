@@ -14,12 +14,11 @@ data, testing, and AgentForge material.
 ### Prerequisites
 
 - Node.js and pnpm matching the repository toolchain.
-- A reachable PostgreSQL 18 database for the application. Use a local database
-  or a non-default Neon development branch. Do not use a production database
-  for local work.
-- Docker for `pnpm test:integration` and `pnpm test:e2e`.
+- Docker Desktop, or another Docker engine, for Local PostgreSQL, integration
+  tests, and Playwright.
 - A configured Sanity project and published landing singleton for the normal
-  landing page and the separate `pnpm sanity:smoke` check.
+  landing page and the separate `pnpm sanity:smoke` check. Do not use a
+  production database for local work.
 
 ### Install and configure
 
@@ -38,11 +37,11 @@ NODE_ENV=development
 
 # Application database. The app uses DATABASE_URL.
 DATABASE_PROVIDER=local-postgres
-DATABASE_URL=postgresql://user:password@localhost:5432/todo
+DATABASE_URL=postgresql://todo:todo-local@127.0.0.1:5432/todo
 
 # Direct connection for Drizzle migrations. For Neon, use the non-default
 # development branch. It may be omitted when DATABASE_URL is direct local.
-DATABASE_URL_UNPOOLED=postgresql://user:password@localhost:5432/todo
+DATABASE_URL_UNPOOLED=postgresql://todo:todo-local@127.0.0.1:5432/todo
 
 BETTER_AUTH_URL=http://localhost:3000
 BETTER_AUTH_SECRET=replace-with-a-local-random-value
@@ -89,9 +88,32 @@ magic link first, Better Auth deliberately revokes the unproven password
 credential as a pre-hijacking safeguard. Password reset/recovery is outside
 the current starter baseline.
 
+### Start local Docker PostgreSQL
+
+The Local profile uses a persistent PostgreSQL 18 container on loopback only.
+Those Compose credentials are local development values, not production secrets.
+
+```powershell
+pnpm local:postgres -- start
+pnpm local:postgres -- migrate
+pnpm local:postgres -- seed
+pnpm dev:local
+```
+
+`pnpm dev:local` starts the container if needed, waits until it accepts
+connections, applies the committed migrations, and then runs `pnpm dev`. Seed
+stays a separate command. `pnpm local:postgres -- stop` keeps the data volume;
+`pnpm local:postgres -- reset` wipes only this Compose database after it proves
+the URL is the local Docker target. These commands refuse Neon and other remote
+URLs.
+
+Sign in as `local-dev@example.test` with password `Local-dev-password-123!`
+after seeding. Auth links still go to the local mailbox.
+
 ### Apply the committed schema
 
-Inspect and apply migrations before opening the app against a new database:
+Inspect and apply migrations before opening the app against a new database.
+Prefer `pnpm local:postgres -- migrate` for the Local Docker target:
 
 ```powershell
 pnpm exec drizzle-kit check --config drizzle.config.ts
@@ -125,6 +147,8 @@ production build locally.
 | Command                                                                           | Purpose                                                                                                         |
 | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `pnpm dev`                                                                        | Start the Next.js development server.                                                                           |
+| `pnpm dev:local`                                                                  | Start Local Docker PostgreSQL, migrate, then run `pnpm dev`.                                                    |
+| `pnpm local:postgres -- start`                                                    | Start the persistent Local Docker PostgreSQL 18 container.                                                      |
 | `pnpm build`                                                                      | Create a production build.                                                                                      |
 | `pnpm start`                                                                      | Serve the production build.                                                                                     |
 | `pnpm typecheck`                                                                  | Run the TypeScript compiler without emitting files.                                                             |

@@ -37,8 +37,15 @@ This is a temporary delivery protocol for the current implementation run. The DW
 3. Run the focused checks plus the proportionate project quality gates. Do not claim a check passed when it was skipped.
 4. Mark the task `[x]`, update any checkpoint it satisfies, and commit the complete task with a descriptive message such as `feat: implement lists capability`.
 5. Push the branch with its upstream configured.
-6. Open a pull request from the task branch into `main`. The PR body must include:
-   - a concise summary of the behavior delivered;
+6. Open a pull request from the task branch into `main`. Use
+   [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
+   The PR body must include:
+   - a **Why this change** section at the top, written for product owners,
+     stakeholders, and other non-engineers: 3-6 short everyday-language
+     sentences covering what a person can now do, why it matters, and what
+     this does not change, with no files, commands, or test IDs in that
+     section;
+   - a concise technical summary of the behavior delivered;
    - the task ID and links to the relevant DWF PRD/SPEC sections;
    - the affected `TST-*` IDs and their status;
    - acceptance criteria and verification commands/results;
@@ -789,10 +796,9 @@ Plan: [`2026-08-31-t-17-documentation-quality.md`](docs/agentforge/plans/2026-08
 
 Dependency checkpoint: T-17.1, T-17.2, and T-17.3 are complete at the final
 reviewed documentation tip. The baseline is complete. T-18.1 has now recorded
-the environment choices and canonical DWF/testing-ledger contracts; T-18.2 and
-T-18.3 and T-18.4 are complete. T-19 and T-20 are now the next unblocked
-environment work items after the shared contract, subject to their named
-local Docker and owner-authorized durable-target prerequisites.
+the environment choices and canonical DWF/testing-ledger contracts; T-18.2,
+T-18.3, T-18.4, and T-19 are complete. T-20 remains the next unblocked
+hosted-development item, subject to an owner-authorized durable Neon target.
 Neon migration evidence remains blocked on an explicitly authorized branch
 realignment; harness outage observation and deployed Sanity delivery remain
 evidence conditions rather than reasons to alter the baseline.
@@ -875,7 +881,7 @@ Verification:
 
 ### T-19: Establish persistent Local Docker PostgreSQL while retaining hosted Sanity
 
-- [ ] Complete T-19 with a repeatable local Docker workflow and runtime evidence.
+- [x] Complete T-19 with a repeatable local Docker workflow and runtime evidence.
 - Files: `docker-compose.yml` or a repository-local equivalent under `scripts/local-postgres/`, `package.json`, `.env.example`/local setup documentation, `README.md`, `docs/runbooks/local-development-and-verification.md`, and local lifecycle tests.
 - Interfaces: explicit `pnpm dev:local` and database lifecycle commands for start/readiness/migrate/seed/stop; loopback-only local database target; the existing real Sanity client/configuration; the existing local/test mailbox; existing Testcontainers and Playwright flows remain available and are not silently redirected to Neon.
 - Acceptance: a contributor can start a persistent PostgreSQL 18 container, apply the committed migration chain, seed safe local data, run the app, authenticate through the local mailbox, exercise todo behavior, and read the real hosted Sanity landing path; local reset refuses every remote target; interrupted startup, migration failure, and seed failure leave a recoverable state; local commands never require Neon or Vercel credentials.
@@ -883,6 +889,16 @@ Verification:
 - Checks: focused local lifecycle tests; `pnpm typecheck`; `pnpm lint`; `pnpm test`; `pnpm test:integration`; the relevant local browser smoke; `pnpm build`; changed-file Prettier checks; and `git diff --check`.
 - Dependencies/unblock: T-18 complete; Docker is a required prerequisite for runtime verification. T-19 and T-20 may be developed in parallel after the shared contract, but T-21 consumes their stable command boundaries.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `incremental-implementation`, `security-and-hardening`, `next-dev-loop`, `browser-testing-with-devtools`, and `git-workflow-and-versioning`.
+- Plan: [`2026-09-03-t-19-local-docker-postgres.md`](docs/agentforge/plans/2026-09-03-t-19-local-docker-postgres.md).
+
+Verification:
+
+- [x] `pnpm exec vitest run scripts/local-postgres/core.test.ts` passes 14 focused tests for command parsing, loopback Compose identity, Neon/remote refusal before mutation, migrate-failure recovery, and password-free errors.
+- [x] `pnpm local:postgres -- start` started `postgres:18-alpine` on `127.0.0.1:5432`; migrate applied users/lists/tasks/auth tables; seed created verified `local-dev@example.test`; sign-in against that database returned HTTP 200; reset of a Neon Development profile failed with `target_mismatch` and left data intact; a matching Local reset wiped public tables; stop kept the volume.
+- [x] `pnpm test` passes 27 files and 228 tests; `pnpm test:integration` passes 6 files and 23 tests against one disposable PostgreSQL 18 Testcontainer, not the Compose volume.
+- [x] `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, `pnpm sanity:smoke`, changed-file Prettier checks, and `git diff --check` pass.
+- [x] Local Docker commands never required Neon or Vercel credentials. `TST-ENV-001` remains `partial` for hosted identity. `TST-MIGRATION-001` remains blocked on an owner-authorized Neon branch. Docker-daemon outage was not observed.
+- [x] Fresh proportional review of the T-19 artifact found no actionable findings. Optional nits about `redactSecrets()` coverage and a verification-retry edge case were deferred.
 
 ### T-20: Establish a durable Neon Development target
 
@@ -1018,11 +1034,11 @@ database a command targets.
 - Dependencies/unblock: T-25 and the reviewed implementation of T-18 through T-24; product scope approval is required before adding a maintained example app.
 - Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
 
-Final post-baseline dependency checkpoint: T-18.1 through T-18.4 and the
-parent T-18 contract gate are complete. T-19 through T-25 remain ordered
-behind the contract and their named prerequisites; T-26 through T-29 are
-recorded follow-ons. No workflow, Neon branch mutation, Vercel deployment, or
-Production operation is authorized by this backlog entry alone.
+Final post-baseline dependency checkpoint: T-18.1 through T-18.4, the
+parent T-18 contract gate, and T-19 are complete. T-20 through T-25 remain
+ordered behind the contract and their named prerequisites; T-26 through T-29
+are recorded follow-ons. No workflow, Neon branch mutation, Vercel
+deployment, or Production operation is authorized by this backlog entry alone.
 
 ## Explicitly out of scope for this baseline
 
