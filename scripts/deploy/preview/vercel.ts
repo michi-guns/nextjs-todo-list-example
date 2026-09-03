@@ -14,28 +14,30 @@ export async function deployPreview(input: {
     )
   }
 
-  const envArgs = runtimeEnvArgs(
+  const envArgs = buildPreviewVercelEnvArgs(
     input.profile,
     input.commitSha,
     input.previewId
   )
-  const output = await runPreviewProcess("vercel", [
-    "deploy",
-    "--yes",
-    "--token",
-    token,
-    "--meta",
-    `previewId=${input.previewId}`,
-    "--meta",
-    `commitSha=${input.commitSha}`,
-    ...envArgs,
-  ])
+  const output = await runPreviewProcess(
+    "vercel",
+    [
+      "deploy",
+      "--yes",
+      "--meta",
+      `previewId=${input.previewId}`,
+      "--meta",
+      `commitSha=${input.commitSha}`,
+      ...envArgs,
+    ],
+    { VERCEL_TOKEN: token }
+  )
   const url = readDeploymentUrl(output)
   const deploymentId = await readDeploymentId(token, url)
   return { url, deploymentId }
 }
 
-function runtimeEnvArgs(
+export function buildPreviewVercelEnvArgs(
   profile: EnvironmentProfile,
   commitSha: string,
   previewId: string
@@ -43,7 +45,6 @@ function runtimeEnvArgs(
   const values: Record<string, string> = {
     APP_ENV: "preview",
     NODE_ENV: "production",
-    BETTER_AUTH_URL: profile.betterAuth.url,
     BETTER_AUTH_SECRET: profile.betterAuth.secret,
     DATABASE_PROVIDER: "neon",
     DATABASE_PROJECT_ID: profile.database.projectId ?? "",
@@ -85,12 +86,9 @@ function readDeploymentUrl(output: string): string {
 }
 
 async function readDeploymentId(token: string, url: string): Promise<string> {
-  const output = await runPreviewProcess("vercel", [
-    "inspect",
-    url,
-    "--token",
-    token,
-  ])
+  const output = await runPreviewProcess("vercel", ["inspect", url], {
+    VERCEL_TOKEN: token,
+  })
   const match = output.match(/\bdpl_[A-Za-z0-9]+\b/)
   if (!match) {
     throw new PreviewDeliveryError(

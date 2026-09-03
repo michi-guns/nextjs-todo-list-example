@@ -981,7 +981,7 @@ Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete.
 
 Verification:
 
-- [x] `pnpm exec vitest run scripts/deploy/preview/core.test.ts src/test/pipeline/preview-workflow.test.ts src/modules/auth/infrastructure/auth-mail.test.ts` passes 3 files and 16 tests.
+- [x] `pnpm exec vitest run scripts/deploy/preview/core.test.ts src/test/pipeline/preview-workflow.test.ts src/modules/auth/infrastructure/auth-mail.test.ts` passes 3 files and 18 tests.
 - [x] `pnpm test` passes 32 files and 260 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, changed-file Prettier, and `git diff --check` pass.
 - [x] Dedicated Sanity `preview` dataset exists with published `landingPage`. GitHub Environment `preview` exists. Repository variable `NEXT_PUBLIC_SANITY_PROJECT_ID` is set.
 - [ ] Controlled hosted deploy/cleanup is blocked on a Vercel project plus GitHub Environment `preview` secrets: `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and Preview `BETTER_AUTH_SECRET`. Do not run the workflow until those secrets exist. Vercel Git auto-deploy must stay disabled.

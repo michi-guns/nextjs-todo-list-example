@@ -753,9 +753,8 @@ async function runProcessCaptured(
       reject(
         new PreviewDeliveryError(
           "command_failed",
-          redactSecrets(
-            stderr.trim() ||
-              `${command} ${args.join(" ")} failed with exit ${exitCode}`
+          redactPreviewLog(
+            stderr.trim() || `${command} failed with exit ${exitCode}`
           )
         )
       )
@@ -782,6 +781,13 @@ function quoteForCmd(value: string): string {
   return `"${value.replaceAll('"', '\\"')}"`
 }
 
-function redactSecrets(value: string): string {
-  return value.replaceAll(/postgresql:\/\/[^\s]+/gi, "postgresql://***")
+export function redactPreviewLog(value: string): string {
+  return value
+    .replaceAll(/postgresql:\/\/[^\s]+/gi, "postgresql://***")
+    .replaceAll(/(--token)\s+\S+/gi, "$1 ***")
+    .replaceAll(/(--(?:env|build-env))\s+[^\s]+/gi, "$1 ***")
+    .replaceAll(
+      /\b(BETTER_AUTH_SECRET|VERCEL_TOKEN|NEON_API_KEY)=[^\s]+/gi,
+      "$1=***"
+    )
 }

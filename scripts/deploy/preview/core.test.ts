@@ -5,13 +5,17 @@ import {
   PREVIEW_PROJECT_ID,
   previewBranchName,
 } from "./constants"
+import { parseEnvironmentProfile } from "../../environment/core"
+
 import {
   PreviewDeliveryError,
   parsePreviewCommand,
+  redactPreviewLog,
   runPreviewCommand,
   type ObservedPreviewBranch,
   type PreviewRuntime,
 } from "./core"
+import { buildPreviewVercelEnvArgs } from "./vercel"
 
 const COMMIT_SHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 const PREVIEW_ID = "demo-1"
@@ -306,5 +310,34 @@ describe("Preview delivery commands", () => {
     expect(output).not.toContain("migration-password")
     expect(output).not.toContain("runtime-password")
     expect(output).not.toContain("preview-auth-secret-for-tests")
+  })
+
+  it("redacts tokens, env flags, and connection strings from process logs", () => {
+    const leaked = redactPreviewLog(
+      "vercel --token super-secret --env DATABASE_URL=postgresql://runtime:runtime-password@host/db BETTER_AUTH_SECRET=preview-auth-secret-for-tests failed"
+    )
+
+    expect(leaked).not.toContain("super-secret")
+    expect(leaked).not.toContain("postgresql://")
+    expect(leaked).not.toContain("runtime-password")
+    expect(leaked).not.toContain("preview-auth-secret-for-tests")
+    expect(leaked).toContain("--token ***")
+    expect(leaked).toContain("--env ***")
+    expect(leaked).toContain("BETTER_AUTH_SECRET=***")
+  })
+})
+
+describe("Preview Vercel deploy arguments", () => {
+  it("omits --prod and BETTER_AUTH_URL so the deployment origin comes from VERCEL_URL", () => {
+    const profile = parseEnvironmentProfile(previewEnvironment())
+    const args = buildPreviewVercelEnvArgs(profile, COMMIT_SHA, PREVIEW_ID)
+    const joined = args.join(" ")
+
+    expect(args).not.toContain("--prod")
+    expect(joined).not.toContain("BETTER_AUTH_URL")
+    expect(joined).not.toContain("preview.example.test")
+    expect(joined).toContain("APP_ENV=preview")
+    expect(joined).toContain(`DATABASE_BRANCH=${BRANCH}`)
+    expect(joined).toContain("NEXT_PUBLIC_SANITY_DATASET=preview")
   })
 })
