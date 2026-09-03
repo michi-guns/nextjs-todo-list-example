@@ -9,9 +9,13 @@ import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { magicLink } from "better-auth/plugins"
 
-import { captureMagicLink } from "@/src/modules/auth/infrastructure/local-mailbox"
+import { deliverAuthEmail } from "@/src/modules/auth/infrastructure/auth-mail"
 
-const configuredBaseUrl = process.env.BETTER_AUTH_URL?.trim()
+const configuredBaseUrl =
+  process.env.BETTER_AUTH_URL?.trim() ||
+  (process.env.APP_ENV === "preview" && process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : undefined)
 const configuredSecret = process.env.BETTER_AUTH_SECRET?.trim()
 
 if (process.env.NODE_ENV === "production" && !configuredSecret) {
@@ -23,6 +27,10 @@ function getTrustedOrigins() {
 
   if (configuredBaseUrl) {
     origins.push(new URL(configuredBaseUrl).origin)
+  }
+
+  if (process.env.APP_ENV === "preview" && process.env.VERCEL_URL) {
+    origins.push(`https://${process.env.VERCEL_URL}`)
   }
 
   if (process.env.NODE_ENV !== "production") {
@@ -50,7 +58,7 @@ export const auth = betterAuth({
     sendOnSignIn: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url, token }) => {
-      await captureMagicLink({
+      await deliverAuthEmail({
         email: user.email,
         url,
         token,
@@ -68,7 +76,7 @@ export const auth = betterAuth({
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url, token, metadata }) => {
-        await captureMagicLink({
+        await deliverAuthEmail({
           email,
           url,
           token,

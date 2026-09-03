@@ -97,6 +97,25 @@ and 21 extra tasks for pagination. `seed --mode performance` runs
 After the profile is configured, `pnpm dev` uses the pooled Development URL
 and hosted Sanity. Auth links still go to the local mailbox.
 
+## Manual Preview delivery
+
+Preview is a manually requested ephemeral deployment, not an automatic pull
+request preview. The adapter creates `preview-<id>` from durable `development`,
+migrates through the direct URL, seeds `preview-user@example.test`, and deploys
+the resolved SHA to Vercel Preview.
+
+```powershell
+pnpm preview -- deploy --ref <branch-tag-or-sha> --preview-id demo-1
+pnpm preview -- inspect --preview-id demo-1
+pnpm preview -- cleanup --preview-id demo-1
+```
+
+`--ref` cannot be `main`, `master`, `latest`, or `head`. The local mailbox is
+rejected. Sign-in uses the controlled seeded password account, not outbound
+mail. Cleanup deletes only the matching Preview branch. GitHub Actions workflow
+`Preview` is `workflow_dispatch` only and uses the `preview` Environment. Do
+not point these commands at Production.
+
 ## Application commands
 
 Start the development server after applying the schema:

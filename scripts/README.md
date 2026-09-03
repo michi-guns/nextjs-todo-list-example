@@ -75,6 +75,22 @@ it is missing. It does not reset `main` and does not accept `reset`.
 explicit port and database path. Ordinary seed replaces only
 `dev-user@example.test`. Performance seed reuses `pnpm neon:performance`.
 
+## Preview delivery
+
+`scripts/deploy/preview/` owns manual Preview branch, seed, Vercel deploy,
+smoke, and cleanup. The command is `pnpm preview -- <subcommand>`.
+
+```powershell
+pnpm preview -- deploy --ref <branch-tag-or-sha> --preview-id demo-1
+pnpm preview -- inspect --preview-id demo-1
+pnpm preview -- cleanup --preview-id demo-1
+```
+
+`deploy` creates expiring Neon branch `preview-<id>` from `development`,
+migrates, seeds `preview-user@example.test`, deploys that SHA without `--prod`,
+and runs HTTP smoke. `cleanup` deletes only that branch after the Preview
+identity matches. The GitHub workflow is manual `workflow_dispatch` only.
+
 ## Neon performance evidence
 
 The T-16 benchmark is deliberately opt-in and targets only the non-default
