@@ -13,7 +13,8 @@ data, testing, and AgentForge material.
 
 ### Prerequisites
 
-- Node.js and pnpm matching the repository toolchain.
+- Node.js 24 and pnpm 11.17.0, matching the `packageManager` field in
+  `package.json`.
 - Docker Desktop, or another Docker engine, for Local PostgreSQL, integration
   tests, and Playwright.
 - A configured Sanity project and published landing singleton for the normal
@@ -168,6 +169,17 @@ The integration and Playwright harnesses own their `TEST_DATABASE_URL` and
 never use a developer or Neon database. Unit tests remain runnable without
 Docker. See [local development and verification](docs/runbooks/local-development-and-verification.md)
 for copyable PowerShell examples, browser selection, and recovery guidance.
+
+## Repository CI
+
+Pushes and pull requests to `main` run [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+The Quality job typechecks, lints, runs unit tests, checks migration shape,
+and builds. The Harness job runs integration tests and the Chromium Playwright
+suite against disposable local PostgreSQL. The workflow does not deploy, create
+Preview branches, mutate Sanity, or use Production secrets.
+`pnpm sanity:smoke` and `pnpm neon:performance` stay local or owner-authorized
+commands. Docker and Chromium are required on the harness runner; GitHub-hosted
+Ubuntu provides both.
 
 ## Environment boundaries
 

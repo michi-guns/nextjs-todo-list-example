@@ -185,6 +185,13 @@ It runs the seven required journeys serially in Chromium. The server receives
 for this run only. The normal Sanity path and deployed runtime do not use that
 fixture. Setup refuses an occupied port instead of reusing an unknown server.
 
+Pushes and pull requests to `main` run these same local commands in
+[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml). Quality is
+Docker-free. Harness needs Docker and Chromium. The workflow does not deploy,
+create Preview branches, mutate Sanity, or read Production secrets. Do not
+point CI at Neon. `pnpm sanity:smoke` and `pnpm neon:performance` stay outside
+that automatic job.
+
 Firefox and WebKit are opt-in. Run them only when those browser binaries are
 installed or before a release/major UI change:
 
