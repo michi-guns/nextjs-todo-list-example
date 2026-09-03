@@ -899,6 +899,7 @@ Verification:
 - [x] `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, `pnpm sanity:smoke`, changed-file Prettier checks, and `git diff --check` pass.
 - [x] Local Docker commands never required Neon or Vercel credentials. `TST-ENV-001` remains `partial` for hosted identity. `TST-MIGRATION-001` remains blocked on an owner-authorized Neon branch. Docker-daemon outage was not observed.
 - [x] Fresh proportional review of the T-19 artifact found no actionable findings. Optional nits about `redactSecrets()` coverage and a verification-retry edge case were deferred.
+- [x] PR: [#23](https://github.com/michi-guns/nextjs-todo-list-example/pull/23) is open from `task/T-19-local-docker-postgres`; implementation tip `4a03a9c`.
 
 ### T-20: Establish a durable Neon Development target
 
