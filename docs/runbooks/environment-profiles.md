@@ -33,11 +33,65 @@ Remote profiles also require both `DATABASE_PROJECT_ID` and
 must never be used for migrations, and a direct URL must not replace the pooled
 runtime default.
 
-The profile parser checks the declared target identity and policy. The target
-classifier and mutation guards owned by T-18.3 must additionally verify the
-actual provider/project/branch before reset, migration, seed, cleanup, or
-deployment. A profile declaration is not permission to mutate a shared or
-Production target.
+The profile parser checks the declared target identity and policy. The
+classifier and mutation guards in `scripts/environment/guards.ts` additionally
+validate and correlate supplied provider/project/branch observations before
+reset, migration, seed, cleanup, or deployment. A profile declaration is not
+permission to mutate a shared or Production target.
+
+## Target classification and operation guards
+
+Provider adapters must supply an observed `DatabaseTargetIdentity` containing
+the provider identity they resolved. A Neon observation is unresolved unless it
+contains `projectId`, `branch`, and a provider-observed endpoint `host` before
+an operation guard can authorize database mutation; a branch label by itself is
+not enough. Local observations must contain a loopback host and cannot carry
+remote project or branch fields. The classifier does not derive identity from a
+friendly branch name or from the local `.env.local` declaration. Provider
+authenticity and hosted identity evidence remain responsibilities of the later
+Neon/Vercel adapters and their verification tasks.
+
+Connection observations must include the provider-observed endpoint host. When
+available, they should also include the port and database name; the guard
+correlates those values and the profile's direct migration URL before allowing
+a state-changing database operation. Local reset additionally requires an
+explicit `ownership: "harness"` observation, so a developer-owned loopback
+database cannot be treated as disposable test state. Production migration also
+requires the same provider-resolved exact-ref and protected-approval proof as
+Production deployment. PostgreSQL URL query parameters that override the
+endpoint (`host`, `hostaddr`, `port`, `database`, or `dbname`) are rejected;
+the authority and path must carry the guarded endpoint identity. Guarded
+mutation URLs must also include an explicit port and database path, so
+`PGPORT` and `PGDATABASE` cannot silently select a different endpoint.
+
+State-changing command adapters call the operation-specific assertion before
+opening the mutation boundary:
+
+| Guard                               | Required safety boundary                                                                                                                                                    |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `assertLocalResetAllowed`           | Local profile, matching loopback PostgreSQL target, harness-owned endpoint, and direct connection                                                                           |
+| `assertMigrationAllowed`            | Matching profile target and an explicitly observed direct connection; pooled Neon URLs are rejected even when mislabeled; Production also requires exact-ref approval proof |
+| `assertSeedReplacementAllowed`      | Any non-Production profile, matching target, and direct connection                                                                                                          |
+| `assertPreviewCleanupAllowed`       | Preview profile plus requested/provider preview IDs and project/branch identity that exactly match the selected temporary branch                                            |
+| `assertPreviewDeploymentAllowed`    | Preview profile, requested/provider preview IDs, complete provider-created identity, and a provider-resolved immutable commit SHA                                           |
+| `assertProductionDeploymentAllowed` | Production profile, matching target, provider-resolved `tag` or full `commit` ref, and protected approval for that exact SHA                                                |
+
+`executeAfterGuard` runs the assertion completely before invoking the supplied
+mutation callback. The repository does not yet have state-changing migration,
+reset, seed, or deployment adapters; later PowerShell and GitHub workflow
+adapters must call these assertions before opening their mutation boundaries.
+Guard failures use stable safe error codes such as
+`target_unresolved`, `target_mismatch`, `connection_role_mismatch`,
+`ref_unresolved`, and `approval_required`. Returned evidence contains only
+profile, provider, project/branch, operation, preview, and resolved-SHA
+metadata; connection strings, credentials, mailbox values, and secrets are
+never copied into it.
+
+The module is runtime-neutral and can be called from those adapters through
+`tsx`; it does not connect to a provider or mutate data by itself. T-20/T-22/T-23
+must provide the actual Neon/Vercel/provider observations and ref-resolution
+implementation; those tasks must call these guards rather than recreate target
+checks.
 
 ## Variables
 
@@ -83,8 +137,12 @@ production --ref <tag-or-commit-ref>
 
 `--ref` is required, must be supplied once, and rejects mutable aliases such as
 `latest`, `main`, and `master`. Preview requires `--preview-id`; Production
-rejects it. T-18.3 owns resolving the supplied ref to one immutable commit and
-T-22/T-23 own the hosted mutation and approval workflows.
+rejects it. The guard boundary accepts only a provider-resolved ref with one
+full 40-character commit SHA. Preview may resolve a branch, tag, or commit;
+Production must resolve a tag or full commit ref and must match protected
+approval. Preview guards compare the requested `--preview-id` with the
+provider-created Preview identity as well as its project and branch. T-22/T-23
+own provider-specific ref resolution and hosted mutation.
 
 ## Redaction rules
 
