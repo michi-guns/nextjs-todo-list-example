@@ -51,6 +51,14 @@ database locations.
 └── package.json
 ```
 
+The tree above is a logical bowl. Current seats:
+
+- Public landing is `app/page.tsx`. `app/(marketing)/` is unused; do not add a second home page there.
+- Sanity Studio schemas and config live under `sanity/`. `src/sanity/` is the application published-content client.
+- List and task repository ports live in module `application/`, not `domain/`.
+- Dashboard UI lives in `components/dashboard`. `src/modules/dashboard/presentation` is page-state helpers.
+- List/task composition is `app/_todo-dependencies.ts` plus thin `app/actions` and `app/api` wrappers.
+
 ### 1.1 Module layers
 
 Inside a capability module (add a folder only when it contains real code):
@@ -296,7 +304,8 @@ No list/task documents.
 
 ### 6.3 Seat
 
-- `src/sanity/` for client/config/schema packages.
+- Application published-content client and config: `src/sanity/`.
+- Studio schemas and Sanity config: `sanity/`.
 - Module adapter maps CMS payload → landing view model (no raw CMS types past infrastructure).
 
 ---
@@ -549,29 +558,31 @@ belong outside `.dwf/`.
 
 ## 13. Definition of done (engineering checklist)
 
-- [ ] Better Auth email/password + magic link working locally
-- [ ] Session guards on actions + JSON API
+Checked items are the local starter baseline already delivered. Unchecked items remain hosted Neon evidence (T-16 snapshot cannot be rerun until T-20; schema-on-Neon is T-20).
+
+- [x] Better Auth email/password + magic link working locally
+- [x] Session guards on actions + JSON API
 - [ ] Drizzle schema: auth tables + lists + tasks + required constraints/indexes; migrations applied on Neon/dev DB
-- [ ] One module-scoped node-postgres pool backs Drizzle across Neon and Testcontainers and is registered for Vercel Fluid Compute lifecycle management
-- [ ] Exactly one default Inbox on every listless private workspace load, including after final-list deletion
-- [ ] List CRUD + cascade delete + case-insensitive per-user name uniqueness
-- [ ] Task CRUD + status + hide completed + case-insensitive per-list title uniqueness
-- [ ] Cursor-paginated list and task reads with opaque next cursors
-- [ ] Pagination defaults to 20, caps at 100, omits total counts, and is visible through dashboard `Load more`
-- [ ] Core list/task reads fetch at most `limit + 1`, avoid N+1 behavior, and use the required query-shaped indexes
+- [x] One module-scoped node-postgres pool backs Drizzle across Neon and Testcontainers and is registered for Vercel Fluid Compute lifecycle management
+- [x] Exactly one default Inbox on every listless private workspace load, including after final-list deletion
+- [x] List CRUD + cascade delete + case-insensitive per-user name uniqueness
+- [x] Task CRUD + status + hide completed + case-insensitive per-list title uniqueness
+- [x] Cursor-paginated list and task reads with opaque next cursors
+- [x] Pagination defaults to 20, caps at 100, omits total counts, and is visible through dashboard `Load more`
+- [x] Core list/task reads fetch at most `limit + 1`, avoid N+1 behavior, and use the required query-shaped indexes
 - [ ] Representative Neon seed and `EXPLAIN ANALYZE` evidence satisfy the agreed index-use, cursor-correctness, and warm-query baseline
-- [ ] Landing Sanity read path plus the read-only live fetch/validate/map smoke passes against the dedicated published singleton
-- [ ] Signed Sanity webhook invalidation and protected manual recovery share one idempotent cache-invalidation service
-- [ ] Zod at boundaries
-- [ ] Module layering respected for lists/tasks/landing
-- [ ] Vitest suite green for agreed scope
-- [ ] PostgreSQL 18 Testcontainers integration suite applies the real migrations and passes the agreed persistence cases
-- [ ] Playwright happy paths pass in Chromium against a harness-owned migrated and seeded local PostgreSQL container; Firefox and WebKit remain available as a separate on-demand check
-- [ ] Routine Playwright uses deterministic test-only landing content and requires no Sanity credentials or network access
-- [ ] Database-backed tests run serially against shared containers, own unique users/data, and do not depend on test order
-- [ ] Routine database-backed tests require no Neon credentials; destructive test cleanup refuses external database URLs
-- [ ] Husky + lint-staged active
-- [ ] README explains setup without referencing unrelated products
+- [x] Landing Sanity read path plus the read-only live fetch/validate/map smoke passes against the dedicated published singleton
+- [x] Signed Sanity webhook invalidation and protected manual recovery share one idempotent cache-invalidation service
+- [x] Zod at boundaries
+- [x] Module layering respected for lists/tasks/landing
+- [x] Vitest suite green for agreed scope
+- [x] PostgreSQL 18 Testcontainers integration suite applies the real migrations and passes the agreed persistence cases
+- [x] Playwright happy paths pass in Chromium against a harness-owned migrated and seeded local PostgreSQL container; Firefox and WebKit remain available as a separate on-demand check
+- [x] Routine Playwright uses deterministic test-only landing content and requires no Sanity credentials or network access
+- [x] Database-backed tests run serially against shared containers, own unique users/data, and do not depend on test order
+- [x] Routine database-backed tests require no Neon credentials; destructive test cleanup refuses external database URLs
+- [x] Husky + lint-staged active
+- [x] README explains setup without referencing unrelated products
 
 ---
 

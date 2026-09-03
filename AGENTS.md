@@ -15,7 +15,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Read [`.dwf/README.md`](.dwf/README.md), [`.dwf/RULES.md`](.dwf/RULES.md), [`.dwf/CONTEXT.md`](.dwf/CONTEXT.md), and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes.
 - Read the generated [Agent PRD](.dwf/output/agent/PRD.md) and [Agent SPEC](.dwf/output/agent/SPEC.md) before implementing product, domain, architecture, persistence, or integration behavior.
 - Read relevant ledgers under [`.dwf/decisions/`](.dwf/decisions/) and supporting architecture/data/domain documents.
-- Read the [project glossary](docs/glossary.md) when a project-specific term is unclear. It defines vocabulary used by this repository and its agents.
+- Read the [project glossary](docs/glossary.md) when a project-specific term is unclear. That page routes AgentForge vocabulary and points to the product/domain glossaries.
 - Treat `.dwf/` as the canonical product/technical design authority. Delivery artifacts live outside `.dwf/` and must reference, not redefine, it.
 - This repo is a standalone public, opinionated Next.js starter implemented through a complete todo reference application. Derived apps should be able to replace mostly domain and UI code while retaining or adapting the cross-cutting foundations.
 - Use the current documented APIs of the accepted stack, written for coding agents as primary authors: prefer what this repository's installed versions teach over both stale tutorials and unaccepted experimental surfaces. Drizzle, Better Auth, and Zod 4 are explicit exceptions and must not be replaced for training-data familiarity. See [RULE-012](.dwf/RULES.md#rule-012) and [TD-028](.dwf/decisions/TECHNICAL.md#td-028). Add complexity only when it has a clear reusable payoff in safety, correctness, operability, maintainability, or avoided rework. Do not turn the starter into a configurable multi-stack framework.
@@ -104,8 +104,8 @@ For any implementation or behavior-changing task in this repository, use the pro
 
 ## Git strategy (simple / flexible)
 
-- **No PR requirement.** No protected-branch ceremony is required for this repository's current workflow.
-- Agents and humans may:
+- **No PR requirement for ordinary work.** No protected-branch ceremony is required except for delivery tasks tracked in [`TODO.md`](TODO.md). Those tasks still use that file's branch and pull-request protocol.
+- For work that is not a `TODO.md` task, agents and humans may:
   - commit and **push directly to `main`**, or
   - use short-lived branches and merge locally / on GitHub however is convenient.
 - Keep commits coherent and messages clear enough to skim history.

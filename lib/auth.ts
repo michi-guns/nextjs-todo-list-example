@@ -1,4 +1,4 @@
-import { db } from "@/db/db" // your drizzle instance
+import { db } from "@/db/db"
 import {
   accountsTable,
   sessionsTable,

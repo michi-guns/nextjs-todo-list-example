@@ -16,7 +16,7 @@
 - The repository now contains the runnable authenticated todo reference: `app/` composes public landing, auth, dashboard, API, and Studio routes; `src/modules/` contains auth, landing, lists, and tasks; and `components/` contains the Focus Rail UI.
 - `app/page.tsx` reads the published Sanity landing singleton through the landing infrastructure boundary; `app/(app)/dashboard/page.tsx` composes the authenticated list/task application path.
 - `lib/auth.ts` contains the Better Auth email/password and magic-link configuration backed by the shared Drizzle client and local/test mailbox boundary.
-- `db/schema/auth.ts`, `db/schema/lists.ts`, and `db/schema/tasks.ts` contain the Better Auth and todo tables. The old `db/schema/test.ts` posts example is not part of the active application schema.
+- `db/schema/auth.ts`, `db/schema/lists.ts`, and `db/schema/tasks.ts` contain the Better Auth and todo tables. Active schema exports are those three modules.
 - `src/sanity/` and `src/modules/landing/infrastructure/` contain the Sanity client/configuration, validated read path, and invalidation boundary.
 - `src/test/`, `scripts/playwright-local/`, and `e2e/` contain the local PostgreSQL 18 Testcontainers and dedicated Playwright lifecycle. The normal browser suite is the seven-journey Chromium todo acceptance path, not the original `playwright.dev` example.
 
@@ -34,11 +34,10 @@ The package manifest includes Next.js, React, Better Auth, Drizzle, node-postgre
 
 ## Operational facts
 
-- No repository-resident Delivery tree, CI workflow, Preview workflow, Production workflow, or deployment orchestration command currently exists.
-- No Delivery System CLI or package script matching the supplied mental model was found in the repository; T-18.1 records the contract before T-18.2/T-18.3 introduce environment and guard commands.
-- A read-only inspection verified that the workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch. T-01 also created the non-default Neon `development` branch for agent-owned migration smoke testing; it expires on 2026-09-02.
-- The live Drizzle migration ledger contains one applied migration whose SHA-256 hash exactly matches `migrations/20260807190126_silly_vivisector/migration.sql`.
-- The default Neon `main` branch remains on the scaffold schema (`account`, `session`, `users`, `verification`, and `posts_table`). The agent-owned `development` branch was used to verify the pre-consolidation T-04 lists/tasks chain and has no real list/task consumers; its migration ledger is not automatically rewritten when pre-release files are consolidated locally.
-- The repository's current T-04 migration creates native UUID list/task keys and UUIDv7 defaults directly. A fresh disposable local PostgreSQL database verified the consolidated chain; the existing agent-owned Neon branch was not destructively realigned.
-- The current read-only `pnpm sanity:smoke` passes against the configured dedicated published landing singleton and reports the four mapped landing fields. The Sanity resource and its exact project identity remain provider configuration, not committed secret material.
-- T-18.1 accepts [`TD-026`](decisions/TECHNICAL.md#td-026): Local uses Docker PostgreSQL with hosted Sanity; Development uses an owner-authorized durable non-default Neon branch; Preview uses an isolated temporary Neon branch plus the dedicated non-production Sanity dataset and controlled verified account; Production requires a separately provisioned protected Neon project/branch and owner-approved mail provider. None of the missing hosted target/protection prerequisites is silently inferred from `.env.local`.
+- Local application database is Docker PostgreSQL 18 through `pnpm local:postgres` / `pnpm dev:local` (`scripts/local-postgres/`). Integration and Playwright use disposable Testcontainers, not the Compose volume.
+- Environment profile parsing and pre-mutation guards live in `scripts/environment/` (`pnpm environment:inspect`). They are not a Next.js runtime gate; `db/db.ts` still uses the supplied `DATABASE_URL`.
+- No repository-resident CI, Preview, or Production workflow exists. Those remain T-21 through T-23.
+- Durable Neon Development is T-20. The T-01 agent-owned `development` branch expired on 2026-09-02 and is not a current target. Do not infer Development or Production identity from `.env.local`.
+- The committed migration chain under `migrations/` is Better Auth plus lists/tasks. Hosted Neon catalogs are not claimed here.
+- `pnpm sanity:smoke` is the read-only published landing check. Sanity project identity is provider configuration, not committed secret material.
+- [`TD-026`](decisions/TECHNICAL.md#td-026) remains the accepted environment matrix. Missing hosted prerequisites are not inferred from local files.

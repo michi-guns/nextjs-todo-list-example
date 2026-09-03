@@ -13,9 +13,13 @@ Status markers:
 - `[x]` Complete
 - `[!]` Blocked
 
-## Temporary task branch and PR protocol
+## Task branch and PR protocol
 
-This is a temporary delivery protocol for the current implementation run. The DWF remains the design authority, and `TODO.md` remains the delivery tracker.
+This protocol applies only to delivery tasks tracked in this file. The DWF remains the design authority, and `TODO.md` remains the delivery tracker.
+
+Ordinary work that is not a `TODO.md` task follows [`AGENTS.md`](AGENTS.md): no PR requirement; commit and push to `main` is allowed. Do not use this protocol for that work.
+
+Every `TODO.md` implementation task still gets its own short-lived branch and pull request.
 
 ### Bootstrap exception
 

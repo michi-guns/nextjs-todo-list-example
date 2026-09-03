@@ -1,8 +1,11 @@
 # Project glossary
 
-This glossary defines terms that have a project-specific meaning. Use these terms consistently in source code, documentation, task descriptions, pull requests, and agent instructions.
+This page routes project vocabulary. It does not replace the design authority in [`.dwf/`](../.dwf/) or override accepted product and technical decisions.
 
-The glossary explains vocabulary. It does not replace the design authority in [`.dwf/`](../.dwf/) or override accepted product and technical decisions.
+- Product and domain terms: [handbook glossary](handbook/glossary.md) and [`.dwf/GLOSSARY.md`](../.dwf/GLOSSARY.md)
+- AgentForge and skill-framework terms: this page
+
+Use these terms consistently in source code, documentation, task descriptions, pull requests, and agent instructions.
 
 ## AgentForge
 

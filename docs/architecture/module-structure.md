@@ -17,11 +17,11 @@ src/modules/tasks/
 
 ## Domain
 
-Entities, value objects, invariants, domain errors, and repository contracts. It must remain framework-independent.
+Entities, value objects, invariants, and domain errors. It must remain framework-independent. In this repository, repository ports live in `application/`, not here.
 
 ## Application
 
-Use cases, commands, queries, DTOs, and application ports. It coordinates work but does not execute SQL or render JSX.
+Use cases, commands, queries, DTOs, and repository ports. It coordinates work but does not execute SQL or render JSX.
 
 ## Infrastructure
 
@@ -29,6 +29,6 @@ Drizzle repositories, Sanity adapters, external providers, mappers, and technica
 
 ## Presentation
 
-Server Actions, Route Handler adapters, input schemas, view models, and module-owned UI.
+Server Actions, Route Handler adapters, input schemas, and view models. In this repository, dashboard UI lives in `components/dashboard`.
 
 Architectural folders make todo-specific code replaceable and keep reusable foundations independent from the reference domain. New feature code should keep files small and add deeper structure only when it contains a real responsibility.
