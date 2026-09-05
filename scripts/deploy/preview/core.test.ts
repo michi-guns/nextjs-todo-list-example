@@ -12,12 +12,14 @@ import {
   parsePreviewCommand,
   redactPreviewLog,
   runPreviewCommand,
+  runPreviewProcess,
   type ObservedPreviewBranch,
   type PreviewRuntime,
 } from "./core"
 import { buildPreviewVercelEnvArgs } from "./vercel"
 
 const COMMIT_SHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+const OTHER_COMMIT_SHA = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 const PREVIEW_ID = "demo-1"
 const BRANCH = previewBranchName(PREVIEW_ID)
 const directHost = "ep-preview-demo.us-east-2.aws.neon.tech"
@@ -77,6 +79,10 @@ function unusedRuntime(): PreviewRuntime {
       commitSha: COMMIT_SHA,
       kind: "commit",
     }),
+    inspectWorkspace: vi.fn().mockResolvedValue({
+      commitSha: COMMIT_SHA,
+      status: "",
+    }),
     observeBranch: vi.fn().mockResolvedValue(observedBranch()),
     createBranch: vi.fn().mockResolvedValue(observedBranch()),
     deleteBranch: vi.fn(),
@@ -95,6 +101,12 @@ function unusedRuntime(): PreviewRuntime {
 }
 
 describe("Preview delivery commands", () => {
+  it("preserves Git commit-peel syntax through the host process wrapper", async () => {
+    await expect(
+      runPreviewProcess("git", ["rev-parse", "--verify", "HEAD^{commit}"])
+    ).resolves.toMatch(/^[0-9a-f]{40}\r?\n$/i)
+  })
+
   it("parses deploy, cleanup, and inspect and rejects extras", () => {
     expect(
       parsePreviewCommand([
@@ -139,6 +151,62 @@ describe("Preview delivery commands", () => {
 
   it("names the Neon branch preview-<preview-id>", () => {
     expect(previewBranchName("demo-1")).toBe("preview-demo-1")
+  })
+
+  it("refuses a requested revision different from the checkout before any Preview operation", async () => {
+    const runtime = unusedRuntime()
+    runtime.inspectWorkspace = vi.fn().mockResolvedValue({
+      commitSha: OTHER_COMMIT_SHA,
+      status: "",
+    })
+
+    await expect(
+      runPreviewCommand(
+        parsePreviewCommand([
+          "deploy",
+          "--ref",
+          COMMIT_SHA,
+          "--preview-id",
+          PREVIEW_ID,
+        ]),
+        { environment: previewEnvironment(), runtime }
+      )
+    ).rejects.toMatchObject({ code: "workspace_mismatch" })
+
+    expect(runtime.observeBranch).not.toHaveBeenCalled()
+    expect(runtime.createBranch).not.toHaveBeenCalled()
+    expect(runtime.migrate).not.toHaveBeenCalled()
+    expect(runtime.seed).not.toHaveBeenCalled()
+    expect(runtime.deploy).not.toHaveBeenCalled()
+    expect(runtime.smoke).not.toHaveBeenCalled()
+  })
+
+  it("refuses local edits at the requested revision before any Preview operation", async () => {
+    const runtime = unusedRuntime()
+    runtime.inspectWorkspace = vi.fn().mockResolvedValue({
+      commitSha: COMMIT_SHA,
+      status: " M migrations/0002_example.sql",
+    })
+
+    await expect(
+      runPreviewCommand(
+        parsePreviewCommand([
+          "deploy",
+          "--ref",
+          COMMIT_SHA,
+          "--preview-id",
+          PREVIEW_ID,
+        ]),
+        { environment: previewEnvironment(), runtime }
+      )
+    ).rejects.toMatchObject({ code: "workspace_mismatch" })
+
+    expect(runtime.observeBranch).not.toHaveBeenCalled()
+    expect(runtime.createBranch).not.toHaveBeenCalled()
+    expect(runtime.migrate).not.toHaveBeenCalled()
+    expect(runtime.seed).not.toHaveBeenCalled()
+    expect(runtime.deploy).not.toHaveBeenCalled()
+    expect(runtime.smoke).not.toHaveBeenCalled()
   })
 
   it("refuses production, local, and development profiles before creating a branch", async () => {
@@ -209,6 +277,7 @@ describe("Preview delivery commands", () => {
       { environment: previewEnvironment(), runtime, write: () => undefined }
     )
 
+    expect(runtime.inspectWorkspace).toHaveBeenCalledOnce()
     expect(runtime.createBranch).toHaveBeenCalledWith(
       expect.objectContaining({
         previewId: PREVIEW_ID,

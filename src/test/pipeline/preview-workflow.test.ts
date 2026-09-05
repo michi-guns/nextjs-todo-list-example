@@ -69,7 +69,9 @@ describe("Preview delivery workflow contract", () => {
   it("deploys through the repository preview adapter without Production flags", () => {
     const workflow = readWorkflow()
 
+    expect(workflow).toMatch(/with:\s*\n\s+ref:\s*\$\{\{ inputs\.ref \}\}/)
     expect(workflow).toMatch(/pnpm preview -- deploy/)
+    expect(workflow).toMatch(/--ref\s+"\$REF"/)
     expect(workflow).toMatch(/pnpm preview -- cleanup/)
     expect(workflow).toMatch(/APP_ENV:\s*preview/)
     expect(workflow).toMatch(/NEXT_PUBLIC_SANITY_DATASET:\s*preview/)
