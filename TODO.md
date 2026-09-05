@@ -6,6 +6,8 @@ The [Testing Decisions and Test Contracts ledger](.dwf/decisions/TESTING.md) own
 
 Historical task sections preserve the status and dependency snapshot recorded when each task closed. They are not current contract statuses; use the current baseline, the T-17 closeout section, and [`TESTING.md`](.dwf/decisions/TESTING.md) for present-day reconciliation.
 
+Deferred experiments without a delivery commitment live in [FUTURE.md](FUTURE.md), outside this roadmap and the canonical DWF contracts.
+
 Status markers:
 
 - `[ ]` Not started
@@ -969,6 +971,11 @@ Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete.
 
 ### T-22: Add manually triggered, fully functional Vercel Preview delivery
 
+Required fix from the 2026-09-05 reusable-foundation review at `634d2b0`:
+
+- [ ] Bind migration, seed, and deployment inputs to the same immutable revision reported by `--ref`. The current local CLI resolves a SHA in `scripts/deploy/preview/core.ts`, but its subprocesses use the current working directory; `scripts/deploy/preview/vercel.ts` passes the SHA as metadata without selecting its files. A different checkout or local edits can therefore produce an artifact that does not match the reported revision. The workflow checkout mitigates the ordinary workflow case, but does not prove the documented local command.
+- [ ] Before hosted T-22 proof, add focused regression evidence for a requested revision different from the current checkout and for local edits. Prove that migration/seed/deploy use the selected revision, or that the command refuses the mismatch before mutation. Reconcile this evidence with the existing exact-ref contracts and T-24; do not treat the earlier green checks below as proof of artifact identity.
+
 - [~] Complete T-22 only after the owner authorizes a controlled hosted Preview run.
 - Files: `.github/workflows/deploy-preview.yml`, explicit deploy/branch/seed/smoke helpers under `scripts/deploy/` or equivalent thin adapters, preview environment configuration documentation, and redacted Preview evidence under `docs/agentforge/evidence/`.
 - Interfaces: `workflow_dispatch` inputs for an exact branch/tag/SHA and a safe preview identifier; resolved immutable commit SHA; isolated temporary Neon branch derived from durable Development; direct migration and safe seed sequence; Vercel Preview deployment; deployment-origin `BETTER_AUTH_URL`; non-production auth/mail/Sanity configuration; explicit cleanup/expiry path; workflow outputs for URL, deployment id, branch id, expiry, SHA, and redacted smoke result.
@@ -999,6 +1006,8 @@ Verification:
 
 Dependency checkpoint: T-22 and T-23 require the environment decisions, CI evidence, and hosted credentials/approvals they name. Neither task is unblocked by local unit tests alone. Do not claim the template's deployment pipeline is proven until T-24 covers both the simulated negative paths and the required disposable/controlled hosted boundaries.
 
+Review priority, existing planned work: retain T-21.5 Production mail as a release prerequisite, complete the T-22 artifact fix before controlled hosted Preview proof, and retain T-23/T-24 protected release and pipeline evidence. These are unfinished delivery obligations, not new tasks or authorization to provision providers or deploy. Local auth and test evidence does not establish Production mail delivery.
+
 ### T-24: Prove the complete environment and delivery pipeline
 
 This is the dedicated template-level pipeline test task. Its purpose is to
@@ -1016,6 +1025,11 @@ commands compile.
 
 ### T-25: Carefully document the complete environment and delivery system
 
+Required reconciliation from the 2026-09-05 review, within this task's existing documentation scope:
+
+- [ ] Reconcile `.dwf/CONTEXT.md` with implemented CI/Preview tooling and the recorded durable Development evidence. At review time it still said those workflows were absent and Development was pending. Distinguish existing code, recorded successful checks, and unproven hosted behavior; do not mark T-22/T-23 complete from file presence.
+- [ ] Reconcile README setup prerequisites with `package.json` and the implemented commands. At review time README named pnpm 11.17.0 while `packageManager` selected 11.25.0. Keep one authoritative version source and avoid conflicting setup instructions.
+
 This is the dedicated documentation task. It should leave a derived
 application operator able to understand, run, verify, preview, release, and
 recover the template without reading hidden agent context or guessing which
@@ -1031,6 +1045,8 @@ database a command targets.
 - Recommended AgentForge skills: `documentation-and-adrs`, `writing-guidelines`, `unslop`, `testing-first-class`, `verification-before-completion`, and `git-workflow-and-versioning`.
 
 ### T-26: Add runtime safety and observability hardening
+
+Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` without the tooling's full environment-profile guard, and unexpected application failures mapped through `src/shared/entry-contract.ts` lose their diagnostic cause. Address runtime target validation and safe failure reporting within this task's accepted scope and prerequisites. Preserve generic client errors; do not describe all database errors as silent because `db/pool.ts` already logs idle-client failures.
 
 - [ ] Complete T-26 as a separately scoped post-baseline hardening task.
 - Files: application startup/configuration boundaries, health/readiness endpoints or checks, structured logging/metrics/tracing adapters, deployment smoke helpers, security headers/error handling, focused tests, and observability runbooks.
@@ -1064,6 +1080,13 @@ database a command targets.
 - Recommended AgentForge skills: `sanity-best-practices`, `sanity-migration`, `browser-testing-with-devtools`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 ### T-29: Publish the derived-application extension and replacement guide
+
+Review follow-through, within the existing guide scope:
+
+- [ ] Provide a short retain/replace checklist for todo modules and UI, migrations and seed data, auth/mail, Sanity, environment identity, and delivery workflows. Link to the owning instructions rather than adding another set of contracts.
+- [ ] Document Neon retargeting explicitly. At review time the original project identity was fixed in `scripts/neon-development/constants.ts`, checked in `scripts/neon-development/core.ts`, inherited by `scripts/deploy/preview/constants.ts`, and repeated in `.github/workflows/deploy-preview.yml`. Explain the coordinated changes and verification a fork needs; environment variables alone do not retarget this tooling. Preserve target guards. A new shared configuration architecture is a proposal requiring separate scope acceptance, not an implementation decision made by this guide.
+
+The separate [fresh-fork experiment](FUTURE.md#fresh-fork-into-a-different-small-application) is a future idea, not an added T-29 acceptance criterion or dependency. T-27 authentication completion and T-28 CMS live authoring retain their existing scope and prerequisites.
 
 - [ ] Complete T-29 only after the core environment and delivery pipeline is reviewed.
 - Files: `docs/architecture/`, a derived-application guide/example, replacement-seam documentation for domain/UI/CMS/deployment adapters, and template verification notes.
