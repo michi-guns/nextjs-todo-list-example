@@ -37,6 +37,7 @@ export type PreviewDeliveryErrorCode =
   | "command_failed"
   | "cli_unavailable"
   | "ref_unresolved"
+  | "workspace_mismatch"
 
 export class PreviewDeliveryError extends Error {
   readonly code: PreviewDeliveryErrorCode
@@ -87,8 +88,14 @@ export interface PreviewSmokeResult {
   readonly mutated: boolean
 }
 
+export interface PreviewWorkspaceState {
+  readonly commitSha: string
+  readonly status: string
+}
+
 export interface PreviewRuntime {
   resolveRef(requestedRef: string): Promise<ResolvedDeliveryRef>
+  inspectWorkspace(): Promise<PreviewWorkspaceState>
   observeBranch(branch: string): Promise<ObservedPreviewBranch | null>
   createBranch(request: PreviewCreateRequest): Promise<ObservedPreviewBranch>
   deleteBranch(branch: string): Promise<void>
@@ -190,6 +197,7 @@ export async function runPreviewCommand(
         )
       }
       const resolvedRef = await runtime.resolveRef(parsed.ref)
+      assertPreviewWorkspace(resolvedRef, await runtime.inspectWorkspace())
       const existing = await runtime.observeBranch(branch)
       const observed = existing
         ? existing
@@ -243,6 +251,28 @@ export async function runPreviewCommand(
         }
       )
     }
+  }
+}
+
+export function assertPreviewWorkspace(
+  resolvedRef: ResolvedDeliveryRef,
+  workspace: PreviewWorkspaceState
+): void {
+  const workspaceCommit = workspace.commitSha.trim().toLowerCase()
+  if (
+    !COMMIT_SHA_PATTERN.test(workspaceCommit) ||
+    workspaceCommit !== resolvedRef.commitSha.toLowerCase()
+  ) {
+    throw new PreviewDeliveryError(
+      "workspace_mismatch",
+      "Preview deploy requires the current checkout to match the resolved --ref commit."
+    )
+  }
+  if (workspace.status.trim()) {
+    throw new PreviewDeliveryError(
+      "workspace_mismatch",
+      "Preview deploy requires a clean working tree at the resolved --ref commit."
+    )
   }
 }
 
@@ -461,6 +491,7 @@ function createRuntime(
   const defaults = createDefaultRuntime()
   return {
     resolveRef: overrides.resolveRef ?? defaults.resolveRef,
+    inspectWorkspace: overrides.inspectWorkspace ?? defaults.inspectWorkspace,
     observeBranch: overrides.observeBranch ?? defaults.observeBranch,
     createBranch: overrides.createBranch ?? defaults.createBranch,
     deleteBranch: overrides.deleteBranch ?? defaults.deleteBranch,
@@ -492,6 +523,17 @@ function createDefaultRuntime(): PreviewRuntime {
         commitSha: output.toLowerCase(),
         kind: COMMIT_SHA_PATTERN.test(requestedRef) ? "commit" : "branch",
       }
+    },
+    async inspectWorkspace() {
+      const [commitSha, status] = await Promise.all([
+        runProcessCaptured("git", ["rev-parse", "--verify", "HEAD^{commit}"]),
+        runProcessCaptured("git", [
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all",
+        ]),
+      ])
+      return { commitSha: commitSha.trim().toLowerCase(), status }
     },
     async observeBranch(branch) {
       const details = await readBranchDetails(branch)

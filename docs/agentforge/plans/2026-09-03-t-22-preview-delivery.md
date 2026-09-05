@@ -12,10 +12,19 @@
 
 **Global constraints:** Do not trigger on `push` or `pull_request`. Do not read Production secrets. Do not mutate Neon `main`, durable `development`, or Production. Do not copy personal Development records. Do not enable the local mailbox. Do not send arbitrary Preview mail. Do not fall back to the Sanity `production` dataset. Do not print connection strings, tokens, passwords, or mailbox contents. T-21.5 and T-23 stay out of scope.
 
+## 2026-09-05 exact-revision amendment
+
+The reusable-foundation review found that the local adapter resolved `--ref` but still ran migration, seed, and Vercel commands from the current working tree. Recording the SHA as deployment metadata did not bind those inputs to that revision.
+
+Keep the local command fail-closed. After resolving `--ref`, inspect the current Git `HEAD` and porcelain status before observing or creating a Preview branch. Continue only when `HEAD` equals the resolved SHA and the working tree has no tracked or untracked changes. Otherwise report a safe workspace-mismatch error and invoke no Neon, migration, seed, deployment, or smoke operation. This also preserves the workflow path because `actions/checkout` selects the requested ref before invoking the adapter.
+
+Focused tests must cover a requested revision that differs from `HEAD`, local changes at the selected revision, and the exact clean revision. The first two cases must prove that no mutation boundary is called. This local evidence strengthens `TST-PIPELINE-001` and `TST-PREVIEW-001` but does not replace the controlled hosted lifecycle required by T-22 and T-24.
+
 ## Current state and file map
 
 - `scripts/environment/core.ts` already parses Preview profiles (`APP_MAIL_TRANSPORT=controlled-account`, dataset `preview`, non-loopback HTTPS origin) and `parseDeliveryArguments({ command: "preview", ref, previewId })`. Mutable aliases `main`/`master`/`latest`/`head` are rejected.
 - `scripts/environment/guards.ts` already implements `assertPreviewDeploymentAllowed`, `assertPreviewCleanupAllowed`, `assertMigrationAllowed`, and `assertSeedReplacementAllowed`. The adapter must supply a provider-created Preview identity whose `previewId` equals the requested id and whose project/branch match the selected Neon branch.
+- `scripts/deploy/preview/core.ts` resolves the requested ref, but migration, seed, and deployment still consume the current working tree. It must inspect and reject a different or dirty checkout before branch observation or creation.
 - `scripts/neon-development/` owns durable `development` (`curly-dust-60603928` / `development`). Preview branches parent from that branch, never from `main`.
 - `.github/workflows/ci.yml` is the only automatic workflow. `src/test/pipeline/ci-workflow.test.ts` forbids Vercel/Neon/secrets in that file only.
 - `lib/auth.ts` always calls `captureMagicLink`, which throws when the local mailbox is disabled. Preview sign-in with `sendOnSignIn: true` would fail without a Preview no-op mail path.
@@ -34,9 +43,9 @@
 
 ## Dependencies and work order
 
-1. Failing tests for command parsing, SHA resolution, branch naming `preview-<preview-id>`, parent/expiry/main refusal, Preview-id mismatch, Production/Development target refusal, and redacted inspect output.
+1. Failing tests for command parsing, SHA resolution, exact clean workspace acceptance, different-checkout refusal, local-edit refusal, branch naming `preview-<preview-id>`, parent/expiry/main refusal, Preview-id mismatch, Production/Development target refusal, and redacted inspect output.
 2. Injected runtime for Neon observe/create/delete, migrate, seed, Vercel deploy, and HTTP smoke. Default runtime shells out to `neon` and `vercel` the same way T-20 shells out to `neon`.
-3. `deploy`: resolve `--ref` to one 40-character SHA; create `preview-<id>` from `development` with `--expires-at` 7 days ahead (RFC 3339, second precision); observe pooled/direct URLs; call `assertPreviewDeploymentAllowed` then migrate through the direct URL; seed the controlled account; deploy that SHA to Vercel Preview with Preview-scoped env; run HTTP smoke; print redacted URL/deployment id/branch id/expiry/SHA.
+3. `deploy`: resolve `--ref` to one 40-character SHA; require a clean working tree whose `HEAD` is that SHA before any provider or database mutation; create `preview-<id>` from `development` with `--expires-at` 7 days ahead (RFC 3339, second precision); observe pooled/direct URLs; call `assertPreviewDeploymentAllowed` then migrate through the direct URL; seed the controlled account; deploy that SHA to Vercel Preview with Preview-scoped env; run HTTP smoke; print redacted URL/deployment id/branch id/expiry/SHA.
 4. Preview auth: when `APP_ENV=preview`, `sendVerificationEmail` and `sendMagicLink` return without writing the local mailbox or sending remote mail. Seed creates the user through Better Auth sign-up, then sets `users.email_verified = true` through SQL. Do not add a Production mail provider.
 5. BETTER_AUTH_URL: set to the Vercel deployment origin. If the origin is known only after the first CLI deploy, pass `https://${VERCEL_URL}` as a Preview-only runtime fallback in `lib/auth.ts` and record the observed URL in evidence. Do not use that fallback for Local, Development, or Production.
 6. `cleanup`: observe the named Preview branch, call `assertPreviewCleanupAllowed`, delete only that Neon branch, and leave Development/Production untouched. Cleanup of a missing matching branch is a safe no-op after identity checks. Do not delete a differently named preview.
@@ -49,7 +58,7 @@ T-22 remains one delivery task in `TODO.md`. Do not split it. Do not start T-21.
 ## Verification strategy
 
 - `TST-PREVIEW-001`: local tests prove orchestration, isolation, refusal, and cleanup identity. Mark `partial` after a real disposable Neon/Vercel/browser-or-HTTP smoke when the owner-authorized resources exist. Mark `blocked` with the named missing resource if preflight fails. Local tests never claim a deployed Preview.
-- `TST-PIPELINE-001`: static workflow tests prove manual dispatch, least-privilege permissions, SHA pins, Environment `preview`, and the absence of automatic PR/push deploy. Hosted lifecycle evidence stays this task's controlled run, not CI.
+- `TST-PIPELINE-001`: orchestration tests prove that a different or dirty checkout stops before provider and database mutation. Static workflow tests prove manual dispatch, least-privilege permissions, SHA pins, Environment `preview`, and the absence of automatic PR/push deploy. Hosted lifecycle evidence stays this task's controlled run, not CI.
 - `TST-ENV-001`: Preview commands refuse `main`, durable `development` as the mutation target, Production profiles, pooled migration URLs, and local-mailbox settings before mutation. Hosted identity evidence is the CLI-observed project/branch/host correlation from the controlled run.
 - `TST-AUTH-001`–`TST-AUTH-003`: HTTP smoke signs in the pre-seeded verified password account. Do not mark remote mail verified. Magic-link/sign-up on Preview remain outside this contract until T-27.
 - `TST-LANDING-002`: HTTP GET of `/` against the Preview origin when the `preview` dataset exists. Do not claim `TST-LANDING-003` webhook delivery.
