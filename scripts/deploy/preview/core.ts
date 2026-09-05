@@ -808,7 +808,7 @@ function resolveCommand(
   command: string,
   args: string[]
 ): { command: string; args: string[] } {
-  if (process.platform !== "win32") {
+  if (process.platform !== "win32" || command === "git") {
     return { command, args }
   }
 

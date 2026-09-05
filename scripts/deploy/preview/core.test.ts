@@ -12,6 +12,7 @@ import {
   parsePreviewCommand,
   redactPreviewLog,
   runPreviewCommand,
+  runPreviewProcess,
   type ObservedPreviewBranch,
   type PreviewRuntime,
 } from "./core"
@@ -100,6 +101,12 @@ function unusedRuntime(): PreviewRuntime {
 }
 
 describe("Preview delivery commands", () => {
+  it("preserves Git commit-peel syntax through the host process wrapper", async () => {
+    await expect(
+      runPreviewProcess("git", ["rev-parse", "--verify", "HEAD^{commit}"])
+    ).resolves.toMatch(/^[0-9a-f]{40}\r?\n$/i)
+  })
+
   it("parses deploy, cleanup, and inspect and rejects extras", () => {
     expect(
       parsePreviewCommand([

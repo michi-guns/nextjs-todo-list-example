@@ -988,8 +988,8 @@ Required fix from the 2026-09-05 reusable-foundation review at `634d2b0`:
 
 Verification:
 
-- [x] `pnpm exec vitest run scripts/deploy/preview/core.test.ts src/test/pipeline/preview-workflow.test.ts src/modules/auth/infrastructure/auth-mail.test.ts` passes 3 files and 20 tests, including exact-revision workspace refusal before any provider or database operation.
-- [x] `pnpm test` passes 32 files and 264 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, and `pnpm exec drizzle-kit check --config drizzle.config.ts` with the committed CI placeholders, changed-file Prettier, and `git diff --check` pass.
+- [x] `pnpm exec vitest run scripts/deploy/preview/core.test.ts src/test/pipeline/preview-workflow.test.ts src/modules/auth/infrastructure/auth-mail.test.ts` passes 3 files and 21 tests, including exact-revision workspace refusal before any provider or database operation and the real Git commit-peel subprocess on Windows.
+- [x] `pnpm test` passes 32 files and 265 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, and `pnpm exec drizzle-kit check --config drizzle.config.ts` with the committed CI placeholders, changed-file Prettier, and `git diff --check` pass.
 - [x] `pnpm test:integration` passes 6 files and 23 tests against disposable PostgreSQL after the Docker preflight reported server 29.7.2.
 - [x] Dedicated Sanity `preview` dataset exists with published `landingPage`. GitHub Environment `preview` exists. Repository variable `NEXT_PUBLIC_SANITY_PROJECT_ID` is set.
 - [ ] Controlled hosted deploy/cleanup is blocked on a Vercel project plus GitHub Environment `preview` secrets: `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and Preview `BETTER_AUTH_SECRET`. Do not run the workflow until those secrets exist. Vercel Git auto-deploy must stay disabled.
