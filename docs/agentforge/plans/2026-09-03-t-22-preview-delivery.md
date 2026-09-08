@@ -43,6 +43,13 @@ Focused tests must cover a requested revision that differs from `HEAD`, local ch
 
 ## Dependencies and work order
 
+Hosted verification on 2026-09-09 is owner-authorized on free tiers. The first
+run stopped before resource creation because pnpm 11 forwards the documented
+leading `--` to the script. Accept that one leading separator in
+`parsePreviewCommand`, with regression coverage for deploy, inspect, and cleanup;
+retain rejection of extra arguments and all existing target/ref guards. This is
+a T-22 command-compatibility repair before retrying the same hosted lifecycle.
+
 1. Failing tests for command parsing, SHA resolution, exact clean workspace acceptance, different-checkout refusal, local-edit refusal, branch naming `preview-<preview-id>`, parent/expiry/main refusal, Preview-id mismatch, Production/Development target refusal, and redacted inspect output.
 2. Injected runtime for Neon observe/create/delete, migrate, seed, Vercel deploy, and HTTP smoke. Default runtime shells out to `neon` and `vercel` the same way T-20 shells out to `neon`.
 3. `deploy`: resolve `--ref` to one 40-character SHA; require a clean working tree whose `HEAD` is that SHA before any provider or database mutation; create `preview-<id>` from `development` with `--expires-at` 7 days ahead (RFC 3339, second precision); observe pooled/direct URLs; call `assertPreviewDeploymentAllowed` then migrate through the direct URL; seed the controlled account; deploy that SHA to Vercel Preview with Preview-scoped env; run HTTP smoke; print redacted URL/deployment id/branch id/expiry/SHA.

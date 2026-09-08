@@ -101,6 +101,16 @@ function unusedRuntime(): PreviewRuntime {
 }
 
 describe("Preview delivery commands", () => {
+  it.each([
+    ["deploy", "--ref", COMMIT_SHA, "--preview-id", PREVIEW_ID],
+    ["cleanup", "--preview-id", PREVIEW_ID],
+    ["inspect", "--preview-id", PREVIEW_ID],
+  ])("accepts the pnpm forwarded separator before %s", (...args) => {
+    expect(parsePreviewCommand(["--", ...args])).toEqual(
+      parsePreviewCommand(args)
+    )
+  })
+
   it("preserves Git commit-peel syntax through the host process wrapper", async () => {
     await expect(
       runPreviewProcess("git", ["rev-parse", "--verify", "HEAD^{commit}"])

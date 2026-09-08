@@ -126,7 +126,7 @@ const PREVIEW_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
 export function parsePreviewCommand(
   argv: readonly string[]
 ): ParsedPreviewCommand {
-  const [command, ...rest] = argv
+  const [command, ...rest] = argv[0] === "--" ? argv.slice(1) : argv
   if (!isPreviewCommand(command)) {
     throw new PreviewDeliveryError(
       "invalid_command",
