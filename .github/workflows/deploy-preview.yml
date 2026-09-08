@@ -63,7 +63,11 @@ jobs:
           runtime: node@24
           cache: true
       - name: Install Neon and Vercel CLIs
-        run: npm install --global neonctl vercel
+        run: |
+          npm install --global --prefix "$RUNNER_TEMP/preview-cli" neonctl@2.45.0 vercel@59.11.2
+          echo "$RUNNER_TEMP/preview-cli/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/preview-cli/bin/neon" --version
+          "$RUNNER_TEMP/preview-cli/bin/vercel" --version
       - name: Deploy preview
         if: ${{ inputs.action == 'deploy' }}
         run: pnpm preview -- deploy --ref "$REF" --preview-id "$PREVIEW_ID"

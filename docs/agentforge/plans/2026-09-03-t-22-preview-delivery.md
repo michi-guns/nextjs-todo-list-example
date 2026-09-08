@@ -50,6 +50,12 @@ leading `--` to the script. Accept that one leading separator in
 retain rejection of extra arguments and all existing target/ref guards. This is
 a T-22 command-compatibility repair before retrying the same hosted lifecycle.
 
+The second run reached the adapter but could not find `neon` on the runner PATH.
+Install the locally verified Neon CLI 2.45.0 and Vercel CLI 59.11.2 under an
+explicit runner-temporary prefix, export its bin directory through GITHUB_PATH,
+and check both executable versions before deployment. Keep these tools outside
+the checkout so the exact-revision clean-tree guard remains meaningful.
+
 1. Failing tests for command parsing, SHA resolution, exact clean workspace acceptance, different-checkout refusal, local-edit refusal, branch naming `preview-<preview-id>`, parent/expiry/main refusal, Preview-id mismatch, Production/Development target refusal, and redacted inspect output.
 2. Injected runtime for Neon observe/create/delete, migrate, seed, Vercel deploy, and HTTP smoke. Default runtime shells out to `neon` and `vercel` the same way T-20 shells out to `neon`.
 3. `deploy`: resolve `--ref` to one 40-character SHA; require a clean working tree whose `HEAD` is that SHA before any provider or database mutation; create `preview-<id>` from `development` with `--expires-at` 7 days ahead (RFC 3339, second precision); observe pooled/direct URLs; call `assertPreviewDeploymentAllowed` then migrate through the direct URL; seed the controlled account; deploy that SHA to Vercel Preview with Preview-scoped env; run HTTP smoke; print redacted URL/deployment id/branch id/expiry/SHA.

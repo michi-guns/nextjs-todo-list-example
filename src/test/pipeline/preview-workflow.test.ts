@@ -19,6 +19,20 @@ function usesEntries(workflow: string): string[] {
 }
 
 describe("Preview delivery workflow contract", () => {
+  it("installs the locally verified CLIs on an explicit runner PATH", () => {
+    const workflow = readWorkflow()
+    expect(workflow).toContain(
+      'npm install --global --prefix "$RUNNER_TEMP/preview-cli" neonctl@2.45.0 vercel@59.11.2'
+    )
+    expect(workflow).toContain(
+      'echo "$RUNNER_TEMP/preview-cli/bin" >> "$GITHUB_PATH"'
+    )
+    expect(workflow).toContain('"$RUNNER_TEMP/preview-cli/bin/neon" --version')
+    expect(workflow).toContain(
+      '"$RUNNER_TEMP/preview-cli/bin/vercel" --version'
+    )
+  })
+
   it("is manual workflow_dispatch only and never runs on push or pull_request", () => {
     const workflow = readWorkflow()
 
