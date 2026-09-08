@@ -76,7 +76,9 @@ function neonEnvironment(
       : isPreview
         ? "controlled-account"
         : "local-mailbox",
-    APP_MAIL_PROVIDER: isProduction ? "provider-name" : undefined,
+    APP_MAIL_PROVIDER: isProduction ? "resend" : undefined,
+    RESEND_API_KEY: isProduction ? "re_synthetic_test_key" : undefined,
+    APP_MAIL_FROM: isProduction ? "auth@example.com" : undefined,
     BETTER_AUTH_LOCAL_MAILBOX: isProduction || isPreview ? undefined : "true",
     DEPLOYMENT_OWNER: isProduction || isPreview ? "vercel" : "local",
     SECRET_NAMESPACE: appEnv,
@@ -84,6 +86,31 @@ function neonEnvironment(
 }
 
 describe("parseEnvironmentProfile", () => {
+  it("does not expose provider credentials or the sender in inspection output", () => {
+    const environment = neonEnvironment("production")
+    const inspection = JSON.stringify(
+      inspectEnvironment(parseEnvironmentProfile(environment))
+    )
+    expect(inspection).not.toContain(environment.RESEND_API_KEY)
+    expect(inspection).not.toContain(environment.APP_MAIL_FROM)
+    expect(inspection).toContain('"provider":"resend"')
+  })
+  it.each(["RESEND_API_KEY", "APP_MAIL_FROM"])(
+    "requires Production %s before accepting the profile",
+    (key) => {
+      const environment = {
+        ...neonEnvironment("production"),
+        APP_MAIL_PROVIDER: "resend",
+        RESEND_API_KEY: "re_synthetic",
+        APP_MAIL_FROM: "auth@example.com",
+        [key]: undefined,
+      }
+      expect(() => parseEnvironmentProfile(environment)).toThrow(
+        "Invalid Production Resend configuration"
+      )
+    }
+  )
+
   it.each([
     ["local", localEnvironment()],
     ["development", neonEnvironment("development")],

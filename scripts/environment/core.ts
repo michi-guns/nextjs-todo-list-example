@@ -1,4 +1,5 @@
 import { URL } from "node:url"
+import { readResendConfig } from "../../src/modules/auth/infrastructure/resend-mail"
 
 export const APP_ENV_VALUES = [
   "local",
@@ -693,6 +694,16 @@ export function parseEnvironmentProfile(
   const sanity = parseSanity(appEnv, environment)
   const mail = parseMail(appEnv, environment)
   const deployment = parseDeployment(appEnv, environment)
+  if (appEnv === "production") {
+    try {
+      readResendConfig(environment)
+    } catch {
+      throw new EnvironmentProfileError(
+        "mail_policy_mismatch",
+        "Invalid Production Resend configuration"
+      )
+    }
+  }
 
   return {
     appEnv,

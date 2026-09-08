@@ -961,6 +961,9 @@ Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete.
 ### T-21.5: Establish the minimum Production mail foundation
 
 - [ ] Complete T-21.5 before T-23 can release Production.
+- Plan: [Resend foundation](docs/agentforge/plans/2026-09-09-t-21-5-resend-foundation.md). Owner approved Resend and test-domain sends on 2026-09-09.
+- [ ] Implement and test the thin Resend adapter and explicit profile/runtime selection, then run local regression and synthetic provider evidence.
+- [ ] Verify an owner domain and protected Production sender configuration before declaring the parent complete. No domain exists; test-domain simulation cannot satisfy this acceptance.
 - Files: the existing Better Auth mail boundary, a thin owner-approved remote mail adapter/configuration, non-secret profile documentation, focused auth/environment tests, and redacted delivery/health evidence.
 - Interfaces: provider-backed `sendVerificationEmail` and `sendMagicLink` callbacks; explicit Production mail transport selection; protected provider configuration; fail-closed missing-configuration behavior; safe diagnostics that never expose message content, tokens, or credentials.
 - Acceptance: Production verification and magic-link sends use the approved remote transport; local/test mailbox settings are rejected in Preview and Production; missing or invalid Production mail configuration blocks release before deployment; non-Production profiles cannot use Production credentials; no provider-swapping framework is introduced.
