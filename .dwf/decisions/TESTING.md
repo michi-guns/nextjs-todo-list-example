@@ -224,6 +224,13 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ### TST-AUTH-001 — Email/password session lifecycle
 
+T-27 adds verified local browser evidence on 2026-09-09:
+`e2e/email-verification.spec.ts` proves fresh UI signup, verification pending,
+dashboard refusal before verification, same-context captured-link consumption,
+automatic Inbox access, and password sign-in after sign-out. The focused
+Chromium journey passes, as do all 8 Chromium journeys and 23 integration tests.
+This evidence uses the disposable local database and mailbox, not remote email.
+
 - **Status:** `verified`
 - **Capability:** Authentication
 - **Evidence layers/modes:** Application, boundary, end-to-end / integration, browser
@@ -488,6 +495,12 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 <a id="tst-e2e-001"></a>
 
 ### TST-E2E-001 — Core authenticated todo journey
+
+T-27 extends the verified browser evidence on 2026-09-09 with
+`e2e/email-verification.spec.ts`: a fresh signup and verification journey,
+including denial of private access before verification and preservation of the
+password credential. The focused journey and complete 8-test Chromium suite
+pass. This local mailbox evidence does not establish remote mail delivery.
 
 - **Status:** `verified`
 - **Capability:** Core todo journey
