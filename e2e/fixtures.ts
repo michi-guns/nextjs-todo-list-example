@@ -1,4 +1,5 @@
 import { expect, test as base, type Page } from "@playwright/test"
+import { redactAuthTokens } from "../src/test/browser-diagnostics"
 
 import {
   clearMagicLinkMailbox,
@@ -40,7 +41,7 @@ export const test = base.extend<{ browserDiagnostics: void }>({
       await use()
 
       expect(
-        failures,
+        failures.map(redactAuthTokens),
         `Unexpected browser diagnostics in ${testInfo.title}`
       ).toEqual([])
     },

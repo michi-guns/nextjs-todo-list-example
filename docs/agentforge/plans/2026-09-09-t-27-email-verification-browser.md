@@ -29,7 +29,7 @@ Run `pnpm exec playwright test e2e/email-verification.spec.ts --project=chromium
 
 ## Risks and assumptions
 
-Use `randomUUID()` for a fresh recipient. Validate only safe URL components in assertion output so a failed check never prints a token. Trace recording is disabled for this link-bearing journey. Clear the harness mailbox before and in finally. Preserve current browser diagnostics and magic-link evidence. No new product behavior or real inbox claim follows from this test.
+Use `randomUUID()` for a fresh recipient. Navigate through browser evaluation so Playwright's report step title contains no verification URL, then poll only the pathname. Trace recording is disabled for this link-bearing journey. Redact token query values from the shared browser diagnostics using `src/test/browser-diagnostics.ts`, with focused regression tests. Inspect the actual HTML report archive for token-bearing verification steps after the browser run. This addresses the independent review's observed report leak while retaining the diagnostics checks. Clear the harness mailbox before and in finally. No new product behavior or real inbox claim follows from this test.
 
 ## Handoff to task breakdown
 

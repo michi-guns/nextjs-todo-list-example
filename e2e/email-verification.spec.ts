@@ -43,8 +43,11 @@ test("fresh signup verifies email before accessing Inbox and retains its passwor
     await page.goto("/dashboard")
     await expect(page).toHaveURL(/\/sign-in\?next=%2Fdashboard/)
 
-    await page.goto(message.url)
-    await expect(page).toHaveURL((url) => url.pathname === "/dashboard")
+    // The evaluated argument is absent from Playwright's report step title.
+    await page.evaluate((url) => {
+      window.location.href = url
+    }, message.url)
+    await expect.poll(() => new URL(page.url()).pathname).toBe("/dashboard")
     await expect(
       page.getByRole("heading", { name: "Inbox", exact: true })
     ).toBeVisible()
