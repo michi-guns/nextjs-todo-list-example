@@ -86,7 +86,7 @@ T-22 remains one delivery task in `TODO.md`. Do not split it. Do not start T-21.
 - Branch names are `preview-<preview-id>`. `preview-id` already matches `PREVIEW_ID_PATTERN` (`^[A-Za-z0-9][A-Za-z0-9._-]*$`).
 - Seed replaces only the synthetic Preview user (`preview-user@example.test`). It never `TRUNCATE`s shared tables or copies Development personal rows.
 - Vercel Git integration, if connected, can still auto-deploy PRs. This repository's workflow must not add PR triggers; operators must disable or ignore Vercel Git auto-deploy in the project settings. That dashboard setting is not encoded in git.
-- `vercel deploy` without `--prod` creates a Preview deployment ([Deploying from the CLI](https://vercel.com/docs/cli/deploy)). Per-deployment env must include the branch-specific `DATABASE_URL` values; stored Vercel Preview env cannot be the source of the Neon URL.
+- **Corrected after the hosted attempt:** Vercel's first deployment is always Production even without `--prod` ([CLI documentation](https://vercel.com/docs/cli/deploy#prod)). The empty project cannot satisfy this plan's Preview-only boundary. Hosted work stops pending an owner decision about initial Production setup. See [attempt and cleanup evidence](../evidence/2026-09-09-preview-attempt.md). Per-deployment env must still include branch-specific database URLs.
 - GitHub Actions Environment `preview` holds `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and the Preview `BETTER_AUTH_SECRET`. The workflow must not reference Production Environment secrets.
 - The Sanity `preview` dataset is an owner-provisioned prerequisite. If it is missing, landing smoke stays blocked; do not retarget `production`.
 
