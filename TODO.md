@@ -1075,9 +1075,12 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 Local email-verification browser journey, explicit T-27 acceptance:
 
-- [ ] Add one self-contained Chromium test, suggested file `e2e/email-verification.spec.ts`, that creates a fresh account through `/sign-up`, observes verification pending, reads its captured verification link, opens that link in the same browser context, and proves authenticated access to `/dashboard` and the new account's Inbox.
-- [ ] Before consuming the link, prove the pending account cannot access `/dashboard`; expect the existing sign-in redirect. After verification, sign out and sign in with the same password to prove that the verified account retains its credential. Do not substitute a seeded, already verified account, injected session cookies, direct database updates, or direct `auth.handler` calls for this browser journey.
-- [ ] Keep the version-one inbox link-only: reuse the existing recipient/URL/token metadata capture. HTML rendering, an inbox UI, SMTP emulation, and a new mail-provider framework are outside this slice. No Resend account, real email delivery, DNS setup, or paid domain is required for this local test.
+- Plan: [local browser slice](docs/agentforge/plans/2026-09-09-t-27-email-verification-browser.md). On 2026-09-09 the owner explicitly authorized this slice independently of T-21.5 and T-24; the parent task and its other prerequisites remain pending.
+- [x] Reconcile TST-AUTH-001/TST-E2E-001 and implement the fresh-account browser journey below. Focused Chromium 1/1, full Chromium 8/8, unit 265/265, integration 23/23, typecheck, lint with only the existing unused `Geist` warning, changed-file Prettier, and `git diff --check` pass. Independent review of the final commit gates the task PR. The parent T-27 remains incomplete.
+
+- [x] Add one self-contained Chromium test, `e2e/email-verification.spec.ts`, that creates a fresh account through `/sign-up`, observes verification pending, reads its captured verification link, opens that link in the same browser context, and proves authenticated access to `/dashboard` and the new account's Inbox.
+- [x] Before consuming the link, prove the pending account cannot access `/dashboard`; expect the existing sign-in redirect. After verification, sign out and sign in with the same password to prove that the verified account retains its credential. Do not substitute a seeded, already verified account, injected session cookies, direct database updates, or direct `auth.handler` calls for this browser journey.
+- [x] Keep the version-one inbox link-only: reuse the existing recipient/URL/token metadata capture. HTML rendering, an inbox UI, SMTP emulation, and a new mail-provider framework are outside this slice. No Resend account, real email delivery, DNS setup, or paid domain is required for this local test.
 
 Implementation guidance, grounded in the current stack:
 
@@ -1091,7 +1094,7 @@ Verification and evidence for this slice:
 
 - Run `pnpm exec playwright test e2e/email-verification.spec.ts --project=chromium` for the focused journey, then the existing `pnpm test:e2e` Chromium suite as the final browser gate. The parent task's required checks still apply when implementing T-27; use its focused auth integration checks if runtime behavior changes.
 - Reconcile the exact signup/verification browser evidence through `testing-first-class` with [TST-AUTH-001](.dwf/decisions/TESTING.md#tst-auth-001) and [TST-E2E-001](.dwf/decisions/TESTING.md#tst-e2e-001), adding or extending the canonical contract before implementation if needed. Keep the separate [TST-AUTH-002](.dwf/decisions/TESTING.md#tst-auth-002) magic-link evidence intact. Do not infer remote delivery or inbox placement from local capture.
-- Coverage clarification: T-15's existing browser test covers magic-link request/read/consume; signup email verification currently runs through the backend integration tests and Playwright seed handler. Earlier T-11/T-15 closeout wording about the full verification browser lifecycle does not establish this new journey. These acceptance items remain pending until the new browser test is implemented and run. T-27's existing parent dependencies and approval prerequisites remain in force.
+- Coverage clarification: T-15's browser test covers magic-link request/read/consume; the 2026-09-09 T-27 slice now proves signup email verification through the real browser UI as well as the existing backend integration coverage. Earlier T-11/T-15 closeout wording did not establish this journey. T-27's parent dependencies remain in force for its other work; the owner-approved local slice is complete.
 
 ### T-28: Add Sanity authenticated preview and live authoring
 
