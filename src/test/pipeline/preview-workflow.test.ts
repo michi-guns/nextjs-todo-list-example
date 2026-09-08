@@ -1,4 +1,5 @@
-import { readdirSync, readFileSync } from "node:fs"
+import { execFileSync } from "node:child_process"
+import { readFileSync } from "node:fs"
 import path from "node:path"
 
 import { describe, expect, it } from "vitest"
@@ -33,9 +34,24 @@ describe("Preview delivery workflow contract", () => {
   })
 
   it("keeps CI as the only automatic workflow", () => {
-    const files = readdirSync(WORKFLOW_DIR).filter((file) =>
-      file.endsWith(".yml")
+    // Include new workflows, but exclude ignored local learning files that
+    // GitHub never receives. Tracked files remain checked even if ignored.
+    const files = execFileSync(
+      "git",
+      [
+        "ls-files",
+        "-z",
+        "--cached",
+        "--others",
+        "--exclude-standard",
+        "--",
+        WORKFLOW_DIR,
+      ],
+      { encoding: "utf8", windowsHide: true }
     )
+      .split("\0")
+      .filter((file) => /\.ya?ml$/.test(file))
+      .map((file) => path.basename(file))
     expect(files).toContain("ci.yml")
     expect(files).toContain("deploy-preview.yml")
 

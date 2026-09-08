@@ -54,3 +54,6 @@ node_modules/
 # local/test Better Auth mailbox
 /.local/better-auth-mailbox/
 /playwright/.auth/
+
+# Local GitHub Actions learning files. Keep the `.yml` suffix for editor syntax highlighting.
+/.github/workflows/*.local.yml
