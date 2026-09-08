@@ -973,8 +973,8 @@ Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete.
 
 Required fix from the 2026-09-05 reusable-foundation review at `634d2b0`:
 
-- [ ] Bind migration, seed, and deployment inputs to the same immutable revision reported by `--ref`. The current local CLI resolves a SHA in `scripts/deploy/preview/core.ts`, but its subprocesses use the current working directory; `scripts/deploy/preview/vercel.ts` passes the SHA as metadata without selecting its files. A different checkout or local edits can therefore produce an artifact that does not match the reported revision. The workflow checkout mitigates the ordinary workflow case, but does not prove the documented local command.
-- [ ] Before hosted T-22 proof, add focused regression evidence for a requested revision different from the current checkout and for local edits. Prove that migration/seed/deploy use the selected revision, or that the command refuses the mismatch before mutation. Reconcile this evidence with the existing exact-ref contracts and T-24; do not treat the earlier green checks below as proof of artifact identity.
+- [x] Bind migration, seed, and deployment inputs to the same immutable revision reported by `--ref`. The local CLI now requires a clean working tree whose `HEAD` equals the resolved SHA before it observes or creates a Preview branch. A different checkout or local edits fail with `workspace_mismatch` before any Neon, migration, seed, deployment, or smoke operation.
+- [x] Before hosted T-22 proof, add focused regression evidence for a requested revision different from the current checkout and for local edits. `scripts/deploy/preview/core.test.ts` proves both refusal paths and the clean exact-revision path; `src/test/pipeline/preview-workflow.test.ts` proves that checkout and the adapter receive the same requested ref. This is local orchestration evidence only and does not satisfy the hosted T-22 or T-24 boundary.
 
 - [~] Complete T-22 only after the owner authorizes a controlled hosted Preview run.
 - Files: `.github/workflows/deploy-preview.yml`, explicit deploy/branch/seed/smoke helpers under `scripts/deploy/` or equivalent thin adapters, preview environment configuration documentation, and redacted Preview evidence under `docs/agentforge/evidence/`.
@@ -988,8 +988,9 @@ Required fix from the 2026-09-05 reusable-foundation review at `634d2b0`:
 
 Verification:
 
-- [x] `pnpm exec vitest run scripts/deploy/preview/core.test.ts src/test/pipeline/preview-workflow.test.ts src/modules/auth/infrastructure/auth-mail.test.ts` passes 3 files and 18 tests.
-- [x] `pnpm test` passes 32 files and 260 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, changed-file Prettier, and `git diff --check` pass.
+- [x] `pnpm exec vitest run scripts/deploy/preview/core.test.ts src/test/pipeline/preview-workflow.test.ts src/modules/auth/infrastructure/auth-mail.test.ts` passes 3 files and 21 tests, including exact-revision workspace refusal before any provider or database operation and the real Git commit-peel subprocess on Windows.
+- [x] `pnpm test` passes 32 files and 265 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, and `pnpm exec drizzle-kit check --config drizzle.config.ts` with the committed CI placeholders, changed-file Prettier, and `git diff --check` pass.
+- [x] `pnpm test:integration` passes 6 files and 23 tests against disposable PostgreSQL after the Docker preflight reported server 29.7.2.
 - [x] Dedicated Sanity `preview` dataset exists with published `landingPage`. GitHub Environment `preview` exists. Repository variable `NEXT_PUBLIC_SANITY_PROJECT_ID` is set.
 - [ ] Controlled hosted deploy/cleanup is blocked on a Vercel project plus GitHub Environment `preview` secrets: `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and Preview `BETTER_AUTH_SECRET`. Do not run the workflow until those secrets exist. Vercel Git auto-deploy must stay disabled.
 
@@ -1022,6 +1023,10 @@ commands compile.
 - Checks: focused pipeline suite; workflow syntax/static checks; `pnpm test`; `pnpm test:integration`; `pnpm test:e2e`; `pnpm typecheck`; `pnpm lint`; `pnpm build`; controlled Preview lifecycle run; controlled release/ref-resolution rehearsal; redacted evidence review; changed-file Prettier; and `git diff --check`.
 - Dependencies/unblock: T-18 through T-23. Neon/Vercel/Sanity credentials and disposable targets are required only for their named boundary tests; absent prerequisites must be reported, not replaced with a weaker claim.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `ci-cd-and-automation`, `security-and-hardening`, `browser-testing-with-devtools`, `next-dev-loop`, `verification-before-completion`, and `git-workflow-and-versioning`.
+
+Available prerequisite evidence from T-22:
+
+- [x] Local orchestration refuses a requested revision different from the checkout and refuses local edits at the selected revision before Neon, migration, seed, deployment, or smoke operations. The Preview workflow checks out and passes the same requested ref. T-24 must retain this evidence when it adds the controlled hosted lifecycle and Production exact-ref rehearsal; these local tests do not prove either hosted boundary.
 
 ### T-25: Carefully document the complete environment and delivery system
 
