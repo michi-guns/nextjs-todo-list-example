@@ -1115,10 +1115,13 @@ Verification and evidence for this slice:
 
 ### T-29: Publish the derived-application extension and replacement guide
 
+- Plan: [derived application guide](docs/agentforge/plans/2026-09-09-t-29-derived-application-guide.md). Owner authorized this documentation slice without a maintained example app.
+- [x] Write the [derived application guide](docs/architecture/derived-applications.md), including an illustrative adaptation smoke checklist. Relative links/anchors, source/command review, formatting and diff checks gate the documentation commit; fresh independent review gates its PR. No maintained or executed fork is claimed. Parent delivery prerequisites remain pending.
+
 Review follow-through, within the existing guide scope:
 
-- [ ] Provide a short retain/replace checklist for todo modules and UI, migrations and seed data, auth/mail, Sanity, environment identity, and delivery workflows. Link to the owning instructions rather than adding another set of contracts.
-- [ ] Document Neon retargeting explicitly. At review time the original project identity was fixed in `scripts/neon-development/constants.ts`, checked in `scripts/neon-development/core.ts`, inherited by `scripts/deploy/preview/constants.ts`, and repeated in `.github/workflows/deploy-preview.yml`. Explain the coordinated changes and verification a fork needs; environment variables alone do not retarget this tooling. Preserve target guards. A new shared configuration architecture is a proposal requiring separate scope acceptance, not an implementation decision made by this guide.
+- [x] Provide a short retain/replace checklist for todo modules and UI, migrations and seed data, auth/mail, Sanity, environment identity, and delivery workflows. Link to the owning instructions rather than adding another set of contracts.
+- [x] Document Neon retargeting explicitly. At review time the original project identity was fixed in `scripts/neon-development/constants.ts`, checked in `scripts/neon-development/core.ts`, inherited by `scripts/deploy/preview/constants.ts`, and repeated in `.github/workflows/deploy-preview.yml`. Explain the coordinated changes and verification a fork needs; environment variables alone do not retarget this tooling. Preserve target guards. A new shared configuration architecture is a proposal requiring separate scope acceptance, not an implementation decision made by this guide.
 
 The separate [fresh-fork experiment](FUTURE.md#fresh-fork-into-a-different-small-application) is a future idea, not an added T-29 acceptance criterion or dependency. T-27 authentication completion and T-28 CMS live authoring retain their existing scope and prerequisites.
 
