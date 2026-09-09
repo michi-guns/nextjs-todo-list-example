@@ -25,3 +25,6 @@ See the supporting [technology stack](./stack.md) and the canonical technical co
 ## Design goal
 
 Keep the todo reference behavior understandable, testable, and replaceable while cross-cutting foundations remain reusable. Isolate framework and provider details where the accepted architecture needs a boundary, but do not add generic provider-swapping abstractions. Keep modules small enough for a developer or AI agent to understand in one focused context.
+
+For the concrete retain/replace checklist and coordinated provider retargeting,
+see [deriving another application](derived-applications.md).
