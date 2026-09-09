@@ -15,10 +15,10 @@
 - Source areas currently present include `app/`, `components/`, `db/`, `lib/`, `src/`, `e2e/`, `migrations/`, `scripts/`, and `docs/`.
 - The repository now contains the runnable authenticated todo reference: `app/` composes public landing, auth, dashboard, API, and Studio routes; `src/modules/` contains auth, landing, lists, and tasks; and `components/` contains the Focus Rail UI.
 - `app/page.tsx` reads the published Sanity landing singleton through the landing infrastructure boundary; `app/(app)/dashboard/page.tsx` composes the authenticated list/task application path.
-- `lib/auth.ts` contains the Better Auth email/password and magic-link configuration backed by the shared Drizzle client and local/test mailbox boundary.
+- `lib/auth.ts` contains the Better Auth email/password and magic-link configuration backed by the shared Drizzle client and explicit mail boundary. Local/test uses the mailbox, Preview suppresses sends, and Production can select the Resend adapter after configuration validation.
 - `db/schema/auth.ts`, `db/schema/lists.ts`, and `db/schema/tasks.ts` contain the Better Auth and todo tables. Active schema exports are those three modules.
 - `src/sanity/` and `src/modules/landing/infrastructure/` contain the Sanity client/configuration, validated read path, and invalidation boundary.
-- `src/test/`, `scripts/playwright-local/`, and `e2e/` contain the local PostgreSQL 18 Testcontainers and dedicated Playwright lifecycle. The normal browser suite is the seven-journey Chromium todo acceptance path, not the original `playwright.dev` example.
+- `src/test/`, `scripts/playwright-local/`, and `e2e/` contain the local PostgreSQL 18 Testcontainers and dedicated Playwright lifecycle. The normal browser suite contains eight Chromium journeys, including fresh signup, pending-access refusal, email verification and subsequent password sign-in.
 
 ## Technology facts
 
@@ -36,8 +36,10 @@ The package manifest includes Next.js, React, Better Auth, Drizzle, node-postgre
 
 - Local application database is Docker PostgreSQL 18 through `pnpm local:postgres` / `pnpm dev:local` (`scripts/local-postgres/`). Integration and Playwright use disposable Testcontainers, not the Compose volume.
 - Environment profile parsing and pre-mutation guards live in `scripts/environment/` (`pnpm environment:inspect`). They are not a Next.js runtime gate; `db/db.ts` still uses the supplied `DATABASE_URL`.
-- No repository-resident CI, Preview, or Production workflow exists. Those remain T-21 through T-23.
-- Durable Neon Development is T-20. The T-01 agent-owned `development` branch expired on 2026-09-02 and is not a current target. Do not infer Development or Production identity from `.env.local`.
+- `.github/workflows/ci.yml` runs Quality and Harness on main pushes/pull requests without deployment. `.github/workflows/deploy-preview.yml` is manual only. T-22 hosted proof remains incomplete; draft PR #30 records command repairs and a cleaned-up attempt whose first Vercel deployment was classified Production. Initial project setup and adapter identity lookup must be resolved before retry. No Production release workflow exists.
+- T-20 provisioned durable `development`, branch `br-super-leaf-axfwoi2e` in Neon project `curly-dust-60603928`, with no expiry. Guarded identity inspection, direct migration and ordinary seed are recorded in the testing ledger. The earlier expiring T-01 branch is historical. Do not infer Development or Production identity from `.env.local`.
+- T-21.5 has a reviewed Resend code/local-evidence slice and successful synthetic test-domain send. The owner has no verified sender domain, so Production mail readiness remains incomplete. T-24 hosted Preview and protected-release evidence also remain incomplete.
+- The [environment map](../docs/architecture/environments.md), [Preview runbook](../docs/runbooks/preview-delivery.md) and [Production readiness page](../docs/runbooks/production-readiness.md) distinguish current commands from unavailable delivery boundaries.
 - The committed migration chain under `migrations/` is Better Auth plus lists/tasks. Hosted Neon catalogs are not claimed here.
 - `pnpm sanity:smoke` is the read-only published landing check. Sanity project identity is provider configuration, not committed secret material.
 - [`TD-026`](decisions/TECHNICAL.md#td-026) remains the accepted environment matrix. Missing hosted prerequisites are not inferred from local files.

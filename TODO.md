@@ -956,7 +956,7 @@ Verification:
 - [x] Fresh proportional review of implementation tip `e50a641` found no actionable findings. Optional nits about test-name tightness and `persist-credentials: false` were deferred.
 - [x] PR: [#25](https://github.com/michi-guns/nextjs-todo-list-example/pull/25) is open from `task/T-21-ci-quality-gates`.
 
-Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 remains blocked on an owner-approved Production mail provider. T-21.5 must still be in place before a Production release workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
+Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 has the reviewed Resend code/local-evidence slice; verified owner-domain and protected Production sender evidence remain pending. T-21.5 must still be in place before a Production release workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
 
 ### T-21.5: Establish the minimum Production mail foundation
 
@@ -979,7 +979,7 @@ Required fix from the 2026-09-05 reusable-foundation review at `634d2b0`:
 - [x] Bind migration, seed, and deployment inputs to the same immutable revision reported by `--ref`. The local CLI now requires a clean working tree whose `HEAD` equals the resolved SHA before it observes or creates a Preview branch. A different checkout or local edits fail with `workspace_mismatch` before any Neon, migration, seed, deployment, or smoke operation.
 - [x] Before hosted T-22 proof, add focused regression evidence for a requested revision different from the current checkout and for local edits. `scripts/deploy/preview/core.test.ts` proves both refusal paths and the clean exact-revision path; `src/test/pipeline/preview-workflow.test.ts` proves that checkout and the adapter receive the same requested ref. This is local orchestration evidence only and does not satisfy the hosted T-22 or T-24 boundary.
 
-- [~] Complete T-22 only after the owner authorizes a controlled hosted Preview run.
+- [~] The owner authorized the 2026-09-09 hosted attempt, but Vercel assigned Production to the first deployment. The task deployment and isolated Neon branch were cleaned up. T-22 remains blocked on the first-deployment decision and adapter repairs in [draft PR #30](https://github.com/michi-guns/nextjs-todo-list-example/pull/30); no valid Preview smoke was completed.
 - Files: `.github/workflows/deploy-preview.yml`, explicit deploy/branch/seed/smoke helpers under `scripts/deploy/` or equivalent thin adapters, preview environment configuration documentation, and redacted Preview evidence under `docs/agentforge/evidence/`.
 - Interfaces: `workflow_dispatch` inputs for an exact branch/tag/SHA and a safe preview identifier; resolved immutable commit SHA; isolated temporary Neon branch derived from durable Development; direct migration and safe seed sequence; Vercel Preview deployment; deployment-origin `BETTER_AUTH_URL`; non-production auth/mail/Sanity configuration; explicit cleanup/expiry path; workflow outputs for URL, deployment id, branch id, expiry, SHA, and redacted smoke result.
 - Acceptance: a client receives an ephemeral Preview that supports authentication, list/task mutations, landing content, and the relevant browser smoke path; Preview database writes are isolated from Development and Production; data is sanitized or deterministic; local filesystem mail is rejected and the selected remote-safe mail or controlled-account strategy works; the requested ref is resolved and displayed; cleanup is repeatable and does not delete another preview; no automatic Preview is created for ordinary PR activity.
@@ -995,7 +995,7 @@ Verification:
 - [x] `pnpm test` passes 32 files and 265 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, and `pnpm exec drizzle-kit check --config drizzle.config.ts` with the committed CI placeholders, changed-file Prettier, and `git diff --check` pass.
 - [x] `pnpm test:integration` passes 6 files and 23 tests against disposable PostgreSQL after the Docker preflight reported server 29.7.2.
 - [x] Dedicated Sanity `preview` dataset exists with published `landingPage`. GitHub Environment `preview` exists. Repository variable `NEXT_PUBLIC_SANITY_PROJECT_ID` is set.
-- [ ] Controlled hosted deploy/cleanup is blocked on a Vercel project plus GitHub Environment `preview` secrets: `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and Preview `BETTER_AUTH_SECRET`. Do not run the workflow until those secrets exist. Vercel Git auto-deploy must stay disabled.
+- [ ] Hosted functional Preview proof remains incomplete. The Vercel project and Preview secrets were supplied for the 2026-09-09 attempt; the resulting first deployment was classified Production and was deleted, and guarded Neon cleanup succeeded. Resolve the [current Preview stop condition](docs/runbooks/preview-delivery.md) and adapter repairs before retry. Vercel Git auto-deploy must stay disabled.
 
 ### T-23: Add manually approved exact-ref Production release
 
@@ -1037,8 +1037,11 @@ Available prerequisite evidence from T-22:
 
 Required reconciliation from the 2026-09-05 review, within this task's existing documentation scope:
 
-- [ ] Reconcile `.dwf/CONTEXT.md` with implemented CI/Preview tooling and the recorded durable Development evidence. At review time it still said those workflows were absent and Development was pending. Distinguish existing code, recorded successful checks, and unproven hosted behavior; do not mark T-22/T-23 complete from file presence.
-- [ ] Reconcile README setup prerequisites with `package.json` and the implemented commands. At review time README named pnpm 11.17.0 while `packageManager` selected 11.25.0. Keep one authoritative version source and avoid conflicting setup instructions.
+- Plan: [current delivery documentation](docs/agentforge/plans/2026-09-09-t-25-delivery-documentation.md). Owner authorized this partial documentation slice independently of unavailable Production evidence.
+- [x] Reconcile current context/toolchain/command examples and add environment, blocked-Preview and Production-readiness runbooks. Changed Markdown relative links/anchors, command-shape review, formatting and diff checks pass. Fresh independent review gates the documentation PR; full delivery documentation remains pending actual Preview/release proof.
+
+- [x] Reconcile `.dwf/CONTEXT.md` with implemented CI/Preview tooling and the recorded durable Development evidence. At review time it still said those workflows were absent and Development was pending. Distinguish existing code, recorded successful checks, and unproven hosted behavior; do not mark T-22/T-23 complete from file presence.
+- [x] Reconcile README setup prerequisites with `package.json` and the implemented commands. At review time README named pnpm 11.17.0 while `packageManager` selected 11.25.0. Keep one authoritative version source and avoid conflicting setup instructions.
 
 This is the dedicated documentation task. It should leave a derived
 application operator able to understand, run, verify, preview, release, and
@@ -1130,12 +1133,18 @@ The separate [fresh-fork experiment](FUTURE.md#fresh-fork-into-a-different-small
 - Dependencies/unblock: T-25 and the reviewed implementation of T-18 through T-24; product scope approval is required before adding a maintained example app.
 - Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
 
-Final post-baseline dependency checkpoint: T-18.1 through T-18.4, the
-parent T-18 contract gate, T-19, T-20, and T-21 are complete. T-21.5 remains
-blocked on an owner-approved Production mail provider. T-22 through T-25 remain
-ordered behind those named prerequisites; T-26 through T-29 are recorded
-follow-ons. No Preview workflow, Vercel deployment, or Production operation is
-authorized by this backlog entry alone.
+Final post-baseline dependency checkpoint, 2026-09-09: T-18.1 through T-18.4,
+T-19, T-20 and T-21 are complete. The reviewed T-27 local verification journey,
+T-21.5 Resend implementation and T-24 local pipeline evidence are merged.
+T-21.5 still needs a verified owner mail domain and protected sender evidence.
+T-22 needs the first Vercel deployment decision and adapter identity repairs;
+T-23 needs its separately protected target and release workflow. T-24 hosted
+and release boundaries remain pending. T-25 and T-29 can publish their
+owner-authorized current documentation slices, while full delivery claims
+remain conditional on those boundaries. T-26, broader T-27 and T-28 retain
+their existing unaccepted scope or prerequisites. Do not infer hosted
+readiness from local test results or authorize provider operations from this
+backlog alone.
 
 ## Explicitly out of scope for this baseline
 

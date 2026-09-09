@@ -10,7 +10,7 @@ authorize changes to a shared database.
 - Node.js and pnpm matching the repository toolchain.
 - Docker for Local PostgreSQL, the Testcontainers-owned integration suite, and
   Playwright.
-- PostgreSQL 18 for a manually run app comes from `pnpm local:postgres -- start`
+- PostgreSQL 18 for a manually run app comes from `pnpm local:postgres start`
   unless you already have a matching loopback database.
 - Sanity project and published landing singleton values for the read-only live
   smoke.
@@ -48,16 +48,16 @@ Start the persistent loopback PostgreSQL 18 container, apply the committed
 migrations, and load the synthetic local user:
 
 ```powershell
-pnpm local:postgres -- start
-pnpm local:postgres -- migrate
-pnpm local:postgres -- seed
+pnpm local:postgres start
+pnpm local:postgres migrate
+pnpm local:postgres seed
 pnpm dev:local
 ```
 
 `pnpm dev:local` is start, readiness, migrate, then `pnpm dev`. It does not
 seed. The container keeps running after you stop the Next.js process.
-`pnpm local:postgres -- stop` keeps the volume.
-`pnpm local:postgres -- reset` deletes only this Compose volume after the
+`pnpm local:postgres stop` keeps the volume.
+`pnpm local:postgres reset` deletes only this Compose volume after the
 command proves the configured URL is `127.0.0.1:5432/todo`. A Neon URL, a
 different local port, or a missing Local profile fails before Docker volumes
 are removed.
@@ -79,10 +79,10 @@ in project `curly-dust-60603928`. Create it once, then migrate and seed through
 the repository command. Do not reset `main`.
 
 ```powershell
-pnpm neon:development -- provision
-pnpm neon:development -- inspect
-pnpm neon:development -- migrate
-pnpm neon:development -- seed
+pnpm neon:development provision
+pnpm neon:development inspect
+pnpm neon:development migrate
+pnpm neon:development seed
 ```
 
 `provision` does not require Development URLs. `inspect`, `migrate`, and
@@ -99,15 +99,19 @@ and hosted Sanity. Auth links still go to the local mailbox.
 
 ## Manual Preview delivery
 
+Hosted verification is blocked by Vercel's first-deployment Production
+prerequisite and pending adapter repairs. Read the [Preview stop condition](preview-delivery.md)
+before using the command shapes below. They do not establish current hosted readiness.
+
 Preview is a manually requested ephemeral deployment, not an automatic pull
 request preview. The adapter creates `preview-<id>` from durable `development`,
 migrates through the direct URL, seeds `preview-user@example.test`, and deploys
 the resolved SHA to Vercel Preview.
 
 ```powershell
-pnpm preview -- deploy --ref <branch-tag-or-sha> --preview-id demo-1
-pnpm preview -- inspect --preview-id demo-1
-pnpm preview -- cleanup --preview-id demo-1
+pnpm preview deploy --ref <branch-tag-or-sha> --preview-id demo-1
+pnpm preview inspect --preview-id demo-1
+pnpm preview cleanup --preview-id demo-1
 ```
 
 `--ref` cannot be `main`, `master`, `latest`, or `head`. The local mailbox is
@@ -224,7 +228,7 @@ temporary auth-link mailbox, and dedicated Next.js server on
 pnpm test:e2e
 ```
 
-It runs the seven required journeys serially in Chromium. The server receives
+It runs the eight required journeys serially in Chromium. The server receives
 `PLAYWRIGHT_E2E=true`, so the landing reader uses deterministic local content
 for this run only. The normal Sanity path and deployed runtime do not use that
 fixture. Setup refuses an occupied port instead of reusing an unknown server.

@@ -13,8 +13,8 @@ data, testing, and AgentForge material.
 
 ### Prerequisites
 
-- Node.js 24 and pnpm 11.17.0, matching the `packageManager` field in
-  `package.json`.
+- Node.js 24 and the pnpm version selected by the `packageManager` field in
+  [package.json](package.json).
 - Docker Desktop, or another Docker engine, for Local PostgreSQL, integration
   tests, and Playwright.
 - A configured Sanity project and published landing singleton for the normal
@@ -95,16 +95,16 @@ The Local profile uses a persistent PostgreSQL 18 container on loopback only.
 Those Compose credentials are local development values, not production secrets.
 
 ```powershell
-pnpm local:postgres -- start
-pnpm local:postgres -- migrate
-pnpm local:postgres -- seed
+pnpm local:postgres start
+pnpm local:postgres migrate
+pnpm local:postgres seed
 pnpm dev:local
 ```
 
 `pnpm dev:local` starts the container if needed, waits until it accepts
 connections, applies the committed migrations, and then runs `pnpm dev`. Seed
-stays a separate command. `pnpm local:postgres -- stop` keeps the data volume;
-`pnpm local:postgres -- reset` wipes only this Compose database after it proves
+stays a separate command. `pnpm local:postgres stop` keeps the data volume;
+`pnpm local:postgres reset` wipes only this Compose database after it proves
 the URL is the local Docker target. These commands refuse Neon and other remote
 URLs.
 
@@ -118,10 +118,10 @@ Development is a local Next.js process against the durable non-default Neon
 expire.
 
 ```powershell
-pnpm neon:development -- provision
-pnpm neon:development -- inspect
-pnpm neon:development -- migrate
-pnpm neon:development -- seed
+pnpm neon:development provision
+pnpm neon:development inspect
+pnpm neon:development migrate
+pnpm neon:development seed
 ```
 
 Set `APP_ENV=development`, `DATABASE_PROVIDER=neon`,
@@ -135,7 +135,7 @@ expiring branches, and pooled migration URLs. They do not reset Neon.
 ### Apply the committed schema
 
 Inspect and apply migrations before opening the app against a new database.
-Prefer `pnpm local:postgres -- migrate` for the Local Docker target:
+Prefer `pnpm local:postgres migrate` for the Local Docker target:
 
 ```powershell
 pnpm exec drizzle-kit check --config drizzle.config.ts
@@ -166,26 +166,30 @@ production build locally.
 
 ## Commands
 
+Preview deployment is blocked pending the first-deployment decision and adapter
+repairs. Do not run the deployment command below on the empty Vercel project;
+read the [Preview stop condition](docs/runbooks/preview-delivery.md) first.
+
 | Command                                                                           | Purpose                                                                                                         |
 | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `pnpm dev`                                                                        | Start the Next.js development server.                                                                           |
 | `pnpm dev:local`                                                                  | Start Local Docker PostgreSQL, migrate, then run `pnpm dev`.                                                    |
-| `pnpm local:postgres -- start`                                                    | Start the persistent Local Docker PostgreSQL 18 container.                                                      |
+| `pnpm local:postgres start`                                                       | Start the persistent Local Docker PostgreSQL 18 container.                                                      |
 | `pnpm build`                                                                      | Create a production build.                                                                                      |
 | `pnpm start`                                                                      | Serve the production build.                                                                                     |
 | `pnpm typecheck`                                                                  | Run the TypeScript compiler without emitting files.                                                             |
 | `pnpm lint`                                                                       | Run ESLint.                                                                                                     |
 | `pnpm test`                                                                       | Run Docker-free Vitest unit and boundary tests.                                                                 |
 | `pnpm test:integration`                                                           | Start one disposable PostgreSQL 18 Testcontainer, apply migrations, run serial integration tests, and clean up. |
-| `pnpm test:e2e`                                                                   | Start the local database/server/mailbox lifecycle and run the seven Chromium journeys.                          |
+| `pnpm test:e2e`                                                                   | Start the local database/server/mailbox lifecycle and run the eight Chromium journeys.                          |
 | `pnpm test:e2e:cross-browser`                                                     | Opt in to the same journeys in Chromium, Firefox, and WebKit.                                                   |
 | `pnpm environment:inspect`                                                        | Validate the selected profile and print redacted target diagnostics.                                            |
-| `pnpm neon:development -- provision`                                              | Create the durable non-default Neon `development` branch if it is missing.                                      |
-| `pnpm neon:development -- inspect`                                                | Print redacted Development project, branch, and endpoint identity.                                              |
-| `pnpm neon:development -- migrate`                                                | Apply committed migrations through the direct Development URL.                                                  |
-| `pnpm neon:development -- seed`                                                   | Replace only the synthetic Development user and a small Inbox dataset.                                          |
-| `pnpm preview -- deploy --ref <ref> --preview-id <id>`                            | Create an isolated expiring Neon branch, migrate, seed the controlled Preview account, and deploy that SHA.     |
-| `pnpm preview -- cleanup --preview-id <id>`                                       | Delete only the matching Preview Neon branch after identity checks.                                             |
+| `pnpm neon:development provision`                                                 | Create the durable non-default Neon `development` branch if it is missing.                                      |
+| `pnpm neon:development inspect`                                                   | Print redacted Development project, branch, and endpoint identity.                                              |
+| `pnpm neon:development migrate`                                                   | Apply committed migrations through the direct Development URL.                                                  |
+| `pnpm neon:development seed`                                                      | Replace only the synthetic Development user and a small Inbox dataset.                                          |
+| `pnpm preview deploy --ref <ref> --preview-id <id>`                               | Create an isolated expiring Neon branch, migrate, seed the controlled Preview account, and deploy that SHA.     |
+| `pnpm preview cleanup --preview-id <id>`                                          | Delete only the matching Preview Neon branch after identity checks.                                             |
 | `pnpm sanity:smoke`                                                               | Read, validate, and map the published Sanity landing singleton without mutating it.                             |
 | `pnpm neon:performance`                                                           | Run the guarded, opt-in Neon development-branch performance evidence lane.                                      |
 | `pnpm exec drizzle-kit check --config drizzle.config.ts`                          | Validate migration metadata and history.                                                                        |
@@ -207,6 +211,12 @@ Preview branches, mutate Sanity, or use Production secrets.
 `pnpm sanity:smoke` and `pnpm neon:performance` stay local or owner-authorized
 commands. Docker and Chromium are required on the harness runner; GitHub-hosted
 Ubuntu provides both.
+
+Hosted Preview proof is currently blocked. Vercel assigns Production to the
+first deployment of a new project; the task-created attempt was deleted and
+its isolated Neon branch cleaned up. Read the [Preview stop condition and
+runbook](docs/runbooks/preview-delivery.md) before any dispatch. Production has
+no implemented release workflow; see [readiness requirements](docs/runbooks/production-readiness.md).
 
 Manual Preview uses [`.github/workflows/deploy-preview.yml`](.github/workflows/deploy-preview.yml)
 with `workflow_dispatch` only. It is not created for ordinary pull requests.
