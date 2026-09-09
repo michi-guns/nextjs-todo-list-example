@@ -956,7 +956,7 @@ Verification:
 - [x] Fresh proportional review of implementation tip `e50a641` found no actionable findings. Optional nits about test-name tightness and `persist-credentials: false` were deferred.
 - [x] PR: [#25](https://github.com/michi-guns/nextjs-todo-list-example/pull/25) is open from `task/T-21-ci-quality-gates`.
 
-Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 remains blocked on an owner-approved Production mail provider. T-21.5 must still be in place before a Production release workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
+Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 has the reviewed Resend code/local-evidence slice; verified owner-domain and protected Production sender evidence remain pending. T-21.5 must still be in place before a Production release workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
 
 ### T-21.5: Establish the minimum Production mail foundation
 
@@ -979,7 +979,7 @@ Required fix from the 2026-09-05 reusable-foundation review at `634d2b0`:
 - [x] Bind migration, seed, and deployment inputs to the same immutable revision reported by `--ref`. The local CLI now requires a clean working tree whose `HEAD` equals the resolved SHA before it observes or creates a Preview branch. A different checkout or local edits fail with `workspace_mismatch` before any Neon, migration, seed, deployment, or smoke operation.
 - [x] Before hosted T-22 proof, add focused regression evidence for a requested revision different from the current checkout and for local edits. `scripts/deploy/preview/core.test.ts` proves both refusal paths and the clean exact-revision path; `src/test/pipeline/preview-workflow.test.ts` proves that checkout and the adapter receive the same requested ref. This is local orchestration evidence only and does not satisfy the hosted T-22 or T-24 boundary.
 
-- [~] Complete T-22 only after the owner authorizes a controlled hosted Preview run.
+- [~] The owner authorized the 2026-09-09 hosted attempt, but Vercel assigned Production to the first deployment. The task deployment and isolated Neon branch were cleaned up. T-22 remains blocked on the first-deployment decision and adapter repairs in [draft PR #30](https://github.com/michi-guns/nextjs-todo-list-example/pull/30); no valid Preview smoke was completed.
 - Files: `.github/workflows/deploy-preview.yml`, explicit deploy/branch/seed/smoke helpers under `scripts/deploy/` or equivalent thin adapters, preview environment configuration documentation, and redacted Preview evidence under `docs/agentforge/evidence/`.
 - Interfaces: `workflow_dispatch` inputs for an exact branch/tag/SHA and a safe preview identifier; resolved immutable commit SHA; isolated temporary Neon branch derived from durable Development; direct migration and safe seed sequence; Vercel Preview deployment; deployment-origin `BETTER_AUTH_URL`; non-production auth/mail/Sanity configuration; explicit cleanup/expiry path; workflow outputs for URL, deployment id, branch id, expiry, SHA, and redacted smoke result.
 - Acceptance: a client receives an ephemeral Preview that supports authentication, list/task mutations, landing content, and the relevant browser smoke path; Preview database writes are isolated from Development and Production; data is sanitized or deterministic; local filesystem mail is rejected and the selected remote-safe mail or controlled-account strategy works; the requested ref is resolved and displayed; cleanup is repeatable and does not delete another preview; no automatic Preview is created for ordinary PR activity.
@@ -1019,6 +1019,8 @@ prove that the environment setup is correct, not merely that individual
 commands compile.
 
 - [ ] Complete T-24 with layered local, static, and required disposable/controlled hosted evidence.
+- Plan: [local pipeline evidence](docs/agentforge/plans/2026-09-09-t-24-local-pipeline-evidence.md), independently authorized by the owner on 2026-09-09.
+- [x] Add stage-order/failure/explicit-cleanup evidence and `pnpm test:pipeline`. The grouped local suite passes 124 tests. Local integration passes 23/23 and Chromium 8/8. Typecheck and lint pass with the existing unused Geist warning. Build, formatting and diff checks pass. The commit hook runs the final unit suite; fresh independent review gates the PR. Hosted Preview and Production rehearsal remain pending; the first Vercel deployment prerequisite and unimplemented protected release cannot be replaced by these local tests.
 - Files: `src/test/environment/`, `src/test/pipeline/` or the repository's established test seat, workflow/static validation fixtures, disposable Neon/Vercel/Sanity adapters or controlled evidence helpers, `package.json`, `.github/workflows/`, `docs/agentforge/evidence/`, `.dwf/decisions/TESTING.md`, and `TODO.md`.
 - Interfaces: a layered pipeline test command; profile/target matrix; exact-ref resolver; branch creation/identity/expiry/cleanup lifecycle; migration and seed sequencing; preview deployment contract; production approval/secret-scope contract; redacted evidence schema; failure-injection hooks that stop before shared/Production mutation.
 - Acceptance: tests cover every environment profile and forbidden cross-target combination; local reset cannot reach Neon; Development and Preview are isolated; Preview branch creation, migration, deterministic/sanitized seed, app configuration, functional smoke, cleanup, and expiry are traceable; the selected tag/SHA resolves to one immutable commit; automatic PR deployment is absent; migration/seed/deploy failures report state and clean up safely; Production workflow requires protected approval and cannot be exercised by non-production credentials; tests prove the full application path for a Preview when the controlled hosted prerequisite is available.
@@ -1134,19 +1136,15 @@ The separate [fresh-fork experiment](FUTURE.md#fresh-fork-into-a-different-small
 - Dependencies/unblock: T-25 and the reviewed implementation of T-18 through T-24; product scope approval is required before adding a maintained example app.
 - Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
 
-Final post-baseline dependency checkpoint: T-18.1 through T-18.4, the
-parent T-18 contract gate, T-19, T-20, and T-21 are complete. T-21.5 remains
-blocked on an owner-approved Production mail provider. T-22 through T-25 remain
-ordered behind those named prerequisites; T-26 through T-29 are recorded
-follow-ons. No Preview workflow, Vercel deployment, or Production operation is
-authorized by this backlog entry alone.
-
-## Explicitly out of scope for this baseline
-
-- OAuth or social login.
-- Teams, organizations, shared lists, roles, or machine-authenticated APIs.
-- Real-time collaboration, offline/PWA behavior, mobile apps, or multi-region operations.
-- Recurring tasks, subtasks, tags, attachments, comments, or payments.
-- Polished email verification and password-reset product flows.
-- Sanity Live, Draft Mode, Presentation Tool, and visual editing. These are deferred until after the webhook and manual-recovery baseline.
-- Speculative database indexes, Redis, application-level query caching, and provider-swapping abstractions.
+Final post-baseline dependency checkpoint, 2026-09-09: T-18.1 through T-18.4,
+T-19, T-20 and T-21 are complete. The reviewed T-27 local verification journey,
+T-21.5 Resend implementation and T-24 local pipeline evidence are merged.
+T-21.5 still needs a verified owner mail domain and protected sender evidence.
+T-22 needs the first Vercel deployment decision and adapter identity repairs;
+T-23 needs its separately protected target and release workflow. T-24 hosted
+and release boundaries remain pending. T-25 and T-29 can publish their
+owner-authorized current documentation slices, while full delivery claims
+remain conditional on those boundaries. T-26, broader T-27 and T-28 retain
+their existing unaccepted scope or prerequisites. Do not infer hosted
+readiness from local test results or authorize provider operations from this
+backlog alone.

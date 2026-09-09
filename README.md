@@ -166,6 +166,10 @@ production build locally.
 
 ## Commands
 
+Preview deployment is blocked pending the first-deployment decision and adapter
+repairs. Do not run the deployment command below on the empty Vercel project;
+read the [Preview stop condition](docs/runbooks/preview-delivery.md) first.
+
 | Command                                                                           | Purpose                                                                                                         |
 | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `pnpm dev`                                                                        | Start the Next.js development server.                                                                           |
@@ -177,7 +181,7 @@ production build locally.
 | `pnpm lint`                                                                       | Run ESLint.                                                                                                     |
 | `pnpm test`                                                                       | Run Docker-free Vitest unit and boundary tests.                                                                 |
 | `pnpm test:integration`                                                           | Start one disposable PostgreSQL 18 Testcontainer, apply migrations, run serial integration tests, and clean up. |
-| `pnpm test:e2e`                                                                   | Start the local database/server/mailbox lifecycle and run the seven Chromium journeys.                          |
+| `pnpm test:e2e`                                                                   | Start the local database/server/mailbox lifecycle and run the eight Chromium journeys.                          |
 | `pnpm test:e2e:cross-browser`                                                     | Opt in to the same journeys in Chromium, Firefox, and WebKit.                                                   |
 | `pnpm environment:inspect`                                                        | Validate the selected profile and print redacted target diagnostics.                                            |
 | `pnpm neon:development provision`                                                 | Create the durable non-default Neon `development` branch if it is missing.                                      |
