@@ -995,7 +995,7 @@ Verification:
 - [x] `pnpm test` passes 32 files and 265 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, and `pnpm exec drizzle-kit check --config drizzle.config.ts` with the committed CI placeholders, changed-file Prettier, and `git diff --check` pass.
 - [x] `pnpm test:integration` passes 6 files and 23 tests against disposable PostgreSQL after the Docker preflight reported server 29.7.2.
 - [x] Dedicated Sanity `preview` dataset exists with published `landingPage`. GitHub Environment `preview` exists. Repository variable `NEXT_PUBLIC_SANITY_PROJECT_ID` is set.
-- [ ] Controlled hosted deploy/cleanup is blocked on a Vercel project plus GitHub Environment `preview` secrets: `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and Preview `BETTER_AUTH_SECRET`. Do not run the workflow until those secrets exist. Vercel Git auto-deploy must stay disabled.
+- [ ] Hosted functional Preview proof remains incomplete. The Vercel project and Preview secrets were supplied for the 2026-09-09 attempt; the resulting first deployment was classified Production and was deleted, and guarded Neon cleanup succeeded. Resolve the [current Preview stop condition](docs/runbooks/preview-delivery.md) and adapter repairs before retry. Vercel Git auto-deploy must stay disabled.
 
 ### T-23: Add manually approved exact-ref Production release
 
@@ -1145,3 +1145,13 @@ remain conditional on those boundaries. T-26, broader T-27 and T-28 retain
 their existing unaccepted scope or prerequisites. Do not infer hosted
 readiness from local test results or authorize provider operations from this
 backlog alone.
+
+## Explicitly out of scope for this baseline
+
+- OAuth or social login.
+- Teams, organizations, shared lists, roles, or machine-authenticated APIs.
+- Real-time collaboration, offline/PWA behavior, mobile apps, or multi-region operations.
+- Recurring tasks, subtasks, tags, attachments, comments, or payments.
+- Polished email verification and password-reset product flows.
+- Sanity Live, Draft Mode, Presentation Tool, and visual editing. These are deferred until after the webhook and manual-recovery baseline.
+- Speculative database indexes, Redis, application-level query caching, and provider-swapping abstractions.
