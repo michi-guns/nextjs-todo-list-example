@@ -101,6 +101,54 @@ function unusedRuntime(): PreviewRuntime {
 }
 
 describe("Preview delivery commands", () => {
+  it("runs migration, seed, deployment and smoke in order before recording success", async () => {
+    const runtime = unusedRuntime()
+    const write = vi.fn()
+    await runPreviewCommand(
+      { command: "deploy", ref: COMMIT_SHA, previewId: PREVIEW_ID },
+      { environment: previewEnvironment(), runtime, write }
+    )
+    const order = [
+      runtime.migrate,
+      runtime.seed,
+      runtime.deploy,
+      runtime.smoke,
+      write,
+    ].map((operation) => {
+      expect(operation).toHaveBeenCalledOnce()
+      return vi.mocked(operation).mock.invocationCallOrder[0]
+    })
+    expect(order).toEqual([...order].sort((a, b) => a - b))
+  })
+
+  it.each(["migrate", "seed", "deploy", "smoke"] as const)(
+    "stops after %s failure and allows only explicit matching cleanup",
+    async (stage) => {
+      const runtime = unusedRuntime()
+      const failure = new Error(`${stage} failed`)
+      runtime[stage] = vi.fn().mockRejectedValue(failure)
+      const write = vi.fn()
+      await expect(
+        runPreviewCommand(
+          { command: "deploy", ref: COMMIT_SHA, previewId: PREVIEW_ID },
+          { environment: previewEnvironment(), runtime, write }
+        )
+      ).rejects.toBe(failure)
+      const stages = ["migrate", "seed", "deploy", "smoke"] as const
+      for (const later of stages.slice(stages.indexOf(stage) + 1)) {
+        expect(runtime[later]).not.toHaveBeenCalled()
+      }
+      expect(write).not.toHaveBeenCalled()
+      expect(runtime.deleteBranch).not.toHaveBeenCalled()
+
+      await runPreviewCommand(
+        { command: "cleanup", previewId: PREVIEW_ID },
+        { environment: previewEnvironment(), runtime, write }
+      )
+      expect(runtime.deleteBranch).toHaveBeenCalledExactlyOnceWith(BRANCH)
+    }
+  )
+
   it("preserves Git commit-peel syntax through the host process wrapper", async () => {
     await expect(
       runPreviewProcess("git", ["rev-parse", "--verify", "HEAD^{commit}"])
@@ -345,7 +393,24 @@ describe("Preview delivery commands", () => {
     expect(runtime.deploy).not.toHaveBeenCalled()
   })
 
-  it("does not delete a missing preview branch or the development parent", async () => {
+  it.each(["development", "preview-another-id"])(
+    "refuses cleanup when observation reports %s",
+    async (branch) => {
+      const runtime = unusedRuntime()
+      runtime.observeBranch = vi
+        .fn()
+        .mockResolvedValue(observedBranch({ branch }))
+      await expect(
+        runPreviewCommand(
+          { command: "cleanup", previewId: PREVIEW_ID },
+          { environment: previewEnvironment(), runtime }
+        )
+      ).rejects.toMatchObject({ code: "target_mismatch" })
+      expect(runtime.deleteBranch).not.toHaveBeenCalled()
+    }
+  )
+
+  it("does not delete a missing preview branch", async () => {
     const runtime = unusedRuntime()
     runtime.observeBranch = vi.fn().mockResolvedValue(null)
 
