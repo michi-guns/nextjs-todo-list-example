@@ -89,7 +89,9 @@ function neonEnvironment(
       : isPreview
         ? "controlled-account"
         : "local-mailbox",
-    APP_MAIL_PROVIDER: isProduction ? "mail-provider" : undefined,
+    APP_MAIL_PROVIDER: isProduction ? "resend" : undefined,
+    RESEND_API_KEY: isProduction ? "re_synthetic_test_key" : undefined,
+    APP_MAIL_FROM: isProduction ? "auth@example.com" : undefined,
     BETTER_AUTH_LOCAL_MAILBOX: isPreview || isProduction ? undefined : "true",
     DEPLOYMENT_OWNER: isPreview || isProduction ? "vercel" : "local",
     SECRET_NAMESPACE: appEnv,
