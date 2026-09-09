@@ -1035,8 +1035,11 @@ Available prerequisite evidence from T-22:
 
 Required reconciliation from the 2026-09-05 review, within this task's existing documentation scope:
 
-- [ ] Reconcile `.dwf/CONTEXT.md` with implemented CI/Preview tooling and the recorded durable Development evidence. At review time it still said those workflows were absent and Development was pending. Distinguish existing code, recorded successful checks, and unproven hosted behavior; do not mark T-22/T-23 complete from file presence.
-- [ ] Reconcile README setup prerequisites with `package.json` and the implemented commands. At review time README named pnpm 11.17.0 while `packageManager` selected 11.25.0. Keep one authoritative version source and avoid conflicting setup instructions.
+- Plan: [current delivery documentation](docs/agentforge/plans/2026-09-09-t-25-delivery-documentation.md). Owner authorized this partial documentation slice independently of unavailable Production evidence.
+- [x] Reconcile current context/toolchain/command examples and add environment, blocked-Preview and Production-readiness runbooks. Changed Markdown relative links/anchors, command-shape review, formatting and diff checks pass. Fresh independent review gates the documentation PR; full delivery documentation remains pending actual Preview/release proof.
+
+- [x] Reconcile `.dwf/CONTEXT.md` with implemented CI/Preview tooling and the recorded durable Development evidence. At review time it still said those workflows were absent and Development was pending. Distinguish existing code, recorded successful checks, and unproven hosted behavior; do not mark T-22/T-23 complete from file presence.
+- [x] Reconcile README setup prerequisites with `package.json` and the implemented commands. At review time README named pnpm 11.17.0 while `packageManager` selected 11.25.0. Keep one authoritative version source and avoid conflicting setup instructions.
 
 This is the dedicated documentation task. It should leave a derived
 application operator able to understand, run, verify, preview, release, and
