@@ -7,3 +7,5 @@
 - [Sanity integration failure](./sanity-integration-failure.md)
 
 Use the [runbook template](./template.md) for repeated operational procedures.
+
+- [Authentication mail](auth-mail.md): local capture, Preview suppression, Resend configuration and Production readiness.

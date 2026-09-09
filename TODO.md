@@ -962,7 +962,7 @@ Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete.
 
 - [ ] Complete T-21.5 before T-23 can release Production.
 - Plan: [Resend foundation](docs/agentforge/plans/2026-09-09-t-21-5-resend-foundation.md). Owner approved Resend and test-domain sends on 2026-09-09.
-- [ ] Implement and test the thin Resend adapter and explicit profile/runtime selection, then run local regression and synthetic provider evidence.
+- [x] Implement the thin Resend adapter and explicit profile/runtime selection. Unit tests pass 294/294, local integration 23/23 and Chromium 8/8. Typecheck, build, formatting and diff checks pass; lint retains only the existing unused Geist warning. A synthetic test-domain send through the adapter was accepted. Next.js MCP reports no compilation/runtime errors, and agent-browser proves password sign-in and local magic-link request. Fresh independent review gates the PR.
 - [ ] Verify an owner domain and protected Production sender configuration before declaring the parent complete. No domain exists; test-domain simulation cannot satisfy this acceptance.
 - Files: the existing Better Auth mail boundary, a thin owner-approved remote mail adapter/configuration, non-secret profile documentation, focused auth/environment tests, and redacted delivery/health evidence.
 - Interfaces: provider-backed `sendVerificationEmail` and `sendMagicLink` callbacks; explicit Production mail transport selection; protected provider configuration; fail-closed missing-configuration behavior; safe diagnostics that never expose message content, tokens, or credentials.

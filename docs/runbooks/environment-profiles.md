@@ -125,6 +125,10 @@ Vercel project settings. Values below describe categories, not credentials.
 | `DEPLOYMENT_OWNER`               | Every profile     | `local`, `github`, or `vercel`, constrained by profile                                           |
 | `SECRET_NAMESPACE`               | Every profile     | `local`/`ci` for Local, otherwise exactly `development`, `preview`, or `production`              |
 
+Production remote mail requires `APP_MAIL_PROVIDER=resend`, protected
+`RESEND_API_KEY`, and `APP_MAIL_FROM` on an owner-verified domain. See the
+[auth-mail runbook](auth-mail.md) for validation and remaining readiness evidence.
+
 The existing `BETTER_AUTH_MAILBOX_DIR` remains a local/test-only path setting.
 It is not a deployment transport and is not accepted as a substitute for the
 Preview controlled account or the Production remote provider.
