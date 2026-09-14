@@ -10,6 +10,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Agent operating notes
 
+## Operator-local preferences
+
+- `.local/` is git-ignored and holds machine-local files that never ship with the repository. When `.local/README.md` exists, read it before starting work: it routes to the operator's personal agent preferences, such as the language and tone of chat replies. Those preferences apply on top of these notes and never override the `.dwf/` contracts or the engineering rules below.
+
 ## Product intent
 
 - Read [`.dwf/README.md`](.dwf/README.md), [`.dwf/RULES.md`](.dwf/RULES.md), [`.dwf/CONTEXT.md`](.dwf/CONTEXT.md), and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes.

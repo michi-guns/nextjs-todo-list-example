@@ -51,11 +51,14 @@ node_modules/
 /.playwright-cli/
 /.ui-explorations/t09a-dashboard/*.png
 
-# local/test Better Auth mailbox
-/.local/better-auth-mailbox/
+# machine-local folder: Better Auth test mailbox, operator-local agent preferences (see AGENTS.md)
+/.local/
 /playwright/.auth/
 
 # Local GitHub Actions learning files. Keep the `.yml` suffix for editor syntax highlighting.
 /.github/workflows/*.local.yml
 
 .vercel
+
+# Claude Code personal project instructions (imports .local/README.md)
+CLAUDE.local.md
