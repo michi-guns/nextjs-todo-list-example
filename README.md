@@ -215,8 +215,9 @@ Ubuntu provides both.
 
 A hosted Preview has run successfully once (2026-09-14, see the
 [run evidence](docs/agentforge/evidence/2026-09-14-preview-run.md)) after a
-placeholder Production deployment resolved Vercel's first-deployment rule.
-Each run still needs owner authorization; read the
+placeholder Production deployment resolved Vercel's first-deployment rule;
+cleanup of that Preview is still pending. Each run still needs owner
+authorization; read the
 [Preview delivery runbook](docs/runbooks/preview-delivery.md) before any dispatch. Production has no implemented release workflow; see
 [readiness requirements](docs/runbooks/production-readiness.md).
 
