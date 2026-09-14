@@ -75,5 +75,5 @@ The owner authorized the two prerequisites and the agent ran them:
 The adapter repairs from the identity plan add the project preflight,
 `--target=preview --json` deployment, and team-scoped deployment
 verification with focused tests. Superseded by the
-[2026-09-14 run evidence](2026-09-14-preview-run.md); TST-PREVIEW-001 stays
-`partial` until that Preview id is cleaned up.
+[2026-09-14 run evidence](2026-09-14-preview-run.md), which records the
+successful run and its cleanup.

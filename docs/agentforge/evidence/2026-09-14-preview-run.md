@@ -62,10 +62,22 @@ and a real Chromium session; no secrets recorded.
   direct migration and seed on the temporary branch, explicit Preview target,
   identity traceability (exact SHA and Preview id in deployment metadata),
   functional smoke over HTTP and in a real browser, and a set expiry.
-- Still pending for this Preview id: explicit `cleanup` of
-  `preview-t22-20260914`. The identity-checked cleanup workflow was proven on
-  2026-09-09 for a different id; this branch is intentionally left alive for
-  the owner's own check and expires on 2026-09-21 if no cleanup runs first.
-- Not a Production release. The Vercel Preview deployment remains until
-  removed or expired by Vercel's retention; deleting the Neon branch makes it
-  unusable.
+- Owner check: the owner opened the Preview, signed in with the controlled
+  account and exercised list and task flows, and reported that everything
+  worked before cleanup was requested.
+- Not a Production release.
+
+## Cleanup, 2026-09-14
+
+- A first cleanup dispatch, [run 34845604489](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/34845604489),
+  failed at `actions/checkout` because the operator passed the abbreviated
+  SHA `f2283f4` as `ref`; the checkout action needs a branch, tag or full SHA.
+  It stopped before installing tools and touched nothing.
+- [Run 34845688852](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/34845688852)
+  with the full SHA and `action=cleanup` succeeded: the `Cleanup preview`
+  step deleted `preview-t22-20260914` through the identity guard. Afterwards
+  `neonctl branches get preview-t22-20260914` reports not found and the
+  project lists only `development` and `main`.
+- The orphaned Vercel Preview deployment was removed with
+  `vercel remove <deployment-url> --yes`; the project now lists only the
+  Production placeholder, which still serves "Not released yet.".

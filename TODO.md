@@ -979,7 +979,7 @@ Required fix from the 2026-09-05 reusable-foundation review at `634d2b0`:
 - [x] Bind migration, seed, and deployment inputs to the same immutable revision reported by `--ref`. The local CLI now requires a clean working tree whose `HEAD` equals the resolved SHA before it observes or creates a Preview branch. A different checkout or local edits fail with `workspace_mismatch` before any Neon, migration, seed, deployment, or smoke operation.
 - [x] Before hosted T-22 proof, add focused regression evidence for a requested revision different from the current checkout and for local edits. `scripts/deploy/preview/core.test.ts` proves both refusal paths and the clean exact-revision path; `src/test/pipeline/preview-workflow.test.ts` proves that checkout and the adapter receive the same requested ref. This is local orchestration evidence only and does not satisfy the hosted T-22 or T-24 boundary.
 
-- [~] The owner authorized the 2026-09-09 hosted attempt, but Vercel assigned Production to the first deployment. The task deployment and isolated Neon branch were cleaned up; no valid Preview smoke was completed. On 2026-09-14 the owner resolved the first-deployment prerequisite with a deliberate placeholder Production deployment (see the [Preview runbook](docs/runbooks/preview-delivery.md)), so further deployments are Previews. [PR #30](https://github.com/michi-guns/nextjs-todo-list-example/pull/30) carries the command and identity repairs; the owner-authorized run is recorded under Verification below.
+- [x] The owner authorized the 2026-09-09 hosted attempt, but Vercel assigned Production to the first deployment. The task deployment and isolated Neon branch were cleaned up; no valid Preview smoke was completed. On 2026-09-14 the owner resolved the first-deployment prerequisite with a deliberate placeholder Production deployment (see the [Preview runbook](docs/runbooks/preview-delivery.md)), so further deployments are Previews. [PR #30](https://github.com/michi-guns/nextjs-todo-list-example/pull/30) carries the command and identity repairs; the owner-authorized run is recorded under Verification below.
 
 Identity repairs slice, 2026-09-14, from the [Preview identity repairs plan](docs/agentforge/plans/2026-09-14-t-22-preview-identity-repairs.md):
 
@@ -1004,7 +1004,7 @@ Verification:
 - [x] `pnpm test` passes 32 files and 265 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, and `pnpm exec drizzle-kit check --config drizzle.config.ts` with the committed CI placeholders, changed-file Prettier, and `git diff --check` pass.
 - [x] `pnpm test:integration` passes 6 files and 23 tests against disposable PostgreSQL after the Docker preflight reported server 29.7.2.
 - [x] Dedicated Sanity `preview` dataset exists with published `landingPage`. GitHub Environment `preview` exists. Repository variable `NEXT_PUBLIC_SANITY_PROJECT_ID` is set.
-- [~] Hosted functional Preview proof. The 2026-09-09 attempt was classified Production and deleted, with guarded Neon cleanup. The first-deployment prerequisite was resolved on 2026-09-14 by the placeholder Production deployment recorded in the [Preview runbook](docs/runbooks/preview-delivery.md). The owner-authorized [run 34840457016](docs/agentforge/evidence/2026-09-14-preview-run.md) at `1c8c38c` then passed the project preflight, created, migrated and seeded `preview-t22-20260914`, deployed a `target=null` Preview with matching commit/preview metadata, passed the HTTP smoke, and was independently verified over HTTP and in a real Chromium session (landing, sign-in, dashboard, list creation). Remaining for this id: explicit `cleanup` of `preview-t22-20260914`, left alive for the owner's own check and expiring 2026-09-21. Vercel Git auto-deploy must stay disabled.
+- [x] Hosted functional Preview proof. The 2026-09-09 attempt was classified Production and deleted, with guarded Neon cleanup. The first-deployment prerequisite was resolved on 2026-09-14 by the placeholder Production deployment recorded in the [Preview runbook](docs/runbooks/preview-delivery.md). The owner-authorized [run 34840457016](docs/agentforge/evidence/2026-09-14-preview-run.md) at `1c8c38c` then passed the project preflight, created, migrated and seeded `preview-t22-20260914`, deployed a `target=null` Preview with matching commit/preview metadata, passed the HTTP smoke, and was independently verified over HTTP and in a real Chromium session (landing, sign-in, dashboard, list creation). The owner then checked the Preview manually and reported it working, and [cleanup run 34845688852](docs/agentforge/evidence/2026-09-14-preview-run.md) deleted `preview-t22-20260914` through the identity guard with `development` and `main` untouched; the orphaned Vercel deployment was removed. `TST-PREVIEW-001` is `verified`. Vercel Git auto-deploy must stay disabled.
 
 ### T-23: Add manually approved exact-ref Production release
 
@@ -1161,9 +1161,13 @@ backlog alone.
 Update, 2026-09-14: the owner resolved the Vercel first-deployment
 prerequisite with a placeholder Production deployment and provisioned the
 separate Neon Production project `jolly-dew-32309276`. T-22's identity
-repairs are implemented with local evidence; a hosted Preview run still needs
-explicit owner authorization. T-21.5's verified-domain requirement and T-23's
-release workflow remain open.
+repairs are implemented with local evidence. Later that day the owner-authorized
+hosted run, manual owner check and identity-checked cleanup completed, so T-22
+is complete and `TST-PREVIEW-001` is `verified`. Dependency recomputation: T-24's
+hosted Preview boundary now has real evidence, while its Production release
+rehearsal still waits for T-23; T-23 remains blocked only by T-21.5's
+verified-domain requirement; T-28 still needs its product decision. Each future
+hosted run still needs owner authorization.
 
 ## Explicitly out of scope for this baseline
 
