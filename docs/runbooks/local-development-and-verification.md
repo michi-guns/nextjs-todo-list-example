@@ -99,9 +99,10 @@ and hosted Sanity. Auth links still go to the local mailbox.
 
 ## Manual Preview delivery
 
-Hosted verification is pending an owner-authorized run. Read the
-[Preview delivery runbook](preview-delivery.md) before using the command
-shapes below; they do not establish current hosted readiness.
+The first hosted run succeeded on 2026-09-14 (run 34840457016; see the
+[Preview delivery runbook](preview-delivery.md)). Each further run still needs
+owner authorization. The command shapes below are the contract, not
+permission to dispatch.
 
 Preview is a manually requested ephemeral deployment, not an automatic pull
 request preview. The adapter creates `preview-<id>` from durable `development`,
