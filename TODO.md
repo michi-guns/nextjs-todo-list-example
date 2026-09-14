@@ -1166,7 +1166,7 @@ hosted run, manual owner check and identity-checked cleanup completed, so T-22
 is complete and `TST-PREVIEW-001` is `verified`. Dependency recomputation: T-24's
 hosted Preview boundary now has real evidence, while its Production release
 rehearsal still waits for T-23; T-23 remains blocked only by T-21.5's
-verified-domain requirement; T-28 still needs its product decision. Each future
+verified-domain requirement; T-28 still waits on T-24 and its product decision. Each future
 hosted run still needs owner authorization.
 
 ## Explicitly out of scope for this baseline

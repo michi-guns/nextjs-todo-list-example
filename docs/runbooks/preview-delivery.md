@@ -86,5 +86,6 @@ database expiry with Vercel cleanup.
 Record the requested/resolved SHA, Preview ID, observed project/branch ID,
 expiry, Vercel project/deployment/target and smoke/cleanup outcomes. Do not
 record connection strings, keys, auth links, cookies or mailbox contents.
-Hosted T-22/T-24 acceptance remains pending until these observations establish
-a real functional Preview and safe cleanup.
+T-22's hosted acceptance was established by the 2026-09-14 run and cleanup;
+T-24's acceptance remains pending until it reconciles these observations with
+a Production release rehearsal.
