@@ -9,7 +9,12 @@ implementation must establish the [TD-026](../../.dwf/decisions/TECHNICAL.md#td-
 and [TD-027](../../.dwf/decisions/TECHNICAL.md#td-027) requirements:
 
 - A separately provisioned protected Neon project/branch with correlated
-  direct migration and pooled runtime URLs.
+  direct migration and pooled runtime URLs. The owner-authorized project
+  `nextjs-todo-list-example-production` (`jolly-dew-32309276`, PostgreSQL 18,
+  `aws-us-east-2`) was created on 2026-09-14; its default `main` branch is the
+  intended Production branch. No tooling in this repository references it
+  yet, which is the isolation that protects it until T-23 adds the release
+  workflow. The free plan exposes no protected-branch setting.
 - Protected Production approval and secrets, unavailable to CI and Preview.
 - A verified owner mail domain, protected Resend settings and controlled
   delivery evidence. See [authentication mail](auth-mail.md). Test-domain

@@ -99,9 +99,9 @@ and hosted Sanity. Auth links still go to the local mailbox.
 
 ## Manual Preview delivery
 
-Hosted verification is blocked by Vercel's first-deployment Production
-prerequisite and pending adapter repairs. Read the [Preview stop condition](preview-delivery.md)
-before using the command shapes below. They do not establish current hosted readiness.
+Hosted verification is pending an owner-authorized run. Read the
+[Preview delivery runbook](preview-delivery.md) before using the command
+shapes below; they do not establish current hosted readiness.
 
 Preview is a manually requested ephemeral deployment, not an automatic pull
 request preview. The adapter creates `preview-<id>` from durable `development`,

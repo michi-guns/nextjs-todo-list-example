@@ -82,6 +82,11 @@ export interface PreviewDeployment {
   readonly deploymentId: string
 }
 
+export interface PreviewDeploymentTarget {
+  readonly projectId: string
+  readonly productionDeploymentId: string
+}
+
 export interface PreviewSmokeResult {
   readonly landing: boolean
   readonly signedIn: boolean
@@ -96,6 +101,12 @@ export interface PreviewWorkspaceState {
 export interface PreviewRuntime {
   resolveRef(requestedRef: string): Promise<ResolvedDeliveryRef>
   inspectWorkspace(): Promise<PreviewWorkspaceState>
+  /**
+   * Proves the deployment target can receive a Preview before any Neon
+   * branch is observed or created. Vercel assigns a project's first
+   * deployment to Production, so an uninitialised project must refuse here.
+   */
+  preflightDeploy(): Promise<PreviewDeploymentTarget>
   observeBranch(branch: string): Promise<ObservedPreviewBranch | null>
   createBranch(request: PreviewCreateRequest): Promise<ObservedPreviewBranch>
   deleteBranch(branch: string): Promise<void>
@@ -198,6 +209,7 @@ export async function runPreviewCommand(
       }
       const resolvedRef = await runtime.resolveRef(parsed.ref)
       assertPreviewWorkspace(resolvedRef, await runtime.inspectWorkspace())
+      await runtime.preflightDeploy()
       const existing = await runtime.observeBranch(branch)
       const observed = existing
         ? existing
@@ -492,6 +504,7 @@ function createRuntime(
   return {
     resolveRef: overrides.resolveRef ?? defaults.resolveRef,
     inspectWorkspace: overrides.inspectWorkspace ?? defaults.inspectWorkspace,
+    preflightDeploy: overrides.preflightDeploy ?? defaults.preflightDeploy,
     observeBranch: overrides.observeBranch ?? defaults.observeBranch,
     createBranch: overrides.createBranch ?? defaults.createBranch,
     deleteBranch: overrides.deleteBranch ?? defaults.deleteBranch,
@@ -534,6 +547,11 @@ function createDefaultRuntime(): PreviewRuntime {
         ]),
       ])
       return { commitSha: commitSha.trim().toLowerCase(), status }
+    },
+    async preflightDeploy() {
+      const { preflightVercelProject, readVercelIdentity } =
+        await import("./vercel")
+      return preflightVercelProject(readVercelIdentity(process.env))
     },
     async observeBranch(branch) {
       const details = await readBranchDetails(branch)

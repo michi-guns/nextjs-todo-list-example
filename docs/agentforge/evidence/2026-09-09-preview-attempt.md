@@ -54,3 +54,26 @@ returned project, target, commit and Preview metadata. Those repairs need
 focused negative tests and a fresh controlled run. TST-PREVIEW-001,
 TST-PIPELINE-001 and TST-ENV-001 retain partial evidence; TST-RELEASE-001 gains
 no release evidence from this attempt.
+
+## Resolution, 2026-09-14
+
+The owner authorized the two prerequisites and the agent ran them:
+
+- Vercel project `prj_v45MdKyM0g9PVTXUQB1PznfgyMI6` received a deliberate
+  placeholder Production deployment `dpl_GRpcAgtr9BZ7QcsUNHX259WAvLin`
+  (`vercel deploy --prod` of a one-line static page from a scratch folder,
+  never from this repository). `vercel ls` shows one deployment, target
+  Production, and `https://nextjs-todo-list-example.vercel.app` returns HTTP
+  200 with "Not released yet.". The project record reports
+  `targets.production` set and `ssoProtection: null`, so a Preview URL is
+  reachable by the HTTP smoke without a protection bypass.
+- Neon project `jolly-dew-32309276` (`nextjs-todo-list-example-production`,
+  PostgreSQL 18, `aws-us-east-2`) was created as the separate Production
+  target required by TD-026. It has one default `main` branch and is not
+  referenced by any tooling in this repository.
+
+The adapter repairs from the identity plan add the project preflight,
+`--target=preview --json` deployment, and team-scoped deployment
+verification with focused tests. No hosted Preview run has been executed
+since; TST-PREVIEW-001 remains `partial` until an owner-authorized run
+records a functional Preview and cleanup.

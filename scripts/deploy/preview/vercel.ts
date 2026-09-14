@@ -1,17 +1,128 @@
 import type { EnvironmentProfile } from "../../environment/core"
-import { PreviewDeliveryError, runPreviewProcess } from "./core"
+import {
+  PreviewDeliveryError,
+  redactPreviewLog,
+  runPreviewProcess,
+} from "./core"
 
-export async function deployPreview(input: {
-  readonly profile: EnvironmentProfile
-  readonly commitSha: string
-  readonly previewId: string
-}): Promise<{ readonly url: string; readonly deploymentId: string }> {
-  const token = process.env.VERCEL_TOKEN?.trim()
+const VERCEL_API_ORIGIN = "https://api.vercel.com"
+const TEAM_ID_PATTERN = /^team_[A-Za-z0-9]+$/
+const PROJECT_ID_PATTERN = /^prj_[A-Za-z0-9]+$/
+const DEPLOYMENT_ID_PATTERN = /^dpl_[A-Za-z0-9]+$/
+
+export interface VercelIdentity {
+  readonly token: string
+  /** Team id from `VERCEL_ORG_ID`. Every lookup is scoped to it. */
+  readonly teamId: string
+  /** Project id from `VERCEL_PROJECT_ID`. */
+  readonly projectId: string
+}
+
+export interface VercelDependencies {
+  readonly run: typeof runPreviewProcess
+  readonly fetch: typeof fetch
+}
+
+export interface VercelProjectPreflight {
+  readonly projectId: string
+  readonly productionDeploymentId: string
+}
+
+export interface VercelDeployOutput {
+  readonly deploymentId: string
+  readonly url: string
+  readonly readyState: string
+  readonly target: string | null
+}
+
+const defaultDependencies: VercelDependencies = {
+  run: runPreviewProcess,
+  fetch: (input, init) => fetch(input, init),
+}
+
+/**
+ * Reads the identity the Preview adapter needs before any provider call.
+ * `VERCEL_ORG_ID` must be a team id so deployment lookups never fall back to
+ * the token owner's personal scope, which is what broke `vercel inspect` on
+ * the 2026-09-09 attempt.
+ */
+export function readVercelIdentity(
+  environment: Readonly<Record<string, string | undefined>>
+): VercelIdentity {
+  const token = environment.VERCEL_TOKEN?.trim()
   if (!token) {
     throw new PreviewDeliveryError(
       "cli_unavailable",
       "VERCEL_TOKEN is required to deploy a Preview"
     )
+  }
+  const teamId = environment.VERCEL_ORG_ID?.trim() ?? ""
+  if (!TEAM_ID_PATTERN.test(teamId)) {
+    throw new PreviewDeliveryError(
+      "target_mismatch",
+      "VERCEL_ORG_ID must be the team id (team_…) so Preview lookups are team-scoped"
+    )
+  }
+  const projectId = environment.VERCEL_PROJECT_ID?.trim() ?? ""
+  if (!PROJECT_ID_PATTERN.test(projectId)) {
+    throw new PreviewDeliveryError(
+      "target_mismatch",
+      "VERCEL_PROJECT_ID must be the project id (prj_…)"
+    )
+  }
+  return { token, teamId, projectId }
+}
+
+/**
+ * Vercel assigns a project's first deployment to Production regardless of
+ * flags. Refuse to start a Preview until a promoted Production deployment
+ * exists, so this tooling can never be the one that creates it.
+ */
+export async function preflightVercelProject(
+  identity: VercelIdentity,
+  dependencies: VercelDependencies = defaultDependencies
+): Promise<VercelProjectPreflight> {
+  const project = await readVercelJson<{
+    id?: unknown
+    targets?: { production?: { id?: unknown } | null }
+  }>(
+    identity,
+    dependencies,
+    `/v9/projects/${encodeURIComponent(identity.projectId)}`
+  )
+  if (project.id !== identity.projectId) {
+    throw new PreviewDeliveryError(
+      "target_mismatch",
+      "Vercel returned a different project than VERCEL_PROJECT_ID"
+    )
+  }
+  const productionDeploymentId = project.targets?.production?.id
+  if (
+    typeof productionDeploymentId !== "string" ||
+    !DEPLOYMENT_ID_PATTERN.test(productionDeploymentId)
+  ) {
+    throw new PreviewDeliveryError(
+      "target_mismatch",
+      "Vercel project has no Production deployment; its first deployment would be assigned Production. Bootstrap the project before requesting a Preview."
+    )
+  }
+  return { projectId: identity.projectId, productionDeploymentId }
+}
+
+export async function deployPreview(
+  input: {
+    readonly profile: EnvironmentProfile
+    readonly commitSha: string
+    readonly previewId: string
+  },
+  dependencies: Partial<VercelDependencies> & {
+    readonly environment?: Readonly<Record<string, string | undefined>>
+  } = {}
+): Promise<{ readonly url: string; readonly deploymentId: string }> {
+  const identity = readVercelIdentity(dependencies.environment ?? process.env)
+  const deps: VercelDependencies = {
+    run: dependencies.run ?? defaultDependencies.run,
+    fetch: dependencies.fetch ?? defaultDependencies.fetch,
   }
 
   const envArgs = buildPreviewVercelEnvArgs(
@@ -19,22 +130,32 @@ export async function deployPreview(input: {
     input.commitSha,
     input.previewId
   )
-  const output = await runPreviewProcess(
+  const output = await deps.run(
     "vercel",
     [
       "deploy",
       "--yes",
+      "--json",
+      "--target=preview",
       "--meta",
       `previewId=${input.previewId}`,
       "--meta",
       `commitSha=${input.commitSha}`,
       ...envArgs,
     ],
-    { VERCEL_TOKEN: token }
+    { VERCEL_TOKEN: identity.token }
   )
-  const url = readDeploymentUrl(output)
-  const deploymentId = await readDeploymentId(token, url)
-  return { url, deploymentId }
+  const deployment = parseVercelDeployOutput(output)
+  await verifyPreviewDeployment(
+    identity,
+    {
+      deploymentId: deployment.deploymentId,
+      commitSha: input.commitSha,
+      previewId: input.previewId,
+    },
+    deps
+  )
+  return { url: deployment.url, deploymentId: deployment.deploymentId }
 }
 
 export function buildPreviewVercelEnvArgs(
@@ -70,31 +191,127 @@ export function buildPreviewVercelEnvArgs(
   return args
 }
 
-function readDeploymentUrl(output: string): string {
-  const lines = output
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-  const url = [...lines].reverse().find((line) => /^https:\/\//.test(line))
-  if (!url) {
+/**
+ * `vercel deploy --json` writes one JSON document to stdout: either the bare
+ * deployment summary or, on an agent/non-TTY runner, `{ status, deployment }`.
+ */
+export function parseVercelDeployOutput(stdout: string): VercelDeployOutput {
+  const start = stdout.indexOf("{")
+  const end = stdout.lastIndexOf("}")
+  let payload: unknown
+  if (start !== -1 && end > start) {
+    try {
+      payload = JSON.parse(stdout.slice(start, end + 1))
+    } catch {
+      payload = undefined
+    }
+  }
+  const record = isRecord(payload)
+    ? isRecord(payload.deployment)
+      ? payload.deployment
+      : payload
+    : undefined
+  const deploymentId = record?.id
+  const url = record?.url
+  if (
+    !record ||
+    typeof deploymentId !== "string" ||
+    !DEPLOYMENT_ID_PATTERN.test(deploymentId) ||
+    typeof url !== "string" ||
+    !/^https:\/\//.test(url)
+  ) {
     throw new PreviewDeliveryError(
       "command_failed",
-      "Vercel deploy did not print a Preview URL"
+      "Vercel deploy did not return a structured Preview deployment"
     )
   }
-  return url
+  const target = typeof record.target === "string" ? record.target : null
+  if (target === "production") {
+    throw new PreviewDeliveryError(
+      "target_mismatch",
+      `Vercel assigned deployment ${deploymentId} to Production; Preview delivery refuses to use it`
+    )
+  }
+  const readyState =
+    typeof record.readyState === "string" ? record.readyState : ""
+  if (readyState !== "READY") {
+    throw new PreviewDeliveryError(
+      "command_failed",
+      `Vercel deployment ${deploymentId} is ${readyState || "in an unknown state"}, not READY`
+    )
+  }
+  return { deploymentId, url, readyState, target }
 }
 
-async function readDeploymentId(token: string, url: string): Promise<string> {
-  const output = await runPreviewProcess("vercel", ["inspect", url], {
-    VERCEL_TOKEN: token,
-  })
-  const match = output.match(/\bdpl_[A-Za-z0-9]+\b/)
-  if (!match) {
+/**
+ * Team-scoped identity check. The deployment must belong to the configured
+ * project, must not be a Production target, must be READY, and must carry the
+ * exact commit and Preview id this run requested.
+ */
+export async function verifyPreviewDeployment(
+  identity: VercelIdentity,
+  expected: {
+    readonly deploymentId: string
+    readonly commitSha: string
+    readonly previewId: string
+  },
+  dependencies: VercelDependencies = defaultDependencies
+): Promise<void> {
+  const deployment = await readVercelJson<{
+    id?: unknown
+    projectId?: unknown
+    target?: unknown
+    readyState?: unknown
+    meta?: { previewId?: unknown; commitSha?: unknown }
+  }>(
+    identity,
+    dependencies,
+    `/v13/deployments/${encodeURIComponent(expected.deploymentId)}`
+  )
+  const mismatches: string[] = []
+  if (deployment.id !== expected.deploymentId) mismatches.push("id")
+  if (deployment.projectId !== identity.projectId) mismatches.push("project")
+  if (deployment.target === "production") mismatches.push("target")
+  if (deployment.readyState !== "READY") mismatches.push("readyState")
+  if (deployment.meta?.commitSha !== expected.commitSha)
+    mismatches.push("commit")
+  if (deployment.meta?.previewId !== expected.previewId)
+    mismatches.push("previewId")
+  if (mismatches.length > 0) {
     throw new PreviewDeliveryError(
-      "command_failed",
-      "Vercel inspect did not include a deployment id"
+      "target_mismatch",
+      `Vercel deployment ${expected.deploymentId} does not match the requested Preview: ${mismatches.join(", ")}`
     )
   }
-  return match[0]
+}
+
+async function readVercelJson<T>(
+  identity: VercelIdentity,
+  dependencies: VercelDependencies,
+  path: string
+): Promise<T> {
+  const url = `${VERCEL_API_ORIGIN}${path}?teamId=${encodeURIComponent(identity.teamId)}`
+  const response = await dependencies.fetch(url, {
+    headers: { authorization: `Bearer ${identity.token}` },
+  })
+  if (!response.ok) {
+    throw new PreviewDeliveryError(
+      "command_failed",
+      `Vercel API ${path} failed with HTTP ${response.status}`
+    )
+  }
+  try {
+    return (await response.json()) as T
+  } catch (error) {
+    throw new PreviewDeliveryError(
+      "command_failed",
+      redactPreviewLog(
+        `Vercel API ${path} returned invalid JSON: ${error instanceof Error ? error.message : String(error)}`
+      )
+    )
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null
 }

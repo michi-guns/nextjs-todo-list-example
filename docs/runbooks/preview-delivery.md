@@ -1,21 +1,34 @@
 # Preview delivery
 
-## Current stop condition
+## Current status
 
-Do not dispatch a new deployment on the empty Vercel project. Vercel documents
-that [the first deployment is always Production](https://vercel.com/docs/cli/deploy#prod),
-even without `--prod`. This conflicts with the accepted Preview-only boundary.
-The owner must resolve initial setup under TD-026 before another attempt.
+Vercel documents that [the first deployment of a project is always Production](https://vercel.com/docs/cli/deploy#prod),
+even without `--prod`. The 2026-09-09 attempt hit that rule: it created,
+migrated and seeded an isolated Neon branch, then Vercel assigned Production to
+the deployment. That deployment was deleted and the explicit Neon cleanup
+workflow succeeded; no hosted Preview smoke was obtained. See the
+[attempt evidence](../agentforge/evidence/2026-09-09-preview-attempt.md).
 
-The 2026-09-09 attempt created, migrated and seeded an isolated Neon branch,
-then Vercel assigned Production to its first deployment. That deployment was
-deleted and the explicit Neon cleanup workflow succeeded. No valid hosted
-Preview smoke or Production release evidence was obtained.
-[Draft PR #30](https://github.com/michi-guns/nextjs-todo-list-example/pull/30)
-contains command repairs and the detailed redacted attempt record. It remains
-incomplete; team-scoped deployment lookup and returned identity validation
-also need repair. The following is the command contract, not permission to
-ignore that stop condition.
+On 2026-09-14 the owner resolved the prerequisite: a deliberate placeholder
+static page was deployed with `vercel deploy --prod` from a scratch folder
+outside this repository, so the project's Production slot is occupied by
+deployment `dpl_GRpcAgtr9BZ7QcsUNHX259WAvLin` at
+`https://nextjs-todo-list-example.vercel.app` ("Not released yet."). Every
+further deployment without `--prod` is a Preview. The placeholder is not a
+release; T-23 replaces it with a reviewed exact-ref release.
+
+The adapter now refuses to start when that prerequisite is missing. Before
+any Neon branch is observed or created, `deploy` reads the project through
+the team-scoped Vercel API and stops with `target_mismatch` unless
+`VERCEL_ORG_ID` is a `team_` id, `VERCEL_PROJECT_ID` matches the returned
+project and the project already has a promoted Production deployment. The
+deployment itself runs with `--target=preview --json`; the structured result
+must be `READY` and not `production`, and a second team-scoped lookup must
+return the same project, a non-Production target and the exact `commitSha`
+and `previewId` metadata before smoke runs.
+
+A hosted run still requires explicit owner authorization each time. The
+following is the command contract, not permission to dispatch.
 
 ## Preflight and request contract
 
@@ -43,8 +56,8 @@ pnpm preview cleanup --preview-id <id>
 
 Use a specific non-mutable branch, tag or SHA; aliases such as `main` and
 `latest` are refused. The workflow checks out the requested ref and passes it
-to the adapter. Until the pending separator repair is merged, avoid adding a
-standalone `--` between the script name and its command.
+to the adapter. The parser accepts pnpm's forwarded leading `--`; both
+`pnpm preview deploy …` and `pnpm preview -- deploy …` are valid.
 
 The selected database must be `preview-<id>` in the configured Neon project,
 with a non-default identity, Development parent and expiry. Runtime and build
