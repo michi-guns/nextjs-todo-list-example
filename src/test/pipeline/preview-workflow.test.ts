@@ -108,6 +108,12 @@ describe("Preview delivery workflow contract", () => {
     expect(workflow).toMatch(/APP_MAIL_TRANSPORT:\s*controlled-account/)
     expect(workflow).toMatch(/secrets\.NEON_API_KEY/)
     expect(workflow).toMatch(/secrets\.VERCEL_TOKEN/)
+    expect(workflow).toMatch(
+      /VERCEL_ORG_ID:\s*\$\{\{ secrets\.VERCEL_ORG_ID \}\}/
+    )
+    expect(workflow).toMatch(
+      /VERCEL_PROJECT_ID:\s*\$\{\{ secrets\.VERCEL_PROJECT_ID \}\}/
+    )
     expect(workflow).toMatch(/secrets\.BETTER_AUTH_SECRET/)
     expect(workflow).not.toMatch(/--prod\b/)
     expect(workflow).not.toMatch(/APP_ENV:\s*production/)

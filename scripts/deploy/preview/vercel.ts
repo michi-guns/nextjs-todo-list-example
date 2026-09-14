@@ -285,31 +285,71 @@ export async function verifyPreviewDeployment(
   }
 }
 
-async function readVercelJson<T>(
+/**
+ * Team-scoped GET against the Vercel API. Provider error text is kept (it is
+ * how the 2026-09-09 "User not found" failure was diagnosed) but the token is
+ * never echoed.
+ */
+async function readVercelJson<T extends Record<string, unknown>>(
   identity: VercelIdentity,
   dependencies: VercelDependencies,
   path: string
 ): Promise<T> {
   const url = `${VERCEL_API_ORIGIN}${path}?teamId=${encodeURIComponent(identity.teamId)}`
-  const response = await dependencies.fetch(url, {
-    headers: { authorization: `Bearer ${identity.token}` },
-  })
-  if (!response.ok) {
-    throw new PreviewDeliveryError(
-      "command_failed",
-      `Vercel API ${path} failed with HTTP ${response.status}`
-    )
-  }
+  const redact = (value: string) =>
+    redactPreviewLog(value).replaceAll(identity.token, "***")
+
+  let response: Response
   try {
-    return (await response.json()) as T
+    response = await dependencies.fetch(url, {
+      headers: { authorization: `Bearer ${identity.token}` },
+    })
   } catch (error) {
     throw new PreviewDeliveryError(
       "command_failed",
-      redactPreviewLog(
-        `Vercel API ${path} returned invalid JSON: ${error instanceof Error ? error.message : String(error)}`
-      )
+      redact(`Vercel API ${path} request failed: ${describeError(error)}`)
     )
   }
+
+  let body: unknown
+  try {
+    body = await response.json()
+  } catch (error) {
+    if (response.ok) {
+      throw new PreviewDeliveryError(
+        "command_failed",
+        redact(
+          `Vercel API ${path} returned invalid JSON: ${describeError(error)}`
+        )
+      )
+    }
+    body = undefined
+  }
+
+  if (!response.ok) {
+    const providerError =
+      isRecord(body) && isRecord(body.error) ? body.error : undefined
+    const detail =
+      providerError && typeof providerError.message === "string"
+        ? ` (${typeof providerError.code === "string" ? `${providerError.code}: ` : ""}${providerError.message})`
+        : ""
+    throw new PreviewDeliveryError(
+      "command_failed",
+      redact(`Vercel API ${path} failed with HTTP ${response.status}${detail}`)
+    )
+  }
+
+  if (!isRecord(body)) {
+    throw new PreviewDeliveryError(
+      "command_failed",
+      `Vercel API ${path} returned a non-object body`
+    )
+  }
+  return body as T
+}
+
+function describeError(error: unknown): string {
+  return error instanceof Error ? error.message : String(error)
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

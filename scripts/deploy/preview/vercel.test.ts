@@ -269,7 +269,37 @@ describe("preflightVercelProject", () => {
     expect(failure).toBeInstanceOf(PreviewDeliveryError)
     expect((failure as PreviewDeliveryError).code).toBe("command_failed")
     expect((failure as PreviewDeliveryError).message).toContain("403")
+    expect((failure as PreviewDeliveryError).message).toContain(
+      "forbidden: token *** rejected"
+    )
     expect((failure as PreviewDeliveryError).message).not.toContain(TOKEN)
+  })
+
+  it("reports a network failure as a delivery error instead of a bare TypeError", async () => {
+    const deps = dependencies({})
+    deps.fetch = vi
+      .fn()
+      .mockRejectedValue(
+        new TypeError("fetch failed")
+      ) as unknown as typeof deps.fetch
+    await expect(preflightVercelProject(identity, deps)).rejects.toThrow(
+      expect.objectContaining({
+        code: "command_failed",
+        message: expect.stringContaining("fetch failed"),
+      })
+    )
+  })
+
+  it("refuses a successful response whose body is not a JSON object", async () => {
+    const deps = dependencies({
+      responses: {
+        [`https://api.vercel.com/v9/projects/${PROJECT_ID}?teamId=${TEAM_ID}`]:
+          { body: null },
+      },
+    })
+    await expect(preflightVercelProject(identity, deps)).rejects.toThrow(
+      expect.objectContaining({ code: "command_failed" })
+    )
   })
 })
 
