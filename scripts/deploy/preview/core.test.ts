@@ -83,6 +83,10 @@ function unusedRuntime(): PreviewRuntime {
       commitSha: COMMIT_SHA,
       status: "",
     }),
+    preflightDeploy: vi.fn().mockResolvedValue({
+      projectId: "prj_test000000000000000000",
+      productionDeploymentId: "dpl_placeholderProduction00000",
+    }),
     observeBranch: vi.fn().mockResolvedValue(observedBranch()),
     createBranch: vi.fn().mockResolvedValue(observedBranch()),
     deleteBranch: vi.fn(),
@@ -101,6 +105,67 @@ function unusedRuntime(): PreviewRuntime {
 }
 
 describe("Preview delivery commands", () => {
+  it.each([
+    ["deploy", "--ref", COMMIT_SHA, "--preview-id", PREVIEW_ID],
+    ["cleanup", "--preview-id", PREVIEW_ID],
+    ["inspect", "--preview-id", PREVIEW_ID],
+  ])("accepts the pnpm forwarded separator before %s", (...args) => {
+    expect(parsePreviewCommand(["--", ...args])).toEqual(
+      parsePreviewCommand(args)
+    )
+  })
+
+  it("preflights the Vercel project after the workspace guard and before any Neon operation", async () => {
+    const runtime = unusedRuntime()
+    await runPreviewCommand(
+      { command: "deploy", ref: COMMIT_SHA, previewId: PREVIEW_ID },
+      { environment: previewEnvironment(), runtime, write: vi.fn() }
+    )
+    const order = [
+      runtime.inspectWorkspace,
+      runtime.preflightDeploy,
+      runtime.observeBranch,
+      runtime.deploy,
+    ].map((operation) => {
+      expect(operation).toHaveBeenCalledOnce()
+      return vi.mocked(operation).mock.invocationCallOrder[0]
+    })
+    expect(order).toEqual([...order].sort((a, b) => a - b))
+  })
+
+  it("stops before observing or creating a Neon branch when the Vercel project has no Production deployment", async () => {
+    const runtime = unusedRuntime()
+    const refusal = new PreviewDeliveryError(
+      "target_mismatch",
+      "Vercel project has no Production deployment"
+    )
+    runtime.preflightDeploy = vi.fn().mockRejectedValue(refusal)
+    const write = vi.fn()
+    await expect(
+      runPreviewCommand(
+        { command: "deploy", ref: COMMIT_SHA, previewId: PREVIEW_ID },
+        { environment: previewEnvironment(), runtime, write }
+      )
+    ).rejects.toBe(refusal)
+    expect(runtime.observeBranch).not.toHaveBeenCalled()
+    expect(runtime.createBranch).not.toHaveBeenCalled()
+    expect(runtime.migrate).not.toHaveBeenCalled()
+    expect(runtime.seed).not.toHaveBeenCalled()
+    expect(runtime.deploy).not.toHaveBeenCalled()
+    expect(write).not.toHaveBeenCalled()
+  })
+
+  it("does not preflight Vercel for inspect or cleanup", async () => {
+    for (const command of ["inspect", "cleanup"] as const) {
+      const runtime = unusedRuntime()
+      await runPreviewCommand(
+        { command, previewId: PREVIEW_ID },
+        { environment: previewEnvironment(), runtime, write: vi.fn() }
+      )
+      expect(runtime.preflightDeploy).not.toHaveBeenCalled()
+    }
+  })
+
   it("runs migration, seed, deployment and smoke in order before recording success", async () => {
     const runtime = unusedRuntime()
     const write = vi.fn()

@@ -73,10 +73,12 @@ pnpm exec vitest run src/test/environment src/test/pipeline scripts/neon-develop
 ```
 
 This is a local guard check, not hosted proof. Consult the
-[Preview stop condition](../runbooks/preview-delivery.md) before provisioning
-or deploying a new Vercel project. A newly created project does not bypass the
-documented first-deployment Production prerequisite. Production remains a
-separately provisioned protected target under TD-026.
+[Preview delivery runbook](../runbooks/preview-delivery.md) before provisioning
+or deploying a new Vercel project. Vercel assigns a new project's first
+deployment to Production, and the Preview adapter refuses to run until a
+Production deployment exists; bootstrap the project deliberately, as this
+repository did with a placeholder page. Production remains a separately
+provisioned protected target under TD-026.
 
 ## Adaptation smoke example
 

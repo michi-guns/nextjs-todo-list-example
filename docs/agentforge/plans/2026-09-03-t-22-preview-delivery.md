@@ -43,6 +43,19 @@ Focused tests must cover a requested revision that differs from `HEAD`, local ch
 
 ## Dependencies and work order
 
+Hosted verification on 2026-09-09 is owner-authorized on free tiers. The first
+run stopped before resource creation because pnpm 11 forwards the documented
+leading `--` to the script. Accept that one leading separator in
+`parsePreviewCommand`, with regression coverage for deploy, inspect, and cleanup;
+retain rejection of extra arguments and all existing target/ref guards. This is
+a T-22 command-compatibility repair before retrying the same hosted lifecycle.
+
+The second run reached the adapter but could not find `neon` on the runner PATH.
+Install the locally verified Neon CLI 2.45.0 and Vercel CLI 59.11.2 under an
+explicit runner-temporary prefix, export its bin directory through GITHUB_PATH,
+and check both executable versions before deployment. Keep these tools outside
+the checkout so the exact-revision clean-tree guard remains meaningful.
+
 1. Failing tests for command parsing, SHA resolution, exact clean workspace acceptance, different-checkout refusal, local-edit refusal, branch naming `preview-<preview-id>`, parent/expiry/main refusal, Preview-id mismatch, Production/Development target refusal, and redacted inspect output.
 2. Injected runtime for Neon observe/create/delete, migrate, seed, Vercel deploy, and HTTP smoke. Default runtime shells out to `neon` and `vercel` the same way T-20 shells out to `neon`.
 3. `deploy`: resolve `--ref` to one 40-character SHA; require a clean working tree whose `HEAD` is that SHA before any provider or database mutation; create `preview-<id>` from `development` with `--expires-at` 7 days ahead (RFC 3339, second precision); observe pooled/direct URLs; call `assertPreviewDeploymentAllowed` then migrate through the direct URL; seed the controlled account; deploy that SHA to Vercel Preview with Preview-scoped env; run HTTP smoke; print redacted URL/deployment id/branch id/expiry/SHA.
@@ -73,7 +86,7 @@ T-22 remains one delivery task in `TODO.md`. Do not split it. Do not start T-21.
 - Branch names are `preview-<preview-id>`. `preview-id` already matches `PREVIEW_ID_PATTERN` (`^[A-Za-z0-9][A-Za-z0-9._-]*$`).
 - Seed replaces only the synthetic Preview user (`preview-user@example.test`). It never `TRUNCATE`s shared tables or copies Development personal rows.
 - Vercel Git integration, if connected, can still auto-deploy PRs. This repository's workflow must not add PR triggers; operators must disable or ignore Vercel Git auto-deploy in the project settings. That dashboard setting is not encoded in git.
-- `vercel deploy` without `--prod` creates a Preview deployment ([Deploying from the CLI](https://vercel.com/docs/cli/deploy)). Per-deployment env must include the branch-specific `DATABASE_URL` values; stored Vercel Preview env cannot be the source of the Neon URL.
+- **Corrected after the hosted attempt:** Vercel's first deployment is always Production even without `--prod` ([CLI documentation](https://vercel.com/docs/cli/deploy#prod)). The empty project could not satisfy this plan's Preview-only boundary. See [attempt and cleanup evidence](../evidence/2026-09-09-preview-attempt.md). Resolved on 2026-09-14 by an owner-authorized placeholder Production deployment; the adapter now preflights for that deployment and validates identity per the [identity repairs plan](2026-09-14-t-22-preview-identity-repairs.md). Per-deployment env must still include branch-specific database URLs.
 - GitHub Actions Environment `preview` holds `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and the Preview `BETTER_AUTH_SECRET`. The workflow must not reference Production Environment secrets.
 - The Sanity `preview` dataset is an owner-provisioned prerequisite. If it is missing, landing smoke stays blocked; do not retarget `production`.
 

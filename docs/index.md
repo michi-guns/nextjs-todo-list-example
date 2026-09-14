@@ -13,7 +13,7 @@ This directory is the knowledge system for the Next.js Todo List Example.
 - [Architecture overview](./architecture/overview.md)
 - [Environment and delivery map](./architecture/environments.md)
 - [Derived application guide](./architecture/derived-applications.md)
-- [Preview delivery and current blocker](./runbooks/preview-delivery.md)
+- [Preview delivery](./runbooks/preview-delivery.md)
 - [Production readiness](./runbooks/production-readiness.md)
 - [Technology stack](./architecture/stack.md)
 - [Data ownership](./data/ownership.md)

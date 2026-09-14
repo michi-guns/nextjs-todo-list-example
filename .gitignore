@@ -57,3 +57,5 @@ node_modules/
 
 # Local GitHub Actions learning files. Keep the `.yml` suffix for editor syntax highlighting.
 /.github/workflows/*.local.yml
+
+.vercel

@@ -166,9 +166,10 @@ production build locally.
 
 ## Commands
 
-Preview deployment is blocked pending the first-deployment decision and adapter
-repairs. Do not run the deployment command below on the empty Vercel project;
-read the [Preview stop condition](docs/runbooks/preview-delivery.md) first.
+Preview deployment is a manual, owner-authorized hosted operation. Read the
+[Preview delivery runbook](docs/runbooks/preview-delivery.md) before dispatching
+it; the adapter refuses to start unless the Vercel project already has a
+Production deployment and the deployment identity is team-scoped.
 
 | Command                                                                           | Purpose                                                                                                         |
 | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -212,11 +213,13 @@ Preview branches, mutate Sanity, or use Production secrets.
 commands. Docker and Chromium are required on the harness runner; GitHub-hosted
 Ubuntu provides both.
 
-Hosted Preview proof is currently blocked. Vercel assigns Production to the
-first deployment of a new project; the task-created attempt was deleted and
-its isolated Neon branch cleaned up. Read the [Preview stop condition and
-runbook](docs/runbooks/preview-delivery.md) before any dispatch. Production has
-no implemented release workflow; see [readiness requirements](docs/runbooks/production-readiness.md).
+A hosted Preview has run successfully once (2026-09-14, see the
+[run evidence](docs/agentforge/evidence/2026-09-14-preview-run.md)) after a
+placeholder Production deployment resolved Vercel's first-deployment rule;
+its branch was cleaned up through the identity-checked cleanup workflow.
+Each run still needs owner authorization; read the
+[Preview delivery runbook](docs/runbooks/preview-delivery.md) before any dispatch. Production has no implemented release workflow; see
+[readiness requirements](docs/runbooks/production-readiness.md).
 
 Manual Preview uses [`.github/workflows/deploy-preview.yml`](.github/workflows/deploy-preview.yml)
 with `workflow_dispatch` only. It is not created for ordinary pull requests.

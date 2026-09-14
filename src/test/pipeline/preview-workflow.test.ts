@@ -19,6 +19,20 @@ function usesEntries(workflow: string): string[] {
 }
 
 describe("Preview delivery workflow contract", () => {
+  it("installs the locally verified CLIs on an explicit runner PATH", () => {
+    const workflow = readWorkflow()
+    expect(workflow).toContain(
+      'npm install --global --prefix "$RUNNER_TEMP/preview-cli" neonctl@2.45.0 vercel@59.11.2'
+    )
+    expect(workflow).toContain(
+      'echo "$RUNNER_TEMP/preview-cli/bin" >> "$GITHUB_PATH"'
+    )
+    expect(workflow).toContain('"$RUNNER_TEMP/preview-cli/bin/neon" --version')
+    expect(workflow).toContain(
+      '"$RUNNER_TEMP/preview-cli/bin/vercel" --version'
+    )
+  })
+
   it("is manual workflow_dispatch only and never runs on push or pull_request", () => {
     const workflow = readWorkflow()
 
@@ -94,6 +108,12 @@ describe("Preview delivery workflow contract", () => {
     expect(workflow).toMatch(/APP_MAIL_TRANSPORT:\s*controlled-account/)
     expect(workflow).toMatch(/secrets\.NEON_API_KEY/)
     expect(workflow).toMatch(/secrets\.VERCEL_TOKEN/)
+    expect(workflow).toMatch(
+      /VERCEL_ORG_ID:\s*\$\{\{ secrets\.VERCEL_ORG_ID \}\}/
+    )
+    expect(workflow).toMatch(
+      /VERCEL_PROJECT_ID:\s*\$\{\{ secrets\.VERCEL_PROJECT_ID \}\}/
+    )
     expect(workflow).toMatch(/secrets\.BETTER_AUTH_SECRET/)
     expect(workflow).not.toMatch(/--prod\b/)
     expect(workflow).not.toMatch(/APP_ENV:\s*production/)
