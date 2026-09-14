@@ -30,7 +30,8 @@ flowchart LR
 This diagram describes the implemented orchestration, not successful hosted
 proof. The Vercel adapter preflights the project for an existing Production
 deployment and validates the returned deployment identity through team-scoped
-lookups; a successful hosted run is still pending. See
-[Preview delivery](../runbooks/preview-delivery.md).
+lookups. One owner-authorized hosted run has completed with independent
+verification; see the [run evidence](../agentforge/evidence/2026-09-14-preview-run.md)
+and [Preview delivery](../runbooks/preview-delivery.md).
 CI has no deployment side effect. [Production readiness](../runbooks/production-readiness.md)
 describes what must exist before a release procedure can be documented as runnable.

@@ -213,11 +213,11 @@ Preview branches, mutate Sanity, or use Production secrets.
 commands. Docker and Chromium are required on the harness runner; GitHub-hosted
 Ubuntu provides both.
 
-Hosted Preview proof is still pending. Vercel assigns Production to the first
-deployment of a new project; the 2026-09-09 attempt hit that rule and was
-cleaned up, and on 2026-09-14 a placeholder Production deployment resolved it.
-Read the [Preview delivery runbook](docs/runbooks/preview-delivery.md) before
-any dispatch. Production has no implemented release workflow; see
+A hosted Preview has run successfully once (2026-09-14, see the
+[run evidence](docs/agentforge/evidence/2026-09-14-preview-run.md)) after a
+placeholder Production deployment resolved Vercel's first-deployment rule.
+Each run still needs owner authorization; read the
+[Preview delivery runbook](docs/runbooks/preview-delivery.md) before any dispatch. Production has no implemented release workflow; see
 [readiness requirements](docs/runbooks/production-readiness.md).
 
 Manual Preview uses [`.github/workflows/deploy-preview.yml`](.github/workflows/deploy-preview.yml)

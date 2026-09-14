@@ -27,8 +27,12 @@ must be `READY` and not `production`, and a second team-scoped lookup must
 return the same project, a non-Production target and the exact `commitSha`
 and `previewId` metadata before smoke runs.
 
-A hosted run still requires explicit owner authorization each time. The
-following is the command contract, not permission to dispatch.
+The first successful hosted run is recorded in the
+[2026-09-14 run evidence](../agentforge/evidence/2026-09-14-preview-run.md):
+run 34840457016 at `1c8c38c` with Preview id `t22-20260914`, verified
+independently over HTTP and in a real browser. A hosted run still requires
+explicit owner authorization each time. The following is the command
+contract, not permission to dispatch.
 
 ## Preflight and request contract
 
