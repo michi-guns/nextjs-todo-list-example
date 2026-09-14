@@ -956,11 +956,14 @@ Verification:
 - [x] Fresh proportional review of implementation tip `e50a641` found no actionable findings. Optional nits about test-name tightness and `persist-credentials: false` were deferred.
 - [x] PR: [#25](https://github.com/michi-guns/nextjs-todo-list-example/pull/25) is open from `task/T-21-ci-quality-gates`.
 
-Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 remains blocked on an owner-approved Production mail provider. T-21.5 must still be in place before a Production release workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
+Dependency checkpoint: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 has the reviewed Resend code/local-evidence slice; verified owner-domain and protected Production sender evidence remain pending. T-21.5 must still be in place before a Production release workflow is enabled. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
 
 ### T-21.5: Establish the minimum Production mail foundation
 
 - [ ] Complete T-21.5 before T-23 can release Production.
+- Plan: [Resend foundation](docs/agentforge/plans/2026-09-09-t-21-5-resend-foundation.md). Owner approved Resend and test-domain sends on 2026-09-09.
+- [x] Implement the thin Resend adapter and explicit profile/runtime selection. Unit tests pass 294/294, local integration 23/23 and Chromium 8/8. Typecheck, build, formatting and diff checks pass; lint retains only the existing unused Geist warning. A synthetic test-domain send through the adapter was accepted. Next.js MCP reports no compilation/runtime errors, and agent-browser proves password sign-in and local magic-link request. Fresh independent review gates the PR.
+- [ ] Verify an owner domain and protected Production sender configuration before declaring the parent complete. No domain exists; test-domain simulation cannot satisfy this acceptance.
 - Files: the existing Better Auth mail boundary, a thin owner-approved remote mail adapter/configuration, non-secret profile documentation, focused auth/environment tests, and redacted delivery/health evidence.
 - Interfaces: provider-backed `sendVerificationEmail` and `sendMagicLink` callbacks; explicit Production mail transport selection; protected provider configuration; fail-closed missing-configuration behavior; safe diagnostics that never expose message content, tokens, or credentials.
 - Acceptance: Production verification and magic-link sends use the approved remote transport; local/test mailbox settings are rejected in Preview and Production; missing or invalid Production mail configuration blocks release before deployment; non-Production profiles cannot use Production credentials; no provider-swapping framework is introduced.
@@ -976,7 +979,7 @@ Required fix from the 2026-09-05 reusable-foundation review at `634d2b0`:
 - [x] Bind migration, seed, and deployment inputs to the same immutable revision reported by `--ref`. The local CLI now requires a clean working tree whose `HEAD` equals the resolved SHA before it observes or creates a Preview branch. A different checkout or local edits fail with `workspace_mismatch` before any Neon, migration, seed, deployment, or smoke operation.
 - [x] Before hosted T-22 proof, add focused regression evidence for a requested revision different from the current checkout and for local edits. `scripts/deploy/preview/core.test.ts` proves both refusal paths and the clean exact-revision path; `src/test/pipeline/preview-workflow.test.ts` proves that checkout and the adapter receive the same requested ref. This is local orchestration evidence only and does not satisfy the hosted T-22 or T-24 boundary.
 
-- [~] Owner-authorized hosted attempt on 2026-09-09 reached migration/seed/deploy but did not establish Preview identity. Vercel forces a new project's first deployment to Production; the task-created deployment was deleted and Neon cleanup succeeded. Do not retry before the initial-deployment decision is reconciled. See [attempt evidence](docs/agentforge/evidence/2026-09-09-preview-attempt.md). T-22 remains incomplete.
+- [~] The owner authorized the 2026-09-09 hosted attempt, but Vercel assigned Production to the first deployment. The task deployment and isolated Neon branch were cleaned up. T-22 remains blocked on the first-deployment decision and adapter repairs in [draft PR #30](https://github.com/michi-guns/nextjs-todo-list-example/pull/30); no valid Preview smoke was completed.
 - Files: `.github/workflows/deploy-preview.yml`, explicit deploy/branch/seed/smoke helpers under `scripts/deploy/` or equivalent thin adapters, preview environment configuration documentation, and redacted Preview evidence under `docs/agentforge/evidence/`.
 - Interfaces: `workflow_dispatch` inputs for an exact branch/tag/SHA and a safe preview identifier; resolved immutable commit SHA; isolated temporary Neon branch derived from durable Development; direct migration and safe seed sequence; Vercel Preview deployment; deployment-origin `BETTER_AUTH_URL`; non-production auth/mail/Sanity configuration; explicit cleanup/expiry path; workflow outputs for URL, deployment id, branch id, expiry, SHA, and redacted smoke result.
 - Acceptance: a client receives an ephemeral Preview that supports authentication, list/task mutations, landing content, and the relevant browser smoke path; Preview database writes are isolated from Development and Production; data is sanitized or deterministic; local filesystem mail is rejected and the selected remote-safe mail or controlled-account strategy works; the requested ref is resolved and displayed; cleanup is repeatable and does not delete another preview; no automatic Preview is created for ordinary PR activity.
@@ -992,7 +995,7 @@ Verification:
 - [x] `pnpm test` passes 32 files and 265 tests; `pnpm typecheck`, `pnpm lint` (0 errors; the pre-existing `app/layout.tsx:1:10` unused `Geist` warning remains), `pnpm build`, and `pnpm exec drizzle-kit check --config drizzle.config.ts` with the committed CI placeholders, changed-file Prettier, and `git diff --check` pass.
 - [x] `pnpm test:integration` passes 6 files and 23 tests against disposable PostgreSQL after the Docker preflight reported server 29.7.2.
 - [x] Dedicated Sanity `preview` dataset exists with published `landingPage`. GitHub Environment `preview` exists. Repository variable `NEXT_PUBLIC_SANITY_PROJECT_ID` is set.
-- [ ] Controlled hosted deploy/cleanup is blocked on a Vercel project plus GitHub Environment `preview` secrets: `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and Preview `BETTER_AUTH_SECRET`. Do not run the workflow until those secrets exist. Vercel Git auto-deploy must stay disabled.
+- [ ] Hosted functional Preview proof remains incomplete. The Vercel project and Preview secrets were supplied for the 2026-09-09 attempt; the resulting first deployment was classified Production and was deleted, and guarded Neon cleanup succeeded. Resolve the [current Preview stop condition](docs/runbooks/preview-delivery.md) and adapter repairs before retry. Vercel Git auto-deploy must stay disabled.
 
 ### T-23: Add manually approved exact-ref Production release
 
@@ -1016,6 +1019,8 @@ prove that the environment setup is correct, not merely that individual
 commands compile.
 
 - [ ] Complete T-24 with layered local, static, and required disposable/controlled hosted evidence.
+- Plan: [local pipeline evidence](docs/agentforge/plans/2026-09-09-t-24-local-pipeline-evidence.md), independently authorized by the owner on 2026-09-09.
+- [x] Add stage-order/failure/explicit-cleanup evidence and `pnpm test:pipeline`. The grouped local suite passes 124 tests. Local integration passes 23/23 and Chromium 8/8. Typecheck and lint pass with the existing unused Geist warning. Build, formatting and diff checks pass. The commit hook runs the final unit suite; fresh independent review gates the PR. Hosted Preview and Production rehearsal remain pending; the first Vercel deployment prerequisite and unimplemented protected release cannot be replaced by these local tests.
 - Files: `src/test/environment/`, `src/test/pipeline/` or the repository's established test seat, workflow/static validation fixtures, disposable Neon/Vercel/Sanity adapters or controlled evidence helpers, `package.json`, `.github/workflows/`, `docs/agentforge/evidence/`, `.dwf/decisions/TESTING.md`, and `TODO.md`.
 - Interfaces: a layered pipeline test command; profile/target matrix; exact-ref resolver; branch creation/identity/expiry/cleanup lifecycle; migration and seed sequencing; preview deployment contract; production approval/secret-scope contract; redacted evidence schema; failure-injection hooks that stop before shared/Production mutation.
 - Acceptance: tests cover every environment profile and forbidden cross-target combination; local reset cannot reach Neon; Development and Preview are isolated; Preview branch creation, migration, deterministic/sanitized seed, app configuration, functional smoke, cleanup, and expiry are traceable; the selected tag/SHA resolves to one immutable commit; automatic PR deployment is absent; migration/seed/deploy failures report state and clean up safely; Production workflow requires protected approval and cannot be exercised by non-production credentials; tests prove the full application path for a Preview when the controlled hosted prerequisite is available.
@@ -1032,8 +1037,11 @@ Available prerequisite evidence from T-22:
 
 Required reconciliation from the 2026-09-05 review, within this task's existing documentation scope:
 
-- [ ] Reconcile `.dwf/CONTEXT.md` with implemented CI/Preview tooling and the recorded durable Development evidence. At review time it still said those workflows were absent and Development was pending. Distinguish existing code, recorded successful checks, and unproven hosted behavior; do not mark T-22/T-23 complete from file presence.
-- [ ] Reconcile README setup prerequisites with `package.json` and the implemented commands. At review time README named pnpm 11.17.0 while `packageManager` selected 11.25.0. Keep one authoritative version source and avoid conflicting setup instructions.
+- Plan: [current delivery documentation](docs/agentforge/plans/2026-09-09-t-25-delivery-documentation.md). Owner authorized this partial documentation slice independently of unavailable Production evidence.
+- [x] Reconcile current context/toolchain/command examples and add environment, blocked-Preview and Production-readiness runbooks. Changed Markdown relative links/anchors, command-shape review, formatting and diff checks pass. Fresh independent review gates the documentation PR; full delivery documentation remains pending actual Preview/release proof.
+
+- [x] Reconcile `.dwf/CONTEXT.md` with implemented CI/Preview tooling and the recorded durable Development evidence. At review time it still said those workflows were absent and Development was pending. Distinguish existing code, recorded successful checks, and unproven hosted behavior; do not mark T-22/T-23 complete from file presence.
+- [x] Reconcile README setup prerequisites with `package.json` and the implemented commands. At review time README named pnpm 11.17.0 while `packageManager` selected 11.25.0. Keep one authoritative version source and avoid conflicting setup instructions.
 
 This is the dedicated documentation task. It should leave a derived
 application operator able to understand, run, verify, preview, release, and
@@ -1075,23 +1083,26 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 Local email-verification browser journey, explicit T-27 acceptance:
 
-- [ ] Add one self-contained Chromium test, suggested file `e2e/email-verification.spec.ts`, that creates a fresh account through `/sign-up`, observes verification pending, reads its captured verification link, opens that link in the same browser context, and proves authenticated access to `/dashboard` and the new account's Inbox.
-- [ ] Before consuming the link, prove the pending account cannot access `/dashboard`; expect the existing sign-in redirect. After verification, sign out and sign in with the same password to prove that the verified account retains its credential. Do not substitute a seeded, already verified account, injected session cookies, direct database updates, or direct `auth.handler` calls for this browser journey.
-- [ ] Keep the version-one inbox link-only: reuse the existing recipient/URL/token metadata capture. HTML rendering, an inbox UI, SMTP emulation, and a new mail-provider framework are outside this slice. No Resend account, real email delivery, DNS setup, or paid domain is required for this local test.
+- Plan: [local browser slice](docs/agentforge/plans/2026-09-09-t-27-email-verification-browser.md). On 2026-09-09 the owner explicitly authorized this slice independently of T-21.5 and T-24; the parent task and its other prerequisites remain pending.
+- [x] Reconcile TST-AUTH-001/TST-E2E-001 and implement the fresh-account browser journey below. Focused Chromium 1/1, full Chromium 8/8, unit 268/268, integration 23/23, typecheck, lint with only the existing unused `Geist` warning, changed-file Prettier, and `git diff --check` pass. The HTML report archive contains zero token-bearing verification strings after the review repair; three focused diagnostic-redaction tests pass. Independent review of the final commit gates the task PR. The parent T-27 remains incomplete.
+
+- [x] Add one self-contained Chromium test, `e2e/email-verification.spec.ts`, that creates a fresh account through `/sign-up`, observes verification pending, reads its captured verification link, opens that link in the same browser context, and proves authenticated access to `/dashboard` and the new account's Inbox.
+- [x] Before consuming the link, prove the pending account cannot access `/dashboard`; expect the existing sign-in redirect. After verification, sign out and sign in with the same password to prove that the verified account retains its credential. Do not substitute a seeded, already verified account, injected session cookies, direct database updates, or direct `auth.handler` calls for this browser journey.
+- [x] Keep the version-one inbox link-only: reuse the existing recipient/URL/token metadata capture. HTML rendering, an inbox UI, SMTP emulation, and a new mail-provider framework are outside this slice. No Resend account, real email delivery, DNS setup, or paid domain is required for this local test.
 
 Implementation guidance, grounded in the current stack:
 
 - Reuse `@playwright/test` through `e2e/fixtures.ts`, the serial Chromium configuration in `playwright.config.ts`, and `e2e/global-setup.ts`. That harness owns the disposable local PostgreSQL 18 Testcontainer, migrations, dedicated Next.js server, test content, and temporary mailbox. Required execution prerequisites are installed pnpm dependencies, available Docker, and the installed Chromium browser; report missing prerequisites without substituting a hosted database or silently installing/starting services.
 - Exercise the existing Next.js sign-up UI and `authClient.signUp.email` path. Keep Better Auth responsible for token generation, validation, and session creation through `lib/auth.ts`, its Drizzle adapter, and the existing auth Route Handler. Preserve `requireEmailVerification` and `autoSignInAfterVerification`; do not implement a second token or session system. Consult the installed Next.js documentation and the installed Better Auth version's official docs/source before any runtime changes.
 - Use `getByLabel("Name")`, `getByLabel("Email")`, `getByLabel("Password")`, and `getByRole("button", { name: "Create account", exact: true })`. Assert the existing `Check your inbox` heading and the `status` notice about waiting for email verification with Playwright's retrying assertions. Reuse current accessible copy and roles rather than changing product text to satisfy the test.
-- Allocate a fresh synthetic recipient for each test attempt, including retries. Clear the existing local mailbox before the journey and in `finally`, as `e2e/magic-link.spec.ts` does. Reuse `readMagicLinkWithRetry(email)` despite its historical name; it reads verification messages too. Use its bounded polling rather than fixed sleeps. Confirm the message belongs to this recipient and its URL targets the dedicated test origin and `/api/auth/verify-email`, then navigate with `page.goto(message.url)`. Do not print the captured URL or token in logs or committed evidence; protect any local browser artifacts that contain them.
+- Allocate a fresh synthetic recipient for each test attempt, including retries. Clear the existing local mailbox before the journey and in `finally`, as `e2e/magic-link.spec.ts` does. Reuse `readMagicLinkWithRetry(email)` despite its historical name; it reads verification messages too. Use its bounded polling rather than fixed sleeps. Confirm the message belongs to this recipient and its URL targets the dedicated test origin and `/api/auth/verify-email`, then navigate in the browser with `page.evaluate` so the verification URL is absent from Playwright report step titles. Poll only the resulting pathname and redact token query values from browser diagnostics. Do not print the captured URL or token in logs or committed evidence; protect any local browser artifacts that contain them.
 - Keep delivery selection behind `deliverAuthEmail` in `src/modules/auth/infrastructure/auth-mail.ts`. Local/test execution uses the existing explicitly enabled mailbox; the owner-approved Production transport remains T-21.5 work under [TD-027](.dwf/decisions/TECHNICAL.md#td-027). Do not weaken Preview/Production mailbox guards to run this test.
 
 Verification and evidence for this slice:
 
 - Run `pnpm exec playwright test e2e/email-verification.spec.ts --project=chromium` for the focused journey, then the existing `pnpm test:e2e` Chromium suite as the final browser gate. The parent task's required checks still apply when implementing T-27; use its focused auth integration checks if runtime behavior changes.
 - Reconcile the exact signup/verification browser evidence through `testing-first-class` with [TST-AUTH-001](.dwf/decisions/TESTING.md#tst-auth-001) and [TST-E2E-001](.dwf/decisions/TESTING.md#tst-e2e-001), adding or extending the canonical contract before implementation if needed. Keep the separate [TST-AUTH-002](.dwf/decisions/TESTING.md#tst-auth-002) magic-link evidence intact. Do not infer remote delivery or inbox placement from local capture.
-- Coverage clarification: T-15's existing browser test covers magic-link request/read/consume; signup email verification currently runs through the backend integration tests and Playwright seed handler. Earlier T-11/T-15 closeout wording about the full verification browser lifecycle does not establish this new journey. These acceptance items remain pending until the new browser test is implemented and run. T-27's existing parent dependencies and approval prerequisites remain in force.
+- Coverage clarification: T-15's browser test covers magic-link request/read/consume; the 2026-09-09 T-27 slice now proves signup email verification through the real browser UI as well as the existing backend integration coverage. Earlier T-11/T-15 closeout wording did not establish this journey. T-27's parent dependencies remain in force for its other work; the owner-approved local slice is complete.
 
 ### T-28: Add Sanity authenticated preview and live authoring
 
@@ -1106,10 +1117,13 @@ Verification and evidence for this slice:
 
 ### T-29: Publish the derived-application extension and replacement guide
 
+- Plan: [derived application guide](docs/agentforge/plans/2026-09-09-t-29-derived-application-guide.md). Owner authorized this documentation slice without a maintained example app.
+- [x] Write the [derived application guide](docs/architecture/derived-applications.md), including an illustrative adaptation smoke checklist. Relative links/anchors, source/command review, formatting and diff checks gate the documentation commit; fresh independent review gates its PR. No maintained or executed fork is claimed. Parent delivery prerequisites remain pending.
+
 Review follow-through, within the existing guide scope:
 
-- [ ] Provide a short retain/replace checklist for todo modules and UI, migrations and seed data, auth/mail, Sanity, environment identity, and delivery workflows. Link to the owning instructions rather than adding another set of contracts.
-- [ ] Document Neon retargeting explicitly. At review time the original project identity was fixed in `scripts/neon-development/constants.ts`, checked in `scripts/neon-development/core.ts`, inherited by `scripts/deploy/preview/constants.ts`, and repeated in `.github/workflows/deploy-preview.yml`. Explain the coordinated changes and verification a fork needs; environment variables alone do not retarget this tooling. Preserve target guards. A new shared configuration architecture is a proposal requiring separate scope acceptance, not an implementation decision made by this guide.
+- [x] Provide a short retain/replace checklist for todo modules and UI, migrations and seed data, auth/mail, Sanity, environment identity, and delivery workflows. Link to the owning instructions rather than adding another set of contracts.
+- [x] Document Neon retargeting explicitly. At review time the original project identity was fixed in `scripts/neon-development/constants.ts`, checked in `scripts/neon-development/core.ts`, inherited by `scripts/deploy/preview/constants.ts`, and repeated in `.github/workflows/deploy-preview.yml`. Explain the coordinated changes and verification a fork needs; environment variables alone do not retarget this tooling. Preserve target guards. A new shared configuration architecture is a proposal requiring separate scope acceptance, not an implementation decision made by this guide.
 
 The separate [fresh-fork experiment](FUTURE.md#fresh-fork-into-a-different-small-application) is a future idea, not an added T-29 acceptance criterion or dependency. T-27 authentication completion and T-28 CMS live authoring retain their existing scope and prerequisites.
 
@@ -1122,12 +1136,18 @@ The separate [fresh-fork experiment](FUTURE.md#fresh-fork-into-a-different-small
 - Dependencies/unblock: T-25 and the reviewed implementation of T-18 through T-24; product scope approval is required before adding a maintained example app.
 - Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
 
-Final post-baseline dependency checkpoint: T-18.1 through T-18.4, the
-parent T-18 contract gate, T-19, T-20, and T-21 are complete. T-21.5 remains
-blocked on an owner-approved Production mail provider. T-22 through T-25 remain
-ordered behind those named prerequisites; T-26 through T-29 are recorded
-follow-ons. No Preview workflow, Vercel deployment, or Production operation is
-authorized by this backlog entry alone.
+Final post-baseline dependency checkpoint, 2026-09-09: T-18.1 through T-18.4,
+T-19, T-20 and T-21 are complete. The reviewed T-27 local verification journey,
+T-21.5 Resend implementation and T-24 local pipeline evidence are merged.
+T-21.5 still needs a verified owner mail domain and protected sender evidence.
+T-22 needs the first Vercel deployment decision and adapter identity repairs;
+T-23 needs its separately protected target and release workflow. T-24 hosted
+and release boundaries remain pending. T-25 and T-29 can publish their
+owner-authorized current documentation slices, while full delivery claims
+remain conditional on those boundaries. T-26, broader T-27 and T-28 retain
+their existing unaccepted scope or prerequisites. Do not infer hosted
+readiness from local test results or authorize provider operations from this
+backlog alone.
 
 ## Explicitly out of scope for this baseline
 

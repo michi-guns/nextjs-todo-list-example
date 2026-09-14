@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { deliverAuthEmail } from "./auth-mail"
 
@@ -10,6 +10,8 @@ const original = {
 }
 
 afterEach(() => {
+  vi.unstubAllEnvs()
+  vi.unstubAllGlobals()
   if (original.appEnv === undefined) delete mutableEnvironment.APP_ENV
   else mutableEnvironment.APP_ENV = original.appEnv
   if (original.nodeEnv === undefined) delete mutableEnvironment.NODE_ENV
@@ -22,6 +24,61 @@ afterEach(() => {
 })
 
 describe("deliverAuthEmail", () => {
+  it("uses Resend for explicitly configured Production", async () => {
+    for (const [key, value] of Object.entries({
+      APP_ENV: "production",
+      NODE_ENV: "production",
+      APP_MAIL_TRANSPORT: "remote",
+      APP_MAIL_PROVIDER: "resend",
+      SECRET_NAMESPACE: "production",
+      RESEND_API_KEY: "re_synthetic",
+      APP_MAIL_FROM: "auth@example.com",
+      BETTER_AUTH_LOCAL_MAILBOX: "false",
+    }))
+      vi.stubEnv(key, value)
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(Response.json({ id: "email-id" }))
+    vi.stubGlobal("fetch", fetchMock)
+    await deliverAuthEmail({
+      email: "person@example.test",
+      url: "https://example.com/verify?token=synthetic",
+      token: "synthetic",
+    })
+    expect(fetchMock).toHaveBeenCalledOnce()
+  })
+
+  it.each(["local", "development", "preview"])(
+    "rejects remote configuration in %s before delivery",
+    async (appEnv) => {
+      vi.stubEnv("APP_ENV", appEnv)
+      vi.stubEnv("APP_MAIL_TRANSPORT", "remote")
+      vi.stubEnv("APP_MAIL_PROVIDER", "resend")
+      const fetchMock = vi.fn()
+      vi.stubGlobal("fetch", fetchMock)
+      await expect(
+        deliverAuthEmail({
+          email: "person@example.test",
+          url: "https://example.com/verify?token=synthetic",
+          token: "synthetic",
+        })
+      ).rejects.toThrow("Remote mail is unavailable outside Production")
+      expect(fetchMock).not.toHaveBeenCalled()
+    }
+  )
+
+  it("rejects enabled local mailbox settings on Preview", async () => {
+    vi.stubEnv("APP_ENV", "preview")
+    vi.stubEnv("BETTER_AUTH_LOCAL_MAILBOX", "true")
+    await expect(
+      deliverAuthEmail({
+        email: "person@example.test",
+        url: "https://example.com/verify",
+        token: "synthetic",
+      })
+    ).rejects.toThrow("Local mailbox is unavailable on Preview")
+  })
+
   it("does not send or write a mailbox on Preview", async () => {
     mutableEnvironment.APP_ENV = "preview"
     mutableEnvironment.NODE_ENV = "production"
