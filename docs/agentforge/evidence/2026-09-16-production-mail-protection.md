@@ -58,19 +58,50 @@ error on failure. It does not load local environment files or call providers.
 - `pnpm lint`: passed with the existing unused `Geist` warning only.
 - Changed-file Prettier and `git diff --check`: passed. A read-only relative
   file-link check also passed for all eight changed Markdown files.
-- Independent review of the exact commit gates push and PR publication.
+- Fresh independent GPT-6-Astra review at xhigh approved
+  `d5a7abebe29aa441c622f0af99c5b139702e5907` without actionable findings.
+  The reviewer independently passed the same 128 focused tests, full-diff
+  formatting and whitespace checks.
+- [PR #35](https://github.com/michi-guns/nextjs-todo-list-example/pull/35)
+  passed Quality and Harness in [CI run 35100323793](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35100323793)
+  and merged as `03b67809944bd4e65ed9d86a1444446b5a9cc0ce`.
 
 The seven new tests exercise safe successful CLI output, missing credential,
 test sender, wrong scope, enabled local mailbox, the protected manual workflow
 and the unchanged CI/Preview credential boundaries. They do not stand in for
 hosted approval or a protected secret read.
 
-## Outstanding evidence
+## Protected execution and closeout
 
-The workflow must land on the default branch before dispatch. Its first
-waiting approval and successful protected execution have not occurred.
-T-21.5 remains in progress, and T-23 has not started. Follow the
-[remaining acceptance](../../runbooks/auth-mail.md#remaining-t-215-acceptance).
+[Run 35103297897](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35103297897)
+was manually dispatched from `main` at
+`03b67809944bd4e65ed9d86a1444446b5a9cc0ce` on 2026-09-16 at 13:39:14 UTC.
+The run entered `waiting`; the pending-deployments API identified the
+`production` Environment and `jimzord12` as its required reviewer before any
+validation step ran. The agent then submitted an explicit approval through
+the required-reviewer API using the owner's authenticated account and their
+authorization to complete T-21.5 and run its tests. The review comment records
+that delegation and exact SHA. This was not a manual owner UI click or an
+administrator bypass.
+
+The protected job passed in 32 seconds, completing at 13:40:32 UTC. Its
+validator output was:
+
+```json
+{
+  "result": "configuration_valid",
+  "provider": "resend",
+  "secretNamespace": "production",
+  "remoteDeliveryTested": false
+}
+```
+
+The run, approval history and validation log were read back independently.
+This completes T-21.5's remaining protected configuration acceptance. The
+earlier provider/domain delivery evidence remains a separate layer. T-23 is
+now eligible for its own prerequisite checks and release implementation.
+
+## Evidence limits
 
 TST-AUTH-001/002 retain their verified local lifecycle evidence.
 TST-ENV-001 and TST-PIPELINE-001 remain partial. TST-RELEASE-001 remains

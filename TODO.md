@@ -73,8 +73,8 @@ Every `TODO.md` implementation task still gets its own short-lived branch and pu
 
 ### Authorization and safety
 
-- The normal task workflow is pre-authorized: do not ask for separate permission to create the task branch, commit task changes, push the branch, or open the PR.
-- Do not merge the PR, force-push, rewrite history, delete branches, reset data, or broaden credentials without an explicit request.
+- The normal task workflow is pre-authorized: create the task branch, commit, push, open the PR, complete the independent review/fix/retest loop and merge when required checks and review pass for the current tip. The owner confirmed autonomous reviews and merges on 2026-09-16; do not ask again for routine task merges.
+- Do not force-push, rewrite history, delete branches, reset data, broaden credentials or bypass protected release gates without an explicit request.
 - Stop and report a blocker when the task needs a missing external resource, a new product or technical decision, unavailable credentials, or a destructive operation outside this protocol.
 - Keep secrets out of commits, PR bodies, logs, and screenshots.
 
@@ -956,25 +956,25 @@ Verification:
 - [x] Fresh proportional review of implementation tip `e50a641` found no actionable findings. Optional nits about test-name tightness and `persist-credentials: false` were deferred.
 - [x] PR: [#25](https://github.com/michi-guns/nextjs-todo-list-example/pull/25) is open from `task/T-21-ci-quality-gates`.
 
-Dependency checkpoint, updated 2026-09-16: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 has the reviewed Resend implementation, a verified owner domain and one controlled real delivery. Protected Production sender configuration and its evidence remain pending, so the parent mail prerequisite is not complete. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
+Dependency checkpoint, updated 2026-09-16: T-18.1 through T-18.4, T-19, T-20, T-21, and T-21.5 are complete. The mail foundation includes reviewed Resend implementation, a verified owner domain, one controlled real delivery, and the approved protected configuration run `35103297897`. T-23 can proceed to its own release preflight. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
 
 ### T-21.5: Establish the minimum Production mail foundation
 
-- [~] Complete T-21.5 before T-23 can release Production.
+- [x] Complete T-21.5 before T-23 can release Production. Protected run [35103297897](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35103297897) passed after approval at `03b67809944bd4e65ed9d86a1444446b5a9cc0ce`.
 - Plan: [Resend foundation and documentation continuation](docs/agentforge/plans/2026-09-09-t-21-5-resend-foundation.md). Owner approved Resend and test-domain sends on 2026-09-09, then the named owner subdomain, three DNS records, verification and one real test send on 2026-09-16.
 - [x] Implement the thin Resend adapter and explicit profile/runtime selection. Unit tests pass 294/294, local integration 23/23 and Chromium 8/8. Typecheck, build, formatting and diff checks pass; lint retains only the existing unused Geist warning. A synthetic test-domain send through the adapter was accepted. Next.js MCP reports no compilation/runtime errors, and agent-browser proves password sign-in and local magic-link request. Fresh independent review gates the PR.
 - [x] Verify the owner-controlled sending subdomain and perform one controlled real delivery through the existing adapter. On 2026-09-16, Resend verified `auth.dim-stamatakis.dev` after three approved Namecheap DNS additions. The test reached the owner's Gmail in Spam and was moved to Inbox only after explicit approval. This proves receipt, not automatic inbox placement or a deployed auth journey. See [redacted domain and delivery evidence](docs/agentforge/evidence/2026-09-16-resend-domain-delivery.md).
-- [ ] Configure and verify the protected Production sender settings before declaring the parent complete. The successful send used an isolated local invocation of `readResendConfig` and `sendResendAuthEmail`; it did not configure GitHub/Vercel Production or prove its secret scope. Follow the [remaining mail acceptance](docs/runbooks/auth-mail.md#remaining-t-215-acceptance).
+- [x] Configure and verify the protected GitHub Production sender settings. The first approved protected validator run passed; it proves configuration shape and secret scope, separately from the earlier real adapter delivery. Vercel runtime configuration remains T-23 work. See [protected mail verification](docs/runbooks/auth-mail.md#remaining-t-215-acceptance).
 - [x] Add the no-network mail configuration CLI and manual, main-only protected workflow, with focused red/green CLI and workflow tests. The focused group passes 128 tests, the full unit suite passes 342, typecheck passes and lint retains only the existing Geist warning. Follow the existing plan's protected configuration continuation.
 - [x] Apply and inspect the Production reviewer, branch restriction and mail variables while preserving the existing scoped key. See [protected configuration evidence](docs/agentforge/evidence/2026-09-16-production-mail-protection.md).
-- [ ] Publish the reviewed task PR, run the protected check after owner approval and record the exact run before closing this task or starting T-23. The workflow must exist on the default branch; an explicit merge instruction is still required by this file's protocol.
+- [x] Publish and merge the independently reviewed [PR #35](https://github.com/michi-guns/nextjs-todo-list-example/pull/35), then record the waiting approval and successful protected execution. The agent submitted approval through the owner's account under their task/test authorization; the [evidence record](docs/agentforge/evidence/2026-09-16-production-mail-protection.md) distinguishes this from an owner UI click.
 - Documentation checkpoint, 2026-09-16: record the provider evidence and spam observation, reconcile the current facts and contract limits, and prepare a fresh JZ handoff. This is a documentation continuation of the existing plan, not completion of the parent task.
 - Files: the existing Better Auth mail boundary, a thin owner-approved remote mail adapter/configuration, non-secret profile documentation, focused auth/environment tests, and redacted delivery/health evidence.
 - Interfaces: provider-backed `sendVerificationEmail` and `sendMagicLink` callbacks; explicit Production mail transport selection; protected provider configuration; fail-closed missing-configuration behavior; safe diagnostics that never expose message content, tokens, or credentials.
 - Acceptance: Production verification and magic-link sends use the approved remote transport; local/test mailbox settings are rejected in Preview and Production; missing or invalid Production mail configuration blocks release before deployment; non-Production profiles cannot use Production credentials; no provider-swapping framework is introduced.
 - Contracts/evidence: `TD-027`, `TST-AUTH-001`, `TST-AUTH-002`, `TST-ENV-001`, `TST-PIPELINE-001`, and `TST-RELEASE-001`; keep local mailbox evidence separate from remote delivery evidence.
 - Checks: focused mail/profile tests; `pnpm test`; `pnpm typecheck`; `pnpm lint`; changed-file Prettier checks; `git diff --check`; and a controlled provider delivery/health smoke when the owner-authorized provider is available.
-- Dependencies/unblock: T-18.2 through T-18.4 and owner approval/provisioning of the Production mail provider. T-23 is blocked until this task's minimum foundation is verified; T-27 consumes it for broader authentication completion and abuse resistance.
+- Dependencies/unblock: T-18.2 through T-18.4 and owner approval/provisioning of the Production mail provider are satisfied. T-21.5's minimum foundation is verified; T-27 consumes it for broader authentication completion and abuse resistance.
 - Recommended AgentForge skills: `better-auth-best-practices`, `email-and-password-best-practices`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, `source-driven-development`, and `git-workflow-and-versioning`.
 
 ### T-22: Add manually triggered, fully functional Vercel Preview delivery
@@ -1019,12 +1019,12 @@ Verification:
 - Acceptance: no branch name or mutable “latest” alias can silently change the deployed commit; Production secrets are unavailable to CI/Preview jobs; migration runs separately from app boot through the direct endpoint; a failed deployment reports whether the database migration already succeeded and does not assume a database down-migration is safe; application rollback guidance names a compatible commit/ref and explicitly handles migration compatibility; the chosen Production Neon project/branch is protected and never reset by routine developer commands.
 - Contracts/evidence: `TST-RELEASE-001`, `TST-PIPELINE-001`, `TST-ENV-001`, `TST-MIGRATION-001`, `TST-LANDING-003`, and the relevant authentication/browser contracts; mark hosted contracts verified only after real protected-environment evidence.
 - Checks: workflow/ref-resolution tests; protected-environment approval evidence; controlled release rehearsal in an explicitly non-Production target where possible; real Production deployment only after owner approval; post-deploy smoke; redacted release artifact; `pnpm build`; and `git diff --check`.
-- Dependencies/unblock: T-18, T-20, T-21, and T-21.5; T-18.1 has resolved the Production target policy and migration-history boundary. On 2026-09-14 the owner authorized the separate Neon Production project `jolly-dew-32309276` (`nextjs-todo-list-example-production`, default `main` branch; see [production readiness](docs/runbooks/production-readiness.md)) and the canonical origin `https://nextjs-todo-list-example.vercel.app` now carries a placeholder deployment that this task's first release replaces. The owner mail domain and controlled delivery were verified on 2026-09-16; protected Production mail configuration remains the outstanding T-21.5 prerequisite. This task must not promote the current Neon `main` merely because it is the existing `.env.local` target.
+- Dependencies/unblock: T-18, T-20, T-21, and T-21.5; T-18.1 has resolved the Production target policy and migration-history boundary. On 2026-09-14 the owner authorized the separate Neon Production project `jolly-dew-32309276` (`nextjs-todo-list-example-production`, default `main` branch; see [production readiness](docs/runbooks/production-readiness.md)) and the canonical origin `https://nextjs-todo-list-example.vercel.app` now carries a placeholder deployment that this task's first release replaces. The owner mail domain and controlled delivery were verified on 2026-09-16; the protected mail check passed in run `35103297897`, completing T-21.5. T-23 may now perform its own prerequisite checks. This task must not promote the current Neon `main` merely because it is the existing `.env.local` target.
 - Recommended AgentForge skills: `ci-cd-and-automation`, `shipping-and-launch`, `migration-history-workflow`, `neon-postgres`, `testing-first-class`, `test-driven-development`, `security-and-hardening`, `observability-and-instrumentation`, and `git-workflow-and-versioning`.
 
 Dependency checkpoint: T-22 and T-23 require the environment decisions, CI evidence, and hosted credentials/approvals they name. Neither task is unblocked by local unit tests alone. Do not claim the template's deployment pipeline is proven until T-24 covers both the simulated negative paths and the required disposable/controlled hosted boundaries.
 
-Review priority, updated 2026-09-16: finish T-21.5's protected Production mail configuration, then proceed to T-23 and the remaining T-24 release evidence. T-22's repairs, hosted proof and cleanup are complete. The verified mail domain and controlled real delivery remove the provider/DNS prerequisite, but do not establish protected Production execution. These are existing delivery obligations, not authorization to provision providers or deploy.
+Review priority, updated 2026-09-16: proceed to T-23 and the remaining T-24 release evidence. T-21.5's protected mail configuration and T-22's hosted Preview lifecycle are complete. The approved mail configuration run establishes that scoped foundation; it does not establish an application release, Production migration or deployed auth journey. T-23 retains its own target, credentials, exact-SHA and protected approval requirements.
 
 ### T-24: Prove the complete environment and delivery pipeline
 
@@ -1184,6 +1184,15 @@ existing scope/decision prerequisites. The real test email initially arrived
 in Spam; the owner's approved manual move to Inbox must not be recorded as
 automatic inbox delivery. No Production configuration or deployment was
 performed in this session.
+
+Latest dependency checkpoint, 2026-09-16 after protected run `35103297897`:
+T-21.5 is complete. PR #35 merged after independent review and passing CI;
+the mail job then waited for its required reviewer and passed with scoped
+Production settings. T-23 is next for its own required preflight and accepted
+release work. T-24 still needs T-23's release evidence; T-25/T-29 final delivery
+documentation follows it. T-26, broader T-27 and T-28 retain their existing
+scope and decision prerequisites. No application release or database change
+was performed to close T-21.5.
 
 ## Explicitly out of scope for this baseline
 

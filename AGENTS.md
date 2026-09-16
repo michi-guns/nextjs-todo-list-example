@@ -80,6 +80,12 @@ For any implementation or behavior-changing task in this repository, use the pro
 
 ## Review and task follow-through
 
+- The owner authorizes agents to complete the review/fix/retest loop, commit,
+  push, open PRs and merge them without another permission request once the
+  required checks and independent review pass for the current tip. Continue
+  to the next authorized, unblocked task. Stop only for a concrete blocker,
+  unresolved decision or action that needs the owner. This does not waive
+  destructive-action checkpoints or the accepted protected release gates.
 - For each completed non-trivial task, spawn a fresh independent reviewer
   sub-agent against the exact latest artifact. Do not substitute a
   self-review in the implementing agent's own context. Use this harness's
