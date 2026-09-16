@@ -42,11 +42,39 @@ and record a controlled delivery check. T-23 must call profile validation and
 require that provider evidence before deployment. No Production release
 workflow currently exists.
 
-The owner has no domain as of 2026-09-09. T-21.5 therefore remains incomplete.
-The authorized test-account check used `onboarding@resend.dev` and
-`delivered@resend.dev`, with synthetic content only. Resend reported simulated
-delivery for the readiness message; the new adapter's synthetic send was also
-accepted. Neither result proves real inbox delivery or Production readiness.
+The 2026-09-09 check used Resend's simulated test-domain delivery. On
+2026-09-16 the owner supplied an existing Namecheap domain, Resend verified
+the sending subdomain, and one synthetic verification message through the
+existing adapter reached the owner's Gmail. It arrived in Spam and was moved
+to Inbox after explicit owner approval. See the [redacted domain and delivery
+record](../agentforge/evidence/2026-09-16-resend-domain-delivery.md) for the
+approved sender, DNS values, command result and evidence limits.
+
+The sending/DNS slice is complete. Protected Production configuration remains
+pending, so T-21.5 is still open. The isolated local adapter invocation did not
+configure or test a deployed Production process. It also did not prove a real
+verification or magic-link lifecycle. Initial spam classification remains a
+deliverability observation; the manual move is not general inbox-placement
+proof. No receiving mailbox was configured.
+
+## Remaining T-21.5 acceptance
+
+1. Inspect the intended protected GitHub/Vercel Production configuration
+   without printing secret values. Identify where the server-only settings
+   above will be stored and supplied; do not use repository-wide or Preview
+   secrets as a substitute for Production isolation.
+2. Prepare the exact proposed settings and obtain owner approval before
+   changing protected configuration or credentials. Reuse the verified
+   sender from the delivery record; do not recreate the domain or DNS records.
+3. Verify the required settings and their scope through the intended
+   protected execution path, using existing validators and redacted evidence.
+   A local `.env.local` key and successful standalone send do not prove that
+   scope. Any additional real email requires its own owner-authorized
+   recipient and purpose.
+4. Reconcile T-21.5 and its test contracts, then continue to T-23's planned
+   release implementation. The workflow, approval boundary, migration and
+   deployed auth smoke remain T-23/T-24 evidence and require their own
+   prerequisites. Do not deploy solely to close this documentation checkpoint.
 
 References: [Resend send API](https://resend.com/docs/api-reference/emails/send-email),
 [Resend test addresses](https://resend.com/docs/dashboard/emails/send-test-emails),
