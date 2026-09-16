@@ -48,7 +48,7 @@ an operation guard can authorize database mutation; a branch label by itself is
 not enough. Local observations must contain a loopback host and cannot carry
 remote project or branch fields. The classifier does not derive identity from a
 friendly branch name or from the local `.env.local` declaration. Provider
-authenticity and hosted identity evidence remain responsibilities of the later
+authenticity and hosted identity evidence are responsibilities of the
 Neon/Vercel adapters and their verification tasks.
 
 Connection observations must include the provider-observed endpoint host. When
@@ -68,8 +68,9 @@ The Local Docker adapter in `scripts/local-postgres/` is the first
 state-changing command adapter. The Development adapter in
 `scripts/neon-development/` is the hosted non-default branch adapter. Both
 call these assertions before migrate or seed. Local reset stays loopback-only.
-The Preview adapter in `scripts/deploy/preview/` is the first state-changing
-Preview command adapter. Production adapters remain future work.
+The Preview adapter in `scripts/deploy/preview/` owns temporary-branch delivery
+and cleanup. `scripts/deploy/production/` owns protected exact-ref release,
+provider identity observation, direct migration, deployment and smoke.
 
 | Guard                               | Required safety boundary                                                                                                                                                    |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
