@@ -143,8 +143,8 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                                  | T-15                                                               | `verified` |
 | [TST-E2E-003](#tst-e2e-003)                 | Browser-visible privacy, pagination, filtering, and mutation feedback work together  | Playwright Chromium, on-demand cross-browser                         | T-10, T-12A, T-15                                                  | `verified` |
 | [TST-PERFORMANCE-001](#tst-performance-001) | Representative Neon queries use the intended indexes and meet the agreed warm target | Query plans and controlled performance evidence                      | T-16                                                               | `verified` |
-| [TST-ENV-001](#tst-env-001)                 | Environment profiles select safe, intended targets and reject unsafe combinations    | Configuration, unit/static guard, local and hosted target inspection | T-18.2, T-18.3, T-18.4, T-19, T-20, T-21, T-21.5, T-22, T-23, T-24 | `partial`  |
-| [TST-PIPELINE-001](#tst-pipeline-001)       | Preview and release orchestration preserves ref, target, and failure boundaries      | Workflow/static, orchestration, controlled hosted                    | T-21, T-21.5, T-22, T-23, T-24                                     | `partial`  |
+| [TST-ENV-001](#tst-env-001)                 | Environment profiles select safe, intended targets and reject unsafe combinations    | Configuration, unit/static guard, local and hosted target inspection | T-18.2, T-18.3, T-18.4, T-19, T-20, T-21, T-21.5, T-22, T-23, T-24 | `verified` |
+| [TST-PIPELINE-001](#tst-pipeline-001)       | Preview and release orchestration preserves ref, target, and failure boundaries      | Workflow/static, orchestration, controlled hosted                    | T-21, T-21.5, T-22, T-23, T-24                                     | `verified` |
 | [TST-PREVIEW-001](#tst-preview-001)         | A requested Preview is isolated, seeded, functional, and traceable                   | Controlled Neon/Vercel/browser Preview                               | T-22, T-24                                                         | `verified` |
 | [TST-RELEASE-001](#tst-release-001)         | An approved exact-ref release is migrated, deployed, smoked, and recorded            | Protected release rehearsal and Production evidence                  | T-21.5, T-23, T-24                                                 | `verified` |
 
@@ -576,7 +576,7 @@ pass. This local mailbox evidence does not establish remote mail delivery.
 
 ### TST-ENV-001 — Environment profile and target safety
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Environment contract and target guardrails
 - **Evidence layers/modes:** Configuration / unit, static guard, local target checks, and hosted target inspection when available
 - **Verifies product decisions:** D-009, D-010
@@ -601,7 +601,7 @@ first approved protected execution passed in run `35103297897`; TST-ENV-001 stay
 
 ### TST-PIPELINE-001 — Environment and delivery pipeline orchestration
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Delivery pipeline
 - **Evidence layers/modes:** Workflow/static validation, orchestration tests, controlled disposable/hosted boundary evidence
 - **Verifies product decisions:** D-009, D-010
@@ -733,6 +733,22 @@ their verified status with the additional real boundary evidence above.
 `TST-ENV-001` and `TST-PIPELINE-001` remain `partial` pending T-24's final matrix
 and evidence reconciliation. T-24 may reuse these runs and T-22's controlled
 Preview lifecycle; no additional Production mutation is authorized by this ledger.
+
+**T-24 final reconciliation, 2026-09-16 (supersedes the two partial statuses above):**
+The [complete pipeline evidence matrix](../../docs/agentforge/evidence/2026-09-16-pipeline-closeout.md)
+maps every SPEC 10.7/11 baseline requirement to its executable and real hosted
+proof. The focused `pnpm test:pipeline` run passed 235 tests across 14 files.
+PR #39 CI `35115190232` reran the full Quality/Harness gates successfully;
+T-23's same-code 24 cross-browser journeys remain applicable. Read-only
+provider metadata confirms Production main-only required approval with admin
+bypass disabled, separate Environment secret entries, absence of the cleaned-up
+Preview branch, matching final Production identity and no Vercel Git link.
+The controlled T-22 lifecycle and T-23 releases provide the hosted proof;
+injected local failures establish stop/cleanup/partial-record decisions.
+No additional hosted mutation, Production failure injection or destructive test
+was performed. `TST-ENV-001` and `TST-PIPELINE-001` are now `verified`.
+This is checkpoint evidence, not continuous monitoring or a claim about future
+provider/configuration changes. All original evidence limits remain intact.
 
 ## SPEC traceability map
 
