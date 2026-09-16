@@ -1,7 +1,8 @@
 # T-23 implementation and local release rehearsal
 
 Date: 2026-09-16. This records implementation and non-Production verification.
-It does not record a Production release.
+The later [live release evidence](2026-09-16-production-release-live.md) records
+the authorized protected runs, credential repair and successful live checks.
 
 ## Reviewed merge and release candidate
 
@@ -86,14 +87,14 @@ The container was stopped by the harness. No hosted database was used.
   errors remain visible. The regression suite and all 24 browser journeys pass
   after this supporting test fix. No application behavior was changed.
 
-## Remaining release evidence
+## Release boundary at this checkpoint
 
-The new protected token/profile has not yet been exercised by this workflow.
+At the implementation checkpoint, the new protected token/profile had not been exercised by this workflow.
 No Production migration, deployment, browser/authentication journey, or real
 Sanity webhook delivery occurred in this implementation rehearsal. T-23.5
-retains these obligations after concrete release authorization.
-`TST-RELEASE-001`, `TST-PIPELINE-001` and `TST-ENV-001` stay `partial`; T-24 keeps
-its broader hosted failure/isolation obligations.
+retained these obligations after concrete release authorization. The later
+live evidence above completes T-23. `TST-RELEASE-001` is now `verified`;
+`TST-PIPELINE-001` and `TST-ENV-001` await T-24's final evidence reconciliation.
 
 The previous Production placeholder is a schema-independent static maintenance
 fallback, not a previous working application. Only the existing two reviewed

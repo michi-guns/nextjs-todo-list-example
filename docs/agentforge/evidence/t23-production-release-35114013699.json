@@ -1,0 +1,38 @@
+{
+  "ref": {
+    "requestedRef": "d639dfeeeca2932606c652cf5305ca3e0cd87a89",
+    "commitSha": "d639dfeeeca2932606c652cf5305ca3e0cd87a89",
+    "kind": "commit"
+  },
+  "ci": {
+    "commitSha": "d639dfeeeca2932606c652cf5305ca3e0cd87a89",
+    "runId": 35111932584,
+    "runAttempt": 1
+  },
+  "actor": "jimzord12",
+  "workflowRunId": "35114013699",
+  "startedAt": "2026-09-16T15:16:46.525Z",
+  "result": "succeeded",
+  "stages": {
+    "preflight": "succeeded",
+    "migration": "succeeded",
+    "deployment": "succeeded",
+    "smoke": "succeeded"
+  },
+  "target": {
+    "projectId": "jolly-dew-32309276",
+    "branchId": "br-purple-sea-a53v962l",
+    "branch": "main"
+  },
+  "rollback": {
+    "deploymentId": "dpl_5TqabFbNNZ6y9gL7qkL4LgH5cGCF",
+    "commitSha": "d639dfeeeca2932606c652cf5305ca3e0cd87a89",
+    "kind": "application",
+    "forwardSchemaCompatible": true
+  },
+  "deployment": {
+    "deploymentId": "dpl_ERxkjWHpMbQakgKTVM81rPT5KuWf",
+    "url": "https://nextjs-todo-list-example-isowws6yf-jimzords-projects.vercel.app"
+  },
+  "finishedAt": "2026-09-16T15:17:39.098Z"
+}
