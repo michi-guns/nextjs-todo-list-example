@@ -137,7 +137,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                                         | T-08, T-09                                                         | `verified` |
 | [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                                  | T-12                                                               | `verified` |
 | [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                                 | T-02, T-12                                                         | `verified` |
-| [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence                      | T-13                                                               | `partial`  |
+| [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence                      | T-13                                                               | `verified` |
 | [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance                            | T-09A, T-09B, T-10, T-11, T-12A, T-15                              | `verified` |
 | [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                                  | T-15                                                               | `verified` |
 | [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                                  | T-15                                                               | `verified` |
@@ -146,7 +146,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-ENV-001](#tst-env-001)                 | Environment profiles select safe, intended targets and reject unsafe combinations    | Configuration, unit/static guard, local and hosted target inspection | T-18.2, T-18.3, T-18.4, T-19, T-20, T-21, T-21.5, T-22, T-23, T-24 | `partial`  |
 | [TST-PIPELINE-001](#tst-pipeline-001)       | Preview and release orchestration preserves ref, target, and failure boundaries      | Workflow/static, orchestration, controlled hosted                    | T-21, T-21.5, T-22, T-23, T-24                                     | `partial`  |
 | [TST-PREVIEW-001](#tst-preview-001)         | A requested Preview is isolated, seeded, functional, and traceable                   | Controlled Neon/Vercel/browser Preview                               | T-22, T-24                                                         | `verified` |
-| [TST-RELEASE-001](#tst-release-001)         | An approved exact-ref release is migrated, deployed, smoked, and recorded            | Protected release rehearsal and Production evidence                  | T-21.5, T-23, T-24                                                 | `partial`  |
+| [TST-RELEASE-001](#tst-release-001)         | An approved exact-ref release is migrated, deployed, smoked, and recorded            | Protected release rehearsal and Production evidence                  | T-21.5, T-23, T-24                                                 | `verified` |
 
 ## Test contracts
 
@@ -470,7 +470,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 
 ### TST-LANDING-003 — Sanity freshness and recovery
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Landing content freshness
 - **Evidence layers/modes:** Infrastructure, boundary / contract, deployed smoke
 - **Verifies product decisions:** D-005, D-008
@@ -481,7 +481,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Contract:** A trusted relevant Sanity publish event and an authorized manual recovery request reach one server-only idempotent invalidation service; invalid signatures, irrelevant events, unauthorized recovery, and duplicate delivery do not cause unsafe invalidation.
 - **Required evidence:** Boundary tests for signatures, relevance, authorization, duplication, and shared service routing, plus one real deployed webhook delivery for release evidence.
 - **Dependencies:** T-12 cache identity/read path and the deployed webhook prerequisite.
-- **Evidence:** Local boundary tests pass in `pnpm test` (6 files, 32 tests at the implementation checkpoint) and cover generated valid/invalid Sanity signatures, malformed payloads, irrelevant and draft events, duplicate deliveries, the stable tag with immediate-expiration profile `{ expire: 0 }`, manual authorization, and shared invalidation routing. The deployed webhook-delivery clause remains deferred because this repository has no deployed release candidate; local direct-handler evidence does not replace it.
+- **Evidence:** Local boundary tests pass in `pnpm test` (6 files, 32 tests at the implementation checkpoint) and cover generated valid/invalid Sanity signatures, malformed payloads, irrelevant and draft events, duplicate deliveries, the stable tag with immediate-expiration profile `{ expire: 0 }`, manual authorization, and shared invalidation routing. The deployed webhook-delivery clause passed on 2026-09-16 through Sanity attempts `atm-3JPmRI2RJHyFNpC93aLuz4p6vMT` and `atm-3JPoK9DYctGZPssOOuAIotTmau8`, both HTTP 200 after identical-content publishes. See [live release evidence](../../docs/agentforge/evidence/2026-09-16-production-release-live.md).
 
 <a id="tst-ui-001"></a>
 
@@ -645,7 +645,7 @@ records successful approved execution in run `35103297897`. TST-PIPELINE-001 sta
 
 ### TST-RELEASE-001 — Protected exact-ref Production release
 
-- **Status:** `partial`
+- **Status:** `verified`
 - **Capability:** Production release
 - **Evidence layers/modes:** Ref-resolution tests, protected workflow rehearsal, direct migration/deployment evidence, post-deploy smoke
 - **Verifies product decisions:** D-009, D-010
@@ -708,6 +708,31 @@ Production profile validation, actual migration/deployment, deployed browser
 and real Sanity webhook evidence are still required. This local rehearsal
 supplements TST-MIGRATION-001 and browser evidence without changing unrelated
 hosted obligations or claiming Production success.
+
+**T-23 live release closeout, 2026-09-16 (supersedes earlier pending-release statements):**
+The owner explicitly approved commit `d639dfeeeca2932606c652cf5305ca3e0cd87a89`,
+its reviewed forward migrations, protected-job approval and live checks.
+Protected runs `35112456687` and `35114013699` passed all release stages.
+The first deployed magic-link request failed despite valid configuration shape;
+updating the existing protected Resend key and redeploying the same SHA resolved
+it. A real message arrived in Gmail Inbox, its original link opened the owner's
+private dashboard/Inbox, and sign-out restored the private-route redirect.
+The final deployment is `dpl_ERxkjWHpMbQakgKTVM81rPT5KuWf`, READY Production with
+matching SHA/project and canonical alias. Read-only catalog inspection confirms
+six expected tables and two migration journal entries. The actual signed Sanity
+webhook returned HTTP 200 on both deployments after identical-content publishes.
+See [live evidence and safe artifacts](../../docs/agentforge/evidence/2026-09-16-production-release-live.md).
+
+`TST-RELEASE-001` is now `verified`. `TST-LANDING-003` is also `verified`: its
+existing signature/relevance/authorization/duplicate/service-routing tests are
+supplemented by actual deployed delivery, including final attempt
+`atm-3JPoK9DYctGZPssOOuAIotTmau8`. Local evidence remains the proof for invalid and
+manual-recovery requests; no Production failure injection is claimed.
+`TST-MIGRATION-001`, `TST-AUTH-002` and the existing browser contracts retain
+their verified status with the additional real boundary evidence above.
+`TST-ENV-001` and `TST-PIPELINE-001` remain `partial` pending T-24's final matrix
+and evidence reconciliation. T-24 may reuse these runs and T-22's controlled
+Preview lifecycle; no additional Production mutation is authorized by this ledger.
 
 ## SPEC traceability map
 

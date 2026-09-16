@@ -39,8 +39,9 @@ Configuration validation checks shape and environment policy. It cannot prove
 that a key works or that a domain is verified. Before T-23 can release, verify
 the sender domain in Resend, configure the protected Production environment,
 and record a controlled delivery check. T-23 must call profile validation and
-require that provider evidence before deployment. No Production release
-workflow currently exists.
+require that provider evidence before deployment. The
+[protected release workflow](production-release.md) implements this boundary;
+its HTTP smoke still requires a separately authorized browser/mail check.
 
 The 2026-09-09 check used Resend's simulated test-domain delivery. On
 2026-09-16 the owner supplied an existing Namecheap domain, Resend verified
@@ -94,6 +95,23 @@ Configuration validation does not prove credential validity or current
 deliverability. The earlier real adapter receipt is separate evidence and
 must retain its limits. Any additional real email needs an owner-authorized
 recipient and purpose.
+
+## Deployed delivery and diagnosis
+
+The [2026-09-16 live release](../agentforge/evidence/2026-09-16-production-release-live.md)
+first exposed a stale or mismatched protected credential: the deployed adapter
+failed although configuration shape checks passed. Updating the protected key
+from the already verified credential and redeploying the same commit resolved
+delivery. The controlled message arrived in Gmail Inbox, and its original link
+opened the private dashboard. Sign-out restored the private-route boundary.
+
+For `Resend auth email delivery failed`, inspect safe Vercel timing/status and
+the matching Resend account's send logs, key metadata, verified domain and
+sender. Do not print provider bodies, recipients, auth URLs or credentials.
+GitHub secret values cannot be read back for comparison. A credential repair
+requires an authorized secret update and a new deployment because the release
+runner supplies configuration to each deployment. Retest the owner-approved
+mail journey; a successful shape check alone cannot close the incident.
 
 References: [Resend send API](https://resend.com/docs/api-reference/emails/send-email),
 [Resend test addresses](https://resend.com/docs/dashboard/emails/send-test-emails),
