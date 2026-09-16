@@ -50,15 +50,17 @@ to Inbox after explicit owner approval. See the [redacted domain and delivery
 record](../agentforge/evidence/2026-09-16-resend-domain-delivery.md) for the
 approved sender, DNS values, command result and evidence limits.
 
-The sending/DNS slice is complete. GitHub Production mail settings and
-approval rules are now configured; their first protected execution remains
-pending, so T-21.5 is still open. The isolated local adapter invocation did not
+The sending/DNS slice and protected configuration acceptance are complete.
+The first approved GitHub Production mail check passed on 2026-09-16, closing
+T-21.5. The isolated local adapter invocation did not
 configure or test a deployed Production process. It also did not prove a real
 verification or magic-link lifecycle. Initial spam classification remains a
 deliverability observation; the manual move is not general inbox-placement
 proof. No receiving mailbox was configured.
 
-## Remaining T-21.5 acceptance
+<a id="remaining-t-215-acceptance"></a>
+
+## Protected mail verification
 
 The existing GitHub `production` Environment owns `RESEND_API_KEY` and the
 seven non-secret variables shown above. `APP_MAIL_FROM` uses the previously
@@ -68,20 +70,22 @@ Environment. The owner may approve their own manual dispatch. CI and Preview
 do not reference this Environment or its Resend secret. See the
 [protected configuration record](../agentforge/evidence/2026-09-16-production-mail-protection.md).
 
-1. Merge the reviewed task PR containing `verify-production-mail.yml` before
-   dispatching it. GitHub requires a manually dispatched workflow to exist on
-   the default branch. The repository task protocol requires an explicit
-   merge instruction.
-2. Run `gh workflow run verify-production-mail.yml --ref main`, then approve
+The initial [protected run](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35103297897)
+passed at `03b67809944bd4e65ed9d86a1444446b5a9cc0ce`. Its approval was submitted
+by the agent through the owner's account under their task/test authorization,
+with that delegation recorded in the approval history.
+
+For a later authorized configuration recheck:
+
+1. Run `gh workflow run verify-production-mail.yml --ref main`, then approve
    the waiting `production` job in GitHub. Review its triggering SHA before
    approving. The workflow checks out that SHA and exposes the scoped mail
    settings only to `pnpm exec tsx scripts/auth-mail/inspect.ts`.
-3. Record the waiting approval and successful run URL/SHA. The command reuses
+2. Record the waiting approval and successful run URL/SHA. The command reuses
    `readResendConfig` and reports only configuration-valid metadata. It makes
-   no network call and sends no email. A failure keeps T-21.5 open. Do not
+   no network call and sends no email. A failure blocks release readiness. Do not
    overwrite an existing credential without the owner's explicit approval.
-4. Reconcile T-21.5 and its test contracts after that protected execution,
-   then continue to T-23. T-23 must validate the complete Production profile
+3. Reconcile the configuration evidence. T-23 must validate the complete Production profile
    and supply the approved settings to the Vercel Production runtime. Its
    release approval, migration, deployment and auth smoke remain separate
    evidence. This mail-only check neither configures nor proves that runtime.

@@ -595,7 +595,7 @@ T-21.5 protection update, 2026-09-16: [configuration evidence](../../docs/agentf
 records the actual GitHub Production reviewer, disabled administrator bypass,
 main-only branch policy, scoped key metadata and mail variables. Seven new
 CLI/workflow tests pass, alongside the existing mail/profile guards. The
-first approved protected execution is pending; TST-ENV-001 stays `partial`.
+first approved protected execution passed in run `35103297897`; TST-ENV-001 stays `partial` because T-23/T-24 release evidence remains pending.
 
 <a id="tst-pipeline-001"></a>
 
@@ -619,7 +619,7 @@ T-21.5 protection update, 2026-09-16: the manual mail inspection workflow
 adds a main-only protected path with secrets supplied only to validation.
 Local tests prove the workflow contract, not a hosted approval. The
 [configuration record](../../docs/agentforge/evidence/2026-09-16-production-mail-protection.md)
-keeps the first approved execution pending. TST-PIPELINE-001 stays `partial`.
+records successful approved execution in run `35103297897`. TST-PIPELINE-001 stays `partial` until T-23/T-24 release evidence is complete.
 
 <a id="tst-preview-001"></a>
 
@@ -658,7 +658,7 @@ keeps the first approved execution pending. TST-PIPELINE-001 stays `partial`.
 - **Current evidence, updated 2026-09-16:** The owner-authorized separate Neon Production project was provisioned on 2026-09-14, as recorded in [Production readiness](../../docs/runbooks/production-readiness.md); the protected release workflow is not implemented. T-21.5 now has a verified owner domain and [controlled real adapter delivery](../../docs/agentforge/evidence/2026-09-16-resend-domain-delivery.md), while its protected Production sender configuration is still pending. No protected release rehearsal, Production migration/deployment or deployed auth journey was performed. This contract remains `specified` and must not be marked `verified` from local, Preview or standalone provider evidence.
 
 T-21.5 protection update, 2026-09-16: [actual GitHub protection and mail configuration](../../docs/agentforge/evidence/2026-09-16-production-mail-protection.md)
-now exists. Its first protected execution and T-23 release work remain pending.
+now exists and the first approved protected check passed in run `35103297897`. T-21.5 is complete; T-23 release work remains pending.
 TST-RELEASE-001 stays `specified`; TST-AUTH-001/002 retain their existing
 verified local lifecycle evidence. No deployed auth or release proof is added.
 

@@ -1,6 +1,6 @@
 # T-21.5 Resend foundation plan
 
-**Status:** Accepted. The code/local-evidence slice is implemented. Owner-domain verification and controlled real delivery were completed on 2026-09-16; protected Production configuration remains pending. See the dated continuation below.
+**Status:** Completed. Code/local evidence, owner-domain verification, controlled delivery and the first approved protected configuration run are complete. See the dated continuations and [protected execution record](../evidence/2026-09-16-production-mail-protection.md).
 
 **Goal:** Wire the existing auth-mail boundary to one explicitly selected remote provider and reject invalid mail configuration before a Production profile can be accepted.
 
@@ -142,3 +142,11 @@ GitHub's [manual workflow documentation](https://docs.github.com/en/actions/how-
 requires the workflow on the default branch. Its [Environment documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments)
 defines approval before secret access. T-23 will consume this same protected
 Environment for its separately verified release path and runtime settings.
+
+### Closeout
+
+PR #35 merged on 2026-09-16 after fresh independent review and passing CI.
+Protected run `35103297897` then passed at merge commit
+`03b67809944bd4e65ed9d86a1444446b5a9cc0ce`, after the required approval.
+This closes T-21.5. The initial state and pending statements above are dated
+planning history. T-23 owns full profile, deployment and remote auth evidence.

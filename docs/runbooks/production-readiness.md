@@ -19,13 +19,13 @@ and [TD-027](../../.dwf/decisions/TECHNICAL.md#td-027) requirements:
 - Protected Production approval and secrets, unavailable to CI and Preview.
   GitHub `production` now requires `jimzord12` approval, disables administrator
   bypass and allows only branch `main`. Its existing Resend key and mail
-  variables are configured. The first protected mail check is pending;
+  variables are configured. The first protected mail check passed on 2026-09-16;
   database, app and deployment credentials remain T-23 setup work.
 - A verified owner mail domain, protected Resend settings and controlled
   delivery evidence. The domain and one real adapter delivery were verified
   on 2026-09-16; the message initially arrived in Gmail Spam and was manually
-  moved to Inbox with owner approval. The first execution with the configured
-  protected mail settings remains T-21.5's outstanding acceptance. See
+  moved to Inbox with owner approval. T-21.5 is complete after its first
+  protected mail check passed. See
   [authentication mail](auth-mail.md#remaining-t-215-acceptance) and its linked
   evidence; local configuration is not protected Production evidence.
 - A manual tag/full-SHA workflow that resolves one immutable revision,
