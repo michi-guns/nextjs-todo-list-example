@@ -5,6 +5,13 @@ its protected release configuration and the Production workflow are not
 implemented. T-23 remains pending. Do not use the Development project's Neon
 `main`, a Preview deployment or a local test as a substitute.
 
+The [2026-09-16 preflight](../agentforge/evidence/2026-09-16-production-release-preflight.md)
+confirms the intended targets and Sanity read path. Vercel token creation is
+blocked through the CLI; the prepared project-only browser form awaits owner
+confirmation before creation and protected storage. The [T-23 plan](../agentforge/plans/2026-09-16-t-23-production-release.md)
+and TODO breakdown are ready; executable implementation waits for that
+prerequisite and the remaining scoped configuration checks.
+
 Before a runnable release/recovery procedure can be completed, the owner and
 implementation must establish the [TD-026](../../.dwf/decisions/TECHNICAL.md#td-026)
 and [TD-027](../../.dwf/decisions/TECHNICAL.md#td-027) requirements:
