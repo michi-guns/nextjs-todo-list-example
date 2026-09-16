@@ -1039,8 +1039,11 @@ This is the dedicated template-level pipeline test task. Its purpose is to
 prove that the environment setup is correct, not merely that individual
 commands compile.
 
-- [ ] Complete T-24 with layered local, static, and required disposable/controlled hosted evidence.
+- [x] Complete T-24 with layered local, static, and required disposable/controlled hosted evidence.
 - Plan: [local pipeline evidence](docs/agentforge/plans/2026-09-09-t-24-local-pipeline-evidence.md), independently authorized by the owner on 2026-09-09.
+- Final closeout plan: [complete pipeline evidence reconciliation](docs/agentforge/plans/2026-09-16-t-24-pipeline-closeout.md), under the owner's instruction to continue unblocked work.
+- [x] T-24.1 — Map every environment, exact-ref, secret/approval, stage/failure and hosted lifecycle requirement to existing source/tests and real run evidence in `docs/agentforge/evidence/2026-09-16-pipeline-closeout.md`. Corroborate current protection/identity with read-only provider metadata. No new provider mutation or Production failure injection.
+- [x] T-24.2 — Run `pnpm test:pipeline`, confirm unchanged executable behavior before reusing PR #39's full CI and the T-23 three-browser evidence, then reconcile `TST-ENV-001`/`TST-PIPELINE-001`, this tracker and dependency readiness. Link/format/diff checks, fresh exact-tip independent review and hosted CI gate merge. Recommended AgentForge skills: `testing-first-class`, `ci-cd-and-automation`, `documentation-and-adrs`, `code-review-and-quality` and `git-workflow-and-versioning`.
 - [x] Add stage-order/failure/explicit-cleanup evidence and `pnpm test:pipeline`. The grouped local suite passes 124 tests. Local integration passes 23/23 and Chromium 8/8. Typecheck and lint pass with the existing unused Geist warning. Build, formatting and diff checks pass. The commit hook runs the final unit suite; fresh independent review gates the PR. Hosted Preview and Production rehearsal remain pending; the first Vercel deployment prerequisite and unimplemented protected release cannot be replaced by these local tests.
 - Files: `src/test/environment/`, `src/test/pipeline/` or the repository's established test seat, workflow/static validation fixtures, disposable Neon/Vercel/Sanity adapters or controlled evidence helpers, `package.json`, `.github/workflows/`, `docs/agentforge/evidence/`, `.dwf/decisions/TESTING.md`, and `TODO.md`.
 - Interfaces: a layered pipeline test command; profile/target matrix; exact-ref resolver; branch creation/identity/expiry/cleanup lifecycle; migration and seed sequencing; preview deployment contract; production approval/secret-scope contract; redacted evidence schema; failure-injection hooks that stop before shared/Production mutation.
@@ -1049,6 +1052,14 @@ commands compile.
 - Checks: focused pipeline suite; workflow syntax/static checks; `pnpm test`; `pnpm test:integration`; `pnpm test:e2e`; `pnpm typecheck`; `pnpm lint`; `pnpm build`; controlled Preview lifecycle run; controlled release/ref-resolution rehearsal; redacted evidence review; changed-file Prettier; and `git diff --check`.
 - Dependencies/unblock: T-18 through T-23. Neon/Vercel/Sanity credentials and disposable targets are required only for their named boundary tests; absent prerequisites must be reported, not replaced with a weaker claim.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`, `ci-cd-and-automation`, `security-and-hardening`, `browser-testing-with-devtools`, `next-dev-loop`, `verification-before-completion`, and `git-workflow-and-versioning`.
+
+Final evidence, 2026-09-16: the [requirement matrix](docs/agentforge/evidence/2026-09-16-pipeline-closeout.md)
+accounts for every baseline clause. `pnpm test:pipeline` passes 235 tests;
+PR #39 CI passed the full Quality/Harness gates on unchanged executable code.
+The real T-22 Preview/cleanup and T-23 Production/mail/webhook evidence now fill
+the hosted boundaries. Read-only provider checks corroborate target/protection
+and secret scope. `TST-ENV-001` and `TST-PIPELINE-001` are `verified`.
+Fresh independent review and hosted CI gate this evidence closeout.
 
 Available prerequisite evidence from T-22:
 
@@ -1211,6 +1222,13 @@ T-22 hosted Preview lifecycle and T-23 protected release. T-25 and T-29 final
 closeout follow that review. T-26 still requires agreed observability scope;
 broader T-27 and T-28 still require their explicit product decisions. Earlier
 checkpoint statements describe the state at their own time, not current blockers.
+
+Latest dependency checkpoint after T-24 reconciliation, 2026-09-16:
+T-18 through T-24 have the required baseline evidence. T-25 is unblocked for
+final operational documentation, then T-29 can close its existing derived-app
+guide scope. T-26 requires an agreed observability scope; broader T-27 and
+T-28 require explicit product decisions. No new hosted operations are needed
+for the documentation closeouts.
 
 ## Explicitly out of scope for this baseline
 
