@@ -34,39 +34,60 @@ Its merge commit is `ad16b60209863ad36dfcecbb3be6de1fc7569bb8`.
   `https://nextjs-todo-list-example.vercel.app`. The project's environment
   variable inventory was empty.
 - GitHub `production` contains only the existing `RESEND_API_KEY` and
-  eight mail/profile variables at this checkpoint. No Preview credentials
+  seven mail/profile variables at this initial checkpoint. No Preview credentials
   were copied.
 - `pnpm sanity:smoke` passed through the real query/client/mapper, returning
   the four expected landing view-model fields. This does not prove a
   deployed webhook or browser path.
 
-## Credential blocker
+## Credential blocker and resolution
 
 Creating a separate project-scoped Vercel token through the authenticated
 CLI's documented `POST /v3/user/tokens` returned
 `403: Cannot create tokens for this app.` The token inventory confirmed no
-new token was created; GitHub still has no Production `VERCEL_TOKEN`.
+new token was created by those failed requests.
 The CLI's existing OAuth login is usable for project reads but cannot mint
 the release credential.
 
-The logged-in browser's normal token form supports the exact project scope.
-The form is prepared with name `nextjs-todo-production-github`, project
-`nextjs-todo-list-example`, expiration 180 days. It has **not** been submitted.
-The browser tool requires confirmation at the action that creates persistent
-security-sensitive access; the owner has been asked to approve creation and
-storage as GitHub Environment `production` secret `VERCEL_TOKEN`.
-No token value has been printed or committed.
+The owner explicitly approved creation through the browser and storage in
+GitHub `production`. The token `nextjs-todo-production-github` was created
+with the form's exact `nextjs-todo-list-example` project scope and 180-day
+expiration (2027-03-15). Its value was transferred directly between the
+visible Vercel result and GitHub's secret form without printing it.
+GitHub confirms `VERCEL_TOKEN` stored at `2026-09-16T14:05:45Z`.
 
-After that action, finish the remaining scoped Production configuration and
-recheck the complete profile before executable implementation. Real migration,
-deployment and deployed webhook evidence retain their own concrete approval
-and verification requirements.
+The remaining prerequisite configuration then completed:
+
+- Neon key id `3341780`, named `nextjs-todo-production-github`, is restricted
+  to `jolly-dew-32309276` and stored as the protected `NEON_API_KEY`. Neon
+  project keys can mutate that project; they cannot access another project.
+- The correlated direct and pooled URLs, distinct randomly generated
+  `BETTER_AUTH_SECRET`, `SANITY_REVALIDATE_SECRET` and
+  `SANITY_MANUAL_RECOVERY_SECRET` were stored only in GitHub `production`.
+- Non-secret target, origin, Sanity and Vercel variables were added there.
+  Existing mail variables matched and were preserved; `RESEND_API_KEY`
+  retains its original 2026-09-05 timestamp. Preview credentials were not used.
+- `parseEnvironmentProfile` accepted the complete configuration in the
+  provisioning process and `inspectEnvironment` emitted a safe projection.
+  Its mail key came from the already configured local provider setup; this
+  does not yet prove the newly stored settings inside a protected runner.
+- Sanity webhook `2rW5R84M7YqsOaw7`, name
+  `nextjs-todo-production-landing`, was created for the published
+  `production` dataset and canonical `/api/sanity/webhook` endpoint. It
+  signs only matching `landingPage` document events, projects `{_id, _type}`,
+  and excludes drafts/version documents. No content was changed and no
+  delivery to the not-yet-deployed endpoint was triggered.
+
+The prerequisite blocker is resolved. Protected-run profile validation,
+real migration, deployment and real webhook delivery remain implementation
+and hosted verification obligations. No Production schema or application
+deployment was changed during this setup.
 
 ## Scope and sources
 
 The [T-23 plan](../plans/2026-09-16-t-23-production-release.md) maps work and
 checks. T-23 remains open; `TST-RELEASE-001` has no executable release
-evidence and is blocked at the named credential prerequisite. The
+evidence and is now `in_progress` after prerequisite setup. The
 environment/pipeline contracts retain their existing partial evidence.
 
 - [Vercel token creation API](https://vercel.com/docs/rest-api/authentication/create-an-auth-token):

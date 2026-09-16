@@ -1015,8 +1015,8 @@ Verification:
 
 - [ ] Complete T-23 only after the Production target, migration policy, and protected approval path are accepted.
 - Plan: [protected Production release](docs/agentforge/plans/2026-09-16-t-23-production-release.md), scoped under the owner's 2026-09-16 instruction to continue T-23 autonomously.
-- Current prerequisite: the [read-only preflight](docs/agentforge/evidence/2026-09-16-production-release-preflight.md) confirms the accepted Neon/Vercel targets and published Sanity content. Vercel's CLI refused project-scoped token creation with `403: Cannot create tokens for this app.` The browser form is prepared; creation and storage in GitHub `production` await the browser tool's required owner confirmation. No executable release implementation has begun.
-- [ ] T-23.1 — Finish prerequisite setup: create the project-only Vercel credential after confirmation, provision the other distinct Production credentials/settings, and validate the complete protected profile. Preserve existing mail settings, Preview scope, and the accepted target identities. Record names/scopes and results without secret values.
+- Current prerequisite: the [preflight evidence](docs/agentforge/evidence/2026-09-16-production-release-preflight.md) confirms the accepted targets and Sanity read path. After the CLI refused token creation, the owner approved the project-only browser token and protected storage. The remaining scoped secrets/variables and signed Sanity webhook are configured; provisioning-process profile validation passed. Executable implementation may proceed; actual protected-run validation remains required.
+- [x] T-23.1 — Finish prerequisite setup: the owner confirmed the project-only Vercel token; distinct Production credentials/settings and the signed Sanity webhook are configured. The complete profile passed validation in the provisioning process, with safe names/scopes recorded in the evidence. Existing mail settings and Preview scope are preserved. Actual protected-run validation belongs to T-23.4/T-23.5 and has not occurred yet.
 - [ ] T-23.2 — Prove the exact-ref/CI boundary in `scripts/deploy/production/ref.ts` and its tests: tag/full-SHA resolution to `ResolvedDeliveryRef`, reviewed-main reachability, clean matching checkout and successful exact-SHA `ci.yml` Quality/Harness evidence. Refuse branch aliases, mismatched revisions and unrelated CI before protected access. Verify with focused Vitest, typecheck and lint.
 - [ ] T-23.3 — Implement the guarded release sequence in `scripts/deploy/production/core.ts`, `runtime.ts`, `cli.ts` and their tests. Consume the existing profile/guard contracts; observe provider identity, record a compatible rollback deployment, migrate directly, deploy the same SHA, run smoke and preserve safe partial-failure results. Prove refusal before mutation, stage order, deployment failure after migration, smoke failure and credential redaction. Use only disposable local PostgreSQL for database test setup.
 - [ ] T-23.4 — Add the manual main-only `.github/workflows/deploy-production.yml`, `package.json` entry/test grouping, workflow tests and `docs/runbooks/production-release.md`. Bind separate unprivileged ref/CI and protected release jobs to the same immutable SHA, scope secrets to their consumer, serialize releases and publish redacted records. Run `pnpm test:pipeline`, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier and `git diff --check`; obtain fresh independent review before merge.
@@ -1196,9 +1196,10 @@ Latest dependency checkpoint, 2026-09-16 after protected run `35103297897`:
 T-21.5 is complete. PR #35 merged after independent review and passing CI;
 the mail job then waited for its required reviewer and passed with scoped
 Production settings. T-23's subsequent preflight confirmed its targets and
-reached the project-scoped Vercel credential blocker recorded in its task entry.
-The implementation plan and breakdown are ready; executable implementation
-waits for prerequisite completion. T-24 still needs T-23's release evidence; T-25/T-29 final delivery
+resolved the project-scoped Vercel credential blocker with explicit owner
+confirmation. Scoped prerequisite settings, the plan and breakdown are ready
+for implementation; protected-run validation and release evidence remain.
+T-24 still needs T-23's release evidence; T-25/T-29 final delivery
 documentation follows it. T-26, broader T-27 and T-28 retain their existing
 scope and decision prerequisites. No application release or database change
 was performed to close T-21.5.

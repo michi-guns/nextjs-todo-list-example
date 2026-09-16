@@ -2,7 +2,7 @@
 
 > AgentForge plan. Task breakdown lives in [TODO.md](../../../TODO.md#t-23-add-manually-approved-exact-ref-production-release).
 
-**Status:** Accepted scope under the owner's 2026-09-16 instruction to continue T-23 autonomously. Implementation waits for the credential prerequisite below.
+**Status:** Accepted scope under the owner's 2026-09-16 instruction to continue T-23 autonomously. The credential prerequisite was resolved after explicit browser confirmation; implementation may proceed.
 
 **Goal:** Release one reviewed tag/full commit SHA through CI, protected approval, forward migration, exact-revision deployment, smoke and a redacted recovery record.
 
@@ -28,18 +28,18 @@
 
 ## Dependencies and work order
 
-T-18, T-20, T-21, T-21.5 and the accepted migration policy are complete. [Preflight evidence](../evidence/2026-09-16-production-release-preflight.md) records observed targets and the current credential blocker.
+T-18, T-20, T-21, T-21.5 and the accepted migration policy are complete. [Preflight evidence](../evidence/2026-09-16-production-release-preflight.md) records observed targets, the resolved credential blocker and scoped prerequisite configuration.
 
-| Prerequisite                                              | Needed for                                                | Current evidence / unblock                                                                                                                                                      |
-| --------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Installed dependencies, Node/pnpm, Git and GitHub access  | Implementation and local verification                     | Available; existing unit suite and hosted CI pass                                                                                                                               |
-| Disposable local PostgreSQL through Docker/Testcontainers | Migration/integration verification                        | Docker server 29.7.2 available; do not use Neon as the test target                                                                                                              |
-| Neon Production identity and correlated URLs              | Required release adapter boundary                         | Project `jolly-dew-32309276`, branch `br-purple-sea-a53v962l` / `main`, `neondb`; read-only query confirms PostgreSQL 18.6, no public tables or migration journal               |
-| Vercel scoped deployment credential                       | Required implementation preflight and hosted verification | Existing CLI login cannot create a token (403); prepared project-only browser form awaits confirmation                                                                          |
-| Production-only provider/database/auth/recovery settings  | Protected profile validation and release                  | Only mail settings currently exist; provision separate scoped credentials and generated auth/recovery values after the blocker is resolved, without copying Preview credentials |
-| Published Sanity production content                       | Release smoke                                             | Existing `pnpm sanity:smoke` passes; deployed webhook configuration/delivery remains required for release evidence                                                              |
-| Protected approval                                        | Real migration/deployment                                 | Required reviewer, no admin bypass, main-only policy already verified; approval must cover the concrete release                                                                 |
-| Optional provider-native Neon branch protection           | Additional protection                                     | Unavailable on the current plan; accepted protection is the separately isolated project plus guarded protected workflow                                                         |
+| Prerequisite                                              | Needed for                                                | Current evidence / unblock                                                                                                                                                  |
+| --------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Installed dependencies, Node/pnpm, Git and GitHub access  | Implementation and local verification                     | Available; existing unit suite and hosted CI pass                                                                                                                           |
+| Disposable local PostgreSQL through Docker/Testcontainers | Migration/integration verification                        | Docker server 29.7.2 available; do not use Neon as the test target                                                                                                          |
+| Neon Production identity and correlated URLs              | Required release adapter boundary                         | Project `jolly-dew-32309276`, branch `br-purple-sea-a53v962l` / `main`, `neondb`; read-only query confirms PostgreSQL 18.6, no public tables or migration journal           |
+| Vercel scoped deployment credential                       | Required implementation preflight and hosted verification | Owner approved browser creation; project-only token stored in GitHub `production`, expires 2027-03-15                                                                       |
+| Production-only provider/database/auth/recovery settings  | Protected profile validation and release                  | Distinct scoped credentials and generated auth/recovery values are stored; provisioning-process profile validation passed. Actual protected-run validation remains required |
+| Published Sanity production content                       | Release smoke                                             | `pnpm sanity:smoke` passes; matching signed webhook configured, with actual deployed delivery still required                                                                |
+| Protected approval                                        | Real migration/deployment                                 | Required reviewer, no admin bypass, main-only policy already verified; approval must cover the concrete release                                                             |
+| Optional provider-native Neon branch protection           | Additional protection                                     | Unavailable on the current plan; accepted protection is the separately isolated project plus guarded protected workflow                                                     |
 
 Complete the prerequisite before executable implementation, then build the ref/CI boundary, the guarded release adapter and workflow, and the recovery/evidence documentation in that order. Each coherent completed unit receives focused checks and independent review. Do not mark the parent task complete before its required hosted evidence.
 
