@@ -121,11 +121,9 @@ Routine repository integration and Playwright tests use a harness-owned local Po
 ## Current implementation prerequisites
 
 The environment direction and target-safety choices are accepted in
-[`TD-026`](../../decisions/TECHNICAL.md#td-026). Resource prerequisites remain
-separate: the ignored local environment still points at the linked Neon
-default `main`; the current agent-owned Neon `development` branch expires on
-2026-09-02 and is not a durable shared target; a protected Production Neon
-project/branch and Preview deployment resources have not been exercised; and
-the non-production Sanity dataset and remote Production mail provider still
-require owner-led provisioning. These facts do not authorize reset, promotion,
-deployment, or Production access.
+[`TD-026`](../../decisions/TECHNICAL.md#td-026). Current resource and verification
+facts live in [Project Context](../../CONTEXT.md), with remaining delivery work
+in [TODO](../../../TODO.md). Verified Development, Preview or mail-provider
+setup does not establish protected Production configuration or a completed
+release. These facts do not authorize reset, promotion, deployment, or
+Production access.

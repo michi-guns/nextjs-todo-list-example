@@ -42,11 +42,54 @@ and record a controlled delivery check. T-23 must call profile validation and
 require that provider evidence before deployment. No Production release
 workflow currently exists.
 
-The owner has no domain as of 2026-09-09. T-21.5 therefore remains incomplete.
-The authorized test-account check used `onboarding@resend.dev` and
-`delivered@resend.dev`, with synthetic content only. Resend reported simulated
-delivery for the readiness message; the new adapter's synthetic send was also
-accepted. Neither result proves real inbox delivery or Production readiness.
+The 2026-09-09 check used Resend's simulated test-domain delivery. On
+2026-09-16 the owner supplied an existing Namecheap domain, Resend verified
+the sending subdomain, and one synthetic verification message through the
+existing adapter reached the owner's Gmail. It arrived in Spam and was moved
+to Inbox after explicit owner approval. See the [redacted domain and delivery
+record](../agentforge/evidence/2026-09-16-resend-domain-delivery.md) for the
+approved sender, DNS values, command result and evidence limits.
+
+The sending/DNS slice is complete. GitHub Production mail settings and
+approval rules are now configured; their first protected execution remains
+pending, so T-21.5 is still open. The isolated local adapter invocation did not
+configure or test a deployed Production process. It also did not prove a real
+verification or magic-link lifecycle. Initial spam classification remains a
+deliverability observation; the manual move is not general inbox-placement
+proof. No receiving mailbox was configured.
+
+## Remaining T-21.5 acceptance
+
+The existing GitHub `production` Environment owns `RESEND_API_KEY` and the
+seven non-secret variables shown above. `APP_MAIL_FROM` uses the previously
+approved `noreply@auth.dim-stamatakis.dev`. The required reviewer is `jimzord12`,
+administrator bypass is disabled, and only branch `main` may use the
+Environment. The owner may approve their own manual dispatch. CI and Preview
+do not reference this Environment or its Resend secret. See the
+[protected configuration record](../agentforge/evidence/2026-09-16-production-mail-protection.md).
+
+1. Merge the reviewed task PR containing `verify-production-mail.yml` before
+   dispatching it. GitHub requires a manually dispatched workflow to exist on
+   the default branch. The repository task protocol requires an explicit
+   merge instruction.
+2. Run `gh workflow run verify-production-mail.yml --ref main`, then approve
+   the waiting `production` job in GitHub. Review its triggering SHA before
+   approving. The workflow checks out that SHA and exposes the scoped mail
+   settings only to `pnpm exec tsx scripts/auth-mail/inspect.ts`.
+3. Record the waiting approval and successful run URL/SHA. The command reuses
+   `readResendConfig` and reports only configuration-valid metadata. It makes
+   no network call and sends no email. A failure keeps T-21.5 open. Do not
+   overwrite an existing credential without the owner's explicit approval.
+4. Reconcile T-21.5 and its test contracts after that protected execution,
+   then continue to T-23. T-23 must validate the complete Production profile
+   and supply the approved settings to the Vercel Production runtime. Its
+   release approval, migration, deployment and auth smoke remain separate
+   evidence. This mail-only check neither configures nor proves that runtime.
+
+Configuration validation does not prove credential validity or current
+deliverability. The earlier real adapter receipt is separate evidence and
+must retain its limits. Any additional real email needs an owner-authorized
+recipient and purpose.
 
 References: [Resend send API](https://resend.com/docs/api-reference/emails/send-email),
 [Resend test addresses](https://resend.com/docs/dashboard/emails/send-test-emails),

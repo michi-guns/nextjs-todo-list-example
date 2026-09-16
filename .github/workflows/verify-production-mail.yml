@@ -1,0 +1,46 @@
+name: Production mail readiness
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-mail-readiness
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    name: Validate protected mail configuration
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      HUSKY: "0"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          runtime: node@24
+          cache: true
+      - name: Validate mail configuration without sending
+        run: pnpm exec tsx scripts/auth-mail/inspect.ts
+        env:
+          APP_ENV: ${{ vars.APP_ENV }}
+          NODE_ENV: ${{ vars.NODE_ENV }}
+          APP_MAIL_TRANSPORT: ${{ vars.APP_MAIL_TRANSPORT }}
+          APP_MAIL_PROVIDER: ${{ vars.APP_MAIL_PROVIDER }}
+          SECRET_NAMESPACE: ${{ vars.SECRET_NAMESPACE }}
+          BETTER_AUTH_LOCAL_MAILBOX: ${{ vars.BETTER_AUTH_LOCAL_MAILBOX }}
+          APP_MAIL_FROM: ${{ vars.APP_MAIL_FROM }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      - name: Record configuration evidence
+        run: |
+          echo "Validated protected Production mail configuration for commit $GITHUB_SHA." >> "$GITHUB_STEP_SUMMARY"
+          echo "No email was sent. Provider credentials and deployed auth were not tested." >> "$GITHUB_STEP_SUMMARY"

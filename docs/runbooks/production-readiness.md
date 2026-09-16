@@ -1,7 +1,8 @@
 # Production readiness
 
-There is no implemented Production release workflow or approved protected
-Production database target. T-23 remains pending. Do not use the current Neon
+The separately provisioned Production Neon project is recorded below, but
+its protected release configuration and the Production workflow are not
+implemented. T-23 remains pending. Do not use the Development project's Neon
 `main`, a Preview deployment or a local test as a substitute.
 
 Before a runnable release/recovery procedure can be completed, the owner and
@@ -16,9 +17,17 @@ and [TD-027](../../.dwf/decisions/TECHNICAL.md#td-027) requirements:
   yet, which is the isolation that protects it until T-23 adds the release
   workflow. The free plan exposes no protected-branch setting.
 - Protected Production approval and secrets, unavailable to CI and Preview.
+  GitHub `production` now requires `jimzord12` approval, disables administrator
+  bypass and allows only branch `main`. Its existing Resend key and mail
+  variables are configured. The first protected mail check is pending;
+  database, app and deployment credentials remain T-23 setup work.
 - A verified owner mail domain, protected Resend settings and controlled
-  delivery evidence. See [authentication mail](auth-mail.md). Test-domain
-  simulation does not meet this requirement.
+  delivery evidence. The domain and one real adapter delivery were verified
+  on 2026-09-16; the message initially arrived in Gmail Spam and was manually
+  moved to Inbox with owner approval. The first execution with the configured
+  protected mail settings remains T-21.5's outstanding acceptance. See
+  [authentication mail](auth-mail.md#remaining-t-215-acceptance) and its linked
+  evidence; local configuration is not protected Production evidence.
 - A manual tag/full-SHA workflow that resolves one immutable revision,
   verifies CI for it, validates the profile/mail prerequisites, waits for
   approval, migrates explicitly, deploys the same revision and runs smoke.
