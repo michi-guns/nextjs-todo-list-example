@@ -678,13 +678,20 @@ resolves tags through the explicit tag namespace or accepts full SHAs, checks
 main ancestry and clean exact checkout, and requires successful main-push
 `ci.yml` evidence plus successful Quality/Harness jobs from that run attempt.
 The subprocess helper uses no shell and hides raw failure output. The focused
-suite passes 28 tests across two files, including a real Git subprocess,
+suite passes 29 tests across two files, including a real Git subprocess,
 refusal cases and safe process failures; typecheck and changed-file lint pass.
 A real read-only Git/GitHub check resolved `ad16b60209863ad36dfcecbb3be6de1fc7569bb8`
 and confirmed CI run `35105163127`, attempt 1. Status is now `partial`;
 workflow wiring, protected validation, migration/deployment and hosted
 browser/webhook evidence remain outstanding. This also adds local ref/CI
 boundary evidence to TST-PIPELINE-001 without completing that contract.
+
+The independent ref review found that an `origin/main` tag could shadow the
+remote-tracking reference. The resolver now uses `refs/remotes/origin/main`;
+a regression test failed before the fix and passes afterward. The initial
+T-23.3 core adds 16 tests for guard refusal, observed database correlation,
+stage ordering, safe partial failure and preservation of recovery evidence.
+The provider adapter and protected workflow are not implemented by this unit.
 
 ## SPEC traceability map
 

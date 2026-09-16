@@ -29,7 +29,12 @@ export async function resolveReleaseRef(
       await run("git", ["rev-parse", "--verify", `${ref}^{commit}`])
     ).trim()
     if (!shaPattern.test(commitSha)) throw new Error()
-    await run("git", ["merge-base", "--is-ancestor", commitSha, "origin/main"])
+    await run("git", [
+      "merge-base",
+      "--is-ancestor",
+      commitSha,
+      "refs/remotes/origin/main",
+    ])
     return { requestedRef, commitSha, kind }
   } catch {
     throw new Error(

@@ -31,13 +31,13 @@ describe("Production immutable ref boundary (TST-RELEASE-001)", () => {
     const main = execFileSync("git", ["rev-parse", "HEAD"], {
       encoding: "utf8",
     }).trim()
-    // A shallow PR checkout need not contain origin/main. Bind the trusted
+    // A shallow PR checkout need not contain the remote main ref. Bind the trusted
     // anchor to this checkout for the subprocess test; the next test checks
-    // the production command's actual origin/main argument.
+    // the production command's fully qualified remote main argument.
     const git: typeof runReleaseProcess = (command, args) =>
       runReleaseProcess(
         command,
-        args.map((arg) => (arg === "origin/main" ? "HEAD" : arg))
+        args.map((arg) => (arg === "refs/remotes/origin/main" ? "HEAD" : arg))
       )
     expect(await resolveReleaseRef(main, git)).toEqual({
       requestedRef: main,
@@ -58,7 +58,7 @@ describe("Production immutable ref boundary (TST-RELEASE-001)", () => {
     })
     expect(git.mock.calls).toEqual([
       ["git", ["rev-parse", "--verify", "refs/tags/v1.2.3^{commit}"]],
-      ["git", ["merge-base", "--is-ancestor", sha, "origin/main"]],
+      ["git", ["merge-base", "--is-ancestor", sha, "refs/remotes/origin/main"]],
     ])
   })
 
@@ -97,6 +97,17 @@ describe("Production immutable ref boundary (TST-RELEASE-001)", () => {
       .fn()
       .mockResolvedValueOnce(sha)
       .mockRejectedValueOnce(new Error("not ancestor"))
+    await expect(resolveReleaseRef(sha, git)).rejects.toThrow("Release ref")
+  })
+
+  it("does not trust a colliding origin/main tag as the remote main branch", async () => {
+    // Git resolves refs/tags/origin/main before refs/remotes/origin/main.
+    // Model an outside candidate contained only in that tag's history.
+    const git = vi.fn<typeof runReleaseProcess>(async (_command, args) => {
+      if (args[0] === "rev-parse") return sha
+      if (args[3] === "origin/main") return ""
+      throw new Error("candidate is outside refs/remotes/origin/main")
+    })
     await expect(resolveReleaseRef(sha, git)).rejects.toThrow("Release ref")
   })
 
