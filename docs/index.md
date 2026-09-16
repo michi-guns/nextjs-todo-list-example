@@ -15,6 +15,9 @@ This directory is the knowledge system for the Next.js Todo List Example.
 - [Derived application guide](./architecture/derived-applications.md)
 - [Preview delivery](./runbooks/preview-delivery.md)
 - [Production readiness](./runbooks/production-readiness.md)
+- [Production release and recovery](./runbooks/production-release.md)
+- [Authentication mail](./runbooks/auth-mail.md)
+- [Verified environment and pipeline evidence](./agentforge/evidence/2026-09-16-pipeline-closeout.md)
 - [Technology stack](./architecture/stack.md)
 - [Data ownership](./data/ownership.md)
 

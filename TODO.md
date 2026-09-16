@@ -1070,6 +1070,9 @@ Available prerequisite evidence from T-22:
 Required reconciliation from the 2026-09-05 review, within this task's existing documentation scope:
 
 - Plan: [current delivery documentation](docs/agentforge/plans/2026-09-09-t-25-delivery-documentation.md). Owner authorized this partial documentation slice independently of unavailable Production evidence.
+- Final plan: [delivery documentation closeout](docs/agentforge/plans/2026-09-16-t-25-delivery-documentation-closeout.md), now that T-24 is reviewed and merged.
+- [x] T-25.1 — Reconcile README, current `.dwf/CONTEXT.md` facts, environment map, profile/local/Preview runbooks, quality gates and documentation navigation with the implemented release and verified pipeline. State command targets and configuration ownership. Preserve canonical decisions, safe placeholders, historical evidence and T-29's separate guide scope.
+- [x] T-25.2 — Review command/setting names against source and workflows without executing provider or migration commands; run link/anchor, changed-file Prettier, stale-current-state and diff checks. Reconcile this tracker, obtain fresh independent exact-tip review and pass hosted CI before merge. AgentForge skills: `documentation-and-adrs`, `testing-first-class`, `code-review-and-quality`, `git-workflow-and-versioning` and `unslop`.
 - [x] Reconcile current context/toolchain/command examples and add environment, blocked-Preview and Production-readiness runbooks. Changed Markdown relative links/anchors, command-shape review, formatting and diff checks pass. Fresh independent review gates the documentation PR; full delivery documentation remains pending actual Preview/release proof.
 
 - [x] Reconcile `.dwf/CONTEXT.md` with implemented CI/Preview tooling and the recorded durable Development evidence. At review time it still said those workflows were absent and Development was pending. Distinguish existing code, recorded successful checks, and unproven hosted behavior; do not mark T-22/T-23 complete from file presence.
@@ -1080,7 +1083,7 @@ application operator able to understand, run, verify, preview, release, and
 recover the template without reading hidden agent context or guessing which
 database a command targets.
 
-- [ ] Complete T-25 after the implemented environment and pipeline behavior has truthful evidence.
+- [x] Complete T-25 after the implemented environment and pipeline behavior has truthful evidence.
 - Files: `README.md`, `docs/index.md`, `docs/architecture/environments.md`, `docs/runbooks/local-development-and-verification.md`, new Preview and Production release/recovery runbooks under `docs/runbooks/`, `docs/development/quality-gates.md`, `.dwf/CONTEXT.md` and supporting DWF/decision references only where T-18.1 authorizes reconciliation, `.env.example`-style non-secret templates, and `TODO.md` evidence links.
 - Interfaces: environment matrix; copyable Local/Development/Preview/Production setup commands; pooled/direct database explanation; Sanity and email boundaries; secret ownership/naming categories without values; Neon branch policy; manual workflow inputs; exact-ref and resolved-SHA behavior; seed modes; cleanup/expiry; approval gates; migration and rollback/recovery procedure; troubleshooting; evidence redaction rules; and a small architecture diagram or sequence showing the delivery lifecycle.
 - Acceptance: documentation is internally consistent with the canonical DWF decisions and implemented commands; it clearly says Local uses Docker PostgreSQL plus hosted Sanity, Development is a local app against durable Neon, Preview is a manually requested ephemeral fully functional deployment, and Production is an approved exact-ref release; it warns that pooled URLs are for runtime and direct URLs for migrations; it explains why an existing Neon `main` branch is not automatically Production; no credentials, tokens, or invented private links appear; stale scaffold statements are corrected or explicitly labeled historical; every operational command names its target and safety boundary.
@@ -1088,6 +1091,17 @@ database a command targets.
 - Checks: link check; copy/paste review of commands; changed-file Prettier; `git diff --check`; documentation review against PRD/SPEC/decision ledgers; and a fresh proportional review of the final documentation tip.
 - Dependencies/unblock: T-18 through T-24 for final truth, though a short design draft may be prepared after T-18.1. Documentation must be updated when later implementation changes the command surface.
 - Recommended AgentForge skills: `documentation-and-adrs`, `writing-guidelines`, `unslop`, `testing-first-class`, `verification-before-completion`, and `git-workflow-and-versioning`.
+
+T-25 final documentation verification, 2026-09-16: README, current context,
+environment map, configuration ownership, Local/Development migration guidance,
+Preview/release navigation and quality gates now match the implemented commands.
+Source/workflow command review, 162 local links/anchors, changed-file Prettier,
+stale-current-state search and `git diff --check` pass. No provider or migration
+command was executed for this prose-only task. Fresh exact-tip independent
+review and hosted CI gate merge. All TST statuses retain the reviewed T-24
+baseline; T-29's existing guide is now ready for its final delivery retargeting
+and documentation review. T-26/broader T-27/T-28 still require their named scope
+or product decisions.
 
 ### T-26: Add runtime safety and observability hardening
 

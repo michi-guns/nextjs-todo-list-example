@@ -48,7 +48,7 @@ an operation guard can authorize database mutation; a branch label by itself is
 not enough. Local observations must contain a loopback host and cannot carry
 remote project or branch fields. The classifier does not derive identity from a
 friendly branch name or from the local `.env.local` declaration. Provider
-authenticity and hosted identity evidence remain responsibilities of the later
+authenticity and hosted identity evidence are responsibilities of the
 Neon/Vercel adapters and their verification tasks.
 
 Connection observations must include the provider-observed endpoint host. When
@@ -68,8 +68,9 @@ The Local Docker adapter in `scripts/local-postgres/` is the first
 state-changing command adapter. The Development adapter in
 `scripts/neon-development/` is the hosted non-default branch adapter. Both
 call these assertions before migrate or seed. Local reset stays loopback-only.
-The Preview adapter in `scripts/deploy/preview/` is the first state-changing
-Preview command adapter. Production adapters remain future work.
+The Preview adapter in `scripts/deploy/preview/` owns temporary-branch delivery
+and cleanup. `scripts/deploy/production/` owns protected exact-ref release,
+provider identity observation, direct migration, deployment and smoke.
 
 | Guard                               | Required safety boundary                                                                                                                                                    |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -82,7 +83,7 @@ Preview command adapter. Production adapters remain future work.
 
 `executeAfterGuard` runs the assertion completely before invoking the supplied
 mutation callback. Local Docker migrate, seed, and reset go through that
-boundary. Later PowerShell and GitHub workflow adapters must call the same
+boundary. Development, Preview and Production adapters also call the relevant
 assertions before opening their mutation boundaries. Guard failures use
 stable safe error codes such as `target_unresolved`, `target_mismatch`,
 `connection_role_mismatch`, `ref_unresolved`, and `approval_required`.
@@ -101,8 +102,10 @@ recorded separately from local refusal tests.
 
 ## Variables
 
-Use these names in a local `.env.local`, a GitHub Environment, or the eventual
-Vercel project settings. Values below describe categories, not credentials.
+Use these names in the profile's local process or scoped GitHub Environment.
+The release adapters supply application values to each Vercel deployment;
+changing a GitHub secret requires redeployment before the app receives it.
+Values below describe categories, not credentials.
 
 | Variable                         | Required          | Meaning                                                                                          |
 | -------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------ |
@@ -129,35 +132,61 @@ Vercel project settings. Values below describe categories, not credentials.
 
 Production remote mail requires `APP_MAIL_PROVIDER=resend`, protected
 `RESEND_API_KEY`, and `APP_MAIL_FROM` on an owner-verified domain. See the
-[auth-mail runbook](auth-mail.md) for validation and remaining readiness evidence.
+[auth-mail runbook](auth-mail.md) for validation, real delivery evidence and diagnosis.
 
 The existing `BETTER_AUTH_MAILBOX_DIR` remains a local/test-only path setting.
 It is not a deployment transport and is not accepted as a substitute for the
 Preview controlled account or the Production remote provider.
 
+## Hosted configuration ownership
+
+| Owner                           | Configuration responsibility                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ignored local `.env.local`      | Local or durable Development URLs, origin, auth secret and public Sanity configuration. Do not copy Production credentials here for routine work.                                                                                                                                                                                              |
+| GitHub `preview` Environment    | `BETTER_AUTH_SECRET`, `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` are scoped secret entries. `NEXT_PUBLIC_SANITY_PROJECT_ID` is a repository or Environment variable. The workflow fixes the Preview profile, dataset and no-send mail policy; the adapter obtains the temporary branch's URLs.                       |
+| GitHub `production` Environment | Secrets: `BETTER_AUTH_SECRET`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_API_KEY`, `VERCEL_TOKEN`, `RESEND_API_KEY`, `SANITY_REVALIDATE_SECRET`, `SANITY_MANUAL_RECOVERY_SECRET`. Required reviewer, main-only branch policy and disabled admin bypass protect consumption.                                                               |
+| Production non-secret variables | Profile/runtime mode, canonical auth origin, provider/project/branch, public Sanity project/dataset/API version, Sanity policy, mail transport/provider/from, local-mailbox=false, deployment owner/namespace, and Vercel organization/project IDs. Exact variable names are in the [workflow](../../.github/workflows/deploy-production.yml). |
+| Vercel deployment               | Only required application build/runtime configuration is forwarded. Production excludes direct migration URLs and Neon/Vercel/GitHub API tokens. Git auto-deploy stays disabled; GitHub owns manual delivery.                                                                                                                                  |
+
+The same secret name in two GitHub Environments does not share its value.
+Provision each scope deliberately with the accepted target identities, and
+use the [readiness record](production-readiness.md) and release runbook before
+the first Production dispatch. Runtime configuration includes secrets and
+must never be serialized into evidence.
+
 ## Delivery argument boundary
 
-The reusable parser accepts the argument shapes reserved for later delivery
-commands:
+The implemented operator entry points are:
 
 ```text
-preview --ref <non-mutable-ref> --preview-id <isolated-preview-id>
-production --ref <tag-or-commit-ref>
+pnpm preview deploy --ref <branch-tag-or-full-SHA> --preview-id <isolated-preview-id>
+pnpm preview inspect --preview-id <isolated-preview-id>
+pnpm preview cleanup --preview-id <isolated-preview-id>
+pnpm release -- resolve --ref <tag-or-full-SHA>
 ```
 
-`--ref` is required, must be supplied once, and rejects mutable aliases such as
-`latest`, `main`, and `master`. Preview requires `--preview-id`; Production
-rejects it. The guard boundary accepts only a provider-resolved ref with one
+Preview deployment and release selection require `--ref` once and reject aliases
+such as `latest`, `main`, and `master`. Preview commands require `--preview-id`;
+Production rejects it. The guard boundary accepts only a provider-resolved ref with one
 full 40-character commit SHA. Preview may resolve a branch, tag, or commit;
 Production must resolve a tag or full commit ref and must match protected
 approval. Preview guards compare the requested `--preview-id` with the
-provider-created Preview identity as well as its project and branch. T-22/T-23
-own provider-specific ref resolution and hosted mutation.
+provider-created Preview identity as well as its project and branch.
+Deploy requires a clean checkout matching the selected SHA. Inspect is read-only;
+cleanup deletes only the identity-matched Preview Neon branch and requires its
+own authorization. See the [Preview runbook](preview-delivery.md) for dispatch
+and Vercel cleanup limits.
+
+`release resolve` only reads Git/GitHub and requires `GITHUB_REPOSITORY` plus a
+read-only `GITHUB_TOKEN` in the process environment. The actual `release` command
+accepts protected Actions metadata and refuses a local invocation. Dispatch and
+approve the [Production workflow](production-release.md#select-and-approve-a-release)
+for that operation; never set workflow metadata locally to bypass it.
 
 ## Redaction rules
 
 The parser result is a validated runtime configuration and intentionally retains
-the connection strings and server-only secrets required by future consumers.
+the connection strings and server-only secrets required by the adapters.
 Treat that result as sensitive and never serialize it directly; use
 `inspectEnvironment` for diagnostics.
 

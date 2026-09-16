@@ -11,11 +11,13 @@ workflow succeeded; no hosted Preview smoke was obtained. See the
 
 On 2026-09-14 the owner resolved the prerequisite: a deliberate placeholder
 static page was deployed with `vercel deploy --prod` from a scratch folder
-outside this repository, so the project's Production slot is occupied by
+outside this repository, so the project's Production slot was occupied by
 deployment `dpl_GRpcAgtr9BZ7QcsUNHX259WAvLin` at
 `https://nextjs-todo-list-example.vercel.app` ("Not released yet."). Every
 further deployment without `--prod` is a Preview. The placeholder is not a
-release; T-23 replaces it with a reviewed exact-ref release.
+release. On 2026-09-16, T-23 replaced it with the reviewed application through
+the [protected release workflow](production-release.md). The project therefore
+continues to satisfy the existing-Production prerequisite for Preview.
 
 The adapter now refuses to start when that prerequisite is missing. Before
 any Neon branch is observed or created, `deploy` reads the project through
@@ -87,5 +89,6 @@ Record the requested/resolved SHA, Preview ID, observed project/branch ID,
 expiry, Vercel project/deployment/target and smoke/cleanup outcomes. Do not
 record connection strings, keys, auth links, cookies or mailbox contents.
 T-22's hosted acceptance was established by the 2026-09-14 run and cleanup;
-T-24's acceptance remains pending until it reconciles these observations with
-a Production release rehearsal.
+T-24 subsequently reconciled these observations with the actual protected
+Production releases in the [complete pipeline matrix](../agentforge/evidence/2026-09-16-pipeline-closeout.md).
+That evidence does not authorize another Preview or cleanup operation.
