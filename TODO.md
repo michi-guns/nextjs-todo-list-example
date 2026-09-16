@@ -956,7 +956,7 @@ Verification:
 - [x] Fresh proportional review of implementation tip `e50a641` found no actionable findings. Optional nits about test-name tightness and `persist-credentials: false` were deferred.
 - [x] PR: [#25](https://github.com/michi-guns/nextjs-todo-list-example/pull/25) is open from `task/T-21-ci-quality-gates`.
 
-Dependency checkpoint, updated 2026-09-16: T-18.1 through T-18.4, T-19, T-20, and T-21 are complete. T-21.5 has the reviewed Resend implementation, a verified owner domain and one controlled real delivery. Protected Production sender configuration and its evidence remain pending, so the parent mail prerequisite is not complete. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
+Dependency checkpoint, updated 2026-09-16: T-18.1 through T-18.4, T-19, T-20, T-21, and T-21.5 are complete. The mail foundation includes reviewed Resend implementation, a verified owner domain, one controlled real delivery, and the approved protected configuration run `35103297897`. T-23 can proceed to its own release preflight. The Preview workflow must not be inferred from Vercel's default Git integration or run automatically on every pull request.
 
 ### T-21.5: Establish the minimum Production mail foundation
 
@@ -1024,7 +1024,7 @@ Verification:
 
 Dependency checkpoint: T-22 and T-23 require the environment decisions, CI evidence, and hosted credentials/approvals they name. Neither task is unblocked by local unit tests alone. Do not claim the template's deployment pipeline is proven until T-24 covers both the simulated negative paths and the required disposable/controlled hosted boundaries.
 
-Review priority, updated 2026-09-16: finish T-21.5's protected Production mail configuration, then proceed to T-23 and the remaining T-24 release evidence. T-22's repairs, hosted proof and cleanup are complete. The verified mail domain and controlled real delivery remove the provider/DNS prerequisite, but do not establish protected Production execution. These are existing delivery obligations, not authorization to provision providers or deploy.
+Review priority, updated 2026-09-16: proceed to T-23 and the remaining T-24 release evidence. T-21.5's protected mail configuration and T-22's hosted Preview lifecycle are complete. The approved mail configuration run establishes that scoped foundation; it does not establish an application release, Production migration or deployed auth journey. T-23 retains its own target, credentials, exact-SHA and protected approval requirements.
 
 ### T-24: Prove the complete environment and delivery pipeline
 
@@ -1185,8 +1185,6 @@ in Spam; the owner's approved manual move to Inbox must not be recorded as
 automatic inbox delivery. No Production configuration or deployment was
 performed in this session.
 
-## Explicitly out of scope for this baseline
-
 Latest dependency checkpoint, 2026-09-16 after protected run `35103297897`:
 T-21.5 is complete. PR #35 merged after independent review and passing CI;
 the mail job then waited for its required reviewer and passed with scoped
@@ -1195,6 +1193,8 @@ release work. T-24 still needs T-23's release evidence; T-25/T-29 final delivery
 documentation follows it. T-26, broader T-27 and T-28 retain their existing
 scope and decision prerequisites. No application release or database change
 was performed to close T-21.5.
+
+## Explicitly out of scope for this baseline
 
 - OAuth or social login.
 - Teams, organizations, shared lists, roles, or machine-authenticated APIs.
