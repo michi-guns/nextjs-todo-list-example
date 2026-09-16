@@ -1164,7 +1164,10 @@ Verification and evidence for this slice:
 ### T-29: Publish the derived-application extension and replacement guide
 
 - Plan: [derived application guide](docs/agentforge/plans/2026-09-09-t-29-derived-application-guide.md). Owner authorized this documentation slice without a maintained example app.
-- [x] Write the [derived application guide](docs/architecture/derived-applications.md), including an illustrative adaptation smoke checklist. Relative links/anchors, source/command review, formatting and diff checks gate the documentation commit; fresh independent review gates its PR. No maintained or executed fork is claimed. Parent delivery prerequisites remain pending.
+- Final closeout, 2026-09-16: T-24 and T-25 are reviewed and merged; the plan's closeout section maps the newly implemented Production boundaries.
+- [x] T-29.1 — Extend the existing guide's retargeting map with `scripts/deploy/production/core.ts` target constants, `runtime.ts` repository identity, protected Production workflow/settings and associated refusal tests. Preserve the illustrative-only adaptation smoke and require the derived application's own hosted evidence. No source/provider change or maintained example app.
+- [x] T-29.2 — Review the complete retain/replace guide against source and the verified pipeline, check command shapes, relative links/anchors, changed-file Prettier and diff, then obtain fresh exact-tip independent review and pass hosted CI before merge. AgentForge skills: `documentation-and-adrs`, `testing-first-class`, `code-review-and-quality`, `git-workflow-and-versioning` and `unslop`.
+- [x] Write the [derived application guide](docs/architecture/derived-applications.md), including an illustrative adaptation smoke checklist. Relative links/anchors, source/command review, formatting and diff checks gate the documentation commit; fresh independent review gates its PR. No maintained or executed fork is claimed. The later T-24/T-25 reviewed closeouts satisfy the parent delivery prerequisites.
 
 Review follow-through, within the existing guide scope:
 
@@ -1173,7 +1176,7 @@ Review follow-through, within the existing guide scope:
 
 The separate [fresh-fork experiment](FUTURE.md#fresh-fork-into-a-different-small-application) is a future idea, not an added T-29 acceptance criterion or dependency. T-27 authentication completion and T-28 CMS live authoring retain their existing scope and prerequisites.
 
-- [ ] Complete T-29 only after the core environment and delivery pipeline is reviewed.
+- [x] Complete T-29 only after the core environment and delivery pipeline is reviewed.
 - Files: `docs/architecture/`, a derived-application guide/example, replacement-seam documentation for domain/UI/CMS/deployment adapters, and template verification notes.
 - Interfaces: documented seams for domain modules, UI surfaces, repositories, auth/mail, Sanity, database provider/branch policy, and delivery workflows; a minimal adaptation checklist that does not create a second framework.
 - Acceptance: a derived app can identify what to replace versus retain, inherit the environment safety and test pipeline, and prove its own profile/preview/release setup; guidance remains opinionated and concrete rather than becoming a provider-agnostic abstraction catalogue.
@@ -1181,6 +1184,13 @@ The separate [fresh-fork experiment](FUTURE.md#fresh-fork-into-a-different-small
 - Checks: documentation link/command review, adaptation smoke example, changed-file Prettier, and `git diff --check`.
 - Dependencies/unblock: T-25 and the reviewed implementation of T-18 through T-24; product scope approval is required before adding a maintained example app.
 - Recommended AgentForge skills: `documentation-and-adrs`, `spec-driven-development`, `testing-first-class`, `writing-guidelines`, and `git-workflow-and-versioning`.
+
+T-29 final guide verification, 2026-09-16: the guide now maps the Production
+Neon/Vercel/origin/fallback constants, exact GitHub repository check, protected
+workflow/settings and refusal tests alongside the existing Development/Preview
+seams. Commands and file responsibilities were checked against source; 95 local
+links/anchors, changed-file Prettier and diff checks pass. The adaptation smoke
+remains illustrative. Fresh independent review and hosted CI gate merge.
 
 Final post-baseline dependency checkpoint, 2026-09-09: T-18.1 through T-18.4,
 T-19, T-20 and T-21 are complete. The reviewed T-27 local verification journey,
@@ -1243,6 +1253,14 @@ final operational documentation, then T-29 can close its existing derived-app
 guide scope. T-26 requires an agreed observability scope; broader T-27 and
 T-28 require explicit product decisions. No new hosted operations are needed
 for the documentation closeouts.
+
+Latest dependency checkpoint after T-29 closeout, 2026-09-16:
+All accepted baseline tasks and the existing derived-app guide are complete.
+The only unchecked tasks are T-26, broader T-27 and T-28. T-26 now has its
+technical prerequisites but still requires agreed observability scope; the
+owner has been asked to choose that scope. Broader authentication and Sanity
+live authoring retain their explicit product-decision prerequisites. No further
+implementation is inferred from baseline completion alone.
 
 ## Explicitly out of scope for this baseline
 

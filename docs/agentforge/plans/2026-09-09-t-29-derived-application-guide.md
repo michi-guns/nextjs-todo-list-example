@@ -31,3 +31,27 @@ Renaming a database variable must not disable identity guards or silently select
 ## Handoff to task breakdown
 
 Complete the two explicit T-29 guide acceptances and their documentation checks. Keep the parent task conditional on the reviewed, proven delivery pipeline and do not create a maintained example application.
+
+## Final closeout, 2026-09-16
+
+The prerequisite is now satisfied: T-24's pipeline matrix and T-25's operational
+documentation were independently reviewed and merged. The earlier sections
+record the initial slice's state. Complete the existing guide scope under the
+owner's instruction to continue unblocked work.
+
+The read-only source audit found two additional Production retargeting seats:
+`productionTarget` in `scripts/deploy/production/core.ts` pins the separately
+approved Neon/Vercel/origin/placeholder identities, and `runtime.ts` checks
+the exact GitHub repository. Add these to the guide alongside the Production
+Environment/workflow settings. Preserve main-history, successful-CI and
+approval guards; update associated fixture identities rather than weakening
+their refusal behavior. Expand the existing local check to cover Production
+tests and link the real baseline evidence, clearly requiring a derived app's
+own provider proof.
+
+Only `docs/architecture/derived-applications.md`, this plan and `TODO.md` change.
+Installed formatting and the local link checker are the only execution
+prerequisites. Review commands and file responsibilities against source, check
+links/anchors and formatting/diff, then obtain fresh exact-tip independent
+review and hosted CI. No new executable test, provider call, maintained app or
+deployment is needed for this documentation closeout.
