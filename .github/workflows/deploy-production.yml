@@ -1,0 +1,135 @@
+name: Production release
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Reviewed main-history tag or full commit SHA with successful CI
+        required: true
+        type: string
+      rollback-compatible:
+        description: Previous deployment is compatible with the forward schema (initial placeholder is maintenance only)
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Resolve exact ref and CI
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HUSKY: "0"
+    outputs:
+      commitSha: ${{ steps.resolve.outputs.commitSha }}
+      requestedRef: ${{ steps.resolve.outputs.requestedRef }}
+      kind: ${{ steps.resolve.outputs.kind }}
+      ciRunId: ${{ steps.resolve.outputs.ciRunId }}
+      ciRunAttempt: ${{ steps.resolve.outputs.ciRunAttempt }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          runtime: node@24
+          cache: true
+      - name: Resolve reviewed revision and successful CI
+        id: resolve
+        run: pnpm release -- resolve --ref "$REF"
+        env:
+          REF: ${{ inputs.ref }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    name: Release ${{ needs.resolve.outputs.commitSha }}
+    needs: resolve
+    if: ${{ github.ref == 'refs/heads/main' && inputs.rollback-compatible }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: production
+    env:
+      HUSKY: "0"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ needs.resolve.outputs.commitSha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          runtime: node@24
+          cache: true
+      - name: Install pinned Vercel CLI
+        run: |
+          npm install --global --prefix "$RUNNER_TEMP/release-cli" vercel@59.11.2
+          echo "$RUNNER_TEMP/release-cli/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/release-cli/bin/vercel" --version
+      - name: Run protected release
+        run: pnpm release -- release
+        env:
+          RELEASE_COMMIT_SHA: ${{ needs.resolve.outputs.commitSha }}
+          RELEASE_REQUESTED_REF: ${{ needs.resolve.outputs.requestedRef }}
+          RELEASE_REF_KIND: ${{ needs.resolve.outputs.kind }}
+          RELEASE_CI_RUN_ID: ${{ needs.resolve.outputs.ciRunId }}
+          RELEASE_CI_RUN_ATTEMPT: ${{ needs.resolve.outputs.ciRunAttempt }}
+          RELEASE_APPROVED_SHA: ${{ needs.resolve.outputs.commitSha }}
+          RELEASE_ROLLBACK_COMPATIBLE: ${{ inputs.rollback-compatible }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_ENV: ${{ vars.APP_ENV }}
+          NODE_ENV: ${{ vars.NODE_ENV }}
+          BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_LOCAL_MAILBOX: ${{ vars.BETTER_AUTH_LOCAL_MAILBOX }}
+          DATABASE_PROVIDER: ${{ vars.DATABASE_PROVIDER }}
+          DATABASE_PROJECT_ID: ${{ vars.DATABASE_PROJECT_ID }}
+          DATABASE_BRANCH: ${{ vars.DATABASE_BRANCH }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET }}
+          NEXT_PUBLIC_SANITY_API_VERSION: ${{ vars.NEXT_PUBLIC_SANITY_API_VERSION }}
+          SANITY_WRITE_POLICY: ${{ vars.SANITY_WRITE_POLICY }}
+          SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET }}
+          SANITY_MANUAL_RECOVERY_SECRET: ${{ secrets.SANITY_MANUAL_RECOVERY_SECRET }}
+          APP_MAIL_TRANSPORT: ${{ vars.APP_MAIL_TRANSPORT }}
+          APP_MAIL_PROVIDER: ${{ vars.APP_MAIL_PROVIDER }}
+          APP_MAIL_FROM: ${{ vars.APP_MAIL_FROM }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DEPLOYMENT_OWNER: ${{ vars.DEPLOYMENT_OWNER }}
+          SECRET_NAMESPACE: ${{ vars.SECRET_NAMESPACE }}
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      - name: Publish safe release record
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: production-release-${{ needs.resolve.outputs.commitSha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/production-release-record.json
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Summarize release
+        if: ${{ always() }}
+        run: |
+          if [ -f "$RUNNER_TEMP/production-release-record.json" ]; then
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$RUNNER_TEMP/production-release-record.json" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'No release record was written. Inspect the failed step and provider state before retrying.' >> "$GITHUB_STEP_SUMMARY"
+          fi

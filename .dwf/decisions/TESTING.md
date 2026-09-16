@@ -691,7 +691,23 @@ remote-tracking reference. The resolver now uses `refs/remotes/origin/main`;
 a regression test failed before the fix and passes afterward. The initial
 T-23.3 core adds 16 tests for guard refusal, observed database correlation,
 stage ordering, safe partial failure and preservation of recovery evidence.
-The provider adapter and protected workflow are not implemented by this unit.
+That unit did not yet include the provider adapter or protected workflow.
+
+**T-23 implementation/rehearsal evidence, 2026-09-16:** The provider adapter,
+CLI, manual protected workflow and recovery runbook now implement the complete
+release sequence. The Production suite passes 62 tests and the pipeline suite
+passes 235. The real read-only resolver selected `e3ee5c0c63d34f81358243496cafe8777db5f785`
+with CI `35107944387`, attempt 1. The installed `drizzle-kit migrate` applied
+both committed migrations to disposable local PostgreSQL and produced two
+journal entries. Integration passed 23 tests; Chromium, Firefox and WebKit
+passed all 24 journeys. A pre-existing Firefox chunk-cancellation diagnostic
+was corrected narrowly, with regression coverage retaining API/network failures.
+See [implementation evidence](../../docs/agentforge/evidence/2026-09-16-production-release-implementation.md).
+TST-RELEASE-001, TST-PIPELINE-001 and TST-ENV-001 remain `partial`: protected
+Production profile validation, actual migration/deployment, deployed browser
+and real Sanity webhook evidence are still required. This local rehearsal
+supplements TST-MIGRATION-001 and browser evidence without changing unrelated
+hosted obligations or claiming Production success.
 
 ## SPEC traceability map
 

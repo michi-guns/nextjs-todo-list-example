@@ -1,5 +1,8 @@
 import { expect, test as base, type Page } from "@playwright/test"
-import { redactAuthTokens } from "../src/test/browser-diagnostics"
+import {
+  isBrowserRequestCancellation,
+  redactAuthTokens,
+} from "../src/test/browser-diagnostics"
 
 import {
   clearMagicLinkMailbox,
@@ -32,7 +35,14 @@ export const test = base.extend<{ browserDiagnostics: void }>({
       })
       page.on("requestfailed", (request) => {
         const failure = request.failure()?.errorText
-        if (failure === "net::ERR_ABORTED") return
+        if (
+          isBrowserRequestCancellation(failure, {
+            method: request.method(),
+            resourceType: request.resourceType(),
+            url: request.url(),
+          })
+        )
+          return
         failures.push(
           `requestfailed: ${request.method()} ${request.url()} (${failure ?? "unknown"})`
         )
