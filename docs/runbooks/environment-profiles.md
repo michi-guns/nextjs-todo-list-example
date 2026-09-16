@@ -93,9 +93,11 @@ values, and secrets are never copied into it.
 The guard module remains runtime-neutral. Local Docker commands in
 `scripts/local-postgres/`, Development commands in
 `scripts/neon-development/`, and Preview commands in
-`scripts/deploy/preview/` call it before mutation. T-23 must still provide the
-Production observations and protected-approval path; that task must call these
-guards rather than recreate target checks.
+`scripts/deploy/preview/` call it before mutation. Production commands in
+`scripts/deploy/production/` consume the same guards with provider observations
+and the protected exact-SHA approval path. See the
+[Production release runbook](production-release.md); actual hosted evidence is
+recorded separately from local refusal tests.
 
 ## Variables
 

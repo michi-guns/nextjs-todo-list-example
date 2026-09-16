@@ -3,6 +3,26 @@
 Date: 2026-09-16. This records implementation and non-Production verification.
 It does not record a Production release.
 
+## Reviewed merge and release candidate
+
+Fresh independent review approved the complete implementation commit
+`7c9f1a923467389e9bd59a64117b440df2b1e701`, with 76 independently run focused tests
+passing. [PR #38](https://github.com/michi-guns/nextjs-todo-list-example/pull/38)
+merged it as `d639dfeeeca2932606c652cf5305ca3e0cd87a89`. The two Git trees are
+identical (`fcbde8968a5d12221b17484bb4bc38f82c044000`). PR CI
+[35111580645](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35111580645)
+and exact main-push CI
+[35111932584](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35111932584)
+both passed Quality and Harness.
+
+A final `BEGIN READ ONLY` inspection confirmed that the accepted Production
+database still has no public tables and no migration journal. The initial
+chain creates the historical scaffold `posts_table` in its first migration
+and drops it in the second; the final schema has the six tables listed below.
+Concrete owner approval for this candidate's migration/deployment and live
+verification was requested separately. No protected release has run at this
+checkpoint.
+
 ## Implemented boundary
 
 The [accepted plan](../plans/2026-09-16-t-23-production-release.md) is implemented
@@ -54,8 +74,8 @@ The container was stopped by the harness. No hosted database was used.
   `origin/main` could shadow the remote-tracking reference. The anchor now uses
   `refs/remotes/origin/main`; the added test failed before the fix and passed
   afterward. Fresh independent review approved ref/core commit `b2c1d2a` with
-  45 tests across three files. The full workflow still requires its own final
-  latest-commit review before merge.
+  45 tests across three files. The complete implementation later received the
+  final latest-commit approval recorded above.
 - The first cross-browser run passed eight Chromium journeys, then failed
   Firefox diagnostics after the core journey completed. The reported failure
   was an interrupted GET for a Next.js static JavaScript chunk with
