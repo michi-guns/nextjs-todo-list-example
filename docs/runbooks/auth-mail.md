@@ -50,7 +50,8 @@ to Inbox after explicit owner approval. See the [redacted domain and delivery
 record](../agentforge/evidence/2026-09-16-resend-domain-delivery.md) for the
 approved sender, DNS values, command result and evidence limits.
 
-The sending/DNS slice is complete. Protected Production configuration remains
+The sending/DNS slice is complete. GitHub Production mail settings and
+approval rules are now configured; their first protected execution remains
 pending, so T-21.5 is still open. The isolated local adapter invocation did not
 configure or test a deployed Production process. It also did not prove a real
 verification or magic-link lifecycle. Initial spam classification remains a
@@ -59,22 +60,36 @@ proof. No receiving mailbox was configured.
 
 ## Remaining T-21.5 acceptance
 
-1. Inspect the intended protected GitHub/Vercel Production configuration
-   without printing secret values. Identify where the server-only settings
-   above will be stored and supplied; do not use repository-wide or Preview
-   secrets as a substitute for Production isolation.
-2. Prepare the exact proposed settings and obtain owner approval before
-   changing protected configuration or credentials. Reuse the verified
-   sender from the delivery record; do not recreate the domain or DNS records.
-3. Verify the required settings and their scope through the intended
-   protected execution path, using existing validators and redacted evidence.
-   A local `.env.local` key and successful standalone send do not prove that
-   scope. Any additional real email requires its own owner-authorized
-   recipient and purpose.
-4. Reconcile T-21.5 and its test contracts, then continue to T-23's planned
-   release implementation. The workflow, approval boundary, migration and
-   deployed auth smoke remain T-23/T-24 evidence and require their own
-   prerequisites. Do not deploy solely to close this documentation checkpoint.
+The existing GitHub `production` Environment owns `RESEND_API_KEY` and the
+seven non-secret variables shown above. `APP_MAIL_FROM` uses the previously
+approved `noreply@auth.dim-stamatakis.dev`. The required reviewer is `jimzord12`,
+administrator bypass is disabled, and only branch `main` may use the
+Environment. The owner may approve their own manual dispatch. CI and Preview
+do not reference this Environment or its Resend secret. See the
+[protected configuration record](../agentforge/evidence/2026-09-16-production-mail-protection.md).
+
+1. Merge the reviewed task PR containing `verify-production-mail.yml` before
+   dispatching it. GitHub requires a manually dispatched workflow to exist on
+   the default branch. The repository task protocol requires an explicit
+   merge instruction.
+2. Run `gh workflow run verify-production-mail.yml --ref main`, then approve
+   the waiting `production` job in GitHub. Review its triggering SHA before
+   approving. The workflow checks out that SHA and exposes the scoped mail
+   settings only to `pnpm exec tsx scripts/auth-mail/inspect.ts`.
+3. Record the waiting approval and successful run URL/SHA. The command reuses
+   `readResendConfig` and reports only configuration-valid metadata. It makes
+   no network call and sends no email. A failure keeps T-21.5 open. Do not
+   overwrite an existing credential without the owner's explicit approval.
+4. Reconcile T-21.5 and its test contracts after that protected execution,
+   then continue to T-23. T-23 must validate the complete Production profile
+   and supply the approved settings to the Vercel Production runtime. Its
+   release approval, migration, deployment and auth smoke remain separate
+   evidence. This mail-only check neither configures nor proves that runtime.
+
+Configuration validation does not prove credential validity or current
+deliverability. The earlier real adapter receipt is separate evidence and
+must retain its limits. Any additional real email needs an owner-authorized
+recipient and purpose.
 
 References: [Resend send API](https://resend.com/docs/api-reference/emails/send-email),
 [Resend test addresses](https://resend.com/docs/dashboard/emails/send-test-emails),

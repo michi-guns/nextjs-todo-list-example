@@ -591,6 +591,12 @@ pass. This local mailbox evidence does not establish remote mail delivery.
 - **T-21.5 local adapter evidence, 2026-09-09:** Resend configuration and mail tests cover explicit Production selection, original verification/magic-link URL delivery, HTTP/network/malformed-response failures without sensitive diagnostics, non-Production remote refusal, deployed local-mailbox refusal, missing sender/key rejection and safe inspection output. A synthetic test-domain send through the adapter was accepted. At that checkpoint no owner domain or protected Production sender configuration had been verified. See [auth-mail runbook](../../docs/runbooks/auth-mail.md) and the subsequent provider evidence below.
 - **T-21.5 provider evidence, 2026-09-16:** The owner-controlled sending subdomain passed Namecheap public-DNS and Resend verification, and one real adapter send reached the owner's Gmail. Initial placement was Spam, followed by an owner-approved manual move to Inbox. The invocation validated an isolated local configuration object; it did not configure or inspect GitHub/Vercel Production secret scope or a deployed process. Protected Production configuration remains pending, so this contract remains `partial`. See [redacted evidence](../../docs/agentforge/evidence/2026-09-16-resend-domain-delivery.md).
 
+T-21.5 protection update, 2026-09-16: [configuration evidence](../../docs/agentforge/evidence/2026-09-16-production-mail-protection.md)
+records the actual GitHub Production reviewer, disabled administrator bypass,
+main-only branch policy, scoped key metadata and mail variables. Seven new
+CLI/workflow tests pass, alongside the existing mail/profile guards. The
+first approved protected execution is pending; TST-ENV-001 stays `partial`.
+
 <a id="tst-pipeline-001"></a>
 
 ### TST-PIPELINE-001 — Environment and delivery pipeline orchestration
@@ -608,6 +614,12 @@ pass. This local mailbox evidence does not establish remote mail delivery.
 - **Current evidence:** T-21 adds `.github/workflows/ci.yml` with `push`/`pull_request` triggers on `main`, `contents: read` default permissions, concurrency cancellation, and SHA-pinned `actions/checkout`, `pnpm/setup`, and `actions/upload-artifact`. The Quality job runs `pnpm typecheck`, `pnpm lint`, `pnpm test`, `drizzle-kit check`, and `pnpm build` with loopback compile-time placeholders. The Harness job runs `pnpm test:integration` and Chromium `pnpm test:e2e` against disposable local PostgreSQL. `src/test/pipeline/ci-workflow.test.ts` proves those trigger, permission, pin, and no-deploy boundaries. The workflow does not deploy, create Preview branches, mutate Sanity, or read `secrets.*`. GitHub Actions run [33746137734](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/33746137734) on `e50a641` succeeded (Quality 1m25s, Harness 2m0s) with no hosted mutation. T-22 adds `.github/workflows/deploy-preview.yml` as `workflow_dispatch` only, GitHub Environment `preview`, and `src/test/pipeline/preview-workflow.test.ts` proving CI remains the only automatic workflow and that checkout and the adapter receive the same requested ref. `scripts/deploy/preview/` proves exact-ref parsing, Preview-id isolation, expiry, identity-checked cleanup, and refusal before mutation. Its exact-revision regression tests prove that a different checkout or local edits stop before any Neon, migration, seed, deployment, or smoke operation, while a clean checkout at the resolved SHA continues. The owner subsequently provisioned the Preview prerequisites. The 2026-09-09 hosted attempt failed to establish Preview identity because Vercel assigned Production to the first deployment. The deployment was deleted and guarded Neon cleanup succeeded. The first-deployment and adapter-lookup blockers were resolved on 2026-09-14 and the hosted Preview stage now has real evidence under TST-PREVIEW-001; this contract stays `partial` until T-23 adds the protected release path and T-24 rehearses it. See [Preview runbook](../../docs/runbooks/preview-delivery.md).
 - **T-24 local slice, 2026-09-09:** `pnpm test:pipeline` groups the environment matrix, static workflow checks and Preview orchestration tests, passing 124 cases. Added evidence proves migration/seed/deploy/smoke ordering, stopping after each stage failure without success output, explicit matching cleanup after failure, and refusal of Development or another Preview identity during cleanup. Hosted lifecycle and protected release evidence remain unavailable; the parent task stays incomplete.
 - **Readiness update, 2026-09-16:** T-22's completed hosted Preview lifecycle remains available evidence. T-21.5 now has verified owner-domain and [controlled real delivery evidence](../../docs/agentforge/evidence/2026-09-16-resend-domain-delivery.md), but protected mail configuration, T-23 release orchestration and T-24 release rehearsal remain pending. Provider acceptance and manual inbox placement do not prove the protected pipeline. Status remains `partial`.
+
+T-21.5 protection update, 2026-09-16: the manual mail inspection workflow
+adds a main-only protected path with secrets supplied only to validation.
+Local tests prove the workflow contract, not a hosted approval. The
+[configuration record](../../docs/agentforge/evidence/2026-09-16-production-mail-protection.md)
+keeps the first approved execution pending. TST-PIPELINE-001 stays `partial`.
 
 <a id="tst-preview-001"></a>
 
@@ -644,6 +656,11 @@ pass. This local mailbox evidence does not establish remote mail delivery.
 - **Required evidence:** Ref-resolution and refusal tests; minimum Production mail adapter/configuration and redacted delivery/health evidence; protected Environment and secret-scope configuration evidence; a controlled non-Production rehearsal where possible; and real Production migration/deployment/smoke evidence only after owner authorization. A rehearsal cannot be presented as Production proof.
 - **Dependencies:** TD-026 and TD-027, T-18 guards, durable Development/CI evidence from T-20/T-21, the minimum Production mail foundation from T-21.5, an owner-approved protected Production Neon project/branch, Vercel Production access, and the forward-only migration policy in TD-025.
 - **Current evidence, updated 2026-09-16:** The owner-authorized separate Neon Production project was provisioned on 2026-09-14, as recorded in [Production readiness](../../docs/runbooks/production-readiness.md); the protected release workflow is not implemented. T-21.5 now has a verified owner domain and [controlled real adapter delivery](../../docs/agentforge/evidence/2026-09-16-resend-domain-delivery.md), while its protected Production sender configuration is still pending. No protected release rehearsal, Production migration/deployment or deployed auth journey was performed. This contract remains `specified` and must not be marked `verified` from local, Preview or standalone provider evidence.
+
+T-21.5 protection update, 2026-09-16: [actual GitHub protection and mail configuration](../../docs/agentforge/evidence/2026-09-16-production-mail-protection.md)
+now exists. Its first protected execution and T-23 release work remain pending.
+TST-RELEASE-001 stays `specified`; TST-AUTH-001/002 retain their existing
+verified local lifecycle evidence. No deployed auth or release proof is added.
 
 ## SPEC traceability map
 

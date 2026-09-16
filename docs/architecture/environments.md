@@ -4,12 +4,12 @@ This is an operational map of [TD-026](../../.dwf/decisions/TECHNICAL.md#td-026)
 The [profile runbook](../runbooks/environment-profiles.md) owns configuration
 examples and [TESTING](../../.dwf/decisions/TESTING.md) records evidence.
 
-| Profile     | App and database                                                         | Mail and CMS                                             | Current evidence                                                                                                  |
-| ----------- | ------------------------------------------------------------------------ | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Local       | Local Next.js, loopback Docker PostgreSQL 18                             | Explicit local mailbox; hosted Sanity                    | Local app and disposable integration/browser suites pass                                                          |
-| Development | Local Next.js, durable non-default Neon `development`                    | Local mailbox; read-only published Sanity                | Provision, identity inspection, guarded migration and seed recorded                                               |
-| Preview     | Intended ephemeral Vercel deployment, expiring Neon child of Development | Controlled verified account, no sends; Sanity `preview`  | One hosted run completed and cleaned up 2026-09-14; each run needs owner authorization                            |
-| Production  | Approved exact-ref deployment, separately protected Neon project/branch  | Resend with verified owner domain; Production CMS policy | Owner domain and controlled delivery verified 2026-09-16; protected mail settings and T-23 release remain pending |
+| Profile     | App and database                                                         | Mail and CMS                                             | Current evidence                                                                                         |
+| ----------- | ------------------------------------------------------------------------ | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Local       | Local Next.js, loopback Docker PostgreSQL 18                             | Explicit local mailbox; hosted Sanity                    | Local app and disposable integration/browser suites pass                                                 |
+| Development | Local Next.js, durable non-default Neon `development`                    | Local mailbox; read-only published Sanity                | Provision, identity inspection, guarded migration and seed recorded                                      |
+| Preview     | Intended ephemeral Vercel deployment, expiring Neon child of Development | Controlled verified account, no sends; Sanity `preview`  | One hosted run completed and cleaned up 2026-09-14; each run needs owner authorization                   |
+| Production  | Approved exact-ref deployment, separately protected Neon project/branch  | Resend with verified owner domain; Production CMS policy | Mail settings and GitHub approval configured; first protected mail check and T-23 release remain pending |
 
 Neon runtime traffic uses the pooled URL. Migrations use the direct URL.
 The local direct URL can serve both roles. An existing branch called `main`

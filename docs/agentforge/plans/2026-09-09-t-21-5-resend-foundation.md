@@ -86,3 +86,59 @@ before treating T-23's mail prerequisite as satisfied. T-22 is complete;
 T-24's remaining release evidence depends on T-23. DNS verification and manual
 removal from Gmail Spam do not establish automatic inbox placement for other
 recipients.
+
+## Protected configuration continuation, 2026-09-16
+
+The owner authorized completion of T-21.5, verification, commits and pushes,
+then continuation to T-23. This continuation implements the existing minimum
+mail acceptance. It does not change the accepted provider or release design.
+
+Read-only preflight found an existing `RESEND_API_KEY` secret in the GitHub
+`production` Environment, no Production variables, no required reviewers and
+no branch restrictions. Repository-wide and Preview secrets do not contain
+that key. Node 24, pnpm 11 and installed dependencies are available.
+
+### File responsibilities and order
+
+1. Add `scripts/auth-mail/inspect.ts`, a no-network CLI around the existing
+   `readResendConfig`. Print only fixed configuration-valid metadata; return
+   a nonzero exit and generic error for invalid configuration.
+2. Add `.github/workflows/verify-production-mail.yml`, manual only and
+   restricted to dispatches from `main`. Check out the triggering immutable
+   SHA, use the existing pinned setup actions and GitHub `production`
+   Environment, and expose mail secrets only to the validation step. It
+   neither sends email nor migrates, builds or deploys the app.
+3. Add focused CLI and workflow contract tests under `src/test/pipeline/`.
+   Preserve the existing CI and Preview secret boundaries. Run those tests
+   red before implementation, then green with the existing mail/profile tests.
+4. Configure the existing Environment with required reviewer `jimzord12`,
+   explicit approval even for administrator runs, and only the `main` branch.
+   Allow the owner to approve their own dispatch because they operate this
+   repository. Keep the existing secret. Add the approved sender and mail
+   policy variables from the auth-mail runbook to this Environment only.
+5. Review and publish the workflow through the normal task PR. Once it is on
+   `main`, dispatch it and obtain the protected approval. Record the waiting
+   gate and successful validator run, then close T-21.5. Do not substitute
+   local validation for this evidence or start T-23 implementation early.
+
+### Verification and boundaries
+
+Required implementation prerequisites are present: repository admin access,
+the existing scoped secret and local tooling. The hosted check requires the
+workflow on the default branch and the configured owner's approval. GitHub
+cannot reveal the existing secret, so its validity stays unproven until that
+run. A failure must remain visible; do not overwrite the credential silently.
+
+Run focused CLI/workflow/mail/profile tests, `pnpm test`, `pnpm typecheck`,
+`pnpm lint`, changed-file Prettier and `git diff --check`. The PR's existing
+CI supplies build, disposable integration and browser regression evidence.
+No application behavior changes, so no additional local browser session is
+required. Reconcile TST-AUTH-001/002, TST-ENV-001, TST-PIPELINE-001 and
+TST-RELEASE-001, retaining their evidence limits. The previous real delivery
+remains separate evidence; this check proves configuration shape and scope,
+not provider credential validity or a deployed auth lifecycle.
+
+GitHub's [manual workflow documentation](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)
+requires the workflow on the default branch. Its [Environment documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments)
+defines approval before secret access. T-23 will consume this same protected
+Environment for its separately verified release path and runtime settings.
