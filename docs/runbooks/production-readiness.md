@@ -5,6 +5,14 @@ its protected release configuration and the Production workflow are not
 implemented. T-23 remains pending. Do not use the Development project's Neon
 `main`, a Preview deployment or a local test as a substitute.
 
+The [2026-09-16 preflight](../agentforge/evidence/2026-09-16-production-release-preflight.md)
+confirms the intended targets and Sanity read path. The owner approved the
+project-only Vercel token through the browser after the CLI refused creation.
+That token and the remaining scoped configuration are stored in GitHub
+`production`; provisioning-process profile validation passed. The [T-23 plan](../agentforge/plans/2026-09-16-t-23-production-release.md)
+and TODO breakdown are ready for implementation. Protected-run validation and
+real release evidence remain required.
+
 Before a runnable release/recovery procedure can be completed, the owner and
 implementation must establish the [TD-026](../../.dwf/decisions/TECHNICAL.md#td-026)
 and [TD-027](../../.dwf/decisions/TECHNICAL.md#td-027) requirements:
@@ -20,7 +28,8 @@ and [TD-027](../../.dwf/decisions/TECHNICAL.md#td-027) requirements:
   GitHub `production` now requires `jimzord12` approval, disables administrator
   bypass and allows only branch `main`. Its existing Resend key and mail
   variables are configured. The first protected mail check passed on 2026-09-16;
-  database, app and deployment credentials remain T-23 setup work.
+  database, app and deployment credentials were added during T-23 preflight.
+  Their actual protected-run validation remains part of T-23 implementation.
 - A verified owner mail domain, protected Resend settings and controlled
   delivery evidence. The domain and one real adapter delivery were verified
   on 2026-09-16; the message initially arrived in Gmail Spam and was manually

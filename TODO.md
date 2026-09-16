@@ -1014,6 +1014,13 @@ Verification:
 ### T-23: Add manually approved exact-ref Production release
 
 - [ ] Complete T-23 only after the Production target, migration policy, and protected approval path are accepted.
+- Plan: [protected Production release](docs/agentforge/plans/2026-09-16-t-23-production-release.md), scoped under the owner's 2026-09-16 instruction to continue T-23 autonomously.
+- Current prerequisite: the [preflight evidence](docs/agentforge/evidence/2026-09-16-production-release-preflight.md) confirms the accepted targets and Sanity read path. After the CLI refused token creation, the owner approved the project-only browser token and protected storage. The remaining scoped secrets/variables and signed Sanity webhook are configured; provisioning-process profile validation passed. Executable implementation may proceed; actual protected-run validation remains required.
+- [x] T-23.1 — Finish prerequisite setup: the owner confirmed the project-only Vercel token; distinct Production credentials/settings and the signed Sanity webhook are configured. The complete profile passed validation in the provisioning process, with safe names/scopes recorded in the evidence. Existing mail settings and Preview scope are preserved. Actual protected-run validation belongs to T-23.4/T-23.5 and has not occurred yet.
+- [ ] T-23.2 — Prove the exact-ref/CI boundary in `scripts/deploy/production/ref.ts` and its tests: tag/full-SHA resolution to `ResolvedDeliveryRef`, reviewed-main reachability, clean matching checkout and successful exact-SHA `ci.yml` Quality/Harness evidence. Refuse branch aliases, mismatched revisions and unrelated CI before protected access. Verify with focused Vitest, typecheck and lint.
+- [ ] T-23.3 — Implement the guarded release sequence in `scripts/deploy/production/core.ts`, `runtime.ts`, `cli.ts` and their tests. Consume the existing profile/guard contracts; observe provider identity, record a compatible rollback deployment, migrate directly, deploy the same SHA, run smoke and preserve safe partial-failure results. Prove refusal before mutation, stage order, deployment failure after migration, smoke failure and credential redaction. Use only disposable local PostgreSQL for database test setup.
+- [ ] T-23.4 — Add the manual main-only `.github/workflows/deploy-production.yml`, `package.json` entry/test grouping, workflow tests and `docs/runbooks/production-release.md`. Bind separate unprivileged ref/CI and protected release jobs to the same immutable SHA, scope secrets to their consumer, serialize releases and publish redacted records. Run `pnpm test:pipeline`, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier and `git diff --check`; obtain fresh independent review before merge.
+- [ ] T-23.5 — Rehearse non-Production ref/CI and migration boundaries, then perform the concretely authorized protected release. Record approval, migration result, matching Production deployment/SHA, canonical-origin smoke, actual browser and real Sanity webhook evidence, plus rollback compatibility. Reconcile all affected `TST-*` statuses, this tracker and runbooks. Keep any unavailable hosted evidence explicit; T-24 retains its broader pipeline proof.
 - Files: `.github/workflows/deploy-production.yml`, release/ref/migration/smoke helpers under `scripts/deploy/`, protected environment configuration documentation, production runbook, and redacted release evidence under `docs/agentforge/evidence/`.
 - Interfaces: `workflow_dispatch` input accepting a tag or commit SHA; exact-ref resolution and verification; required CI evidence for the resolved SHA; protected GitHub `production` Environment approval; direct forward migration; Vercel production deployment of the exact SHA; post-deploy smoke; release record containing SHA, migration result, deployment id, rollback reference, and operator/time metadata without secrets.
 - Acceptance: no branch name or mutable “latest” alias can silently change the deployed commit; Production secrets are unavailable to CI/Preview jobs; migration runs separately from app boot through the direct endpoint; a failed deployment reports whether the database migration already succeeded and does not assume a database down-migration is safe; application rollback guidance names a compatible commit/ref and explicitly handles migration compatibility; the chosen Production Neon project/branch is protected and never reset by routine developer commands.
@@ -1188,8 +1195,11 @@ performed in this session.
 Latest dependency checkpoint, 2026-09-16 after protected run `35103297897`:
 T-21.5 is complete. PR #35 merged after independent review and passing CI;
 the mail job then waited for its required reviewer and passed with scoped
-Production settings. T-23 is next for its own required preflight and accepted
-release work. T-24 still needs T-23's release evidence; T-25/T-29 final delivery
+Production settings. T-23's subsequent preflight confirmed its targets and
+resolved the project-scoped Vercel credential blocker with explicit owner
+confirmation. Scoped prerequisite settings, the plan and breakdown are ready
+for implementation; protected-run validation and release evidence remain.
+T-24 still needs T-23's release evidence; T-25/T-29 final delivery
 documentation follows it. T-26, broader T-27 and T-28 retain their existing
 scope and decision prerequisites. No application release or database change
 was performed to close T-21.5.
