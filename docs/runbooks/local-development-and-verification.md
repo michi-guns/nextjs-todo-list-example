@@ -123,6 +123,10 @@ not point these commands at Production.
 
 ## Application commands
 
+Production release and recovery use the separately protected target and
+[manual exact-ref workflow](production-release.md). The commands in this local
+runbook do not substitute for its CI and approval gates.
+
 Start the development server after applying the schema:
 
 ```powershell
@@ -164,12 +168,18 @@ pnpm exec drizzle-kit check --config drizzle.config.ts
 pnpm exec drizzle-kit generate --config drizzle.config.ts --explain --output text
 ```
 
-Apply the committed chain to the configured migration target only after
+Apply the committed chain to the configured Local Docker target after
 checking the target and the SQL:
 
 ```powershell
-pnpm exec drizzle-kit migrate --config drizzle.config.ts
+pnpm local:postgres migrate
 ```
+
+For the separately configured durable Development branch, inspect its provider
+identity with `pnpm neon:development inspect`, then use
+`pnpm neon:development migrate`. For Production, the protected release workflow
+owns direct migration and records its outcome before deployment. Never infer
+the target from a branch named `main` or from an existing `.env.local` URL.
 
 To create a migration after an intentional schema change, read the repository
 [`migration-history-workflow`](../../.agents/skills/migration-history-workflow/SKILL.md)
