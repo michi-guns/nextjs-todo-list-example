@@ -118,35 +118,35 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 
 ## Test contract index
 
-| ID                                          | Contract                                                                             | Primary evidence                                                     | Owner                                                              | Status        |
-| ------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------- |
-| [TST-FOUNDATION-001](#tst-foundation-001)   | Shared database runtime works across local PostgreSQL and Neon                       | Unit, local integration, hosted smoke                                | T-03                                                               | `verified`    |
-| [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke               | T-01, T-04, T-14, T-20                                             | `verified`    |
-| [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks                        | T-14, T-15, T-21                                                   | `partial`     |
-| [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration and hosted query-plan evidence                | T-04, T-06, T-07, T-14, T-16                                       | `verified`    |
-| [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                                     | T-05, T-15                                                         | `verified`    |
-| [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                                      | T-05, T-15                                                         | `verified`    |
-| [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                                    | T-05, T-09, T-15                                                   | `verified`    |
-| [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration, browser                 | T-06, T-10, T-14                                                   | `verified`    |
-| [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary                            | T-04, T-06, T-09, T-14                                             | `verified`    |
-| [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                                | T-06, T-08, T-10, T-14                                             | `verified`    |
-| [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                                        | T-07, T-09, T-14                                                   | `verified`    |
-| [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                                    | T-04, T-07, T-09, T-14                                             | `verified`    |
-| [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                                | T-07, T-08, T-10, T-14                                             | `verified`    |
-| [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                               | T-06, T-07, T-14                                                   | `verified`    |
-| [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                                         | T-08, T-09                                                         | `verified`    |
-| [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                                  | T-12                                                               | `verified`    |
-| [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                                 | T-02, T-12                                                         | `verified`    |
-| [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence                      | T-13                                                               | `partial`     |
-| [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance                            | T-09A, T-09B, T-10, T-11, T-12A, T-15                              | `verified`    |
-| [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                                  | T-15                                                               | `verified`    |
-| [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                                  | T-15                                                               | `verified`    |
-| [TST-E2E-003](#tst-e2e-003)                 | Browser-visible privacy, pagination, filtering, and mutation feedback work together  | Playwright Chromium, on-demand cross-browser                         | T-10, T-12A, T-15                                                  | `verified`    |
-| [TST-PERFORMANCE-001](#tst-performance-001) | Representative Neon queries use the intended indexes and meet the agreed warm target | Query plans and controlled performance evidence                      | T-16                                                               | `verified`    |
-| [TST-ENV-001](#tst-env-001)                 | Environment profiles select safe, intended targets and reject unsafe combinations    | Configuration, unit/static guard, local and hosted target inspection | T-18.2, T-18.3, T-18.4, T-19, T-20, T-21, T-21.5, T-22, T-23, T-24 | `partial`     |
-| [TST-PIPELINE-001](#tst-pipeline-001)       | Preview and release orchestration preserves ref, target, and failure boundaries      | Workflow/static, orchestration, controlled hosted                    | T-21, T-21.5, T-22, T-23, T-24                                     | `partial`     |
-| [TST-PREVIEW-001](#tst-preview-001)         | A requested Preview is isolated, seeded, functional, and traceable                   | Controlled Neon/Vercel/browser Preview                               | T-22, T-24                                                         | `verified`    |
-| [TST-RELEASE-001](#tst-release-001)         | An approved exact-ref release is migrated, deployed, smoked, and recorded            | Protected release rehearsal and Production evidence                  | T-21.5, T-23, T-24                                                 | `in_progress` |
+| ID                                          | Contract                                                                             | Primary evidence                                                     | Owner                                                              | Status     |
+| ------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------ | ---------- |
+| [TST-FOUNDATION-001](#tst-foundation-001)   | Shared database runtime works across local PostgreSQL and Neon                       | Unit, local integration, hosted smoke                                | T-03                                                               | `verified` |
+| [TST-MIGRATION-001](#tst-migration-001)     | The versioned migration chain upgrades the intended databases                        | PostgreSQL migration integration, Neon migration smoke               | T-01, T-04, T-14, T-20                                             | `verified` |
+| [TST-HARNESS-001](#tst-harness-001)         | Database-backed test infrastructure is isolated and fails safely                     | Testcontainers integration and harness checks                        | T-14, T-15, T-21                                                   | `partial`  |
+| [TST-PERSISTENCE-001](#tst-persistence-001) | PostgreSQL enforces persistence invariants and repository mappings                   | PostgreSQL integration and hosted query-plan evidence                | T-04, T-06, T-07, T-14, T-16                                       | `verified` |
+| [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                                     | T-05, T-15                                                         | `verified` |
+| [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                                      | T-05, T-15                                                         | `verified` |
+| [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                                    | T-05, T-09, T-15                                                   | `verified` |
+| [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration, browser                 | T-06, T-10, T-14                                                   | `verified` |
+| [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary                            | T-04, T-06, T-09, T-14                                             | `verified` |
+| [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                                | T-06, T-08, T-10, T-14                                             | `verified` |
+| [TST-TASKS-001](#tst-tasks-001)             | Task lifecycle, status, title, and notes rules are correct                           | Domain, application, boundary                                        | T-07, T-09, T-14                                                   | `verified` |
+| [TST-TASKS-002](#tst-tasks-002)             | Task ownership, list relationships, uniqueness, and cascade behavior are correct     | Application, PostgreSQL, boundary                                    | T-04, T-07, T-09, T-14                                             | `verified` |
+| [TST-TASKS-003](#tst-tasks-003)             | Task pagination and completed filtering preserve the contract                        | Application, PostgreSQL, boundary, UI                                | T-07, T-08, T-10, T-14                                             | `verified` |
+| [TST-CONCURRENCY-001](#tst-concurrency-001) | Concurrent accepted writes follow last-successful-write semantics                    | Application and PostgreSQL integration                               | T-06, T-07, T-14                                                   | `verified` |
+| [TST-BOUNDARY-001](#tst-boundary-001)       | JSON routes and Server Actions map auth, validation, and outcomes consistently       | Request-level boundary tests                                         | T-08, T-09                                                         | `verified` |
+| [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                                  | T-12                                                               | `verified` |
+| [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                                 | T-02, T-12                                                         | `verified` |
+| [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence                      | T-13                                                               | `partial`  |
+| [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance                            | T-09A, T-09B, T-10, T-11, T-12A, T-15                              | `verified` |
+| [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                                  | T-15                                                               | `verified` |
+| [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                                  | T-15                                                               | `verified` |
+| [TST-E2E-003](#tst-e2e-003)                 | Browser-visible privacy, pagination, filtering, and mutation feedback work together  | Playwright Chromium, on-demand cross-browser                         | T-10, T-12A, T-15                                                  | `verified` |
+| [TST-PERFORMANCE-001](#tst-performance-001) | Representative Neon queries use the intended indexes and meet the agreed warm target | Query plans and controlled performance evidence                      | T-16                                                               | `verified` |
+| [TST-ENV-001](#tst-env-001)                 | Environment profiles select safe, intended targets and reject unsafe combinations    | Configuration, unit/static guard, local and hosted target inspection | T-18.2, T-18.3, T-18.4, T-19, T-20, T-21, T-21.5, T-22, T-23, T-24 | `partial`  |
+| [TST-PIPELINE-001](#tst-pipeline-001)       | Preview and release orchestration preserves ref, target, and failure boundaries      | Workflow/static, orchestration, controlled hosted                    | T-21, T-21.5, T-22, T-23, T-24                                     | `partial`  |
+| [TST-PREVIEW-001](#tst-preview-001)         | A requested Preview is isolated, seeded, functional, and traceable                   | Controlled Neon/Vercel/browser Preview                               | T-22, T-24                                                         | `verified` |
+| [TST-RELEASE-001](#tst-release-001)         | An approved exact-ref release is migrated, deployed, smoked, and recorded            | Protected release rehearsal and Production evidence                  | T-21.5, T-23, T-24                                                 | `partial`  |
 
 ## Test contracts
 
@@ -645,7 +645,7 @@ records successful approved execution in run `35103297897`. TST-PIPELINE-001 sta
 
 ### TST-RELEASE-001 — Protected exact-ref Production release
 
-- **Status:** `in_progress`
+- **Status:** `partial`
 - **Capability:** Production release
 - **Evidence layers/modes:** Ref-resolution tests, protected workflow rehearsal, direct migration/deployment evidence, post-deploy smoke
 - **Verifies product decisions:** D-009, D-010
@@ -668,10 +668,23 @@ The authenticated Vercel CLI refused token creation, but the owner subsequently
 confirmed browser creation of the project-only token and protected storage.
 The distinct Production credentials/settings and signed Sanity webhook are
 configured; the complete profile passed validation in the provisioning process.
-Status is now `in_progress`. Actual protected-run validation, executable release
+Status became `in_progress` at prerequisite completion. Actual protected-run validation, executable release
 orchestration, migration, deployment and webhook delivery remain outstanding.
 See the [preflight evidence](../../docs/agentforge/evidence/2026-09-16-production-release-preflight.md)
 and [implementation plan](../../docs/agentforge/plans/2026-09-16-t-23-production-release.md).
+
+**T-23.2 ref/CI evidence, 2026-09-16:** `scripts/deploy/production/ref.ts`
+resolves tags through the explicit tag namespace or accepts full SHAs, checks
+main ancestry and clean exact checkout, and requires successful main-push
+`ci.yml` evidence plus successful Quality/Harness jobs from that run attempt.
+The subprocess helper uses no shell and hides raw failure output. The focused
+suite passes 28 tests across two files, including a real Git subprocess,
+refusal cases and safe process failures; typecheck and changed-file lint pass.
+A real read-only Git/GitHub check resolved `ad16b60209863ad36dfcecbb3be6de1fc7569bb8`
+and confirmed CI run `35105163127`, attempt 1. Status is now `partial`;
+workflow wiring, protected validation, migration/deployment and hosted
+browser/webhook evidence remain outstanding. This also adds local ref/CI
+boundary evidence to TST-PIPELINE-001 without completing that contract.
 
 ## SPEC traceability map
 
