@@ -547,7 +547,8 @@ effect, and Preview/Production jobs receive only their scoped secrets.
 
 ### 11.1 Shared backend logging
 
-[TD-029](../../decisions/TECHNICAL.md#td-029) is accepted planned work, not a
+[TD-029](../../decisions/TECHNICAL.md#td-029) and its protected settings CLI in
+[TD-031](../../decisions/TECHNICAL.md#td-031) are accepted planned work, not a
 claim of implementation. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
 [T-26.2](../../../TODO.md#t-262) and [T-26.3](../../../TODO.md#t-263), with proof
 defined by [TST-LOGGING-001](../../decisions/TESTING.md#tst-logging-001) and
@@ -604,12 +605,28 @@ extension in [section 11.2](#diagnostics-provider-adapters).
   remains separately authorized release evidence.
 - Controls govern only future facade events. They cannot recover suppressed
   history or promise to suppress Next.js, provider or other independent logs.
-- The protected settings writer is unresolved in
-  [OD-026](../../decisions/OPEN-DECISIONS.md#od-026). Its eventual interface must
-  validate the full snapshot, update atomically, reject stale edits and enforce
-  that decision's operator/target safeguards. No CLI, endpoint or UI is accepted
-  by this specification. Runtime target guards, health/readiness and external
-  observability remain separate unfinished T-26 scope.
+- Provide the protected repository-local TypeScript CLI accepted in
+  [TD-031](../../decisions/TECHNICAL.md#td-031). One future `pnpm logging` entry
+  point supports `inspect` and `set --file policy.json --expected-revision n`.
+  Require explicit environment and mutation-target selection with the existing
+  profile/target-identity guards before writes; exact guard argument syntax is
+  an implementation choice. Inspection returns policy and revision. Updates
+  validate the full policy, publish one atomic snapshot in that environment's
+  existing application database and reject stale expected revisions.
+- Keep `scripts/logging/cli.ts` as the thin argument/output adapter and
+  `scripts/logging/core.ts` as testable typed command logic, with focused
+  `core.test.ts` tests. Follow existing `tsx` script commands, `pnpm test` and
+  `pnpm typecheck`. During implementation, add `scripts/logging/**/*.test.ts`
+  to the existing Vitest include list and confirm nonzero test discovery. The
+  current strict TypeScript configuration already includes `**/*.ts`; no new
+  test infrastructure is required.
+- Use existing operator credentials from secure configuration, never command
+  arguments, policy files or output. Access rights plus the existing target
+  guards protect writes; the CLI alone grants no authorization. Add no
+  application admin role, public writable endpoint, browser settings UI or new
+  authentication system. Production writes retain their existing protected
+  authorization requirements. Runtime target guards, health/readiness and
+  external observability remain separate unfinished T-26 scope.
 
 <a id="diagnostics-provider-adapters"></a>
 
@@ -642,7 +659,8 @@ planned logger. Neither stage is implemented. [T-26.4](../../../TODO.md#t-264),
   with a `warn` log minimum, `diagnostics.errorReportsEnabled=false` and
   separate per-module numeric overrides. An existing setting must never
   implicitly enable export. Validate the complete transition, preserve atomic/stale-write rules
-  and use a forward migration if needed. OD-026 remains the editor prerequisite.
+  and use a forward migration if needed. The protected TypeScript CLI accepted
+  in [TD-031](../../decisions/TECHNICAL.md#td-031) edits this extended policy.
 - Existing contextual objects consult refreshed policy. Emission performs no
   database read. Last-valid fallback keeps its policy; cold fallback keeps
   remote export disabled until valid explicit enablement, a selected provider
@@ -911,8 +929,9 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 
 The environment direction and target-safety choices are accepted in
 [`TD-026`](../../decisions/TECHNICAL.md#td-026) and [`TD-027`](../../decisions/TECHNICAL.md#td-027).
-The planned shared logger's protected settings editor remains open in
-[`OD-026`](../../decisions/OPEN-DECISIONS.md#od-026). Current provisioning and verification facts
+The planned shared logger's protected TypeScript settings CLI is accepted in
+[`TD-031`](../../decisions/TECHNICAL.md#td-031); implementation and authorized
+execution remain future work. Current provisioning and verification facts
 are recorded in [`../../CONTEXT.md`](../../CONTEXT.md), with delivery follow-ups
 in [`../../../TODO.md`](../../../TODO.md). Use those records for current
 Development, Preview, owner-domain and Production readiness instead of a

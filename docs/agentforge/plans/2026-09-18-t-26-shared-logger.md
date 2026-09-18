@@ -2,7 +2,8 @@
 
 **Status:** The owner accepted the logger direction and requested this task
 definition on 2026-09-18. Implementation is not authorized by this document.
-The settings-management interface below is proposed pending [OD-026](../../../.dwf/decisions/OPEN-DECISIONS.md#od-026).
+The owner also accepted the protected TypeScript settings CLI under
+[TD-031](../../../.dwf/decisions/TECHNICAL.md#td-031), resolving OD-026.
 
 **Goal:** Diagnose meaningful backend operations and failures through one small
 Pino-backed logger whose shared filters can change without redeploying.
@@ -46,7 +47,7 @@ planned locations, not claims that a module or command already exists.
 | `src/modules/auth/infrastructure/auth-mail.ts`; `app/api/auth/[...all]/route.ts` and `lib/auth.ts` only for necessary context wiring                        | Mail delivery outcomes, duration and safe failure classification. Preserve Better Auth callbacks, responses and token/session behavior.                                                     |
 | `src/modules/landing/infrastructure/sanity-landing-reader.ts`, `sanity-landing-source.ts`, `sanity-invalidation.ts`; webhook/recovery presentation boundary | Published-read and invalidation outcomes without CMS content, secrets or raw provider payloads. Preserve cache/revalidation behavior.                                                       |
 | `db/pool.ts`                                                                                                                                                | Replace the existing raw idle-client error report with a sanitized event. Pool construction and lifecycle stay unchanged.                                                                   |
-| Proposed `scripts/logging/cli.ts`, `core.ts`, tests and one `package.json` command                                                                          | Protected operator settings inspection/update, subject to OD-026. Do not rewrite deployment or environment CLI logging.                                                                     |
+| Planned `scripts/logging/cli.ts`, `core.ts`, `core.test.ts` and one `package.json` command                                                                  | Accepted protected TypeScript settings CLI under TD-031, with a thin entry point and testable core. Preserve existing deployment/environment CLI output.                                    |
 | `package.json`, generated `pnpm-lock.yaml`                                                                                                                  | Add compatible stable Pino and local-only formatting support when implementation/install is authorized. Pino is not a direct dependency today.                                              |
 | New `docs/runbooks/logging.md`, links in `docs/index.md`, stack/data docs and existing testing ledger                                                       | Usage, event catalogue, config changes, failure diagnosis, freshness limits and evidence. Documentation must distinguish implemented local behavior from hosted proof.                      |
 
@@ -158,48 +159,54 @@ process exit, including destination failure. Keep readable local formatting
 local-only; do not import a pretty-print worker into deployed request handling.
 This does not promise durable log storage or recover earlier suppressed events.
 
-## Proposed settings-management interface
+## Accepted TypeScript settings CLI
 
-Recommend an operator CLI, matching [existing script conventions](../../../scripts/README.md),
+Use the accepted operator CLI, matching [existing script conventions](../../../scripts/README.md),
 with `inspect` and `set --file <snapshot.json> --expected-revision <n>` beneath
 one future `pnpm logging` command. JSON on stdout is the inspection/update
-result; diagnostics go to stderr. The input file contains policy only, never
-credentials. The writer uses existing operator-supplied environment credentials,
-an explicit target and existing profile/target identity checks before mutation.
+result; sanitized diagnostics go to stderr. The input file contains policy only,
+never credentials. Use existing operator credentials through secure environment
+configuration, never command arguments, policy files or output. The writer
+requires an explicitly selected environment/target and existing profile/target
+identity checks before mutation. Access permissions and these checks provide
+the protection; running a CLI does not itself grant authorization.
 It validates the full snapshot, commits once and refuses stale revisions.
 
-If selected, register `scripts/logging/**/*.test.ts` in `vitest.config.ts`.
+Implement `scripts/logging/cli.ts` as a thin argument/output adapter and keep
+typed, testable operations in `core.ts`, with focused `core.test.ts` coverage.
+The future package command uses `tsx scripts/logging/cli.ts`; existing
+`pnpm typecheck` includes these TypeScript files under strict checking.
+Register `scripts/logging/**/*.test.ts` in `vitest.config.ts` during implementation.
 Its current explicit includes omit that directory; a successful command with
 zero discovered tests is not evidence. Record a nonzero test count for the
-focused adapter run.
+focused `pnpm exec vitest run scripts/logging` run. Reuse the existing Vitest
+setup and preserve coverage of validation, environment/target refusal, stale
+revisions, atomic writes and credential-safe output.
 
-This recommendation adds no product admin identity, public HTTP endpoint or
-settings UI. [OD-026](../../../.dwf/decisions/OPEN-DECISIONS.md#od-026) must choose
-the interface and protected authorization path before implementing its writer
-or operating it against hosted environments. Production changes retain the
-existing owner/protected-operation boundary; the command must not quietly load
-an ambient `.env.local` target and infer authorization. If the owner selects an
-endpoint/UI instead, revise this bounded task before implementing that design.
-The accepted database store and dynamic multi-instance behavior are not open
-questions.
+The accepted [TD-031](../../../.dwf/decisions/TECHNICAL.md#td-031) interface adds
+no product admin identity, public HTTP endpoint, settings UI or new authorization
+system. Production changes retain the existing owner/protected-operation
+boundary; the command must not quietly load an ambient `.env.local` target and
+infer authorization. The interface choice is resolved. Implementation and
+hosted operation still require their separate execution authorization.
 
 ## Dependencies and work order
 
 The ordered review units are [T-26.1](../../../TODO.md#t-261),
 [T-26.2](../../../TODO.md#t-262), and [T-26.3](../../../TODO.md#t-263).
 First prove the emission contract with safe defaults, then shared settings and
-its selected writer, then adopt the logger in the named backend paths. Each
+its accepted TypeScript CLI, then adopt the logger in the named backend paths. Each
 unit gets its own branch, tests, evidence and fresh independent review. All
 remain unchecked and await a separate execution instruction.
 
-| Prerequisite                                                                                                                 | Classification and unblock condition                                                                                                                                     |
-| ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Execution authorization, stable compatible Pino/version documentation, registry access and installed repository dependencies | Required to implement T-26.1; package installation is future work and must be authorized, not performed during task definition.                                          |
-| OD-026 selection; documented schema/target classification                                                                    | Required before T-26.2 writer implementation. Existing Production migration history is immutable; add only a reviewed forward migration under TD-025.                    |
-| Running Docker, repository PostgreSQL 18 Testcontainers and migration tooling                                                | Required for T-26.2 local persistence/upgrade verification. No hosted database substitutes.                                                                              |
-| Owner-authorized non-default Neon branch and direct migration role                                                           | Required for the existing branch-first migration verification before promotion. Never infer this authorization from the plan or apply schema changes to Production here. |
-| Installed Playwright Chromium and the repository's isolated Next.js test lifecycle                                           | Required for T-26.3 runtime/browser regression evidence; use synthetic accounts and disposable local PostgreSQL.                                                         |
-| Real provider credentials and explicit hosted-operation authorization                                                        | Required only for a separately requested deployed/provider smoke. Local tests do not establish Vercel delivery, live mail or live Sanity outage evidence.                |
+| Prerequisite                                                                                                                 | Classification and unblock condition                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Execution authorization, stable compatible Pino/version documentation, registry access and installed repository dependencies | Required to implement T-26.1; package installation is future work and must be authorized, not performed during task definition.                                                  |
+| TD-031 accepted CLI; documented schema/target classification                                                                 | Interface choice is resolved; execution authorization and target classification remain required. Existing Production history is immutable; add a forward migration under TD-025. |
+| Running Docker, repository PostgreSQL 18 Testcontainers and migration tooling                                                | Required for T-26.2 local persistence/upgrade verification. No hosted database substitutes.                                                                                      |
+| Owner-authorized non-default Neon branch and direct migration role                                                           | Required for the existing branch-first migration verification before promotion. Never infer this authorization from the plan or apply schema changes to Production here.         |
+| Installed Playwright Chromium and the repository's isolated Next.js test lifecycle                                           | Required for T-26.3 runtime/browser regression evidence; use synthetic accounts and disposable local PostgreSQL.                                                                 |
+| Real provider credentials and explicit hosted-operation authorization                                                        | Required only for a separately requested deployed/provider smoke. Local tests do not establish Vercel delivery, live mail or live Sanity outage evidence.                        |
 
 For this documentation task, Git, installed Prettier and the local link checker
 are available in the original checkout. Its pre-existing `pnpm-lock.yaml`
@@ -275,6 +282,7 @@ Reviewed on 2026-09-18:
 
 Use the three linked unchecked TODO units as the sole executable task list.
 The reusable facade, environment-local settings store, refresh behavior and
-initial adoption are defined here; only OD-026's management choice remains
-unselected. This documentation delivery ends after its own checks, independent
-review and integration. It does not start T-26.1 or close parent T-26.
+initial adoption are defined here. TD-031 resolves the management choice with a
+protected TypeScript CLI; no design choice remains open for this slice. This
+documentation delivery ends after its own checks, independent review and
+integration. It does not start T-26.1 or close parent T-26.

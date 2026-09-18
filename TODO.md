@@ -1079,8 +1079,9 @@ Logger task definition, 2026-09-18: the owner selected a reusable Pino-backed
 backend logger with dynamic settings in each environment's existing application
 database. The [logger plan](docs/agentforge/plans/2026-09-18-t-26-shared-logger.md)
 records that direction and the three unchecked review units below. This request
-authorizes documentation/task definition only, not execution. The protected
-settings writer remains a narrow [open decision](.dwf/decisions/OPEN-DECISIONS.md#od-026).
+authorizes documentation/task definition only, not execution. The owner later
+accepted the protected TypeScript settings CLI in [TD-031](.dwf/decisions/TECHNICAL.md#td-031),
+resolving OD-026 without starting implementation.
 The separately accepted [diagnostics plan](docs/agentforge/plans/2026-09-18-t-26-diagnostics.md)
 adds T-26.4 through T-26.7 for optional central logs and grouped errors using
 one startup-selected Sentry or Better Stack adapter. It also authorizes task
@@ -1093,6 +1094,11 @@ The 26 existing test-contract statuses and T-27/T-28 content are unchanged;
 both new diagnostics contracts remain `specified`. Normal hooks, fresh
 independent review of the final commit and main-push CI gate integration.
 These documentation checks provide no logger or diagnostics runtime evidence.
+
+TypeScript CLI decision follow-up, 2026-09-18: TD-031 resolves OD-026. Nine
+Markdown files pass changed-file Prettier, 448 local link/anchor checks and
+`git diff --check`; all 28 existing test-contract statuses remain unchanged.
+T-26.1 through T-26.7 remain unchecked, awaiting execution authorization.
 
 Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` without the tooling's full environment-profile guard, and unexpected application failures mapped through `src/shared/entry-contract.ts` lose their diagnostic cause. Address runtime target validation and safe failure reporting within this task's accepted scope and prerequisites. Preserve generic client errors; do not describe all database errors as silent because `db/pool.ts` already logs idle-client failures.
 
@@ -1145,14 +1151,14 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 #### T-26.2: Share logger settings safely across backend instances
 
 - [ ] Add the environment-local settings store, bounded refresh cache and the
-      selected protected management interface. Await execution authorization
-      and resolve OD-026 before implementing the settings writer.
+      accepted protected TypeScript CLI. Await execution authorization;
+      TD-031 resolves the interface choice previously tracked as OD-026.
 - Files: `db/schema/logging.ts`, `db/schema/index.ts`, a new forward migration
   with generated metadata, `src/shared/logging/` settings store/cache/composition,
   colocated unit tests, `src/test/logging-settings.integration.test.ts`, and the
-  selected operator adapter. Proposed CLI files are `scripts/logging/cli.ts`,
-  `core.ts`, tests, `vitest.config.ts` discovery and one manifest command, not an
-  approved admin endpoint/UI.
+  TypeScript CLI: thin `scripts/logging/cli.ts`, typed/testable `core.ts`, focused
+  `core.test.ts`, `vitest.config.ts` discovery and one `pnpm logging` manifest
+  command using `tsx scripts/logging/cli.ts`. No new test infrastructure.
 - Interfaces: one validated, versioned full snapshot per selected database;
   atomic revision-checked update; cached read and coalesced stale refresh.
   Reuse the existing pool without a logger/database import cycle. No log-event
@@ -1164,20 +1170,24 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   logging. Late results cannot replace newer revisions. Old contextual objects
   see updated filters. Writes reject invalid snapshots, stale revisions and
   mismatched targets before mutation; read-only runtime use never writes defaults.
+  The CLI explicitly selects the environment/target and uses existing operator
+  permissions and credentials outside argv, policy files and output. Inspection
+  results are JSON on stdout; sanitized diagnostics go to stderr. No new admin
+  role, public endpoint, settings UI or authorization system is introduced.
 - Contracts: [TST-LOGGING-002](.dwf/decisions/TESTING.md#tst-logging-002),
   `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-ENV-001`.
   Existing baseline statuses/evidence do not prove the new schema or behavior.
 - Checks: focused cache/settings unit tests via `pnpm exec vitest run src/shared/logging`
-  and the selected management-adapter test; `pnpm test:integration` for real
+  and `pnpm exec vitest run scripts/logging`; `pnpm test:integration` for real
   persistence, independent caches, revision conflict, target isolation and
   timeout cleanup; `pnpm exec drizzle-kit check --config drizzle.config.ts`;
   fresh-chain and prior-schema upgrade evidence; branch-first migration smoke
   on an explicitly authorized non-default Neon branch. Also run `pnpm test`,
   `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier and diff check.
   Run `pnpm test:pipeline` if shared environment guards change.
-  If the CLI is selected, include its test directory in Vitest discovery and
-  require a nonzero focused adapter test count.
-- Dependencies/prerequisites: T-26.1; OD-026 and execution authorization to
+  Include the CLI test directory in Vitest discovery and require a nonzero
+  focused test count. Existing strict `pnpm typecheck` covers its `.ts` files.
+- Dependencies/prerequisites: T-26.1; accepted TD-031 and execution authorization to
   implement; Docker/PostgreSQL 18 Testcontainers for local verification;
   authorized non-default Neon target and direct migration role for the named
   migration check. Follow TD-025 and the migration-history skill; no reset,
@@ -1236,7 +1246,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
       transition. Await a separate execution instruction.
 - Files: planned `src/shared/logging/` policy/facade/cache and tests; new
   `src/shared/diagnostics/contracts.ts`, `dispatcher.ts`, `runtime.ts` and
-  colocated tests; selected settings writer and
+  colocated tests; the accepted TypeScript settings CLI and
   `src/test/logging-settings.integration.test.ts`. Change schema/migration
   only if the stored representation requires it; no provider SDK in this unit.
 - Interfaces: `SafeLogEvent`, `SafeErrorReport`, startup-selected Strategy
@@ -1257,12 +1267,12 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   `pnpm build`, changed-file Prettier and `git diff --check`. Require nonzero
   focused test discovery. Prove both directions of independent routing and
   atomic policy transition across two real local PostgreSQL cache instances.
-  Run the selected writer's focused tests. If schema changes, add
+  Run `pnpm exec vitest run scripts/logging`. If schema changes, add
   `pnpm exec drizzle-kit check --config drizzle.config.ts`, fresh/upgrade
   evidence and the authorized non-default Neon migration check from T-26.2.
 - Dependencies/prerequisites: T-26.3, execution authorization, installed
-  dependencies and Docker/PostgreSQL 18 for required verification. OD-026 is
-  resolved by the upstream writer task, not here. One policy/routing review
+  dependencies and Docker/PostgreSQL 18 for required verification. TD-031's
+  accepted CLI is delivered by the upstream writer task. One policy/routing review
   unit; no hosted provider credentials required.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `api-and-interface-design`,

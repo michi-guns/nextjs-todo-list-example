@@ -86,11 +86,16 @@ logging, change severity thresholds, override exact modules and suppress exact
 events. Generic user-facing errors stay unchanged, and private content and raw
 error messages stay out of logs.
 
-This work is not implemented. The protected operator editing interface remains
-[open in OD-026](../../decisions/OPEN-DECISIONS.md#od-026); a CLI is only a
-proposal. [T-26.1 through T-26.3](../../../TODO.md#t-261) own implementation and
-verification. Browser-only errors, independent framework/provider logs,
-health/readiness checks and external telemetry are outside this logger slice.
+This work is not implemented. [TD-031](../../decisions/TECHNICAL.md#td-031)
+accepts a protected repository-local TypeScript CLI to inspect policy and
+revision, then publish a validated full policy atomically. It rejects stale
+revisions and requires existing operator access plus explicit environment and
+target checks. Credentials stay outside command arguments, policy files and
+output. Production authorization remains required; this adds no application
+admin role, public endpoint or browser UI. [T-26.1 through T-26.3](../../../TODO.md#t-261)
+own implementation and verification. Browser-only errors, independent
+framework/provider logs, health/readiness checks and external telemetry are
+outside this logger slice.
 
 ## Optional diagnostics, planned follow-on
 
@@ -111,7 +116,8 @@ queues and flush work so diagnostics failure cannot break application behavior.
 Browser capture, replay, metrics, tracing and health expansion remain excluded.
 [T-26.4 through T-26.7](../../../TODO.md#t-264) are future work. Neither adapter
 is implemented or verified, and hosted readiness needs separate real-provider
-proof. OD-026's settings-editor choice remains open.
+proof. The protected CLI accepted in [TD-031](../../decisions/TECHNICAL.md#td-031)
+will also edit the diagnostics policy; no editor choice remains open.
 
 ## Required application behavior
 

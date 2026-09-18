@@ -4,7 +4,7 @@ Scripts that need a convenient `npm` or `pnpm` command should be organized as
 one self-contained directory under `scripts/`.
 
 Each script gets exactly one package command. That command points to the
-script's thin `cli.mjs` entry point. The CLI may expose subcommands for the
+script's thin `cli.ts` entry point. The CLI may expose subcommands for the
 script's related operations.
 
 Example:

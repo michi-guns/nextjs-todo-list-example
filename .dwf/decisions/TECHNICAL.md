@@ -438,7 +438,7 @@ multi-stack framework.
 - **Related product decisions:** [D-009](PRODUCT.md#d-009)
 - **Related technical decisions:** [TD-015](#td-015), [TD-025](#td-025), [TD-026](#td-026)
 - **Related test contracts:** [TST-LOGGING-001](TESTING.md#tst-logging-001), [TST-LOGGING-002](TESTING.md#tst-logging-002)
-- **Open decision:** [OD-026](OPEN-DECISIONS.md#od-026), protected settings editing interface only
+- **Later decision:** [TD-031](#td-031) selects the protected settings editing interface
 - **Source:** owner-approved shared logger direction, 2026-09-18
 
 Use a small reusable server-only Node logger facade backed by Pino, with
@@ -459,9 +459,9 @@ The [Agent SPEC](../output/agent/SPEC.md#shared-backend-logging) owns policy
 precedence, privacy, refresh and failure semantics. JSON deployed output and
 readable local output must respect Node/Next request and process lifecycles.
 This decision adds no browser logging, external telemetry service, health
-endpoint or authority over independent framework/provider logs. The settings
-writer remains subject to OD-026; accepting database storage does not choose
-its operator interface.
+endpoint or authority over independent framework/provider logs. This decision
+left the settings writer's operator interface open; [TD-031](#td-031)
+subsequently accepts it without changing this logger design.
 
 [TD-030](#td-030) accepts a separately planned diagnostics extension. Its
 authorization does not change this initial logger slice or its evidence.
@@ -495,5 +495,35 @@ payload privacy, settings compatibility, error ownership, provider fidelity and
 bounded lifecycle behavior. Application outcomes must survive diagnostics
 failure. Browser instrumentation, replay, metrics, tracing, profiling, uptime,
 alerts, health expansion and durable delivery are outside this extension.
-OD-026 still owns the protected settings editor; two fixed adapters require no
-additional product choice. Implementation and hosted proof remain future work.
+[TD-031](#td-031) subsequently accepts the protected settings editor; two fixed
+adapters require no additional product choice. Implementation and hosted proof
+remain future work.
+
+<a id="td-031"></a>
+
+## TD-031 - Protected TypeScript CLI for logging settings
+
+- **Status:** ACCEPTED, planned implementation
+- **Related technical decisions:** [TD-026](#td-026), [TD-029](#td-029), [TD-030](#td-030)
+- **Related test contracts:** [TST-LOGGING-002](TESTING.md#tst-logging-002)
+- **Resolves:** OD-026, protected shared logging settings editor
+- **Source:** owner-approved protected CLI and TypeScript selection, 2026-09-18
+
+Provide a repository-local terminal CLI in TypeScript to inspect logging policy
+and its revision, then publish a fully validated replacement policy atomically
+in the selected environment's existing application database. Require an expected
+revision and reject stale edits. The CLI is a thin argument/output adapter over
+testable typed core logic, using the existing `tsx`, pnpm, Vitest and typecheck
+conventions. The [Agent SPEC](../output/agent/SPEC.md#shared-backend-logging)
+defines the command and module boundaries.
+
+Use existing operator credentials, kept outside arguments, policy files and
+output, and explicit environment selection with existing target-identity guards
+before writes. Credential access rights and those guards protect the operation;
+the existence of a CLI does not grant authorization. Add no application admin
+role, public endpoint, browser UI or new authentication system. Production
+operations retain their existing protected authorization boundaries.
+
+This resolves only the editor choice. Logger storage, cache, filtering and
+diagnostics provider decisions remain unchanged. Implementation, verification
+and separately authorized hosted work remain future work.
