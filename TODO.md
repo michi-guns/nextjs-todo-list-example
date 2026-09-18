@@ -1141,7 +1141,8 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   with generated metadata, `src/shared/logging/` settings store/cache/composition,
   colocated unit tests, `src/test/logging-settings.integration.test.ts`, and the
   selected operator adapter. Proposed CLI files are `scripts/logging/cli.ts`,
-  `core.ts`, tests and one manifest command, not an approved admin endpoint/UI.
+  `core.ts`, tests, `vitest.config.ts` discovery and one manifest command, not an
+  approved admin endpoint/UI.
 - Interfaces: one validated, versioned full snapshot per selected database;
   atomic revision-checked update; cached read and coalesced stale refresh.
   Reuse the existing pool without a logger/database import cycle. No log-event
@@ -1164,6 +1165,8 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   on an explicitly authorized non-default Neon branch. Also run `pnpm test`,
   `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier and diff check.
   Run `pnpm test:pipeline` if shared environment guards change.
+  If the CLI is selected, include its test directory in Vitest discovery and
+  require a nonzero focused adapter test count.
 - Dependencies/prerequisites: T-26.1; OD-026 and execution authorization to
   implement; Docker/PostgreSQL 18 Testcontainers for local verification;
   authorized non-default Neon target and direct migration role for the named

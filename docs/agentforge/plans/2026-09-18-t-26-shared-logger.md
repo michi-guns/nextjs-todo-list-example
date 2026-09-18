@@ -102,9 +102,10 @@ implementation. The SPEC remains the semantic authority.
   formatting or output failures cannot fail business work or mask its error.
 
 Request context uses Node async-context isolation or explicit immutable context,
-not a mutable process-wide request field. Generate a correlation ID at adopted
-entries; accept an incoming ID only after bounded validation. Keep static
-operation names instead of URL queries, resource identifiers or personal data.
+not a mutable process-wide request field. Generate a server-owned correlation ID
+at adopted entries and propagate it internally through the operation. Do not use
+a caller-supplied ID as that trusted identity. Keep static operation names
+instead of URL queries, resource identifiers or personal data.
 Background pool errors receive an independent correlation ID and must not
 inherit an unrelated request. Metadata cannot overwrite event, level, time,
 module, environment or correlation fields. Avoid constructing expensive debug
@@ -161,6 +162,11 @@ result; diagnostics go to stderr. The input file contains policy only, never
 credentials. The writer uses existing operator-supplied environment credentials,
 an explicit target and existing profile/target identity checks before mutation.
 It validates the full snapshot, commits once and refuses stale revisions.
+
+If selected, register `scripts/logging/**/*.test.ts` in `vitest.config.ts`.
+Its current explicit includes omit that directory; a successful command with
+zero discovered tests is not evidence. Record a nonzero test count for the
+focused adapter run.
 
 This recommendation adds no product admin identity, public HTTP endpoint or
 settings UI. [OD-026](../../../.dwf/decisions/OPEN-DECISIONS.md#od-026) must choose

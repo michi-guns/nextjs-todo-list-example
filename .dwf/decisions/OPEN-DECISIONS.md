@@ -634,7 +634,7 @@ Use local fixture tests to cover valid Sanity payload mapping, optional fields, 
 ## OD-026 - Protected shared logging settings editor
 
 - **Status:** OPEN
-- **Impact:** TECHNICAL
+- **Impact:** SPEC
 - **Blocking:** YES, only implementation and operation of the settings writer in [T-26.2](../../TODO.md#t-262); documentation and the logger/read-cache design may proceed
 - **Related:** [TD-029](TECHNICAL.md#td-029), [shared backend logging](../output/agent/SPEC.md#shared-backend-logging), [TST-LOGGING-002](TESTING.md#tst-logging-002)
 
