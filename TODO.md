@@ -1090,14 +1090,14 @@ beyond these two plans remain pending. The parent task is not complete.
 
 Diagnostics definition validation, 2026-09-18: seven Markdown files pass
 changed-file Prettier, 436 local link/anchor checks and `git diff --check`.
-The 26 existing test-contract statuses and T-27/T-28 content are unchanged;
+The existing test-contract statuses and T-27/T-28 content are unchanged;
 both new diagnostics contracts remain `specified`. Normal hooks, fresh
 independent review of the final commit and main-push CI gate integration.
 These documentation checks provide no logger or diagnostics runtime evidence.
 
 TypeScript CLI decision follow-up, 2026-09-18: TD-031 resolves OD-026. Nine
 Markdown files pass changed-file Prettier, 448 local link/anchor checks and
-`git diff --check`; all 28 existing test-contract statuses remain unchanged.
+`git diff --check`; all existing test-contract statuses remain unchanged.
 T-26.1 through T-26.7 remain unchecked, awaiting execution authorization.
 
 Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` without the tooling's full environment-profile guard, and unexpected application failures mapped through `src/shared/entry-contract.ts` lose their diagnostic cause. Address runtime target validation and safe failure reporting within this task's accepted scope and prerequisites. Preserve generic client errors; do not describe all database errors as silent because `db/pool.ts` already logs idle-client failures.
