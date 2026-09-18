@@ -2,7 +2,7 @@
 
 > AgentForge plan. Use `task-breakdown` after this plan is accepted.
 
-**Status:** Accepted on 2026-09-18. The owner approved the exact cleanup and documentation scope, with a fresh stash usefulness review before execution.
+**Status:** Completed on 2026-09-18. The owner approved the exact cleanup and documentation scope, with a fresh stash usefulness review before execution. Final inspection confirms that the later manual disk cleanup resolved the initial tool-policy blocker.
 
 **Goal:** Return the working checkout to current `main`, remove completed Git branches and obsolete local artifacts, and correct current documentation without discarding unique work.
 
@@ -82,7 +82,9 @@ Fresh local build, database integration, browser and hosted checks were not run 
 
 After acceptance, create one focused housekeeping documentation task in `TODO.md`, covering the six-file patch, links/format checks, independent review, CI and merge. The Git cleanup appendix is an owner-approved operational action and does not redefine product requirements. Recommended skills: `planning`, `task-breakdown`, `documentation-and-adrs`, `git-workflow-and-versioning`, `code-review-and-quality`, `unslop`; consult `testing-first-class` for evidence reconciliation without changing its statuses.
 
-## Execution evidence, 2026-09-18
+## Initial execution evidence, 2026-09-18
+
+This records the first execution checkpoint. The directory-removal blocker described here was subsequently resolved, as verified in the final closeout below.
 
 - Fresh preflight matched every approved local and remote object ID, both stash IDs, disabled-file hashes, and the clean worktree. No open PR or process command line naming the worktree was observed.
 - Updated local `main` to `960e7cad2d09381d393f80e105311008a9b2a89f` and created `task/T-30-repository-housekeeping` for the documentation changes.
@@ -93,6 +95,14 @@ After acceptance, create one focused housekeeping documentation task in `TODO.md
 - Applied the six-file documentation patch. Standard Prettier also normalized the imported Vercel guide's code examples. An exact comparison confirmed that file equals the original with only three link replacements followed by the configured Prettier output.
 - Changed-file Prettier and `git diff --check` passed. The current-documentation path scan checked 247 files and 343 local Markdown destinations with zero missing paths. Seventeen links and anchors introduced by the original patch and six plan links were checked separately. Initial same-session unit/type/lint results above remain valid because application code, tests, dependencies, and configuration are unchanged.
 - Commit review and PR CI still gate the documentation merge. The remaining local directory cleanup is a recorded execution-policy blocker, not an application or documentation failure. T-26, broader T-27, and T-28 retain their existing product-decision prerequisites; this task does not unblock them.
+
+## Final closeout, 2026-09-18
+
+Read-only inspection confirmed that the residual directory and all four approved empty reviewer-skill directories no longer exist. The main repository and its installed dependencies remain present. Git showed clean synchronized `main` at `8bf38235f3fb29e25682f3d85a6b1c8058dd1df8`, only one local and one GitHub branch, no open PRs, and only the primary worktree. The sole retained stash is still `ae0af7f5f1e79246b6b77e12ccf395103265d6d6`.
+
+[PR #43](https://github.com/michi-guns/nextjs-todo-list-example/pull/43) merged after fresh independent review of exact commit `c77c8b9202d817f519b662b6de2a5e6ee27abb62` and passing Quality/Harness checks. The [subsequent main CI](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35344566757) passed too. The owner separately approved deletion of the housekeeping branch after merge; both its local and remote refs were removed. This follow-up corrects only the two closeout records and follows the same review/CI workflow.
+
+There is no remaining housekeeping prerequisite. The preserved dependency proposal is a separate review item. T-26, broader T-27, T-28, and the partial live-Docker-outage evidence retain their existing scope and decision requirements.
 
 ## Exact approval scope and command appendix
 
