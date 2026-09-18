@@ -1081,8 +1081,18 @@ database. The [logger plan](docs/agentforge/plans/2026-09-18-t-26-shared-logger.
 records that direction and the three unchecked review units below. This request
 authorizes documentation/task definition only, not execution. The protected
 settings writer remains a narrow [open decision](.dwf/decisions/OPEN-DECISIONS.md#od-026).
-Runtime target validation, health/readiness and broader observability remain
-pending outside this slice. The parent task is not complete.
+The separately accepted [diagnostics plan](docs/agentforge/plans/2026-09-18-t-26-diagnostics.md)
+adds T-26.4 through T-26.7 for optional central logs and grouped errors using
+one startup-selected Sentry or Better Stack adapter. It also authorizes task
+definition only. Runtime target validation, health/readiness and observability
+beyond these two plans remain pending. The parent task is not complete.
+
+Diagnostics definition validation, 2026-09-18: seven Markdown files pass
+changed-file Prettier, 436 local link/anchor checks and `git diff --check`.
+The 26 existing test-contract statuses and T-27/T-28 content are unchanged;
+both new diagnostics contracts remain `specified`. Normal hooks, fresh
+independent review of the final commit and main-push CI gate integration.
+These documentation checks provide no logger or diagnostics runtime evidence.
 
 Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` without the tooling's full environment-profile guard, and unexpected application failures mapped through `src/shared/entry-contract.ts` lose their diagnostic cause. Address runtime target validation and safe failure reporting within this task's accepted scope and prerequisites. Preserve generic client errors; do not describe all database errors as silent because `db/pool.ts` already logs idle-client failures.
 
@@ -1217,6 +1227,159 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   `incremental-implementation`, `next-dev-loop`, `browser-testing-with-devtools`,
   `observability-and-instrumentation`, `security-and-hardening`,
   `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-264"></a>
+
+#### T-26.4: Route safe events under independent destination policies
+
+- [ ] Extend the logger with a small diagnostics Strategy and shared settings
+      transition. Await a separate execution instruction.
+- Files: planned `src/shared/logging/` policy/facade/cache and tests; new
+  `src/shared/diagnostics/contracts.ts`, `dispatcher.ts`, `runtime.ts` and
+  colocated tests; selected settings writer and
+  `src/test/logging-settings.integration.test.ts`. Change schema/migration
+  only if the stored representation requires it; no provider SDK in this unit.
+- Interfaces: `SafeLogEvent`, `SafeErrorReport`, startup-selected Strategy
+  `none`/`sentry`/`better-stack`, independent local/remote log policies and an
+  explicit error-report control. Concrete method names follow the plan.
+- Acceptance: common off/module-off/event suppression veto every destination.
+  Console thresholds never discard eligible remote events; remote log
+  thresholds never silently discard explicit error reports. Legacy settings
+  retain console behavior and keep diagnostics off. No SDK loads for `none`.
+  Existing logger objects see refreshed policy, with no per-event DB query.
+  Credentials/provider identity remain startup-only, outside shared settings.
+  Lazy metadata and safe projection run only for eligible destinations.
+- Contracts: [TST-DIAGNOSTICS-001](.dwf/decisions/TESTING.md#tst-diagnostics-001),
+  `TST-LOGGING-001`/`002`, `TST-ENV-001`; if schema changes, also
+  `TST-MIGRATION-001`, `TST-FOUNDATION-001`, `TST-HARNESS-001`.
+- Checks: `pnpm exec vitest run src/shared/logging src/shared/diagnostics`,
+  `pnpm test:integration`, `pnpm test`, `pnpm typecheck`, `pnpm lint`,
+  `pnpm build`, changed-file Prettier and `git diff --check`. Require nonzero
+  focused test discovery. Prove both directions of independent routing and
+  atomic policy transition across two real local PostgreSQL cache instances.
+  Run the selected writer's focused tests. If schema changes, add
+  `pnpm exec drizzle-kit check --config drizzle.config.ts`, fresh/upgrade
+  evidence and the authorized non-default Neon migration check from T-26.2.
+- Dependencies/prerequisites: T-26.3, execution authorization, installed
+  dependencies and Docker/PostgreSQL 18 for required verification. OD-026 is
+  resolved by the upstream writer task, not here. One policy/routing review
+  unit; no hosted provider credentials required.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `api-and-interface-design`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`;
+  `migration-history-workflow` only if a schema migration is required.
+
+<a id="t-265"></a>
+
+#### T-26.5: Add Sentry and Better Stack adapters with local wire evidence
+
+- [ ] Implement both concrete adapters behind the accepted Strategy, selecting
+      only one at startup. Await execution and dependency-install authorization.
+- Files: `src/shared/diagnostics/sentry.ts`, `better-stack.ts`, startup
+  composition, shared safe mapping where warranted, local wire tests and
+  dependency manifest/lockfile. No browser SDK, public ingest proxy or account setup.
+- Interfaces: Sentry structured logs and safe error events; Better Stack HTTP
+  logs and documented Sentry-compatible error ingestion; bounded flush and
+  local-only failure notices. Do not infer Logs API parity from error DSN support.
+- Acceptance: real SDK/HTTP output preserves safe levels, timestamps, static
+  event/module, environment, correlation and grouping fields. Post-enrichment
+  filtering prevents sensitive metadata from escaping. Disable recapture and
+  unwanted SDK integrations. Invalid credentials, timeouts, quota refusals,
+  queue overflow and serialization failures cannot change app results or
+  recursively export. Refreshed off policies discard unsent records, including
+  SDK-buffered records; no fallback provider, unbounded retry or disk spool.
+- Contracts: local adapter portion of
+  [TST-DIAGNOSTICS-002](.dwf/decisions/TESTING.md#tst-diagnostics-002), plus
+  `TST-DIAGNOSTICS-001` and `TST-LOGGING-001`. Local wire evidence cannot
+  complete the hosted ingestion/grouping obligation.
+- Checks: `pnpm exec vitest run src/shared/diagnostics`, `pnpm test`,
+  `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier and
+  `git diff --check`. The focused run must use actual SDKs against a local
+  collector via supported transport configuration. Inspect serialized payloads
+  for sensitive sentinels, test slow/failed requests and off-before-flush, and
+  confirm completion deadlines bound actual work rather than only an await.
+- Dependencies/prerequisites: T-26.4; authorized compatible stable SDK install,
+  registry access and installed-version public API/source review. One adapter
+  delivery/review unit. Accounts/secrets are unnecessary for this local evidence.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `source-driven-development`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-266"></a>
+
+#### T-26.6: Report backend failures once and document diagnostics operation
+
+- [ ] Connect Node startup, error ownership and bounded completion to the
+      existing logger adoption; publish the runbook. Await execution authorization.
+- Files: new root `instrumentation.ts`; adopted route/action/server composition,
+  auth-mail/Sanity/pool reporting owners; boundary/runtime tests; new
+  `docs/runbooks/diagnostics.md`, logger runbook/index and environment guidance.
+  Leave client error components and pure error mapping free of Node SDK imports.
+- Interfaces: startup `register`, awaited Node `onRequestError`, explicit
+  safe error reports for caught/mapped failures, request/job completion flush,
+  trusted correlation and occurrence deduplication distinct from issue grouping.
+- Acceptance: mapped unexpected errors and unhandled render/route failures
+  each create one report when enabled. Reported rethrows do not duplicate even
+  if Next transforms the error. Expected refusals and redirect/notFound control
+  flow create no issue. Independent requests retain isolated context; generic
+  client responses and auth/cache behavior stay unchanged. Runbook explains
+  provider selection, destination controls, protected settings changes, safe
+  grouping, timeout/loss limits and local versus hosted proof.
+- Contracts: complete local `TST-DIAGNOSTICS-001` runtime obligations; preserve
+  affected `TST-LOGGING-001`/`002`, `TST-BOUNDARY-001`, `TST-AUTH-001`/`002`,
+  `TST-LANDING-001`/`003`, `TST-ENV-001`, `TST-E2E-001`/`002`.
+- Checks: focused changed-boundary tests, `pnpm test`, `pnpm test:integration`,
+  `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, docs links,
+  changed-file Prettier and `git diff --check`. In the repository's isolated
+  Next Node runtime, capture real adapter payloads locally for mapped,
+  unhandled, rethrown, concurrent and expected-control-flow cases. Verify one
+  issue per occurrence, bounded flush and absence of Node SDKs in client output.
+  No hosted smoke is claimed by these checks.
+- Dependencies/prerequisites: T-26.5, installed dependencies, Docker and
+  matching Chromium for the isolated runtime/browser harness. One adoption
+  and runbook review unit. T-26.7's hosted readiness remains pending.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `next-dev-loop`, `browser-testing-with-devtools`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-267"></a>
+
+#### T-26.7: Prove both adapters against authorized hosted test projects
+
+- [ ] Verify central log ingestion and grouped issues on each real provider,
+      in separate runs with one startup-selected provider. Await explicit
+      provider/target authorization and credentials; do not purchase services.
+- Files: diagnostics runbook and `TST-DIAGNOSTICS-002` evidence. Any reusable
+  smoke helper stays small and server-only; code changes require their own
+  affected checks and fresh review. No application feature expansion.
+- Interfaces: the implemented facade/settings writer and each provider's
+  authorized test project; sanitized evidence containing no credentials.
+- Acceptance: for Sentry and Better Stack separately, find the same synthetic
+  operation's safe log and issue by correlation; two separate requests with
+  the same safe failure form one issue with two occurrences, while a distinct
+  safe failure stays separate. An error-level log alone creates no issue.
+  Toggle each destination and shared off, then prove new export stops after
+  the documented refresh window. Inspect received fields for sensitive
+  sentinels. Record provider, commit, environment, time and evidence links.
+- Contract: hosted portion of `TST-DIAGNOSTICS-002`. Record per-provider
+  outcomes and required unavailable evidence honestly; a single provider
+  pass or local collector cannot mark both adapters hosted-ready.
+- Checks: the runbook's actual installed invocation and provider UI/API
+  observations, accounting for ingestion delay; exact commands must be
+  documented by T-26.6 before this run. Review sanitized evidence, verify local
+  docs links/formatting and `git diff --check`. Reuse unchanged code checks;
+  rerun affected tests if the smoke needs a code repair.
+- Dependencies/prerequisites: T-26.6 and explicitly authorized isolated provider
+  projects, ingest credentials and test target. Missing access blocks this
+  hosted task without invalidating earlier local work. One evidence/review
+  unit; parent T-26 remains incomplete after it.
+- Recommended AgentForge skills: `observability-and-instrumentation`,
+  `security-and-hardening`, `testing-first-class`, `documentation-and-adrs`,
+  `code-review-and-quality`, `git-workflow-and-versioning`;
+  `test-driven-development` if executable smoke code or behavior changes.
 
 ### T-27: Complete authentication product flows and abuse resistance
 

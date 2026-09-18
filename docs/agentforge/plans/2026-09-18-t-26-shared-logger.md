@@ -27,6 +27,11 @@ remaining T-26 concerns are not approved by this logger slice. T-27/T-28 remain
 outside scope. No packages, application code, migrations or hosted settings
 are changed while defining these tasks.
 
+The separately accepted [diagnostics follow-on](2026-09-18-t-26-diagnostics.md)
+extends this initial logger stage under TD-030. Its later destination policies
+refine numeric filtering without changing this slice's shared vetoes or store.
+The exclusions above describe T-26.1 through T-26.3, not that later work.
+
 ## Current state and file map
 
 The source inspected at `2ca1c6a` has these boundaries. New paths below are

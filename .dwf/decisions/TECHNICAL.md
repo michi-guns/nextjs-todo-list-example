@@ -462,3 +462,38 @@ This decision adds no browser logging, external telemetry service, health
 endpoint or authority over independent framework/provider logs. The settings
 writer remains subject to OD-026; accepting database storage does not choose
 its operator interface.
+
+[TD-030](#td-030) accepts a separately planned diagnostics extension. Its
+authorization does not change this initial logger slice or its evidence.
+
+<a id="td-030"></a>
+
+## TD-030 - Optional application logs and grouped error diagnostics
+
+- **Status:** ACCEPTED, planned implementation
+- **Related product decisions:** [D-009](PRODUCT.md#d-009)
+- **Related technical decisions:** [TD-029](#td-029), [TD-026](#td-026)
+- **Related test contracts:** [TST-DIAGNOSTICS-001](TESTING.md#tst-diagnostics-001), [TST-DIAGNOSTICS-002](TESTING.md#tst-diagnostics-002)
+- **Source:** owner-approved diagnostics extension, 2026-09-18
+
+Extend the planned Node/Pino logger with optional central application logs and
+grouped error reports through a small Strategy interface and exactly two
+concrete adapters, Sentry and Better Stack. Select one provider per environment
+at startup, including `none`; no live provider switching, dual export or generic
+provider framework. TD-029's initial no-external-service scope remains intact.
+
+Shared global/module/event vetoes apply to backend output and diagnostics,
+including explicit exception reports. Each destination has independent numeric
+log thresholds and off controls; explicit reports have their own enablement,
+independent of log thresholds. Use the same environment-local versioned settings
+snapshot/cache for live policy; provider selection and credentials remain
+startup environment configuration. Remote export starts disabled and fails
+closed on missing/invalid configuration, with no provider fallback.
+
+The [Agent SPEC](../output/agent/SPEC.md#diagnostics-provider-adapters) owns
+payload privacy, settings compatibility, error ownership, provider fidelity and
+bounded lifecycle behavior. Application outcomes must survive diagnostics
+failure. Browser instrumentation, replay, metrics, tracing, profiling, uptime,
+alerts, health expansion and durable delivery are outside this extension.
+OD-026 still owns the protected settings editor; two fixed adapters require no
+additional product choice. Implementation and hosted proof remain future work.

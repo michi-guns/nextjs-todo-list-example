@@ -786,6 +786,43 @@ provider/configuration changes. All original evidence limits remain intact.
 - **Dependencies:** T-26.1; disposable local PostgreSQL for integration; existing target guards; owner selection in [OD-026](OPEN-DECISIONS.md#od-026) before writer implementation/operation; authorized non-default Neon branch for migration proof. The proposed CLI is not an accepted prerequisite or implemented interface.
 - **Current evidence:** None. The owner decision blocks only the writer portion; this record claims no implementation, mutation or verification.
 
+These original logger contracts retain their stage-specific meaning.
+[TD-030](TECHNICAL.md#td-030)'s optional follow-on has separate contracts below.
+
+<a id="tst-diagnostics-001"></a>
+
+### TST-DIAGNOSTICS-001 - Diagnostics routing, privacy and lifecycle
+
+- **Status:** `specified`
+- **Capability:** Optional backend application diagnostics
+- **Evidence layers/modes:** Unit, disposable PostgreSQL compatibility where needed, local Node/Next lifecycle and application boundaries
+- **Verifies product decisions:** D-009
+- **Verifies technical decisions:** TD-029, TD-030
+- **Edge cases:** Independent destination filtering, settings transition/outage, SDK enrichment, duplicate failures and serverless completion
+- **SPEC:** [Diagnostics provider adapters](../output/agent/SPEC.md#diagnostics-provider-adapters)
+- **Owners:** [T-26.4](../../TODO.md#t-264), [T-26.6](../../TODO.md#t-266)
+- **Contract:** Shared vetoes govern both destinations and explicit reports; console thresholds cannot gate diagnostics. Explicit reports require diagnostics/report enablement independently of log thresholds. Live policy uses the existing environment cache, with conservative legacy/cold defaults and no emission reads. Sanitized log and error payloads retain safe context/grouping without private data. Each unexpected failure has one reporting owner; diagnostics failure cannot alter application results.
+- **Required evidence:** Routing matrix covers global/module/event vetoes, each destination's off/default/module log thresholds and explicit report controls independent of log thresholds. Controlled refresh tests cover old contextual objects, no per-event queries, legacy numeric thresholds becoming console-only, disabled remote cold fallback and invalid credential refusal without provider fallback. Privacy sentinels cover nested message/cause/frame inputs, correlation isolation, grouping without occurrence IDs and payload re-allowlisting after SDK enrichment. Boundary tests cover caught/mapped, swallowed, unhandled and reported/rethrown failures, including Next error transformation and expected control-flow exclusions. Local runtime tests prove startup selection, no browser imports/recapture, bounded awaited flush, failure/timeout/quota/overflow containment, unsent-policy drops and no suppressed replay.
+- **Dependencies:** Planned logger/settings foundation; installed Next/provider documentation; local Node runtime; disposable PostgreSQL and TST-MIGRATION-001 obligations if snapshot compatibility requires persistence changes. OD-026 remains required for writer work.
+- **Current evidence:** None. Designed only; no executable or runtime evidence is claimed.
+
+<a id="tst-diagnostics-002"></a>
+
+### TST-DIAGNOSTICS-002 - Provider fidelity and hosted diagnostics proof
+
+- **Status:** `specified`
+- **Capability:** Sentry and Better Stack adapters
+- **Evidence layers/modes:** Local actual-SDK/HTTP wire tests and separately authorized real provider smoke
+- **Verifies product decisions:** D-009
+- **Verifies technical decisions:** TD-030
+- **Edge cases:** Logs versus error-ingestion compatibility, provider payload enrichment, rejection and grouping
+- **SPEC:** [Diagnostics provider adapters](../output/agent/SPEC.md#diagnostics-provider-adapters)
+- **Owners:** [T-26.5](../../TODO.md#t-265), [T-26.7](../../TODO.md#t-267)
+- **Contract:** Each fixed adapter preserves the accepted safe log/error semantics through documented supported interfaces. Only the startup-selected provider exports. Local fidelity and hosted ingestion are separate claims; neither adapter's success proves the other's readiness.
+- **Required evidence:** Actual selected SDKs and HTTP adapters send to a controlled local receiver through supported transport configuration. Inspect final wire payloads after enrichment for privacy, severity/event/context mapping, no automatic capture or recapture, independent log/report handling and bounded rejection/timeout/flush behavior. Better Stack evidence exercises its distinct log-ingestion and Sentry-compatible error paths. Separately authorized synthetic hosted smoke for each provider proves searchable logs, safe context, repeated occurrences grouped into one issue and a distinct failure grouped separately, with safe evidence of request completion. Reconcile missing hosted evidence explicitly rather than treating a local receiver as provider proof.
+- **Dependencies:** T-26.4 core; installed compatible SDKs and documented transports; T-26.6 runtime adoption before hosted proof; separately authorized provider resources/configuration and any protected deployment needed for T-26.7. No provider provisioning or hosted send is authorized by this ledger.
+- **Current evidence:** None. Both adapters and all hosted checks remain future work.
+
 ## SPEC traceability map
 
 The Agent SPEC remains the technical contract and this ledger owns the individual test obligations. The current mapping is:
@@ -802,5 +839,6 @@ The Agent SPEC remains the technical contract and this ledger owns the individua
 | Environment profiles and target safety           | `TST-ENV-001`                                                                                           |
 | CI, Preview, and Production delivery             | `TST-PIPELINE-001`, `TST-PREVIEW-001`, `TST-RELEASE-001`                                                |
 | Shared backend logging and settings              | `TST-LOGGING-001`, `TST-LOGGING-002`                                                                    |
+| Optional application diagnostics                 | `TST-DIAGNOSTICS-001`, `TST-DIAGNOSTICS-002`                                                            |
 
 When a SPEC behavior changes, update the owning Product or Technical Decision first when necessary, then update its linked `TST-*` contract and affected delivery tasks. Do not silently alter a contract only in `TODO.md` or in a test file.

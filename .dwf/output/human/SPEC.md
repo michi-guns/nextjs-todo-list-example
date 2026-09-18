@@ -92,6 +92,27 @@ proposal. [T-26.1 through T-26.3](../../../TODO.md#t-261) own implementation and
 verification. Browser-only errors, independent framework/provider logs,
 health/readiness checks and external telemetry are outside this logger slice.
 
+## Optional diagnostics, planned follow-on
+
+[TD-030](../../decisions/TECHNICAL.md#td-030) accepts central application logs
+and grouped error reports after the logger foundation. A small Strategy
+interface supports exactly Sentry and Better Stack. Each environment selects
+one provider at startup, or none. Live settings control export through the same
+database/cache as logging; credentials stay in environment configuration.
+
+Shared global, module and event suppression controls apply everywhere. Console
+and diagnostics thresholds remain independent. Remote export starts disabled,
+and missing credentials never trigger a provider fallback. Only sanitized
+events leave the server. Explicit error reports group repeated failures without
+turning every error-level log into an issue or reporting one failure twice.
+
+The [technical contract](../agent/SPEC.md#diagnostics-provider-adapters) bounds
+queues and flush work so diagnostics failure cannot break application behavior.
+Browser capture, replay, metrics, tracing and health expansion remain excluded.
+[T-26.4 through T-26.7](../../../TODO.md#t-264) are future work. Neither adapter
+is implemented or verified, and hosted readiness needs separate real-provider
+proof. OD-026's settings-editor choice remains open.
+
 ## Required application behavior
 
 The minimum application APIs cover:

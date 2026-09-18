@@ -373,6 +373,7 @@ The individual test obligations for this contract are owned by the [Testing Deci
 | UI and browser acceptance               | `TST-UI-001`, `TST-E2E-001`–`TST-E2E-003`                                               |
 | Neon performance                        | `TST-PERFORMANCE-001`                                                                   |
 | Shared backend logging                  | `TST-LOGGING-001`, `TST-LOGGING-002`                                                    |
+| Optional application diagnostics        | `TST-DIAGNOSTICS-001`, `TST-DIAGNOSTICS-002`                                            |
 
 ### 10.1 Vitest
 
@@ -552,6 +553,9 @@ claim of implementation. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
 defined by [TST-LOGGING-001](../../decisions/TESTING.md#tst-logging-001) and
 [TST-LOGGING-002](../../decisions/TESTING.md#tst-logging-002).
 
+These initial logger rules precede the separately accepted optional diagnostics
+extension in [section 11.2](#diagnostics-provider-adapters).
+
 - Provide a small server-only Node facade backed by Pino. Contextual logger
   objects carry module and request/job context without importing todo concepts
   into the shared core. Do not add a provider framework or import this Node
@@ -607,6 +611,89 @@ defined by [TST-LOGGING-001](../../decisions/TESTING.md#tst-logging-001) and
   by this specification. Runtime target guards, health/readiness and external
   observability remain separate unfinished T-26 scope.
 
+<a id="diagnostics-provider-adapters"></a>
+
+### 11.2 Diagnostics provider adapters
+
+[TD-030](../../decisions/TECHNICAL.md#td-030) accepts this later extension to the
+planned logger. Neither stage is implemented. [T-26.4](../../../TODO.md#t-264),
+[T-26.5](../../../TODO.md#t-265), [T-26.6](../../../TODO.md#t-266) and
+[T-26.7](../../../TODO.md#t-267) own delivery; evidence belongs to
+[TST-DIAGNOSTICS-001](../../decisions/TESTING.md#tst-diagnostics-001) and
+[TST-DIAGNOSTICS-002](../../decisions/TESTING.md#tst-diagnostics-002).
+
+- Provide optional central application logs and grouped error reports through
+  a small Strategy interface with exactly Sentry and Better Stack adapters.
+  Select one provider per environment at Node startup, or `none`. Credentials
+  stay in environment configuration, never settings rows or payloads. No live
+  provider switching, simultaneous providers or open-ended provider framework.
+- Route each sanitized facade event independently to backend output and
+  diagnostics. Shared global `enabled=false`, module `off` and exact named
+  suppression veto both destinations, including explicit error reports. A
+  destination's own off control or numeric log threshold affects only that
+  destination. Resolve numeric default/module thresholds for each log destination
+  before Pino; a console threshold must never prevent eligible remote export.
+  Construct lazy metadata only when at least one destination accepts the event.
+  Explicit `reportError` ignores log thresholds and requires shared veto checks,
+  `diagnostics.enabled` and `diagnostics.errorReportsEnabled` to allow reporting.
+- Extend TD-029's versioned environment-local snapshot and refresh cache, not
+  another settings store. Preserve shared vetoes. On a legacy snapshot, retain
+  numeric thresholds as console policy and default `diagnostics.enabled=false`,
+  with a `warn` log minimum, `diagnostics.errorReportsEnabled=false` and
+  separate per-module numeric overrides. An existing setting must never
+  implicitly enable export. Validate the complete transition, preserve atomic/stale-write rules
+  and use a forward migration if needed. OD-026 remains the editor prerequisite.
+- Existing contextual objects consult refreshed policy. Emission performs no
+  database read. Last-valid fallback keeps its policy; cold fallback keeps
+  remote export disabled until valid explicit enablement, a selected provider
+  and valid configuration exist. Missing/invalid credentials disable export,
+  contain failure locally and never select a different provider. A bounded,
+  sanitized local notice must obey local policy.
+- `SafeLogEvent` carries trusted timestamp, severity, stable event, module,
+  `APP_ENV`, server-generated request/job correlation where present, bounded
+  safe operation/outcome/duration and release when known. A separate typed
+  error-report operation accepts `SafeErrorReport`, adding safe error
+  class/code/static message, bounded sanitized source frame locations/cause
+  facts and stable grouping fields. Error-level logs do not automatically
+  create issues. An occurrence identifier differs from the issue fingerprint;
+  grouping never includes request IDs or user text.
+- Share the logger sanitizer. No raw `Error`, request, headers, cookies, query,
+  secrets or personal content may reach providers. Re-allowlist the complete
+  provider payload after SDK enrichment and before network transmission.
+  Disable unselected user/request/environment capture, breadcrumbs, native
+  Pino/console recapture, automatic exception reporting, tracing and profiling
+  using supported installed-version integrations/hooks. Do not patch SDK
+  internals. Use scoped context, never global per-user/request mutations.
+- Use explicit facade adapters initially. Sentry log and error APIs are
+  separate, with supported final-send filtering. Better Stack error ingestion
+  may use its documented Sentry-compatible DSN, while application logs use its
+  separate documented HTTP ingestion. Do not assume full Sentry Logs support
+  from error-ingestion compatibility. Verify exact supported APIs against the
+  versions selected during implementation before claiming adapter fidelity.
+- The owning application boundary reports caught/mapped unexpected list/task
+  action/route errors and swallowed integration failures. Next `onRequestError`
+  owns unhandled render/route failures. Reported rethrows must not report again,
+  including when Next supplies a transformed error/digest. One failure may
+  produce one log and one issue report when independently enabled, never two
+  reports from facade/framework/SDK capture. Skip expected auth, validation,
+  domain and framework `redirect`/`notFound` control-flow failures.
+- Initialize optional Node-only adapters once at startup. Bound payload size,
+  queue size and network deadlines. Await bounded flush at request/job and
+  framework-hook completion using the installed Next lifecycle contract; do
+  not depend on background timers before serverless freeze or close a shared
+  SDK every request. A policy change stops new exports, drops unsent queued
+  records now disallowed and never replays suppressed history. It cannot
+  recall data already in flight; cross-instance refresh is not instantaneous.
+- Network errors, timeouts, quotas and queue overflow never affect application
+  outcomes. Failure notices are bounded, sanitized, local-only and governed by
+  local policy; they cannot recursively export diagnostics failures. No disk
+  spool, retry framework or durable-delivery guarantee is accepted.
+- Browser instrumentation, session replay, metrics, tracing, profiling, uptime,
+  alerting and health/readiness expansion remain outside this work. Local
+  adapter wire tests cannot prove hosted ingestion or issue grouping. Real
+  provider evidence needs separate authorization and must cover each adapter
+  before both are presented as ready for hosted use.
+
 ---
 
 ## 12. Implementation notes vs current scaffold
@@ -620,8 +707,9 @@ reintroduce the old scaffold or a parallel architecture in `lib/`. The
 canonical design authority is `.dwf/`; Delivery artifacts, when created,
 belong outside `.dwf/`.
 
-The shared logger in section 11.1 is accepted planned work. Its implementation
-and evidence remain outstanding; the baseline checklist below does not cover it.
+The shared logger in section 11.1 and diagnostics extension in section 11.2
+are accepted planned work. Their implementation and evidence remain outstanding;
+the baseline checklist below does not cover them.
 
 ---
 
