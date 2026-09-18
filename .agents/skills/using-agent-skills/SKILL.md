@@ -38,7 +38,8 @@ Task arrives
     ├── CI/CD pipeline work? ──────────→ ci-cd-and-automation
     ├── Migration history work? ──────→ migration-history-workflow
     ├── Deprecating/migrating? ────────→ deprecation-and-migration
-    ├── Writing docs/ADRs? ───────────→ documentation-and-adrs
+    ├── Maintaining docs or agent rules? → documentation-and-adrs
+    ├── Auditing/reviewing AI context? ─→ documentation-and-adrs (read-only mode)
     ├── Adding logs/metrics/alerts? ───→ observability-and-instrumentation
     └── Deploying/launching? ─────────→ shipping-and-launch
 ```
@@ -197,6 +198,6 @@ For this repository, `testing-first-class` is required before implementation or 
 | Ship   | git-workflow-and-versioning       | Atomic commits, clean history                                              |
 | Ship   | ci-cd-and-automation              | Automated quality gates on every change                                    |
 | Ship   | deprecation-and-migration         | Remove old systems and migrate users safely                                |
-| Ship   | documentation-and-adrs            | Document the why, not just the what                                        |
+| Ship   | documentation-and-adrs            | Maintain project documentation and audit affected agent instructions       |
 | Ship   | observability-and-instrumentation | Structured logs, RED metrics, traces, symptom-based alerts                 |
 | Ship   | shipping-and-launch               | Pre-launch checklist, monitoring, rollback plan                            |

@@ -39,6 +39,7 @@ This is the navigation and maintenance protocol for the project's design, suppor
 - Repeated operational problems get a runbook under `docs/runbooks/`.
 - One document should own one concept or decision. Prefer links over repeated normative prose.
 - Repair navigation when canonical files move.
+- Use the [documentation specialist skill](../.agents/skills/documentation-and-adrs/SKILL.md) for maintenance and focused audits of affected agent guidance. It also defines read-only audit/review modes; this protocol remains the authority and navigation map.
 
 ## ADR rules
 

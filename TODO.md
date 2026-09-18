@@ -1263,12 +1263,13 @@ Accepted plan: [workflow, documentation, and dependencies](docs/agentforge/plans
 
 ### T-32: Specialize documentation maintenance and agent-context audits
 
-- [ ] Adapt the existing documentation skill for a delegated specialist with product/domain/architecture documentation maintenance and focused AI-context audits.
+- [~] Adapt the existing documentation skill for a delegated specialist with product/domain/architecture documentation maintenance and focused AI-context audits.
 - Files: `documentation-and-adrs`, `context-engineering`, `using-agent-skills`, `AGENTS.md`, and documentation protocol/navigation as needed. No application code or replacement framework.
 - Interfaces: a scoped delegation brief with accepted intent, changed files/evidence and maintenance or read-only review mode; output with changes, anchored actionable findings, unresolved decisions and verification limits.
 - Acceptance: one maintained source of specialist instructions; canonical DWF authority and ADR history preserved; scoped automatic routing; no invented requirements, blanket audits, recursive delegation, or copied source-project policies.
 - Evidence: skill validation, independent forward-tests for maintenance/review boundaries, duplicate guidance and code/contract disagreement; local links, changed-file Prettier, diff check, independent exact-tip review, and main-push CI. Product `TST-*` statuses are unaffected.
 - Dependencies: T-31. Prerequisites: repository and available sub-agents; available.
+- Verification: [specialist evidence](docs/agentforge/evidence/2026-09-18-documentation-specialist.md) records the independent maintenance and read-only audit runs, including the actionable historical-reviewer wording correction. T-31 main-push [CI run 35361865667](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35361865667) passed at `0a317a1`.
 - Recommended AgentForge skills: `documentation-and-adrs`, `context-engineering`, `git-workflow-and-versioning`, `code-review-and-quality`, `unslop`.
 
 ### T-33: Refresh stable dependencies while retaining TypeScript 6

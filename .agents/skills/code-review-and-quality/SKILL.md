@@ -255,7 +255,8 @@ context instead of spawning.
    [task workflow](../../../TODO.md#task-branch-and-merge-protocol); a PR and
    an additional human approval are not required for ordinary task delivery.
 
-Completed plans that name GPT-5.6-Sol mean this spawn, not that named model.
+Completed plans that name GPT-5.6-Sol record the reviewer used at that time.
+New closeout reviews follow the selection rule above; preserve historical evidence.
 
 **Example prompt for a review agent:**
 
