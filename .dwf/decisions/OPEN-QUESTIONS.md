@@ -17,7 +17,7 @@ What Better Auth configuration and local/test mail delivery behavior are support
 
 ### Why It Matters
 
-The product requires magic-link request/consume behavior, while the repository currently contains only a basic email/password configuration.
+When this question was raised, the product required magic-link request/consume behavior but the repository contained only basic email/password configuration. The implemented auth boundary is now described in [Project Context](../CONTEXT.md).
 
 ### Evidence Needed
 
@@ -36,8 +36,8 @@ Evidence: [Better Auth magic-link documentation](https://better-auth.com/docs/pl
 ## OQ-002 — Sanity project and document evidence
 
 - **Status:** ANSWERED
-- **Blocking:** NO for the real landing read path — the configured singleton smoke is verified; deployed webhook delivery remains partial under `TST-LANDING-003`
-- **Source:** repository files, configured non-secret environment-key inspection, and the read-only `pnpm sanity:smoke` on 2026-09-01
+- **Blocking:** NO — the configured singleton smoke and deployed webhook evidence are verified under `TST-LANDING-002` and `TST-LANDING-003`
+- **Source:** repository files, configured non-secret environment-key inspection, the read-only `pnpm sanity:smoke` on 2026-09-01, and the linked Production webhook evidence from 2026-09-16
 - **Related:** D-005, D-008, TD-023, EC-007, OD-005
 
 ### Exact Question
@@ -46,7 +46,7 @@ What Sanity project, dataset, document type, and published document are availabl
 
 ### Why It Matters
 
-The technical contract names the landing fields, but the repository currently has no Sanity dependency or client configuration.
+When this question was raised, the technical contract named the landing fields but the repository had no Sanity dependency or client configuration.
 
 ### Evidence Needed
 
@@ -56,9 +56,13 @@ Project configuration and a non-secret local/test document shape.
 
 No Sanity project, dataset, document type, or published landing document is currently available from this workspace. The package manifest has no Sanity dependency, the source tree has no Sanity client or schema configuration, and the local environment contains no Sanity configuration keys. A project resource must be provisioned before the real landing integration can be verified; OD-005 settles that it will be a dedicated project and dataset with one singleton landing document.
 
-### Current answer (2026-09-01)
+### Historical answer (2026-09-01)
 
 The repository now contains the Sanity dependency, client/configuration, validated landing read path, and dedicated landing singleton integration. The read-only `pnpm sanity:smoke` command fetched, validated, and mapped the published singleton fields `headline`, `blurb`, `primaryCtaLabel`, and `secondaryCtaLabel`. The configured project and dataset identifiers remain environment configuration and are not committed as secret material. The deployed webhook-delivery portion remains partial under `TST-LANDING-003`; it does not block the local landing read path or the T-18 environment contract.
+
+### Current answer (2026-09-16)
+
+The published landing integration remains implemented. Real signed Sanity webhook deliveries returned HTTP 200 on the approved Production deployments. [TST-LANDING-003](TESTING.md#tst-landing-003) is verified using that hosted delivery and the existing local refusal, idempotence, and recovery evidence. See the [live release record](../../docs/agentforge/evidence/2026-09-16-production-release-live.md) for the evidence and its limits.
 
 <a id="oq-003"></a>
 
@@ -66,7 +70,7 @@ The repository now contains the Sanity dependency, client/configuration, validat
 
 - **Status:** ANSWERED
 - **Blocking:** NO — current migration and environment state is verified; future Neon realignment is a separately authorized delivery operation
-- **Source:** linked Neon status, read-only `information_schema` queries, live Drizzle migration ledgers, local Docker catalog inspection, and migration metadata review on 2026-08-28
+- **Source:** linked Neon status, read-only `information_schema` queries, live Drizzle migration ledgers, local Docker catalog inspection, migration metadata review on 2026-08-28, and the linked T-20 and Production evidence
 - **Related:** D-003, D-004, TD-005, TD-006, OD-006
 
 ### Exact Question
@@ -81,8 +85,12 @@ The repository contains migration artifacts, so the linked database and actual d
 
 A safe local/development database inspection during implementation preparation.
 
-### Answer
+### Historical answer (2026-08-28)
 
 The workspace is linked to the `nextjs-todo-list-example` Neon project and its default `main` branch. The default branch still contains the scaffold Better Auth tables and `posts_table`, with its original migration ledger intact. The non-default `development` branch is an agent-owned migration-smoke target; it contains the previously verified two-step T-04 lists/tasks history and no real list/task consumers.
 
 The repository now consolidates that pre-release history into one T-04 migration that creates native UUID list/task keys and UUIDv7 defaults directly. A fresh local PostgreSQL 18 database applied the complete consolidated chain successfully and matched the expected catalog. The existing Neon development ledger was not destructively reset; future use of the consolidated history there requires explicit realignment.
+
+### Current answer (2026-09-16)
+
+T-20 provisioned a durable non-default Development branch and applied the committed migration chain. [TST-MIGRATION-001](TESTING.md#tst-migration-001) records the target and catalog evidence. The separately protected Production releases also applied the reviewed forward migrations, as recorded in the [live release evidence](../../docs/agentforge/evidence/2026-09-16-production-release-live.md). The earlier temporary development-branch realignment is a historical prerequisite, not a current blocker. Use [Project Context](../CONTEXT.md) for the current environment identities; future shared or Production changes still require reviewed forward migrations.

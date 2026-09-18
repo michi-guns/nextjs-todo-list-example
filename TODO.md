@@ -1262,6 +1262,21 @@ owner has been asked to choose that scope. Broader authentication and Sanity
 live authoring retain their explicit product-decision prerequisites. No further
 implementation is inferred from baseline completion alone.
 
+## Repository maintenance
+
+### T-30: Reconcile current documentation and complete approved housekeeping
+
+- [!] Finish the owner-approved [housekeeping plan](docs/agentforge/plans/2026-09-18-repository-housekeeping.md). The approved Git cleanup and documentation corrections are implemented; residual local directory removal is blocked by the execution policy.
+- [x] Review both stashes, remove the superseded T-27 snapshot, and preserve the unique dependency-upgrade snapshot unchanged.
+- [x] Remove 43 completed local branches, 32 GitHub branches, five stale tracking refs, and the two expired disabled reviewer files. The secondary worktree is unregistered; its partial leftover directory and the empty disabled-skill directories still require removal.
+- [x] Correct stale current-state documentation and broken skill references, preserving historical evidence and existing contract statuses. Changed-file formatting and diff checks pass; 247 current documentation/skill files contain 343 valid local Markdown destinations. Fresh exact-tip review and hosted CI gate the PR.
+- Files: the six documentation/skill files named in the plan, this tracker, and the plan. Git cleanup affects only the approved refs, worktree, stash, and disabled reviewer artifacts. No application, dependency, database, or deployment changes.
+- Acceptance: completed branch pointers and obsolete local artifacts are removed; the unique dependency-upgrade stash is retained; stale current-state claims and six broken documentation references are corrected; historical evidence and T-26/T-27/T-28 scope remain intact.
+- Evidence contracts: reconcile prose against existing verified `TST-MIGRATION-001`, `TST-PERFORMANCE-001`, `TST-LANDING-002`, and `TST-LANDING-003`. Do not change their statuses or close the partial `TST-HARNESS-001` live-outage observation.
+- Verification: fresh exact-ref/file preflight before deletion; final Git/stash/worktree inventory; documentation link/anchor checks; changed-file Prettier; `git diff --check`; fresh independent exact-tip review; normal PR CI. Reuse the same-turn unchanged-code audit evidence: `pnpm test` 42 files/415 tests, `pnpm typecheck --incremental false`, and `pnpm lint` with only the existing `Geist` warning.
+- Dependencies: owner approval received on 2026-09-18, unchanged approved object IDs, existing Git/GitHub access and installed pnpm tools. The remaining disk cleanup needs an allowed execution of the explicitly named directory removal; automatic approval review returned only `blocked by policy`.
+- Recommended AgentForge skills: `planning`, `task-breakdown`, `documentation-and-adrs`, `git-workflow-and-versioning`, `code-review-and-quality`, `testing-first-class`, and `unslop`.
+
 ## Explicitly out of scope for this baseline
 
 - OAuth or social login.

@@ -558,11 +558,11 @@ belong outside `.dwf/`.
 
 ## 13. Definition of done (engineering checklist)
 
-Checked items are the local starter baseline already delivered. Unchecked items remain hosted Neon evidence (T-16 snapshot cannot be rerun until T-20; schema-on-Neon is T-20).
+Checked items reflect the delivered baseline and the recorded evidence in the [testing ledger](../../decisions/TESTING.md). Neon migration evidence is recorded under [TST-MIGRATION-001](../../decisions/TESTING.md#tst-migration-001), and the original T-16 performance snapshot under [TST-PERFORMANCE-001](../../decisions/TESTING.md#tst-performance-001). These records do not claim a new hosted run. Current environment facts remain in [Project Context](../../CONTEXT.md).
 
 - [x] Better Auth email/password + magic link working locally
 - [x] Session guards on actions + JSON API
-- [ ] Drizzle schema: auth tables + lists + tasks + required constraints/indexes; migrations applied on Neon/dev DB
+- [x] Drizzle schema: auth tables + lists + tasks + required constraints/indexes; migrations applied on Neon/dev DB
 - [x] One module-scoped node-postgres pool backs Drizzle across Neon and Testcontainers and is registered for Vercel Fluid Compute lifecycle management
 - [x] Exactly one default Inbox on every listless private workspace load, including after final-list deletion
 - [x] List CRUD + cascade delete + case-insensitive per-user name uniqueness
@@ -570,7 +570,7 @@ Checked items are the local starter baseline already delivered. Unchecked items 
 - [x] Cursor-paginated list and task reads with opaque next cursors
 - [x] Pagination defaults to 20, caps at 100, omits total counts, and is visible through dashboard `Load more`
 - [x] Core list/task reads fetch at most `limit + 1`, avoid N+1 behavior, and use the required query-shaped indexes
-- [ ] Representative Neon seed and `EXPLAIN ANALYZE` evidence satisfy the agreed index-use, cursor-correctness, and warm-query baseline
+- [x] Representative Neon seed and `EXPLAIN ANALYZE` evidence satisfy the agreed index-use, cursor-correctness, and warm-query baseline
 - [x] Landing Sanity read path plus the read-only live fetch/validate/map smoke passes against the dedicated published singleton
 - [x] Signed Sanity webhook invalidation and protected manual recovery share one idempotent cache-invalidation service
 - [x] Zod at boundaries
