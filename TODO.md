@@ -1253,11 +1253,12 @@ Accepted plan: [workflow, documentation, and dependencies](docs/agentforge/plans
 
 ### T-31: Simplify task integration and branch cleanup
 
-- [~] Replace mandatory PR delivery with task branches from `main`, reviewed direct merges, ordinary push authorization, and verified merged-branch cleanup.
+- [x] Replace mandatory PR delivery with task branches from `main`, reviewed direct merges, ordinary push authorization, and verified merged-branch cleanup.
 - Files: `AGENTS.md`, this task protocol, Git/review/testing skills, testing execution guidance, and affected current development docs. Preserve historical PR evidence and protected release requirements.
 - Acceptance: one consistent current workflow; no new permission for commit/push/eligible branch deletion; no deletion of unmerged, active, or unrelated work; stale documentation checked.
 - Evidence: prose-only, no product `TST-*` status changes. Verify current-rule consistency, local Markdown destinations, changed-file Prettier, `git diff --check`, independent exact-tip review, and main-push CI.
 - Dependencies: none. Prerequisites: repository, Git, installed formatter; all available.
+- Verification, 2026-09-18: all 264 local Markdown destinations across eight changed files resolve; changed-file Prettier and `git diff --check` pass. Commit-hook `pnpm test` passes 42 files/415 tests. Fresh GPT-6-Astra `xhigh` review approved implementation commit `c655f94` with no actionable findings. This metadata tip receives its own independent review before integration; main-push CI is checked afterward. No product contract status changed.
 - Recommended AgentForge skills: `planning`, `task-breakdown`, `git-workflow-and-versioning`, `documentation-and-adrs`, `code-review-and-quality`, `unslop`.
 
 ### T-32: Specialize documentation maintenance and agent-context audits
