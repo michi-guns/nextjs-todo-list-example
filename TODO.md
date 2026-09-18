@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 23 files and 121 tests.
+- [x] `pnpm test` passes 42 files and 415 tests (T-33 dependency refresh, 2026-09-18).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1275,12 +1275,14 @@ Accepted plan: [workflow, documentation, and dependencies](docs/agentforge/plans
 
 ### T-33: Refresh stable dependencies while retaining TypeScript 6
 
-- [ ] Update direct dependencies to current stable compatible releases in related groups; keep TypeScript below 7 and allow the Drizzle release-candidate line.
+- [~] Update direct dependencies to current stable compatible releases in related groups; retain TypeScript 6 and ESLint 9, and allow the Drizzle release-candidate line.
 - Files: `package.json`, generated `pnpm-lock.yaml`, required compatibility fixes/tests, stack documentation and a dated evidence record. Preserve the existing dependency stash and database migration history.
 - Acceptance: official release/migration notes reviewed; no experimental release except Drizzle; application behavior preserved; all required local checks pass; independent review and tidy direct merge.
 - Evidence contracts: the local foundation, migration, harness, persistence, auth, list/task, concurrency, boundary, landing, UI/E2E and environment/pipeline contracts named in the accepted plan. Record fresh local results separately from historical hosted and performance evidence; do not close unrelated partial obligations.
 - Checks: pre-upgrade `pnpm test`; per-group affected checks; final `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, `pnpm test:e2e:cross-browser`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm build`, changed-file Prettier, `git diff --check`, independent review, and main-push CI.
 - Dependencies: T-32. Prerequisites: registry access/dependencies to implement; Docker and matching Playwright browsers for integration/browser checks. Initial preflight passes; install browser revisions required by the authorized upgrade.
+- Previous task closeout: T-32 final commit `900e018` received fresh GPT-6-Astra `xhigh` approval and passed main-push [CI run 35363143600](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35363143600). Its merged local branch was deleted; no PR was created.
+- Local verification: [dependency evidence](docs/agentforge/evidence/2026-09-18-stable-dependencies.md) records passing typecheck, lint (existing warning), 415 unit tests, 23 integration tests, 8 Chromium and 24 cross-browser journeys, migration check, production build, frozen install, peers, formatting and links. It also records the investigated transient lint/browser diagnostics and unchanged successful reruns. Independent exact-tip review and main-push CI remain pending. T-26/T-27/T-28 retain their existing product/prerequisite boundaries and are outside this session's authorized scope.
 - Recommended AgentForge skills: `testing-first-class`, `incremental-implementation`, `source-driven-development`, `test-driven-development` for compatibility behavior changes, `next-dev-loop` when runtime changes, `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
 
 ## Explicitly out of scope for this baseline

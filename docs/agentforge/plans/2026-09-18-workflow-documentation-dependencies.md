@@ -20,7 +20,8 @@ checks. No new application capability or agent framework is needed.
 and protected hosted-release gates. Delete only branches proven merged into
 `main` and unused by another worker. Preserve the existing dependency stash.
 Select stable package releases, allow the Drizzle RC line, and keep TypeScript
-below 7. Do not apply stashed package versions as upgrade authority.
+below 7. The owner additionally confirmed ESLint 9 on 2026-09-18 after the
+ESLint 10 compatibility check. Do not apply stashed package versions as upgrade authority.
 
 ## Current state and file map
 

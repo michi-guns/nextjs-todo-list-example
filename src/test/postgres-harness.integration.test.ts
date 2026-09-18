@@ -11,7 +11,7 @@ function quoteIdentifier(identifier: string) {
   return `"${identifier.replaceAll('"', '""')}"`
 }
 
-describe.sequential("PostgreSQL Testcontainers harness", () => {
+describe("PostgreSQL Testcontainers harness", { concurrent: false }, () => {
   it("starts one local PostgreSQL 18 database with the migration chain", async () => {
     const pool = new Pool({ connectionString: databaseUrl })
     const database = drizzle({ client: pool })

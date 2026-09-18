@@ -82,7 +82,7 @@ async function expectUniqueViolation(action: () => Promise<unknown>) {
   }
 }
 
-describe.sequential("lists and tasks PostgreSQL schema", () => {
+describe("lists and tasks PostgreSQL schema", { concurrent: false }, () => {
   const databaseUrl = getLocalDatabaseUrl(testDatabaseUrl)
   const schemaName = `codex_t04_${process.pid}_${Date.now()}`
   let setupPool: Pool | undefined

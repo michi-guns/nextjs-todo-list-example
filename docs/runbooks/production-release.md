@@ -59,7 +59,7 @@ See the [accepted plan](../agentforge/plans/2026-09-16-t-23-production-release.m
 
 The protected Environment settings are described in the prerequisite evidence.
 The current required reviewer is `jimzord12`, only `main` can deploy, and admin
-bypass is disabled. The owner has delegated reviewed PR merges; that delegation
+bypass is disabled. The owner has delegated reviewed task merges; that delegation
 does not remove the release approval gate. Do not copy secret values into
 workflow inputs, PRs, artifacts, logs or runbooks.
 

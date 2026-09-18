@@ -69,7 +69,7 @@ async function getMigrationSqlFiles() {
   )
 }
 
-describe.sequential("Drizzle task repository", () => {
+describe("Drizzle task repository", { concurrent: false }, () => {
   const databaseUrl = getLocalDatabaseUrl(testDatabaseUrl)
   const schemaName = `codex_t07_${process.pid}_${Date.now()}`
   let setupPool: Pool | undefined

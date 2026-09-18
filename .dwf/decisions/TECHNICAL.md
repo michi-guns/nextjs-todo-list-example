@@ -401,9 +401,11 @@ mail prerequisite.
 - **Related rules:** [RULE-010](../RULES.md#rule-010), [RULE-011](../RULES.md#rule-011), [RULE-012](../RULES.md#rule-012)
 - **Source:** owner stack-selection guidance for coding-agent authors
 
-This starter is written for coding agents as the primary authors, then reviewed
-by humans. Pick the current, well-documented default of each accepted
-technology: the APIs the installed versions in this repository actually teach.
+Coding agents write this starter under the owner's direction. Non-trivial tasks
+receive fresh independent agent review under
+[the repository workflow](../../AGENTS.md#review-and-task-follow-through).
+Pick the current, well-documented default of each accepted technology: the APIs
+the installed versions in this repository actually teach.
 
 Do not revive older framework modes because they dominate training data. Do not
 require preview flags, experimental compiler options, or last-week surfaces as

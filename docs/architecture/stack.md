@@ -9,7 +9,7 @@ This is a supporting inventory of the starter's selected technologies. The canon
 
 ## Selection rule
 
-This starter is written for coding agents as the primary authors, then reviewed by humans. Use the current documented default of each accepted technology: the APIs the installed versions in this repository actually teach.
+Coding agents write this starter under the owner's direction. Non-trivial tasks receive fresh independent agent review under [the repository workflow](../../AGENTS.md#review-and-task-follow-through). Use the current documented default of each accepted technology: the APIs the installed versions in this repository actually teach.
 
 Do not revive older framework modes because they dominate training data. Do not require preview flags, experimental compiler options, or last-week surfaces as baseline unless a Technical Decision already accepted them.
 
@@ -22,6 +22,12 @@ The Next.js illustration: use the App Router as this installed Next.js version d
 - Zod 4
 
 When those APIs differ from older tutorials, follow this repository's code and the installed package documentation.
+
+## Versions and upgrades
+
+[`package.json`](../../package.json) owns dependency declarations and selects pnpm through `packageManager`. [`pnpm-lock.yaml`](../../pnpm-lock.yaml) records the exact dependency resolutions. Use those files for versions rather than maintaining a second version inventory here.
+
+The [approved dependency refresh](../agentforge/plans/2026-09-18-workflow-documentation-dependencies.md) selects stable releases, retaining the accepted Drizzle ORM and Drizzle Kit RC line, TypeScript 6, and ESLint 9. TypeScript 7 and ESLint 10 are outside the approved scope. Compatibility checks and their evidence belong to the delivery task.
 
 ## Application
 

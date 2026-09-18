@@ -102,7 +102,7 @@ type AuthTestContext = {
   appPool: Pool
 }
 
-describe.sequential("Better Auth boundary", () => {
+describe("Better Auth boundary", { concurrent: false }, () => {
   const databaseUrl = getLocalDatabaseUrl(testDatabaseUrl)
   const schemaName = `codex_t05_${process.pid}_${Date.now()}`
   let setupPool: Pool | undefined
