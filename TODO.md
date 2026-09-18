@@ -15,68 +15,38 @@ Status markers:
 - `[x]` Complete
 - `[!]` Blocked
 
-## Task branch and PR protocol
+## Task branch and merge protocol
 
-This protocol applies only to delivery tasks tracked in this file. The DWF remains the design authority, and `TODO.md` remains the delivery tracker.
+This protocol applies to delivery tasks in this file. [AGENTS.md](AGENTS.md)
+owns repository-wide authorization, safety, and independent review. Historical
+PR references below record earlier deliveries; they do not require new PRs.
 
-Ordinary work that is not a `TODO.md` task follows [`AGENTS.md`](AGENTS.md): no PR requirement; commit and push to `main` is allowed. Do not use this protocol for that work.
-
-Every `TODO.md` implementation task still gets its own short-lived branch and pull request.
-
-### Bootstrap exception
-
-- The initial tracker and this protocol may be committed directly to the current `main` branch.
-- After the bootstrap commit, every implementation task gets its own short-lived branch and pull request.
-
-### Start a task
-
-1. Read the relevant `TST-*` contracts before selecting implementation work. Identify evidence that is possible now and evidence that depends on later tasks or unavailable prerequisites.
-2. Select the next unchecked task whose dependencies are satisfied. `T-03A` must be complete before selecting any later implementation task.
-3. Start from the latest `main` and create `task/<task-id>-<short-slug>`, for example `task/T-06-lists-capability`.
-4. Mark the task `[~]` on that branch and keep the change limited to the task and its required verification.
-5. For multi-step work, use AgentForge `planning` first and `task-breakdown` second. Use the task's recommended agent skills, including `testing-first-class` before coding and `test-driven-development` for executable behavior. Do not silently expand scope or resolve a product/technical decision in code.
-
-### Finish a task
-
-1. Complete the task acceptance criteria and record the verification evidence in the task or its linked artifact.
-2. Reconcile every referenced `TST-*` contract. Mark it `verified`, `partial`, `blocked`, `deferred`, or `retired` with the exact evidence or a linked follow-up; never silently omit a future integration or E2E obligation.
-3. Run the focused checks plus the proportionate project quality gates. Do not claim a check passed when it was skipped.
-4. Commit the complete task with a descriptive message such as `feat: implement lists capability`.
-5. Spawn the independent closeout reviewer required by `AGENTS.md`: a fresh
-   sub-agent on this harness's most capable model, at Grok `high`, Codex or
-   Claude Code `xhigh`, or the highest available effort on GLM, Kimi, Qwen,
-   and similar harnesses. Point it at that exact commit. Fix actionable
-   findings, rerun affected checks, and spawn a new reviewer for each
-   changed tip.
-6. Mark the task `[x]`, update any checkpoint it satisfies, and commit remaining evidence.
-   If that creates a new tip, spawn a new reviewer against it. Do not push or
-   open a PR until the reviewed commit is the current branch/PR tip.
-7. Push the branch with its upstream configured.
-8. Open a pull request from the task branch into `main`. Use
-   [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
-   The PR body must include:
-   - a **Why this change** section at the top, written for product owners,
-     stakeholders, and other non-engineers: 3-6 short everyday-language
-     sentences covering what a person can now do, why it matters, and what
-     this does not change, with no files, commands, or test IDs in that
-     section;
-   - a concise technical summary of the behavior delivered;
-   - the task ID and links to the relevant DWF PRD/SPEC sections;
-   - the affected `TST-*` IDs and their status;
-   - acceptance criteria and verification commands/results;
-   - known limitations, follow-up tasks, and any external prerequisites.
-9. Report the terminal handoff in this format:
-
-   `T-XX | PR #N | <PR title> | <clickable GitHub URL>`
-
-   Include the final commit SHA and the checks that ran below it.
-
-### Authorization and safety
-
-- The normal task workflow is pre-authorized: create the task branch, commit, push, open the PR, complete the independent review/fix/retest loop and merge when required checks and review pass for the current tip. The owner confirmed autonomous reviews and merges on 2026-09-16; do not ask again for routine task merges.
-- Do not force-push, rewrite history, delete branches, reset data, broaden credentials or bypass protected release gates without an explicit request.
-- Stop and report a blocker when the task needs a missing external resource, a new product or technical decision, unavailable credentials, or a destructive operation outside this protocol.
-- Keep secrets out of commits, PR bodies, logs, and screenshots.
+1. Select an authorized unchecked task with satisfied dependencies. Read its
+   plan and affected `TST-*` contracts, then run the required preflight.
+2. Fetch current remote state, bring clean `main` forward without rewriting
+   history, and create `codex/<task-id>-<short-slug>` from it. Preserve any
+   unrelated local work and check active worktrees before switching branches.
+3. Mark the task `[~]`, implement its accepted scope, and record checks and
+   documentation changes here or in a linked evidence file. Commit coherent
+   increments. No permission is needed for commits or ordinary pushes.
+4. Complete the independent review/fix/retest loop required by `AGENTS.md`.
+   Record task completion and evidence, then review the final commit including
+   that metadata. Every changed tip requires a fresh independent review.
+5. Refresh remote state before integration. When `main` is still the branch
+   ancestor, prefer a fast-forward merge so the reviewed commit is the result.
+   If `main` advanced independently, merge it into the task branch without
+   rewriting history, resolve conflicts, rerun affected checks and obtain a
+   fresh review of the combined tip before integration.
+6. Merge directly into `main` and push it. Do not open a PR. Check the
+   main-push CI result for that exact commit; investigate failures rather than
+   treating local checks as hosted evidence. No deployment is implied.
+7. Confirm each finished branch's current tip is contained in `main`, and
+   that no agent/worktree is using it. Delete eligible local and remote task
+   branches under the pre-authorization in `AGENTS.md`. Finish on clean
+   `main`; active parallel-work branches may remain. Preserve stashes and
+   unrelated files, and report any housekeeping that needs separate approval.
+8. Report the task ID, final commit, checks/results, and remaining blockers.
+   Recompute dependencies and continue only within the owner's authorized scope.
 
 ## Current baseline
 
@@ -1276,6 +1246,39 @@ implementation is inferred from baseline completion alone.
 - Verification: fresh exact-ref/file preflight before deletion; final Git/stash/worktree inventory; documentation link/anchor checks; changed-file Prettier; `git diff --check`; fresh independent exact-tip review; normal PR CI. Reuse the same-turn unchanged-code audit evidence: `pnpm test` 42 files/415 tests, `pnpm typecheck --incremental false`, and `pnpm lint` with only the existing `Geist` warning.
 - Dependencies: satisfied. The final inventory had clean synchronized `main`, one local and one remote branch, no open PRs, one registered worktree, and the intentionally retained dependency stash `ae0af7f5f1e79246b6b77e12ccf395103265d6d6`. This documentation-only closeout uses the same task branch and review/CI protocol. T-26 still needs agreed observability scope; broader T-27 and T-28 still need their product decisions. No further cleanup blocks selection of the next task.
 - Recommended AgentForge skills: `planning`, `task-breakdown`, `documentation-and-adrs`, `git-workflow-and-versioning`, `code-review-and-quality`, `testing-first-class`, and `unslop`.
+
+## Workflow and maintenance improvements
+
+Accepted plan: [workflow, documentation, and dependencies](docs/agentforge/plans/2026-09-18-workflow-documentation-dependencies.md).
+
+### T-31: Simplify task integration and branch cleanup
+
+- [~] Replace mandatory PR delivery with task branches from `main`, reviewed direct merges, ordinary push authorization, and verified merged-branch cleanup.
+- Files: `AGENTS.md`, this task protocol, Git/review/testing skills, testing execution guidance, and affected current development docs. Preserve historical PR evidence and protected release requirements.
+- Acceptance: one consistent current workflow; no new permission for commit/push/eligible branch deletion; no deletion of unmerged, active, or unrelated work; stale documentation checked.
+- Evidence: prose-only, no product `TST-*` status changes. Verify current-rule consistency, local Markdown destinations, changed-file Prettier, `git diff --check`, independent exact-tip review, and main-push CI.
+- Dependencies: none. Prerequisites: repository, Git, installed formatter; all available.
+- Recommended AgentForge skills: `planning`, `task-breakdown`, `git-workflow-and-versioning`, `documentation-and-adrs`, `code-review-and-quality`, `unslop`.
+
+### T-32: Specialize documentation maintenance and agent-context audits
+
+- [ ] Adapt the existing documentation skill for a delegated specialist with product/domain/architecture documentation maintenance and focused AI-context audits.
+- Files: `documentation-and-adrs`, `context-engineering`, `using-agent-skills`, `AGENTS.md`, and documentation protocol/navigation as needed. No application code or replacement framework.
+- Interfaces: a scoped delegation brief with accepted intent, changed files/evidence and maintenance or read-only review mode; output with changes, anchored actionable findings, unresolved decisions and verification limits.
+- Acceptance: one maintained source of specialist instructions; canonical DWF authority and ADR history preserved; scoped automatic routing; no invented requirements, blanket audits, recursive delegation, or copied source-project policies.
+- Evidence: skill validation, independent forward-tests for maintenance/review boundaries, duplicate guidance and code/contract disagreement; local links, changed-file Prettier, diff check, independent exact-tip review, and main-push CI. Product `TST-*` statuses are unaffected.
+- Dependencies: T-31. Prerequisites: repository and available sub-agents; available.
+- Recommended AgentForge skills: `documentation-and-adrs`, `context-engineering`, `git-workflow-and-versioning`, `code-review-and-quality`, `unslop`.
+
+### T-33: Refresh stable dependencies while retaining TypeScript 6
+
+- [ ] Update direct dependencies to current stable compatible releases in related groups; keep TypeScript below 7 and allow the Drizzle release-candidate line.
+- Files: `package.json`, generated `pnpm-lock.yaml`, required compatibility fixes/tests, stack documentation and a dated evidence record. Preserve the existing dependency stash and database migration history.
+- Acceptance: official release/migration notes reviewed; no experimental release except Drizzle; application behavior preserved; all required local checks pass; independent review and tidy direct merge.
+- Evidence contracts: the local foundation, migration, harness, persistence, auth, list/task, concurrency, boundary, landing, UI/E2E and environment/pipeline contracts named in the accepted plan. Record fresh local results separately from historical hosted and performance evidence; do not close unrelated partial obligations.
+- Checks: pre-upgrade `pnpm test`; per-group affected checks; final `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, `pnpm test:e2e:cross-browser`, `pnpm exec drizzle-kit check --config drizzle.config.ts`, `pnpm build`, changed-file Prettier, `git diff --check`, independent review, and main-push CI.
+- Dependencies: T-32. Prerequisites: registry access/dependencies to implement; Docker and matching Playwright browsers for integration/browser checks. Initial preflight passes; install browser revisions required by the authorized upgrade.
+- Recommended AgentForge skills: `testing-first-class`, `incremental-implementation`, `source-driven-development`, `test-driven-development` for compatibility behavior changes, `next-dev-loop` when runtime changes, `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
 
 ## Explicitly out of scope for this baseline
 

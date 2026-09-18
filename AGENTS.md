@@ -81,7 +81,8 @@ For any implementation or behavior-changing task in this repository, use the pro
 ## Review and task follow-through
 
 - The owner authorizes agents to complete the review/fix/retest loop, commit,
-  push, open PRs and merge them without another permission request once the
+  push and merge task branches directly into `main` without a PR or another
+  permission request once the
   required checks and independent review pass for the current tip. Continue
   to the next authorized, unblocked task. Stop only for a concrete blocker,
   unresolved decision or action that needs the owner. This does not waive
@@ -101,12 +102,13 @@ For any implementation or behavior-changing task in this repository, use the pro
 - Treat reviewer output as evidence, not as a new source of requirements. Before accepting or rejecting a finding, reread the changed artifact and reconcile it with the applicable DWF contracts, `TST-*` obligations, installed-version official documentation/source, and executable behavior. A suggestion that overrides a framework's built-in security or lifecycle behavior is a contract conflict until those sources support it.
 - Classify findings as actionable, contract conflict/design gap, optional/nit, or noise. Fix in-scope actionable findings; document or defer optional feedback; stop and surface unresolved contract conflicts instead of silently choosing. When a finding changes behavior, add or update the smallest regression test before or alongside the fix when the prerequisite is available.
 - Any code or test change invalidates the previous approval. Rerun the affected checks and obtain a fresh review. If three substantive cycles remain unresolved or contradictory, stop and report the exact conflict rather than looping indefinitely or claiming approval.
-- Before marking a task complete or merging, confirm that the reviewed commit is the current branch/PR tip, reconcile exact verification evidence and affected `TST-*` statuses, update `TODO.md`, and recompute every dependency to find all genuinely unblocked work. Keep any temporary run/checkpoint artifact current after each task transition.
+- Before marking a task complete or merging, confirm that the reviewed commit is the current branch tip, reconcile exact verification evidence and affected `TST-*` statuses, update `TODO.md`, and recompute every dependency to find all genuinely unblocked work within the authorized scope. Keep any temporary run/checkpoint artifact current after each task transition.
 
 ## Git and destructive-action safety
 
 - Preserve existing dirty or untracked work and use the repository's simple branch strategy unless the user says otherwise.
-- Ask for explicit confirmation before deleting or overwriting files, removing directories, clearing generated or cached data, resetting databases, or using destructive Git operations such as reset, clean, restore, checkout that overwrites paths, rebase, amend, branch deletion, force-push, or history rewriting.
+- Deleting local or remote branches is pre-authorized only after their current tips are proven ancestors of `main` and they are not in use by another agent or worktree. Refresh remote refs and confirm the remote tip before deleting a remote branch. Never delete `main` or an unmerged branch under this authorization.
+- Ask for explicit confirmation before deleting or overwriting files, removing directories, clearing generated or cached data, resetting databases, or using other destructive Git operations such as reset, clean, restore, checkout that overwrites paths, rebase, amend, unmerged branch deletion, force-push, or history rewriting. Light housekeeping does not authorize discarding unrelated work, stashes, or worktree directories.
 
 ## Completion reporting
 
@@ -114,15 +116,13 @@ For any implementation or behavior-changing task in this repository, use the pro
 
 ## Git strategy (simple / flexible)
 
-- **No PR requirement for ordinary work.** No protected-branch ceremony is required except for delivery tasks tracked in [`TODO.md`](TODO.md). Those tasks still use that file's branch and pull-request protocol.
+- Each [`TODO.md`](TODO.md) task starts on a short-lived branch from current `main`, passes its required checks and independent review, then merges directly back into `main`. Do not create a PR unless the user explicitly requests one. The [task workflow](TODO.md#task-branch-and-merge-protocol) owns the operational steps.
 - For work that is not a `TODO.md` task, agents and humans may:
   - commit and **push directly to `main`**, or
-  - use short-lived branches and merge locally / on GitHub however is convenient.
+  - use short-lived branches and merge directly into `main`.
 - Keep commits coherent and messages clear enough to skim history.
-- When opening a pull request, start the body with the **Why this change**
-  section from [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
-  Write it for product owners and other non-engineers, not as a technical
-  changelog.
+- Finish with clean `main` and remove merged local and remote task branches under the safety rule above. Keep branches used by active parallel work. Check documentation for stale instructions and leave unrelated work intact.
+- For an explicitly requested PR, use [the PR template](.github/PULL_REQUEST_TEMPLATE.md), beginning with its product-owner-facing **Why this change** section.
 - Do not force-push `main` unless the operator explicitly asks.
 - Do not rewrite shared history casually.
 - Secrets stay out of git (`.env*`, tokens, credentials).

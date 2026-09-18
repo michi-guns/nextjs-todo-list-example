@@ -50,6 +50,6 @@ Before declaring the task complete:
 2. Record the exact commands and results for verified evidence.
 3. Record the blocker and linked follow-up for partial, blocked, or deferred evidence.
 4. Ensure no passing lower-level test is presented as proof of an unimplemented higher-level contract.
-5. Include the contract IDs and evidence summary in the PR description.
+5. Include the contract IDs and evidence summary in the delivery task or its linked evidence record. A PR is not required.
 
 Do not create a coverage-percentage gate. The obligation is suitable, honest evidence for the behavior and risk described by each contract.

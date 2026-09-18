@@ -10,5 +10,6 @@
 8. Update documentation when behavior, architecture, or test design changes.
 9. Reconcile the test-contract status and run the relevant quality gates, reporting skipped checks.
 10. For a non-trivial task, spawn the independent closeout reviewer required by [`AGENTS.md`](../../AGENTS.md): a fresh sub-agent on this harness's most capable model, at Grok `high`, Codex or Claude Code `xhigh`, or the highest available effort on GLM, Kimi, Qwen, and similar harnesses.
+11. Follow the [task branch and merge protocol](../../TODO.md#task-branch-and-merge-protocol) to integrate the reviewed tip directly into `main`, check main-push CI, and remove eligible merged branches. Preserve active parallel work and unrelated local files.
 
 Start with the smallest complete user journey rather than scaffolding abstractions for hypothetical features.

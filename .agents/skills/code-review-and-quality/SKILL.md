@@ -216,7 +216,7 @@ Model B reviews for correctness and architecture
 Model A addresses the feedback
     │
     ▼
-Human makes the final call
+Integrator applies the repository's review and merge gate
 ```
 
 This catches issues that a single model might miss — different models have different blind spots.
@@ -250,8 +250,10 @@ context instead of spawning.
    conflict/design gap, optional/nit, or noise. Fix in-scope actionable
    findings. Any later commit, including docs-only evidence or tracker
    closeout, invalidates the previous approval and requires a new spawn
-   against the new tip. Do not push or open a PR until the reviewed
-   commit is the current branch/PR tip.
+   against the new tip. Do not merge or push the result to `main` until the
+   reviewed commit is the current branch tip. Follow the repository's
+   [task workflow](../../../TODO.md#task-branch-and-merge-protocol); a PR and
+   an additional human approval are not required for ordinary task delivery.
 
 Completed plans that name GPT-5.6-Sol mean this spawn, not that named model.
 

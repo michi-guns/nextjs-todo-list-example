@@ -112,9 +112,9 @@ For any implementation or behavior-changing task:
 4. Use the repository's TDD workflow for executable behavior: write a focused failing test where the required dependency is available, implement the smallest behavior, and verify it.
 5. If an integration or E2E test cannot yet be written or run, preserve its contract, state the exact dependency, and link the task that will resume it. Do not replace it with a misleading unit test and do not silently omit it.
 6. Before task completion, reconcile every affected contract as `verified`, `partial`, `blocked`, `deferred`, or `retired`, with commands/results or a concrete follow-up.
-7. Include the contract IDs and verification evidence in the PR description.
+7. Include the contract IDs and verification evidence in the delivery task or its linked evidence record. A PR is not required.
 
-The `testing-first-class` project skill operationalizes this protocol. The skill improves agent reliability through explicit instructions and traceability; it is not a mechanical guarantee that an agent can never omit work. The ledger and task/PR reconciliation make an omission visible to the next agent and human reviewer.
+The `testing-first-class` project skill operationalizes this protocol. The skill improves agent reliability through explicit instructions and traceability; it is not a mechanical guarantee that an agent can never omit work. The ledger and task evidence reconciliation make an omission visible to the next agent and human reviewer.
 
 ## Test contract index
 
