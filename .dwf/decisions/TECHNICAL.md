@@ -429,3 +429,36 @@ still use it:
 When those APIs differ from older tutorials, follow this repository's code and
 the installed package documentation. Do not turn the starter into a configurable
 multi-stack framework.
+
+<a id="td-029"></a>
+
+## TD-029 - Shared backend logging with environment-local policy
+
+- **Status:** ACCEPTED, planned implementation
+- **Related product decisions:** [D-009](PRODUCT.md#d-009)
+- **Related technical decisions:** [TD-015](#td-015), [TD-025](#td-025), [TD-026](#td-026)
+- **Related test contracts:** [TST-LOGGING-001](TESTING.md#tst-logging-001), [TST-LOGGING-002](TESTING.md#tst-logging-002)
+- **Open decision:** [OD-026](OPEN-DECISIONS.md#od-026), protected settings editing interface only
+- **Source:** owner-approved shared logger direction, 2026-09-18
+
+Use a small reusable server-only Node logger facade backed by Pino, with
+contextual logger objects and no interchangeable-provider framework. Record
+meaningful backend boundaries and integration outcomes with stable events,
+isolated request/job correlation and allowlisted metadata. Preserve generic
+client errors, avoid duplicate reports of propagated failures, and exclude
+secrets, personal content and raw error strings before serialization.
+
+Store shared logging settings through Drizzle in the selected environment's
+existing application PostgreSQL database. Each instance uses its last fully
+validated policy, refreshed at bounded request/job boundaries. Log writes do
+not query the database; outages retain the last valid snapshot, with enabled
+`info` defaults at cold start. Global off, severity thresholds, exact module
+overrides and exact event suppression govern facade events only.
+
+The [Agent SPEC](../output/agent/SPEC.md#shared-backend-logging) owns policy
+precedence, privacy, refresh and failure semantics. JSON deployed output and
+readable local output must respect Node/Next request and process lifecycles.
+This decision adds no browser logging, external telemetry service, health
+endpoint or authority over independent framework/provider logs. The settings
+writer remains subject to OD-026; accepting database storage does not choose
+its operator interface.

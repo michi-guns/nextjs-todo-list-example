@@ -1,6 +1,6 @@
 # Human Technical Guide — Next.js Todo List Example
 
-This is a human-oriented projection of the validated [Agent SPEC](../agent/SPEC.md). It explains the implementation shape without becoming a second technical contract. Durable choices live in [`../../decisions/TECHNICAL.md`](../../decisions/TECHNICAL.md); individual testing obligations live in [`../../decisions/TESTING.md`](../../decisions/TESTING.md); product behavior remains owned by [`../agent/PRD.md`](../agent/PRD.md).
+This is a human-oriented projection of the [Agent SPEC](../agent/SPEC.md), including accepted planned work where labeled. It explains the implementation shape without becoming a second technical contract. Durable choices live in [`../../decisions/TECHNICAL.md`](../../decisions/TECHNICAL.md); individual testing obligations live in [`../../decisions/TESTING.md`](../../decisions/TESTING.md); product behavior remains owned by [`../agent/PRD.md`](../agent/PRD.md).
 
 ## System shape
 
@@ -74,6 +74,23 @@ local mailbox is never a deployed fallback. Diagnostics may
 show safe target names and metadata, but never connection strings, credentials,
 tokens, mailbox URLs, or auth secrets. Preview and Production delivery are
 manual; CI verifies the repository without deployment side effects.
+
+## Shared backend logging, planned
+
+The accepted [shared logger design](../agent/SPEC.md#shared-backend-logging)
+adds a small Pino-backed server logger for useful backend events, with request
+correlation and safe metadata. Each environment keeps its settings in its own
+existing application database. Instances refresh a cached policy during active
+work; database failures preserve the last valid settings. Operators can disable
+logging, change severity thresholds, override exact modules and suppress exact
+events. Generic user-facing errors stay unchanged, and private content and raw
+error messages stay out of logs.
+
+This work is not implemented. The protected operator editing interface remains
+[open in OD-026](../../decisions/OPEN-DECISIONS.md#od-026); a CLI is only a
+proposal. [T-26.1 through T-26.3](../../../TODO.md#t-261) own implementation and
+verification. Browser-only errors, independent framework/provider logs,
+health/readiness checks and external telemetry are outside this logger slice.
 
 ## Required application behavior
 

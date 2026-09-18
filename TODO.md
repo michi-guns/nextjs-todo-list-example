@@ -1075,6 +1075,15 @@ or product decisions.
 
 ### T-26: Add runtime safety and observability hardening
 
+Logger task definition, 2026-09-18: the owner selected a reusable Pino-backed
+backend logger with dynamic settings in each environment's existing application
+database. The [logger plan](docs/agentforge/plans/2026-09-18-t-26-shared-logger.md)
+records that direction and the three unchecked review units below. This request
+authorizes documentation/task definition only, not execution. The protected
+settings writer remains a narrow [open decision](.dwf/decisions/OPEN-DECISIONS.md#od-026).
+Runtime target validation, health/readiness and broader observability remain
+pending outside this slice. The parent task is not complete.
+
 Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` without the tooling's full environment-profile guard, and unexpected application failures mapped through `src/shared/entry-contract.ts` lose their diagnostic cause. Address runtime target validation and safe failure reporting within this task's accepted scope and prerequisites. Preserve generic client errors; do not describe all database errors as silent because `db/pool.ts` already logs idle-client failures.
 
 - [ ] Complete T-26 as a separately scoped post-baseline hardening task.
@@ -1085,6 +1094,126 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
 - Dependencies/unblock: T-24 and T-25; production-like observability requirements must be agreed before implementation.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
+
+<a id="t-261"></a>
+
+#### T-26.1: Provide a reusable contextual backend logger
+
+- [ ] Implement the database-independent Pino facade and prove its emission,
+      privacy and request-context contract. Await a separate execution instruction.
+- Files: new `src/shared/logging/` core, configuration schema, context,
+  sanitizer, Pino writer and colocated `*.test.ts`; `package.json` and generated
+  `pnpm-lock.yaml` for authorized dependencies. No database or application
+  adoption in this unit; keep Node imports out of client-facing shared barrels.
+- Interfaces: contextual module loggers, current-policy access, lazy event
+  metadata, isolated request/job context and safe output. Concrete API names
+  are implementation choices, not copies of the illustrative discussion API.
+- Acceptance: global off wins; named-event suppression and exact module off
+  cannot be overridden; module threshold replaces the default threshold.
+  Existing logger objects see a changed snapshot. Concurrent requests do not
+  share context. Filter before expensive metadata construction; sanitize
+  arbitrary error strings/causes/stacks as well as keys. Logger/output failure
+  cannot change an application result. JSON deployed output and readable local
+  output retain safe severity, event, time, module, environment and correlation.
+- Contracts: [TST-LOGGING-001](.dwf/decisions/TESTING.md#tst-logging-001), initially
+  `specified`; record only the core evidence this unit provides.
+- Checks: `pnpm exec vitest run src/shared/logging`, `pnpm test`,
+  `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier and
+  `git diff --check`; inspect real writer output and short-process completion
+  for both formats, severity channels and injected destination failures.
+  Independent security/log review must find no sensitive fixture strings.
+- Dependencies/prerequisites: accepted TD-029 direction, explicit execution and
+  dependency-install authorization, registry access and installed dependencies.
+  Scope is one core-library review unit. No Docker/provider operation needed.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `source-driven-development`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-262"></a>
+
+#### T-26.2: Share logger settings safely across backend instances
+
+- [ ] Add the environment-local settings store, bounded refresh cache and the
+      selected protected management interface. Await execution authorization
+      and resolve OD-026 before implementing the settings writer.
+- Files: `db/schema/logging.ts`, `db/schema/index.ts`, a new forward migration
+  with generated metadata, `src/shared/logging/` settings store/cache/composition,
+  colocated unit tests, `src/test/logging-settings.integration.test.ts`, and the
+  selected operator adapter. Proposed CLI files are `scripts/logging/cli.ts`,
+  `core.ts`, tests and one manifest command, not an approved admin endpoint/UI.
+- Interfaces: one validated, versioned full snapshot per selected database;
+  atomic revision-checked update; cached read and coalesced stale refresh.
+  Reuse the existing pool without a logger/database import cycle. No log-event
+  table, database query per emitted event or cross-environment settings service.
+- Acceptance: two independent instances observe shared updates within the
+  documented active-work refresh policy. Cold start uses safe defaults;
+  outages/malformed data retain the last valid policy, including off. Refresh
+  has a real bounded connection/query lifetime, bounded retry and no recursive
+  logging. Late results cannot replace newer revisions. Old contextual objects
+  see updated filters. Writes reject invalid snapshots, stale revisions and
+  mismatched targets before mutation; read-only runtime use never writes defaults.
+- Contracts: [TST-LOGGING-002](.dwf/decisions/TESTING.md#tst-logging-002),
+  `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-ENV-001`.
+  Existing baseline statuses/evidence do not prove the new schema or behavior.
+- Checks: focused cache/settings unit tests via `pnpm exec vitest run src/shared/logging`
+  and the selected management-adapter test; `pnpm test:integration` for real
+  persistence, independent caches, revision conflict, target isolation and
+  timeout cleanup; `pnpm exec drizzle-kit check --config drizzle.config.ts`;
+  fresh-chain and prior-schema upgrade evidence; branch-first migration smoke
+  on an explicitly authorized non-default Neon branch. Also run `pnpm test`,
+  `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier and diff check.
+  Run `pnpm test:pipeline` if shared environment guards change.
+- Dependencies/prerequisites: T-26.1; OD-026 and execution authorization to
+  implement; Docker/PostgreSQL 18 Testcontainers for local verification;
+  authorized non-default Neon target and direct migration role for the named
+  migration check. Follow TD-025 and the migration-history skill; no reset,
+  applied-history rewrite or Production migration is implied. One settings
+  delivery/review unit; stop for a missing prerequisite before coding.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `migration-history-workflow`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-263"></a>
+
+#### T-26.3: Adopt the logger at meaningful backend boundaries
+
+- [ ] Instrument the plan's initial boundaries and publish the usage/diagnosis
+      runbook. Await execution authorization; do not broaden parent T-26.
+- Files: list/task route/action adapters and server composition, shared entry
+  error reporting, auth-mail boundary, Sanity read/invalidation boundaries,
+  `db/pool.ts`, affected boundary tests and runtime evidence; new
+  `docs/runbooks/logging.md` with index/stack/data documentation links.
+- Interfaces: refresh at adopted request/job entries, isolated correlation,
+  stable operation/event names, safe outcomes/durations and one reporting owner
+  for each propagated error. Preserve all existing client response contracts.
+- Acceptance: caught unexpected failures are diagnosable without raw error
+  leakage; ordinary validation/auth/domain refusals are not server errors.
+  Mail/Sanity outcomes and idle pool errors are safe and bounded in volume.
+  Suppression works on already-created loggers after refresh. No Node logger
+  enters `app/(app)/dashboard/error.tsx` or another client bundle; no claim that
+  backend events capture browser-only failures. Existing deployment/environment
+  CLI result streams and Better Auth built-in behavior remain intact.
+- Contracts: complete `TST-LOGGING-001`/`002` local obligations and rerun affected
+  `TST-BOUNDARY-001`, `TST-AUTH-001`/`002`, `TST-LANDING-001`/`003`,
+  `TST-FOUNDATION-001` and `TST-E2E-001`/`002` checks. Document separately gated
+  hosted evidence without claiming it from local tests.
+- Checks: focused changed-boundary unit tests, `pnpm test`,
+  `pnpm test:integration`, `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`,
+  `pnpm build`, security/log review, documentation links/commands,
+  changed-file Prettier and `git diff --check`. Use the repository's Next.js
+  runtime/browser workflow with captured real Pino JSON, induced local failure,
+  concurrent request IDs and updated settings across independent instances.
+  Verify completion/output lifecycle and severity mapping; real hosted
+  delivery/provider checks require separate authorization.
+- Dependencies/prerequisites: T-26.2; installed dependencies, available Docker
+  and matching Chromium for the isolated browser/runtime checks. Scope is one
+  adoption/runbook review unit. Parent T-26 remains incomplete afterward.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `next-dev-loop`, `browser-testing-with-devtools`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
 
 ### T-27: Complete authentication product flows and abuse resistance
 

@@ -372,6 +372,7 @@ The individual test obligations for this contract are owned by the [Testing Deci
 | Sanity landing behavior                 | `TST-LANDING-001`–`TST-LANDING-003`                                                     |
 | UI and browser acceptance               | `TST-UI-001`, `TST-E2E-001`–`TST-E2E-003`                                               |
 | Neon performance                        | `TST-PERFORMANCE-001`                                                                   |
+| Shared backend logging                  | `TST-LOGGING-001`, `TST-LOGGING-002`                                                    |
 
 ### 10.1 Vitest
 
@@ -541,6 +542,71 @@ deployment may use an application rollback reference, but the workflow must
 not assume that a database down-migration is safe. CI has no deployment side
 effect, and Preview/Production jobs receive only their scoped secrets.
 
+<a id="shared-backend-logging"></a>
+
+### 11.1 Shared backend logging
+
+[TD-029](../../decisions/TECHNICAL.md#td-029) is accepted planned work, not a
+claim of implementation. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
+[T-26.2](../../../TODO.md#t-262) and [T-26.3](../../../TODO.md#t-263), with proof
+defined by [TST-LOGGING-001](../../decisions/TESTING.md#tst-logging-001) and
+[TST-LOGGING-002](../../decisions/TESTING.md#tst-logging-002).
+
+- Provide a small server-only Node facade backed by Pino. Contextual logger
+  objects carry module and request/job context without importing todo concepts
+  into the shared core. Do not add a provider framework or import this Node
+  logger into client components such as `error.tsx`.
+- Instrument meaningful backend boundaries and integration outcomes. Report a
+  propagated unexpected failure once at its owning boundary; routine auth,
+  validation and domain refusals are not unexpected failures. Preserve existing
+  generic client errors. Backend instrumentation does not capture browser-only
+  failures or replace production/environment CLI result streams.
+- Settings contain a global enabled flag, default severity threshold, exact
+  module/category thresholds including `off`, and exact suppressed event names.
+  Global off dominates. A matching module threshold replaces the default; a
+  module set to `off` emits nothing. A named suppressed event never emits,
+  regardless of threshold. Otherwise emit only at or above the effective
+  threshold. No wildcard hierarchy is required.
+- Persist settings through Drizzle in the existing application PostgreSQL
+  database selected for that environment under TD-026. No environment reads or
+  writes a shared Production control database. Future schema work uses an
+  append-only migration and the existing TD-025 branch-first verification.
+- Each instance caches one fully validated snapshot. At request/job boundaries,
+  use elapsed time to trigger bounded, coalesced refresh; never query settings
+  from a log write or require background timers to run in an idle serverless
+  instance. Existing contextual logger objects consult current policy when
+  emitting. Active instances converge after a successful eligible refresh;
+  updates are not an instantaneous cross-instance switch. The implementation
+  plan must justify its interval and read/retry bounds; 30 seconds is illustrative.
+- Missing, invalid or unreadable settings retain the last valid snapshot.
+  Before any valid snapshot, use enabled `info` with no module overrides or
+  event suppressions. Bound retries after failure and do not recursively invoke
+  the logger or its settings cache from refresh failure handling.
+- Emit timestamp, severity, stable event name, module and `APP_ENV`, plus
+  isolated server-generated request/job correlation where that context exists.
+  Process-level events need not invent a request. Allow only defined outcome,
+  duration and safe error metadata. Caller metadata cannot override trusted
+  fields, and concurrent requests must not share context.
+- Exclude credentials, tokens, URLs, email addresses, personal list/task text,
+  raw payloads and email bodies. Key redaction alone cannot sanitize arbitrary
+  message, cause or stack strings. Map failures to allowlisted diagnostic facts
+  before Pino sees them; raw error objects and content must not reach its
+  serializers. Apply filtering before constructing expensive debug metadata.
+- Logger serialization/output failures must neither change application results
+  nor replace the original error. Emit JSON in deployed runtime and readable
+  local output. Verify Node/Next stdout/stderr, request completion, process exit
+  and severity mapping against documented Vercel behavior; do not assume a
+  buffered worker transport flushes safely. Actual deployed delivery proof
+  remains separately authorized release evidence.
+- Controls govern only future facade events. They cannot recover suppressed
+  history or promise to suppress Next.js, provider or other independent logs.
+- The protected settings writer is unresolved in
+  [OD-026](../../decisions/OPEN-DECISIONS.md#od-026). Its eventual interface must
+  validate the full snapshot, update atomically, reject stale edits and enforce
+  that decision's operator/target safeguards. No CLI, endpoint or UI is accepted
+  by this specification. Runtime target guards, health/readiness and external
+  observability remain separate unfinished T-26 scope.
+
 ---
 
 ## 12. Implementation notes vs current scaffold
@@ -553,6 +619,9 @@ validated baseline and the accepted environment/delivery contract in section 11.
 reintroduce the old scaffold or a parallel architecture in `lib/`. The
 canonical design authority is `.dwf/`; Delivery artifacts, when created,
 belong outside `.dwf/`.
+
+The shared logger in section 11.1 is accepted planned work. Its implementation
+and evidence remain outstanding; the baseline checklist below does not cover it.
 
 ---
 
@@ -753,8 +822,9 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 ### 14.10 Current factual implementation prerequisites
 
 The environment direction and target-safety choices are accepted in
-[`TD-026`](../../decisions/TECHNICAL.md#td-026) and [`TD-027`](../../decisions/TECHNICAL.md#td-027), and no tracked design choice
-remains open for this contract. Current provisioning and verification facts
+[`TD-026`](../../decisions/TECHNICAL.md#td-026) and [`TD-027`](../../decisions/TECHNICAL.md#td-027).
+The planned shared logger's protected settings editor remains open in
+[`OD-026`](../../decisions/OPEN-DECISIONS.md#od-026). Current provisioning and verification facts
 are recorded in [`../../CONTEXT.md`](../../CONTEXT.md), with delivery follow-ups
 in [`../../../TODO.md`](../../../TODO.md). Use those records for current
 Development, Preview, owner-domain and Production readiness instead of a

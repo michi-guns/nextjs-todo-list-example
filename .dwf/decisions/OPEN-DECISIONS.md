@@ -629,6 +629,37 @@ Choose the split between local Sanity tests, routine browser tests, and live int
 
 Use local fixture tests to cover valid Sanity payload mapping, optional fields, and missing or invalid required-content failures. Routine Playwright uses deterministic test-only landing content through the same application-facing landing contract and requires no Sanity credentials or network access; this test source is unavailable in deployed runtime modes and is not a production fallback. Provide one separate, read-only live Sanity smoke that fetches the published singleton from the dedicated project and dataset, validates it, and maps it to the landing view model. The live smoke must pass before the starter baseline is declared complete and before a deployment is treated as release evidence. It fails clearly when configuration, the document, validation, or mapping is unavailable and never creates or edits CMS content. Exact fixture format, test-source wiring, command name, and evidence output remain implementation choices.
 
+<a id="od-026"></a>
+
+## OD-026 - Protected shared logging settings editor
+
+- **Status:** OPEN
+- **Impact:** TECHNICAL
+- **Blocking:** YES, only implementation and operation of the settings writer in [T-26.2](../../TODO.md#t-262); documentation and the logger/read-cache design may proceed
+- **Related:** [TD-029](TECHNICAL.md#td-029), [shared backend logging](../output/agent/SPEC.md#shared-backend-logging), [TST-LOGGING-002](TESTING.md#tst-logging-002)
+
+### Problem / conflict
+
+Shared dynamic settings in each environment's existing application database
+are accepted. The owner has not selected how an authorized operator edits them.
+
+### Accepted constraints
+
+Use the selected environment profile and existing target-identity guards,
+existing operator credentials and an explicit mutation target. Do not grant
+ordinary users or browsers write access, add an application admin role, or
+expose a public writable route. Publish only a fully validated atomic settings
+snapshot and reject stale edits so concurrent operators cannot lose updates.
+Production operations retain their existing authorization boundaries.
+
+### Decision required
+
+Choose the operator interface and authorization path. A minimal operator CLI
+under `scripts/logging/` is **PROPOSED** in the
+[implementation plan](../../docs/agentforge/plans/2026-09-18-t-26-shared-logger.md),
+pending owner selection. CLI, endpoint and UI are not interchangeable accepted
+options. This decision does not reopen database storage or dynamic settings.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.
