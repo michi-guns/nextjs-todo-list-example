@@ -393,8 +393,8 @@ For triaging `npm audit` findings and supply-chain risk (typosquatting, compromi
 
 ## See Also
 
-- For detailed security review guidance, see `../../references/security-checklist.md`
-- For performance review checks, see `../../references/performance-checklist.md`
+- For detailed security review guidance, see [security-and-hardening](../security-and-hardening/SKILL.md).
+- For performance review checks, see [performance-optimization](../performance-optimization/SKILL.md).
 
 ## Common Rationalizations
 
