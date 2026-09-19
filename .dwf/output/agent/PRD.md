@@ -160,6 +160,20 @@ verification belongs to [TST-AUTH-004](../../decisions/TESTING.md#tst-auth-004),
 [TST-AUTH-005](../../decisions/TESTING.md#tst-auth-005) and
 [TST-AUTH-006](../../decisions/TESTING.md#tst-auth-006).
 
+<a id="operational-alerts"></a>
+
+### 5.7 Automatic operational alerts, planned
+
+[D-012](../../decisions/PRODUCT.md#d-012) accepts automatic operator alerts
+for operational incidents, including total application outage. Detection and
+delivery must still work when the monitored Next.js application is unavailable.
+Each incident and notification has one owner, avoiding duplicate notifications.
+The first transport and detailed policy remain open in
+[OD-027](../../decisions/OPEN-DECISIONS.md#od-027). This later T-26 scope is
+separate from the accepted logger/diagnostics slices and does not authorize
+implementation or provision a service. [SPEC](SPEC.md#operational-alerts)
+owns its technical boundary.
+
 ## 6. Data ownership (product view)
 
 | System             | Owns                                                        |

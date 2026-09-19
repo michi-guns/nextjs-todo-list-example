@@ -495,6 +495,7 @@ payload privacy, settings compatibility, error ownership, provider fidelity and
 bounded lifecycle behavior. Application outcomes must survive diagnostics
 failure. Browser instrumentation, replay, metrics, tracing, profiling, uptime,
 alerts, health expansion and durable delivery are outside this extension.
+Operational alerts are separately accepted in [TD-033](#td-033).
 [TD-031](#td-031) subsequently accepts the protected settings editor; two fixed
 adapters require no additional product choice. Implementation and hosted proof
 remain future work.
@@ -559,3 +560,26 @@ limits, windows, token lifetimes and copy remain grounded implementation
 proposals within the accepted behavior. This extends TD-004 without replacing
 the auth architecture or mail provider; implementation and verification remain
 future work under [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance).
+
+<a id="td-033"></a>
+
+## TD-033 — Operational alerts through Ports and Adapters
+
+- **Status:** ACCEPTED, planned implementation
+- **Source:** owner-approved notification architecture, 2026-09-19
+- **Related:** [D-012](PRODUCT.md#d-012), [TD-030](#td-030), [OD-027](OPEN-DECISIONS.md#od-027), [TST-ALERTS-001](TESTING.md#tst-alerts-001)
+
+Use a small provider- and channel-neutral operational-alert contract and an
+outbound notification port. Concrete adapters own transport credentials and
+message formatting. Keep this boundary distinct from TD-030's diagnostics
+Strategy, preserving supported native SDK behavior and existing privacy and
+reporting ownership rules. Total-outage detection and delivery must operate
+independently of the monitored application and its database; an in-app dispatcher alone cannot
+satisfy that requirement. Coordinate provider-native and application-originated
+notifications under one incident/notification owner.
+
+Slack, Telegram and Pushover are possible future adapters, not selected
+transports or a requirement to implement all three. The first transport and
+detailed policy remain open. No new service, queue or implementation is
+authorized. [Agent SPEC](../output/agent/SPEC.md#operational-alerts) owns the
+boundary; the existing logger/diagnostics slices remain unchanged.

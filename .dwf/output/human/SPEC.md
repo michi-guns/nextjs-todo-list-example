@@ -132,6 +132,16 @@ is implemented or verified, and hosted readiness needs separate real-provider
 proof. The protected CLI accepted in [TD-031](../../decisions/TECHNICAL.md#td-031)
 will also edit the diagnostics policy; no editor choice remains open.
 
+## Operational alerts, planned separately
+
+[TD-033](../../decisions/TECHNICAL.md#td-033) keeps notification delivery
+behind a small outbound port, with channel-specific formatting and credentials
+in adapters. It is separate from diagnostics storage and error tracking.
+Outage detection and delivery must continue when the Next.js application is
+down, and one owner prevents duplicate incidents or notifications. The first
+channel and precise policy remain [open](../../decisions/OPEN-DECISIONS.md#od-027).
+No notification adapter, new service or queue is implemented or authorized yet.
+
 ## Required application behavior
 
 The minimum application APIs cover:

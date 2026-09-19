@@ -145,3 +145,19 @@ implementation proposals. Account deletion, profile/email editing, social
 login, MFA, CAPTCHA procurement, a new auth architecture and provider replacement
 are outside this decision. This later scope does not rewrite baseline evidence
 or authorize hosted mail sends or deployment.
+
+<a id="d-012"></a>
+
+## D-012 — Automatic operational alerts
+
+- **Status:** ACCEPTED, planned implementation
+- **Source:** owner-approved remaining T-26 scope, 2026-09-19
+- **Related:** [TD-033](TECHNICAL.md#td-033), [Agent PRD](../output/agent/PRD.md#operational-alerts), [TST-ALERTS-001](TESTING.md#tst-alerts-001), [T-26](../../TODO.md#t-26-add-runtime-safety-and-observability-hardening)
+
+The reusable starter supports automatic operator alerts for operational
+incidents, including total application outage. Detection and notification
+delivery for a total outage must continue independently of the monitored
+Next.js application. Each incident and notification has one owner, preventing
+duplicate incidents or delivery paths. The first transport and precise alert
+policy remain unresolved in [OD-027](OPEN-DECISIONS.md#od-027). This decision
+authorizes no implementation or service provisioning.

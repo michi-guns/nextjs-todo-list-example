@@ -56,6 +56,15 @@ procurement, a new auth architecture and provider replacement are outside this
 scope. The [Agent PRD](../agent/PRD.md#account-recovery-and-abuse) owns the exact
 product contract; existing baseline evidence does not verify this later work.
 
+## Automatic operational alerts
+
+Automatic operational alerts are accepted future work under
+[D-012](../../decisions/PRODUCT.md#d-012). Alerts must still reach the operator
+when the monitored application is completely unavailable, without duplicate
+notifications. The first delivery channel and exact alert policy remain
+[undecided](../../decisions/OPEN-DECISIONS.md#od-027); no implementation or new
+service is authorized.
+
 ## Lists and tasks
 
 A user can own many lists. List names are trimmed, contain 1–80 characters, and are unique for that user under case-insensitive comparison. Whenever the private workspace loads with no lists, the product creates exactly one `Inbox`. The automatic Inbox is an ordinary list after creation and may be renamed or deleted. If the final list is deleted, the next private workspace load creates a new empty Inbox. Any existing list prevents automatic Inbox creation. Deleting a list removes its tasks. Lists are shown oldest-created first through forward cursor pagination, 20 at a time by default, with a visible way to load more.

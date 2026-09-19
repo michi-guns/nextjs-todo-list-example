@@ -1088,6 +1088,23 @@ one startup-selected Sentry or Better Stack adapter. It also authorizes task
 definition only. Runtime target validation, health/readiness and observability
 beyond these two plans remain pending. The parent task is not complete.
 
+Automatic alerts decision, 2026-09-19: [D-012](.dwf/decisions/PRODUCT.md#d-012)
+and [TD-033](.dwf/decisions/TECHNICAL.md#td-033) accept a provider/channel-neutral
+alert contract and outbound notification port, separate from diagnostics.
+Total-outage detection and delivery must work independently of the monitored
+Next.js app, with one incident/notification owner. Slack, Telegram and Pushover
+are examples only. [OD-027](.dwf/decisions/OPEN-DECISIONS.md#od-027) retains
+first-transport and exact-policy choices; no service, queue or implementation
+is authorized. [TST-ALERTS-001](.dwf/decisions/TESTING.md#tst-alerts-001) is
+`specified`. T-26.1–T-26.7 remain unchanged and unchecked; consolidated
+breakdown of the remaining work is deferred until scope decisions are settled.
+
+Alert decision-record checks, 2026-09-19: nine documentation files pass scoped
+Prettier and diff checks; 563 local links/anchors resolve. Existing contract
+statuses remain unchanged and TST-ALERTS-001 is `specified`. Normal hooks,
+fresh exact-tip independent review and main-push CI gate integration. No
+notification or outage evidence is claimed.
+
 Diagnostics definition validation, 2026-09-18: seven Markdown files pass
 changed-file Prettier, 436 local link/anchor checks and `git diff --check`.
 The existing test-contract statuses and T-27/T-28 content are unchanged;

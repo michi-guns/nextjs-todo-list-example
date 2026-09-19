@@ -152,6 +152,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-RELEASE-001](#tst-release-001)         | An approved exact-ref release is migrated, deployed, smoked, and recorded            | Protected release rehearsal and Production evidence                  | T-21.5, T-23, T-24                                                 | `verified`  |
 | [TST-LOGGING-001](#tst-logging-001)         | Backend events preserve context, privacy and application outcomes                    | Unit, boundary, Node/Next output lifecycle                           | T-26.1, T-26.3                                                     | `specified` |
 | [TST-LOGGING-002](#tst-logging-002)         | Shared policy refresh and protected edits preserve environment isolation             | Unit, PostgreSQL integration, operator refusal checks                | T-26.2, T-26.3                                                     | `specified` |
+| [TST-ALERTS-001](#tst-alerts-001)           | Operational alerts stay independent of app outage and have one delivery owner        | Contract, adapter, external outage evidence                          | T-26                                                               | `specified` |
 
 ## Test contracts
 
@@ -877,6 +878,23 @@ These original logger contracts retain their stage-specific meaning.
 - **Dependencies:** T-26.4 core; installed compatible SDKs and documented transports; T-26.6 runtime adoption before hosted proof; separately authorized provider resources/configuration and any protected deployment needed for T-26.7. No provider provisioning or hosted send is authorized by this ledger.
 - **Current evidence:** None. Both adapters and all hosted checks remain future work.
 
+<a id="tst-alerts-001"></a>
+
+### TST-ALERTS-001 — Independent operational notification boundary
+
+- **Status:** `specified`
+- **Capability:** Operational alerts
+- **Evidence layers/modes:** Port/adapter contract, integration, controlled external outage evidence
+- **Verifies product decisions:** D-012
+- **Verifies technical decisions:** TD-030, TD-033
+- **SPEC:** [Operational alert delivery boundary](../output/agent/SPEC.md#operational-alerts)
+- **Owners:** [T-26](../../TODO.md#t-26-add-runtime-safety-and-observability-hardening)
+- **Contract:** Operational alerts use a small provider/channel-neutral value and outbound notification port, with transport credentials/formatting in adapters. Diagnostics storage/error tracking stays separate. Total-app-outage detection and delivery operate independently of that app and its database, with one incident/notification owner and no duplicate delivery path.
+- **Required evidence:** Contract and selected-adapter checks for neutral payloads, safe credential/format boundaries and single incident/notification ownership. Once the policy and deployment arrangement are accepted, controlled external evidence proves detection and delivery while the monitored app is unavailable; an in-app test or successful log ingestion cannot substitute for that proof.
+- **Dependencies:** [OD-027](OPEN-DECISIONS.md#od-027) transport/policy resolution and the resulting accepted plan; separate authorization for real provider configuration or outage exercises.
+- **Current evidence:** None. Existing logger/diagnostics contracts and source inspection do not verify this extension.
+- **Follow-up:** Complete policy/design planning under T-26 before implementation or final consolidated task breakdown; do not infer new service/queue authorization.
+
 ## SPEC traceability map
 
 The Agent SPEC remains the technical contract and this ledger owns the individual test obligations. The current mapping is:
@@ -896,3 +914,5 @@ The Agent SPEC remains the technical contract and this ledger owns the individua
 | Optional application diagnostics                 | `TST-DIAGNOSTICS-001`, `TST-DIAGNOSTICS-002`                                                            |
 
 When a SPEC behavior changes, update the owning Product or Technical Decision first when necessary, then update its linked `TST-*` contract and affected delivery tasks. Do not silently alter a contract only in `TODO.md` or in a test file.
+
+Operational alert delivery in SPEC section 11.3 maps to `TST-ALERTS-001`.

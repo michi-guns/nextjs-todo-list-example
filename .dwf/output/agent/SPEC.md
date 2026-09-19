@@ -777,12 +777,38 @@ planned logger. Neither stage is implemented. [T-26.4](../../../TODO.md#t-264),
   local policy; they cannot recursively export diagnostics failures. No disk
   spool, retry framework or durable-delivery guarantee is accepted.
 - Browser instrumentation, session replay, metrics, tracing, profiling, uptime,
-  alerting and health/readiness expansion remain outside this work. Local
+  alerting and health/readiness expansion remain outside this diagnostics slice;
+  [operational alerts](#operational-alerts) are separately accepted. Local
   adapter wire tests cannot prove hosted ingestion or issue grouping. Real
   provider evidence needs separate authorization and must cover each adapter
   before both are presented as ready for hosted use.
 
 ---
+
+<a id="operational-alerts"></a>
+
+### 11.3 Operational alert delivery boundary
+
+[D-012](../../decisions/PRODUCT.md#d-012) and
+[TD-033](../../decisions/TECHNICAL.md#td-033) accept automatic alerts as later
+T-26 scope. Define a small provider/channel-neutral operational-alert value and
+outbound notification port. Provider credentials, channel formatting and
+transport calls belong in concrete adapters, never the shared contract or
+application use cases. This is separate from the diagnostics Strategy for
+storing logs and grouping errors; preserve its supported SDK behavior and
+single-report ownership. Provider-native and application-originated incident
+notifications must have one explicit owner, not parallel duplicate paths.
+
+Total-outage detection and delivery must operate independently of the monitored
+Next.js application and its database. An in-app dispatcher cannot be the only path. The later
+design must demonstrate that independence; this decision does not select or
+authorize a new external service, queue or dispatcher deployment. Slack,
+Telegram and Pushover are examples of possible adapters, not selected channels.
+[OD-027](../../decisions/OPEN-DECISIONS.md#od-027) retains the first transport
+and exact policy choices; do not assume Production-only, email or a cooldown.
+Implement nothing until that policy and the resulting plan are accepted.
+[TST-ALERTS-001](../../decisions/TESTING.md#tst-alerts-001) owns future evidence;
+existing diagnostics tests cannot prove outage notification delivery.
 
 ## 12. Implementation notes vs current scaffold
 

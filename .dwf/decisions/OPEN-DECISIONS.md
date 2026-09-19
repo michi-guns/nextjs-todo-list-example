@@ -629,6 +629,24 @@ Choose the split between local Sanity tests, routine browser tests, and live int
 
 Use local fixture tests to cover valid Sanity payload mapping, optional fields, and missing or invalid required-content failures. Routine Playwright uses deterministic test-only landing content through the same application-facing landing contract and requires no Sanity credentials or network access; this test source is unavailable in deployed runtime modes and is not a production fallback. Provide one separate, read-only live Sanity smoke that fetches the published singleton from the dedicated project and dataset, validates it, and maps it to the landing view model. The live smoke must pass before the starter baseline is declared complete and before a deployment is treated as release evidence. It fails clearly when configuration, the document, validation, or mapping is unavailable and never creates or edits CMS content. Exact fixture format, test-source wiring, command name, and evidence output remain implementation choices.
 
+<a id="od-027"></a>
+
+## OD-027 — First operational alert transport and policy
+
+- **Status:** OPEN
+- **Impact:** PRD and SPEC
+- **Blocking:** YES — operational-alert implementation planning; not the accepted logger/diagnostics slices or account-recovery planning
+- **Related:** [D-012](PRODUCT.md#d-012), [TD-033](TECHNICAL.md#td-033), [T-26](../../TODO.md#t-26-add-runtime-safety-and-observability-hardening)
+
+Select the first notification transport and the operational policy: environment
+coverage, actionable conditions, repeat/recovery behavior and incident ownership.
+Production-only operation, email delivery and cooldown rules are proposals,
+not accepted choices. Slack, Telegram and Pushover are examples of potential
+adapters only. The chosen arrangement must detect and deliver total-outage
+alerts independently of the monitored Next.js application, retain one incident
+and notification owner, and use the accepted Ports and Adapters boundary.
+No new service/queue or hosted configuration is authorized by this open entry.
+
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.
