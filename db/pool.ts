@@ -1,10 +1,30 @@
 import { Pool } from "pg"
+import { createLogger } from "../src/shared/logging/logger"
+import { withLogContext } from "../src/shared/logging/context"
+import { loggingEnvironment } from "../src/shared/logging/environment"
 
 const MAX_POOL_SIZE = 10
 const IDLE_TIMEOUT_MILLISECONDS = 20_000
 const CONNECTION_TIMEOUT_MILLISECONDS = 10_000
 
-export function createDatabasePool(connectionString: string): Pool {
+const defaultLogger = createLogger({ environment: loggingEnvironment() })
+
+export function reportIdlePoolError(
+  error: unknown,
+  logger = defaultLogger
+): void {
+  withLogContext("database.pool.idle", () => {
+    logger("database.pool").emit("error", "database.pool.idle.failed", {
+      outcome: "failed",
+      error,
+    })
+  })
+}
+
+export function createDatabasePool(
+  connectionString: string,
+  reportIdleError: (error: Error) => void = reportIdlePoolError
+): Pool {
   const normalizedConnectionString = connectionString.trim()
 
   if (!normalizedConnectionString) {
@@ -19,7 +39,7 @@ export function createDatabasePool(connectionString: string): Pool {
   })
 
   pool.on("error", (error) => {
-    console.error("[db] Unexpected idle PostgreSQL client error", error)
+    reportIdleError(error)
   })
 
   return pool

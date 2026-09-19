@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest"
 import type { List } from "../domain/list"
 import { ListConflictError, ListNotFoundError } from "../domain/list-errors"
 import type { createListApplication } from "../application/list-use-cases"
+import { createLogger } from "../../../shared/logging/logger"
+import { createOperationRunner } from "../../../shared/logging/operation"
 import {
   createListActionHandlers,
   type ListActionDependencies,
@@ -14,6 +16,50 @@ import {
 } from "./list-routes"
 
 type ListApplication = ReturnType<typeof createListApplication>
+
+vi.mock("server-only", () => ({}))
+
+it("reports mapped list route/action failures safely and preserves expected refusals", async () => {
+  const write = vi.fn()
+  const logging = createOperationRunner({
+    logger: createLogger({ environment: "preview", write }),
+    refresh: async () => {},
+  })
+  const error = new Error("private-list-name token=secret")
+  const dependencies = routeDependencies(
+    makeApplication({ listLists: vi.fn().mockRejectedValue(error) })
+  )
+  const routes = createListCollectionHandlers(dependencies)
+  const response = await logging.run("lists", "lists.read", () =>
+    routes.GET(request("http://localhost/api/lists"))
+  )
+  expect(response.status).toBe(500)
+  expect(await response.json()).toEqual({
+    error: { code: "internal_error", message: "Internal server error" },
+  })
+  expect(write).toHaveBeenCalledTimes(1)
+  expect(JSON.stringify(write.mock.calls)).not.toContain("private-list-name")
+  const actions = createListActionHandlers(
+    actionDependencies(
+      makeApplication({ createList: vi.fn().mockRejectedValue(error) })
+    )
+  )
+  expect(
+    await logging.run("lists", "lists.create.action", () =>
+      actions.createList({ name: "private-list-name" })
+    )
+  ).toMatchObject({ ok: false, error: { code: "internal_error" } })
+  expect(write).toHaveBeenCalledTimes(2)
+  vi.mocked(dependencies.authenticate).mockRejectedValue(unauthenticatedError())
+  expect(
+    (
+      await logging.run("lists", "lists.read", () =>
+        routes.GET(request("http://localhost/api/lists"))
+      )
+    ).status
+  ).toBe(401)
+  expect(write).toHaveBeenCalledTimes(2)
+})
 
 const user = { id: "user-a", email: "a@example.test", name: "User A" }
 const now = new Date("2026-08-30T12:00:00.000Z")

@@ -1331,8 +1331,10 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.3: Adopt the logger at meaningful backend boundaries
 
-- [ ] Instrument the plan's initial boundaries and publish the usage/diagnosis
-      runbook. Await execution authorization; do not broaden parent T-26.
+- [~] Instrument the plan's initial boundaries and publish the usage/diagnosis
+  runbook. Execution authorized by the owner's next-task instruction on
+  2026-09-19. Dependencies, Docker, matching Chromium and the isolated Next.js
+  runtime/browser preflight pass. Keep this unit within parent T-26's scope.
 - Files: list/task route/action adapters and server composition, shared entry
   error reporting, auth-mail boundary, Sanity read/invalidation boundaries,
   `db/pool.ts`, affected boundary tests and runtime evidence; new

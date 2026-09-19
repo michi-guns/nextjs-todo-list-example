@@ -9,8 +9,10 @@ Execution update, 2026-09-19: subsequent next-task instructions authorized
 T-26.1 and T-26.2 separately. Their [core evidence](../evidence/2026-09-19-logger-core.md)
 and [settings evidence](../evidence/2026-09-19-logger-settings.md) record completed
 implementation and verification. The settings evidence refines the illustrative
-refresh budget using installed pg-pool behavior. T-26.3 remains unstarted;
-the earlier planning-state descriptions below are historical.
+refresh budget using installed pg-pool behavior. A further next-task instruction
+authorized T-26.3 on 2026-09-19. Its [adoption evidence](../evidence/2026-09-19-logger-adoption.md)
+records implementation and local runtime verification. The planning-state
+descriptions below are historical; later diagnostics work remains separate.
 
 **Goal:** Diagnose meaningful backend operations and failures through one small
 Pino-backed logger whose shared filters can change without redeploying.

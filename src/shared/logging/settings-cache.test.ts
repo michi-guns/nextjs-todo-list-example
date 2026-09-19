@@ -7,6 +7,26 @@ vi.mock("server-only", () => ({}))
 afterEach(() => vi.useRealTimers())
 
 describe("TST-LOGGING-002 settings refresh", () => {
+  it("reports only failure/recovery transitions and contains diagnostic failure", async () => {
+    vi.useFakeTimers()
+    const read = vi
+      .fn<() => Promise<unknown>>()
+      .mockRejectedValue(new Error("private database error"))
+    const notify = vi.fn()
+    const cache = createSettingsCache({ read }, notify)
+    await cache.refresh()
+    await vi.advanceTimersByTimeAsync(SETTINGS_REFRESH_MS)
+    await cache.refresh()
+    expect(notify.mock.calls).toEqual([["failed"]])
+    read.mockResolvedValue(defaultLogPolicy)
+    notify.mockImplementation(() => {
+      throw new Error("output failed")
+    })
+    await vi.advanceTimersByTimeAsync(SETTINGS_REFRESH_MS)
+    await expect(cache.refresh()).resolves.toBeUndefined()
+    expect(notify.mock.calls).toEqual([["failed"], ["recovered"]])
+    expect(cache.current()).toEqual(defaultLogPolicy)
+  })
   it("coalesces boundary reads, updates old loggers and never reads on emission", async () => {
     vi.useFakeTimers()
     let resolve!: (value: unknown) => void

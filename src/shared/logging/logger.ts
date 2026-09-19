@@ -1,4 +1,4 @@
-import "server-only"
+// The Node context import also prevents this core from entering a browser bundle.
 import {
   defaultLogPolicy,
   logEnvironmentSchema,

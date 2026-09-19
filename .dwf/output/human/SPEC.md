@@ -124,9 +124,10 @@ logging, change severity thresholds, override exact modules and suppress exact
 events. Generic user-facing errors stay unchanged, and private content and raw
 error messages stay out of logs.
 
-The core and shared settings are implemented; application adoption remains
-T-26.3 work. [Settings evidence](../../../docs/agentforge/evidence/2026-09-19-logger-settings.md)
-records the current limits. [TD-031](../../decisions/TECHNICAL.md#td-031)
+The core, shared settings and backend adoption are implemented.
+[Application evidence](../../../docs/agentforge/evidence/2026-09-19-logger-adoption.md)
+records local request and multi-instance checks, without claiming hosted
+delivery. [TD-031](../../decisions/TECHNICAL.md#td-031)
 defines the protected repository-local TypeScript CLI to inspect policy and
 revision, then publish a validated full policy atomically. It rejects stale
 revisions and requires existing operator access plus explicit environment and

@@ -1,9 +1,31 @@
 import { captureMagicLink, type MagicLinkMessage } from "./local-mailbox"
 import { readResendConfig, sendResendAuthEmail } from "./resend-mail"
+import { observeOperation } from "../../../shared/logging/operation"
 
 export async function deliverAuthEmail(
   message: MagicLinkMessage
 ): Promise<void> {
+  const transport =
+    process.env.APP_ENV === "production"
+      ? "resend"
+      : process.env.APP_ENV === "preview"
+        ? "suppressed"
+        : "mailbox"
+  return observeOperation(
+    "auth.mail",
+    "auth.mail.delivery",
+    () => deliver(message),
+    {
+      level: "info",
+      metadata: {
+        transport,
+        outcome: transport === "suppressed" ? "suppressed" : "completed",
+      },
+    }
+  )
+}
+
+async function deliver(message: MagicLinkMessage): Promise<void> {
   if (process.env.APP_ENV === "production") {
     await sendResendAuthEmail(readResendConfig(process.env), message)
     return

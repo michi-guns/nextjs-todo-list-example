@@ -47,7 +47,7 @@ The [approved dependency refresh](../agentforge/plans/2026-09-18-workflow-docume
 ## Validation and quality
 
 - **Zod** — untrusted input and external-payload validation
-- **Pino** — server-only [backend logging core](../runbooks/logging.md), with application adoption still planned
+- **Pino** — [contextual backend logging](../runbooks/logging.md) at application entries, with shared database policy and safe metadata
 - **Vitest** — domain, application, and schema tests
 - **Playwright** — end-to-end browser journeys
 - **pnpm** — package management and scripts

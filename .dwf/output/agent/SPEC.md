@@ -668,10 +668,11 @@ effect, and Preview/Production jobs receive only their scoped secrets.
 
 [TD-029](../../decisions/TECHNICAL.md#td-029) and its protected settings CLI in
 [TD-031](../../decisions/TECHNICAL.md#td-031) define the accepted logging contract.
-The database-independent core and shared settings/CLI are implemented;
-application adoption remains planned. [Core evidence](../../../docs/agentforge/evidence/2026-09-19-logger-core.md)
-and [settings evidence](../../../docs/agentforge/evidence/2026-09-19-logger-settings.md)
-record the current limits. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
+The core, shared settings/CLI and application adoption are implemented with local
+evidence. [Core evidence](../../../docs/agentforge/evidence/2026-09-19-logger-core.md),
+[settings evidence](../../../docs/agentforge/evidence/2026-09-19-logger-settings.md)
+and [application evidence](../../../docs/agentforge/evidence/2026-09-19-logger-adoption.md)
+record proof and limits. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
 [T-26.2](../../../TODO.md#t-262) and [T-26.3](../../../TODO.md#t-263), with proof
 defined by [TST-LOGGING-001](../../decisions/TESTING.md#tst-logging-001) and
 [TST-LOGGING-002](../../decisions/TESTING.md#tst-logging-002).

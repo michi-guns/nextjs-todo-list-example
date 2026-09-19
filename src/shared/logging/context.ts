@@ -1,4 +1,4 @@
-import "server-only"
+// Node-only core shared with repository tools; server.ts guards the Next facade.
 import { AsyncLocalStorage } from "node:async_hooks"
 import { randomUUID } from "node:crypto"
 import { logName } from "./config"

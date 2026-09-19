@@ -2,6 +2,10 @@ import { timingSafeEqual } from "node:crypto"
 import type { NextRequest } from "next/server"
 import { parseBody } from "next-sanity/webhook"
 import { z } from "zod"
+import {
+  observeOperation,
+  reportOperationError,
+} from "../../../shared/logging/operation"
 
 const LANDING_DOCUMENT_ID = "landingPage"
 const LANDING_DOCUMENT_TYPE = "landingPage"
@@ -65,6 +69,7 @@ export async function handleSanityWebhook(
   const secret = configuredSecret(dependencies.webhookSecret)
 
   if (!secret) {
+    reportOperationError(new Error("Sanity webhook is not configured"))
     return errorResponse(500, "configuration_error")
   }
 
@@ -82,6 +87,7 @@ export async function handleSanityWebhook(
       return errorResponse(400, "invalid_payload")
     }
 
+    reportOperationError(error)
     return errorResponse(500, "server_error")
   }
 
@@ -103,8 +109,14 @@ export async function handleSanityWebhook(
   }
 
   try {
-    await dependencies.invalidate()
-  } catch {
+    await observeOperation(
+      "sanity",
+      "sanity.invalidation",
+      async () => dependencies.invalidate(),
+      { level: "info" }
+    )
+  } catch (error) {
+    reportOperationError(error)
     return errorResponse(500, "server_error")
   }
 
@@ -134,6 +146,7 @@ export async function handleManualLandingRecovery(
   const secret = configuredSecret(dependencies.manualRecoverySecret)
 
   if (!secret) {
+    reportOperationError(new Error("Sanity recovery is not configured"))
     return errorResponse(500, "configuration_error")
   }
 
@@ -142,8 +155,14 @@ export async function handleManualLandingRecovery(
   }
 
   try {
-    await dependencies.invalidate()
-  } catch {
+    await observeOperation(
+      "sanity",
+      "sanity.invalidation",
+      async () => dependencies.invalidate(),
+      { level: "info" }
+    )
+  } catch (error) {
+    reportOperationError(error)
     return errorResponse(500, "server_error")
   }
 

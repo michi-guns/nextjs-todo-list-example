@@ -2,8 +2,8 @@ import type { CurrentUser } from "../../auth/domain/current-user"
 import {
   assertSameOriginMutation,
   InvalidEntryInputError,
-  jsonErrorResponse,
 } from "../../../shared/entry-contract"
+import { loggedJsonErrorResponse as jsonErrorResponse } from "../../../shared/logging/entry-errors"
 import { parsePaginationQuery } from "../../../shared/pagination"
 import type { createListApplication } from "../application/list-use-cases"
 import {

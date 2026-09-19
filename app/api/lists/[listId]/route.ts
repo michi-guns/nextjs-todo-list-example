@@ -1,5 +1,6 @@
 import { requireUserForHeaders } from "@/src/modules/auth"
 import { createListResourceHandlers } from "@/src/modules/lists/presentation/list-routes"
+import { loggedHandler } from "@/src/shared/logging/server"
 
 import {
   listApplication,
@@ -14,5 +15,5 @@ const handlers = createListResourceHandlers({
   revalidate: revalidateDashboard,
 })
 
-export const PATCH = handlers.PATCH
-export const DELETE = handlers.DELETE
+export const PATCH = loggedHandler("lists", "lists.rename", handlers.PATCH)
+export const DELETE = loggedHandler("lists", "lists.delete", handlers.DELETE)

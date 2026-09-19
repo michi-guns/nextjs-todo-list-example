@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest"
 
 import type { createTaskApplication } from "../application/task-use-cases"
+import { createLogger } from "../../../shared/logging/logger"
+import { createOperationRunner } from "../../../shared/logging/operation"
 import type { Task } from "../domain/task"
 import { TaskConflictError, TaskNotFoundError } from "../domain/task-errors"
 import {
@@ -14,6 +16,46 @@ import {
 } from "./task-routes"
 
 type TaskApplication = ReturnType<typeof createTaskApplication>
+
+vi.mock("server-only", () => ({}))
+
+it("reports caught task route and action failures without logging task content", async () => {
+  const write = vi.fn()
+  const logging = createOperationRunner({
+    logger: createLogger({ environment: "preview", write }),
+    refresh: async () => {},
+  })
+  const failure = Object.assign(new Error("private task notes"), {
+    code: "ETIMEDOUT",
+  })
+  const routes = createTaskListHandlers(
+    routeDependencies(
+      makeApplication({ listTasks: vi.fn().mockRejectedValue(failure) })
+    )
+  )
+  expect(
+    (
+      await logging.run("tasks", "tasks.read", () =>
+        routes.GET(request(`/api/lists/${listId}/tasks`), {
+          params: Promise.resolve({ listId }),
+        })
+      )
+    ).status
+  ).toBe(500)
+  expect(write).toHaveBeenCalledTimes(1)
+  const actions = createTaskActionHandlers(
+    actionDependencies(
+      makeApplication({ createTask: vi.fn().mockRejectedValue(failure) })
+    )
+  )
+  expect(
+    await logging.run("tasks", "tasks.create.action", () =>
+      actions.createTask({ listId, title: "private task notes" })
+    )
+  ).toMatchObject({ ok: false, error: { code: "internal_error" } })
+  expect(write).toHaveBeenCalledTimes(2)
+  expect(JSON.stringify(write.mock.calls)).not.toContain("private task notes")
+})
 
 const user = { id: "user-a", email: "a@example.test", name: "User A" }
 const now = new Date("2026-08-30T12:00:00.000Z")

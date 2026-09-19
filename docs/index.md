@@ -17,7 +17,7 @@ This directory is the knowledge system for the Next.js Todo List Example.
 - [Production readiness](./runbooks/production-readiness.md)
 - [Production release and recovery](./runbooks/production-release.md)
 - [Authentication mail](./runbooks/auth-mail.md)
-- [Backend logging core and limits](./runbooks/logging.md)
+- [Backend logging, event catalogue and diagnosis](./runbooks/logging.md)
 - [Verified environment and pipeline evidence](./agentforge/evidence/2026-09-16-pipeline-closeout.md)
 - [Technology stack](./architecture/stack.md)
 - [Data ownership](./data/ownership.md)

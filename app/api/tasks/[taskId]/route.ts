@@ -1,5 +1,6 @@
 import { requireUserForHeaders } from "@/src/modules/auth"
 import { createTaskResourceHandlers } from "@/src/modules/tasks/presentation/task-routes"
+import { loggedHandler } from "@/src/shared/logging/server"
 
 import {
   revalidateDashboard,
@@ -14,5 +15,5 @@ const handlers = createTaskResourceHandlers({
   revalidate: revalidateDashboard,
 })
 
-export const PATCH = handlers.PATCH
-export const DELETE = handlers.DELETE
+export const PATCH = loggedHandler("tasks", "tasks.update", handlers.PATCH)
+export const DELETE = loggedHandler("tasks", "tasks.delete", handlers.DELETE)

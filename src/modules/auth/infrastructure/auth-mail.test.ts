@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { deliverAuthEmail } from "./auth-mail"
+import { createLogger } from "../../../shared/logging/logger"
+import { createOperationRunner } from "../../../shared/logging/operation"
 
 const mutableEnvironment = process.env as Record<string, string | undefined>
 const original = {
@@ -24,7 +26,43 @@ afterEach(() => {
 })
 
 describe("deliverAuthEmail", () => {
+  it("records suppression and delivery failure once without mail contents", async () => {
+    const write = vi.fn()
+    const logging = createOperationRunner({
+      logger: createLogger({ environment: "preview", write }),
+      refresh: async () => {},
+    })
+    const message = {
+      email: "private-person@example.test",
+      url: "https://example.test/?token=private-token",
+      token: "private-token",
+    }
+    vi.stubEnv("APP_ENV", "preview")
+    vi.stubEnv("BETTER_AUTH_LOCAL_MAILBOX", "false")
+    await logging.run("auth", "auth.post", () => deliverAuthEmail(message))
+    expect(write).toHaveBeenCalledWith(
+      "info",
+      expect.objectContaining({
+        outcome: "suppressed",
+        transport: "suppressed",
+        event: "auth.mail.delivery.completed",
+      })
+    )
+    vi.stubEnv("APP_MAIL_TRANSPORT", "remote")
+    await expect(
+      logging.run("auth", "auth.post", () => deliverAuthEmail(message))
+    ).rejects.toThrow()
+    expect(
+      write.mock.calls.filter(([level]) => level === "error")
+    ).toHaveLength(1)
+    expect(JSON.stringify(write.mock.calls)).not.toContain("private-")
+  })
   it("uses Resend for explicitly configured Production", async () => {
+    const write = vi.fn()
+    const logging = createOperationRunner({
+      logger: createLogger({ environment: "production", write }),
+      refresh: async () => {},
+    })
     for (const [key, value] of Object.entries({
       APP_ENV: "production",
       NODE_ENV: "production",
@@ -40,12 +78,25 @@ describe("deliverAuthEmail", () => {
       .fn()
       .mockResolvedValue(Response.json({ id: "email-id" }))
     vi.stubGlobal("fetch", fetchMock)
-    await deliverAuthEmail({
-      email: "person@example.test",
-      url: "https://example.com/verify?token=synthetic",
-      token: "synthetic",
-    })
+    await logging.run("auth", "auth.post", () =>
+      deliverAuthEmail({
+        email: "person@example.test",
+        url: "https://example.com/verify?token=synthetic",
+        token: "synthetic",
+      })
+    )
     expect(fetchMock).toHaveBeenCalledOnce()
+    expect(write).toHaveBeenCalledWith(
+      "info",
+      expect.objectContaining({
+        event: "auth.mail.delivery.completed",
+        transport: "resend",
+        outcome: "completed",
+      })
+    )
+    expect(JSON.stringify(write.mock.calls)).not.toContain(
+      "person@example.test"
+    )
   })
 
   it.each(["local", "development", "preview"])(

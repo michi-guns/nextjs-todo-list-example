@@ -1,4 +1,3 @@
-import "server-only"
 import pino from "pino"
 import type { LogEnvironment, LogLevel } from "./config"
 import type { SafeMetadata } from "./sanitize"

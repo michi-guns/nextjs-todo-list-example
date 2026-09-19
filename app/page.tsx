@@ -1,5 +1,6 @@
 import { LandingPage } from "@/components/landing/landing-page"
 import { getPublishedLandingContent } from "@/src/modules/landing/infrastructure/sanity-landing-reader"
+import { runLoggedOperation } from "@/src/shared/logging/server"
 
 export const metadata = {
   title: "Focus Rail",
@@ -10,7 +11,9 @@ export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
 export default async function Page() {
-  const content = await getPublishedLandingContent()
+  const content = await runLoggedOperation("landing", "landing.read", () =>
+    getPublishedLandingContent()
+  )
 
   return <LandingPage content={content} />
 }

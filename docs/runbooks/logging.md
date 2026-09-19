@@ -1,17 +1,84 @@
 # Backend logging
 
-The database-independent logger core lives in `src/shared/logging/`. T-26.1
-provides filtering, request/job context, safe metadata and Pino output. Application
-adoption belongs to T-26.3. T-26.2 adds shared database settings, bounded refresh
-and the operator CLI. See the [accepted contract](../../.dwf/output/agent/SPEC.md#shared-backend-logging),
+The logger lives in `src/shared/logging/`. Adopted backend entries refresh the
+shared database policy, establish a correlation ID and report safe outcomes
+through Pino. See the [accepted contract](../../.dwf/output/agent/SPEC.md#shared-backend-logging),
 [core evidence](../agentforge/evidence/2026-09-19-logger-core.md) and
-[settings evidence](../agentforge/evidence/2026-09-19-logger-settings.md).
+[settings evidence](../agentforge/evidence/2026-09-19-logger-settings.md), plus
+[application/runtime evidence](../agentforge/evidence/2026-09-19-logger-adoption.md).
+
+## Use an application entry
+
+Import `runLoggedOperation` or `loggedHandler` from
+`src/shared/logging/server.ts`. This Next.js facade has the `server-only` marker
+and composes the cache with the existing pool in `db/db.ts`. Never export it
+from the mixed `src/shared/index.ts` barrel or import it from a Client Component.
+
+```ts
+import { runLoggedOperation } from "@/src/shared/logging/server"
+
+return runLoggedOperation("jobs", "job.run", async () => performWork())
+```
+
+Use `loggedHandler("lists", "lists.read", handlers.GET)` for a route function.
+Every entry generates its own UUID, ignoring caller request-ID headers. It
+awaits a stale-policy refresh before work and records completion at `debug`.
+Known application refusals retain their existing responses. For caught errors,
+list/task adapters use `entry-errors.ts` before the pure response mapper. For
+rethrown errors, the entry records the failure and preserves the same exception.
+
+Integration boundaries call `observeOperation` from `operation.ts` inside an
+adopted entry. Mail delivery and Sanity reads/invalidation own their failures;
+the enclosing entry does not report the same exception again. Ownership also
+applies when policy suppresses that event, so an outer event cannot bypass its
+suppression. An integration called outside an adopted entry runs normally
+without adding output, preserving seed and deployment CLI result streams.
+
+Keep framework control flow outside observed work. The dashboard awaits
+Next.js `connection()` before refreshing settings and redirects unauthenticated
+visitors after the observed read returns its refusal. Build-time prerendering
+therefore does not query settings or produce a false application failure.
+
+## Event catalogue and diagnosis
+
+Operation names below produce `.completed` at `debug` and `.failed` at `error`
+unless the table names a different completion level. Completion means the
+boundary returned; inspect `outcome`, which can be `refused` or `failed`.
+
+| Module             | Operations/events                                                                                         | Reporting owner and use                                                                                                                                                                                 |
+| ------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lists`            | `lists.read`, `lists.create`, `lists.rename`, `lists.delete`; mutation names also have `.action` variants | JSON or Server Action entry, including authentication, application and revalidation failures                                                                                                            |
+| `tasks`            | `tasks.read`, `tasks.create`, `tasks.update`, `tasks.delete`; mutation names also have `.action` variants | JSON or Server Action entry; no task title, notes or record IDs                                                                                                                                         |
+| `dashboard`        | `dashboard.read`                                                                                          | Session and initial private workspace read; normal sign-in redirect is not an error                                                                                                                     |
+| `landing`          | `landing.read`                                                                                            | Landing entry; nested Sanity failures stay owned by `sanity.read`                                                                                                                                       |
+| `auth`             | `auth.get`, `auth.post`, `auth.patch`, `auth.put`, `auth.delete`                                          | Better Auth HTTP entry; its responses and independent built-in logger stay intact                                                                                                                       |
+| `auth.mail`        | `auth.mail.delivery`                                                                                      | `info` on delivery completion or Preview suppression, `error` on delivery/configuration failure; only transport, outcome and duration                                                                   |
+| `sanity`           | `sanity.read`, `sanity.invalidation`, `sanity.webhook`, `sanity.recover`                                  | Validated read at `debug`, accepted invalidation at `info`; integration/configuration failures at `error`; invalid signatures, irrelevant documents and unauthorized recovery are not unexpected errors |
+| `database.pool`    | `database.pool.idle.failed`                                                                               | Idle-client callback, with a new independent correlation ID and safe driver classification                                                                                                              |
+| `logging.settings` | `logging.settings.failed`, `logging.settings.recovered`                                                   | One `warn` when reads become unavailable/invalid and one `info` on recovery, subject to current policy; no repeated outage chatter                                                                      |
+
+Start with module, event, correlation ID and duration. `timeout`, `unavailable`,
+`conflict` and `constraint` classify allowlisted driver codes; everything else is
+`unexpected`. The event tells you which boundary failed, not the raw provider
+message. For `auth.mail.delivery.failed`, inspect the selected transport using
+the [mail runbook](auth-mail.md). For Sanity failures, use the
+[integration runbook](sanity-integration-failure.md). For settings fallback,
+check the selected database, migration and role through the guarded CLI below.
+
+To enable list diagnostics only, publish a new revision with
+`"moduleLevels": { "lists": "debug" }`. To quiet a specific event, add its exact
+full name, such as `lists.read.completed`, to `suppressedEvents`. `enabled: false`
+suppresses every facade event, including settings recovery, until a successful
+refresh adopts an enabled policy. Inspect persisted policy first when logs
+disappear; absence alone does not prove an outage or universal instance adoption.
 
 ## Use the core
 
-Import the facade directly from server code. Its `server-only` marker rejects
-Client Component imports. Do not export it from the mixed `src/shared/index.ts`
-barrel. The core has no database, Next request API or domain dependency.
+The core has no database, Next request API or domain dependency. It uses Node
+async context and can also run in repository TypeScript tools. The Next-specific
+`server-only` marker lives on `server.ts`; direct Node core imports still cannot
+compile for a browser because they depend on Node async hooks. Keep all of these
+modules out of client-facing barrels.
 
 ```ts
 import { createLogPolicy } from "@/src/shared/logging/config"
@@ -45,10 +112,8 @@ ID. Use a new context for independent jobs or background callbacks rather than
 retaining a request's identity. The helper returns the callback's value/promise
 and preserves its exception.
 
-The example asks three diagnostic questions: which operation produced an event,
-whether it completed or failed, and how long it took. The core supplies those
-fields; T-26.3 will document the actual application event catalogue and reporting
-owners. It does not yet change any application's logging behavior.
+The example records which operation ran, its outcome and duration. It only
+uses in-memory policy; application entries use the shared composition above.
 
 ## Policy and privacy
 
@@ -84,12 +149,17 @@ changing application results. An invalid environment suppresses facade output.
 produce JSON. Each includes time, numeric Pino level, explicit severity, event,
 module and environment, with correlation/operation when present. No hostname or
 process ID is added. Local formatting requires no extra package or worker.
+Application composition selects a recognized `APP_ENV`; otherwise it uses
+`production` when `NODE_ENV=production` and `local` elsewhere. This output
+fallback is not runtime target validation, which remains T-26.8 work.
 
 The direct Pino destination invokes `console.log` for trace/debug/info,
 `console.warn` for warn and `console.error` for error/fatal. Vercel derives its
 dashboard severity from the output channel, not a JSON field. Thus the JSON
 severity preserves distinctions such as debug and fatal even when the platform
-groups them as info or error. See [Vercel's structured logging guidance](https://vercel.com/kb/guide/add-structured-application-logs-to-vercel-functions).
+groups them as info or error. Vercel preserves `console.warn` as warning for
+streaming functions; non-streaming functions group stderr as error. See
+[Vercel runtime log levels](https://vercel.com/docs/logs/runtime#level).
 
 There is no application queue, worker transport or deferred flush. Tests inspect
 real output at operation completion and normal Node process exit, including
@@ -98,18 +168,17 @@ console stream failures. Node console streams may still be asynchronous; abrupt
 does not promise durable storage or prove deployed delivery. See
 [Node process I/O](https://nodejs.org/api/process.html#a-note-on-process-io).
 
-Run `pnpm exec vitest run src/shared/logging` for the core evidence. Next.js
-request-boundary lifecycle and once-only application failure reporting remain
-T-26.3 obligations. Hosted ingestion has its own authorized tasks.
+Run `pnpm exec vitest run src/shared/logging` for core/entry checks. Local Next.js
+request completion, JSON channels and two-process policy adoption are recorded
+in the application evidence. Hosted ingestion has its own authorized tasks.
 
 ## Shared settings and refresh
 
 `createLoggingRuntime(pool, environment)` composes the store, cache and logger
 with the existing application pool. Create it once after the database boundary
 exists. Do not import this composition from `db/pool.ts`; the logger core stays
-database-independent. T-26.3 will wire application entries to `await refresh()`
-and use its `logger` factory. This task provides the composition but does not
-change current application request logging.
+database-independent. `db/db.ts` composes it once and supplies the current-policy
+logger to its idle-pool callback. The server facade refreshes adopted entries.
 
 The selected database owns one `logging_settings` row, with singleton ID 1,
 revision and a full JSON policy. Reads never insert defaults. A missing table,
@@ -137,8 +206,9 @@ waiters are removed by pg-pool's deadline; PostgreSQL enforces its own statement
 bound even if the client disconnects first.
 Retries wait another 30 seconds after either result. Healthy active instances
 converge at their next eligible checkpoint plus this bounded attempt; outages
-can preserve stale settings indefinitely. The cache emits no recursive failure
-logs. Operator inspection distinguishes persisted state from instance adoption.
+can preserve stale settings indefinitely. Cache transition diagnostics only
+read current in-memory policy and never recurse through refresh. Operator
+inspection distinguishes persisted state from instance adoption.
 
 ## Inspect and change policy
 

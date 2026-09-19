@@ -1,10 +1,12 @@
 import type { CurrentUser } from "../../auth/domain/current-user"
 import {
-  actionErrorResult,
   inputFromActionValue,
-  invalidInputActionResult,
   type ActionResult,
 } from "../../../shared/entry-contract"
+import {
+  loggedActionErrorResult as actionErrorResult,
+  loggedInvalidInputActionResult as invalidInputActionResult,
+} from "../../../shared/logging/entry-errors"
 import type { createTaskApplication } from "../application/task-use-cases"
 import {
   createTaskInputSchema,

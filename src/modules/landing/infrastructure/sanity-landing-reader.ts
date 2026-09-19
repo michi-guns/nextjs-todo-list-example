@@ -2,6 +2,7 @@ import {
   getLandingContent,
   type LandingContent,
 } from "../application/get-landing-content"
+import { observeOperation } from "../../../shared/logging/operation"
 
 const PLAYWRIGHT_LANDING_CONTENT: LandingContent = {
   headline: "Make progress visible.",
@@ -20,11 +21,12 @@ export async function getPublishedLandingContent(
     return PLAYWRIGHT_LANDING_CONTENT
   }
 
-  const { sanityClient } = await import("../../../sanity/client")
-  const { createSanityLandingContentRepositoryFromClient } =
-    await import("./sanity-landing-source")
-  const landingContentRepository =
-    createSanityLandingContentRepositoryFromClient(sanityClient)
-
-  return getLandingContent(landingContentRepository)
+  return observeOperation("sanity", "sanity.read", async () => {
+    const { sanityClient } = await import("../../../sanity/client")
+    const { createSanityLandingContentRepositoryFromClient } =
+      await import("./sanity-landing-source")
+    const landingContentRepository =
+      createSanityLandingContentRepositoryFromClient(sanityClient)
+    return getLandingContent(landingContentRepository)
+  })
 }

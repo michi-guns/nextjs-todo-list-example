@@ -436,7 +436,7 @@ multi-stack framework.
 
 ## TD-029 - Shared backend logging with environment-local policy
 
-- **Status:** ACCEPTED, planned implementation
+- **Status:** ACCEPTED, implemented with local evidence
 - **Related product decisions:** [D-009](PRODUCT.md#d-009)
 - **Related technical decisions:** [TD-015](#td-015), [TD-025](#td-025), [TD-026](#td-026)
 - **Related test contracts:** [TST-LOGGING-001](TESTING.md#tst-logging-001), [TST-LOGGING-002](TESTING.md#tst-logging-002)

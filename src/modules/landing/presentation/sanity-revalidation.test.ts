@@ -1,6 +1,8 @@
 import { createHmac } from "node:crypto"
 import type { NextRequest } from "next/server"
 import { describe, expect, it, vi } from "vitest"
+import { createLogger } from "../../../shared/logging/logger"
+import { createOperationRunner } from "../../../shared/logging/operation"
 
 import {
   handleManualLandingRecovery,
@@ -44,6 +46,44 @@ function parsedWebhook(body: unknown, isValidSignature = true) {
 }
 
 describe("handleSanityWebhook", () => {
+  it("reports safe invalidation outcomes and one mapped failure, excluding expected refusals", async () => {
+    const write = vi.fn()
+    const logging = createOperationRunner({
+      logger: createLogger({ environment: "preview", write }),
+      refresh: async () => {},
+    })
+    const dependencies = {
+      webhookSecret: WEBHOOK_SECRET,
+      parseBody: parsedWebhook(landingEvent),
+      invalidate: vi.fn(),
+    }
+    const call = () =>
+      logging.run("sanity", "sanity.webhook", () =>
+        handleSanityWebhook(createRequest("{}"), dependencies)
+      )
+    expect((await call()).status).toBe(200)
+    expect(write).toHaveBeenCalledWith(
+      "info",
+      expect.objectContaining({
+        event: "sanity.invalidation.completed",
+        outcome: "completed",
+      })
+    )
+    dependencies.invalidate.mockRejectedValue(
+      new Error("private CMS body secret")
+    )
+    expect((await call()).status).toBe(500)
+    expect(
+      write.mock.calls.filter(([level]) => level === "error")
+    ).toHaveLength(1)
+    dependencies.parseBody.mockResolvedValue({
+      body: landingEvent,
+      isValidSignature: false,
+    })
+    expect((await call()).status).toBe(401)
+    expect(write).toHaveBeenCalledTimes(2)
+    expect(JSON.stringify(write.mock.calls)).not.toContain("private CMS")
+  })
   it("accepts a valid Sanity signature for the published landing singleton", async () => {
     const body = JSON.stringify(landingEvent)
     const invalidate = vi.fn()
