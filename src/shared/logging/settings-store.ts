@@ -45,10 +45,12 @@ export function createSettingsStore(pool: Pool) {
   }
 
   async function execute<T>(
-    operation: (client: PoolClient) => Promise<T>
+    operation: (client: PoolClient) => Promise<T>,
+    readOnly = false
   ): Promise<T> {
     let client: PoolClient | undefined
     let released = false
+    let committed = false
     let timer: ReturnType<typeof setTimeout> | undefined
     const ignoreConnectionError = () => undefined
     try {
@@ -59,12 +61,22 @@ export function createSettingsStore(pool: Pool) {
       const deadline = new Promise<never>((_, reject) => {
         timer = setTimeout(() => {
           released = true
-          // Destroy the active socket; a raced promise alone would leave SQL alive.
+          // Bound client/network lifetime as well as the server statement below.
           activeClient.release(true)
           reject(new LoggingSettingsError("settings_unavailable"))
         }, SETTINGS_QUERY_TIMEOUT_MS)
       })
-      return await Promise.race([operation(client), deadline])
+      const work = async () => {
+        await activeClient.query(readOnly ? "BEGIN READ ONLY" : "BEGIN")
+        // Disconnect alone does not cancel SQL blocked on a server-side lock.
+        // LOCAL confines the deadline to this transaction, leaving other pool users unchanged.
+        await activeClient.query("SET LOCAL statement_timeout = '750ms'")
+        const result = await operation(activeClient)
+        await activeClient.query("COMMIT")
+        committed = true
+        return result
+      }
+      return await Promise.race([work(), deadline])
     } catch (error) {
       if (error instanceof LoggingSettingsError) throw error
       throw new LoggingSettingsError("settings_unavailable")
@@ -72,7 +84,8 @@ export function createSettingsStore(pool: Pool) {
       clearTimeout(timer)
       if (client && !released) {
         client.removeListener("error", ignoreConnectionError)
-        client.release()
+        // Failed/incomplete transactions are discarded and rolled back by PostgreSQL.
+        client.release(!committed)
       }
     }
   }
@@ -94,7 +107,7 @@ export function createSettingsStore(pool: Pool) {
           throw new LoggingSettingsError("invalid_policy")
         }
         return parsed.data
-      })
+      }, true)
     },
     async set(input: unknown, expectedRevision: number): Promise<LogPolicy> {
       const policy = validateSettingsUpdate(input, expectedRevision)

@@ -1,5 +1,5 @@
 import { Pool } from "pg"
-import { afterAll, beforeAll, describe, expect, inject, it, vi } from "vitest"
+import { afterAll, describe, expect, inject, it, vi } from "vitest"
 import { defaultLogPolicy } from "../shared/logging/config"
 import { createSettingsCache } from "../shared/logging/settings-cache"
 import { createSettingsStore } from "../shared/logging/settings-store"
@@ -37,12 +37,6 @@ async function isolatedTarget(name: string, priorOnly = false) {
 }
 
 describe("TST-LOGGING-002 real settings persistence", () => {
-  let first: Pool
-  let second: Pool
-  beforeAll(async () => {
-    first = await isolatedTarget("first")
-    second = await isolatedTarget("second")
-  })
   afterAll(async () => {
     for (const pool of pools) await pool.end()
     for (const schema of schemas)
@@ -51,6 +45,8 @@ describe("TST-LOGGING-002 real settings persistence", () => {
   })
 
   it("reads without creating defaults; independent caches converge and targets stay isolated", async () => {
+    const first = await isolatedTarget("first")
+    const second = await isolatedTarget("second")
     const store = createSettingsStore(first)
     expect(await store.read()).toBeNull()
     const a = createSettingsCache(store)
@@ -79,7 +75,10 @@ describe("TST-LOGGING-002 real settings persistence", () => {
   })
 
   it("rejects invalid writes and atomically accepts only one concurrent revision", async () => {
+    const first = await isolatedTarget("conflicts")
     const store = createSettingsStore(first)
+    await store.set({ ...defaultLogPolicy, revision: 1 }, 0)
+    await store.set({ ...defaultLogPolicy, revision: 2 }, 1)
     await expect(
       store.set({ ...defaultLogPolicy, revision: 3, minimumLevel: "bogus" }, 2)
     ).rejects.toMatchObject({ code: "invalid_policy" })
@@ -103,7 +102,9 @@ describe("TST-LOGGING-002 real settings persistence", () => {
   })
 
   it("retains old policy after malformed reads and a real locked-table timeout, then frees the pool", async () => {
+    const first = await isolatedTarget("timeouts")
     const store = createSettingsStore(first)
+    await store.set({ ...defaultLogPolicy, revision: 1, enabled: false }, 0)
     const cache = createSettingsCache(store)
     await cache.refresh()
     const last = cache.current()
@@ -119,6 +120,16 @@ describe("TST-LOGGING-002 real settings persistence", () => {
         code: "settings_unavailable",
       })
       expect(performance.now() - start).toBeLessThan(2500)
+      // Keep the blocker held: disconnect alone can leave server SQL waiting.
+      await vi.waitFor(
+        async () => {
+          const blocked = await admin.query(
+            "SELECT count(*)::int AS count FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND state = 'active' AND wait_event_type = 'Lock' AND query LIKE '%logging_settings%'"
+          )
+          expect(blocked.rows[0].count).toBe(0)
+        },
+        { timeout: 300 }
+      )
     } finally {
       await locker.query("ROLLBACK")
       locker.release()

@@ -124,13 +124,17 @@ operation is not interrupted. Idle instances wait until the next invocation;
 there is no background polling, and emitting an event never reads the database.
 
 The shared pool retains its existing 10-second connection/checkout deadline.
-Once checked out, the settings operation has a one-second deadline that destroys
-its connection on timeout. Thus an attempt can take at most approximately 11
+Once checked out, the settings transaction has a one-second client deadline that
+destroys its connection on timeout. Its PostgreSQL-local `statement_timeout`
+also cancels statements after 750 milliseconds, including blocked lock waits.
+Failed transactions are discarded; successful commit restores the connection's
+previous settings. Thus an attempt can take at most approximately 11
 seconds, subject to Node event-loop scheduling. This deliberately replaces the
 plan's illustrative one-second total budget: installed pg-pool has no public
 per-checkout timeout/cancellation API, and changing every application connection
 or using a second runtime pool would alter unrelated behavior. Saturated pool
-waiters are removed by pg-pool's deadline; timed-out SQL is not left running.
+waiters are removed by pg-pool's deadline; PostgreSQL enforces its own statement
+bound even if the client disconnects first.
 Retries wait another 30 seconds after either result. Healthy active instances
 converge at their next eligible checkpoint plus this bounded attempt; outages
 can preserve stale settings indefinitely. The cache emits no recursive failure

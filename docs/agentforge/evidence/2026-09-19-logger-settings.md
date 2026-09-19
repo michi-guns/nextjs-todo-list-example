@@ -46,6 +46,9 @@ Sources checked on 2026-09-19:
   and `release(true)` destroys the client.
 - [node-postgres client API](https://node-postgres.com/apis/client) and installed
   `pg` 8.23.0 `Client.end` confirm ending an active query destroys its socket.
+- [PostgreSQL statement deadlines](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-STATEMENT-TIMEOUT)
+  bound server work independently of connection lifetime. A transaction-local
+  750 ms deadline handles blocked SQL while the client budget stays one second.
 - [Drizzle insert](https://orm.drizzle.team/docs/insert), installed Drizzle
   1.0.0-rc.4 types and generated migration shape ground insert-if-absent and
   revision-checked updates with `returning`.
@@ -55,8 +58,10 @@ Sources checked on 2026-09-19:
 The illustrative one-second total refresh proposal is refined to the existing
 pool's maximum 10-second connection/checkout plus a one-second query deadline.
 pg-pool has no public per-acquisition cancellation/timeout option. This preserves
-the shared pool and existing connection behavior. SQL timeout destroys the
-checked-out connection, rather than merely abandoning a promise. Retry spacing
+the shared pool and existing connection behavior. Each operation uses a small
+transaction with a local server statement deadline; reads use a read-only
+transaction. Client timeout destroys the checked-out connection, and PostgreSQL
+also cancels blocked SQL. Failed transactions are discarded. Retry spacing
 is 30 seconds after completion, with no background refresh and no recursive
 cache-failure logging. The [runbook](../../runbooks/logging.md) states active/idle
 limits and the ambiguous-commit case after a write timeout.
@@ -92,6 +97,19 @@ the store now consistently returns a rejected promise from its async write API.
   was formatted without changing its metadata values.
 
 Independent review, non-default Neon smoke and main-push CI gate closeout.
+
+## Independent review and fixes
+
+Fresh GPT-6-Astra `xhigh` review of `982057a` found two actionable issues.
+Disconnecting a query waiting on a table lock left its PostgreSQL backend work
+alive until the lock was released, and one integration test depended on a prior
+test's policy revision. Both findings match the task's timeout and test-isolation
+contracts. A regression check reproduced the active lock waiter before the
+blocker was released. The store now adds PostgreSQL `SET LOCAL statement_timeout`
+within a bounded transaction, and each integration case creates its own state.
+The formerly dependent test passes in isolation. The review's optional schema
+inventory correction and two related stale Agent SPEC paragraphs were also fixed.
+A fresh review of the changed tip is required before integration.
 
 ## Evidence limits
 
