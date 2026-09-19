@@ -46,6 +46,7 @@ A todo list is a universally understood reference domain, so the architecture an
 12. Prefer current stable best practices and high-leverage production safeguards without adding speculative framework machinery.
 13. Provide manually requested isolated Preview and manually approved exact-ref Production delivery paths with explicit target, secret, approval, migration, smoke, and evidence boundaries.
 14. Extend the delivered authentication baseline with the accepted, planned [account recovery and abuse resistance](#account-recovery-and-abuse) scope.
+15. Deliver the activated next-cycle [editorial preview](#54-editorial-publishing-and-preview) scope through existing Sanity editor access.
 
 ## 3. Non-goals (explicit)
 
@@ -57,7 +58,7 @@ Out of scope for the current todo reference baseline:
 - Native mobile apps
 - OAuth / social login
 - Polished email verification and password-reset product flows were outside the original baseline; the later accepted [T-27 recovery scope](#account-recovery-and-abuse) is now planned
-- Sanity Live draft preview and click-to-edit visual editing in the initial delivery phase; this accepted capability follows the webhook and manual-recovery baseline
+- Sanity Live draft preview and click-to-edit visual editing were outside the initial delivery phase; [D-013](../../decisions/PRODUCT.md#d-013) activates them for the next development cycle, with implementation still planned
 - Internationalization (English only)
 - Recurring tasks, subtasks, tags, attachments, comments
 - Payments, teams, orgs, roles beyond “user owns own data”
@@ -78,6 +79,7 @@ Out of scope for the current todo reference baseline:
 - There is **no** tenant, organization, or `Workspace` entity. Lists belong directly to the authenticated user through `userId`.
 - Authorization rule: **must be signed in** to read or write lists/tasks.
 - Requests for another user's list or task do not reveal whether that resource exists.
+- Planned editorial preview uses existing Sanity Studio editor identity. Application registration or sign-in does not grant editorial access or add an application administrator role.
 
 ## 5. Product shape
 
@@ -116,7 +118,11 @@ Out of scope for the current todo reference baseline:
 
 - Publishing the landing singleton in Sanity automatically invalidates the affected public cache through a trusted webhook.
 - An authorized operator can force the same invalidation when automatic delivery or cache state needs recovery.
-- Authenticated live draft preview with click-to-edit visual editing is an intended capability, delivered after the webhook and manual-recovery baseline.
+- [D-013](../../decisions/PRODUCT.md#d-013) activates authenticated draft preview, live updates and click-to-edit Sanity Studio editing for the next development cycle. Implementation remains planned under [T-28](../../../TODO.md#t-28-add-sanity-authenticated-preview-and-live-authoring).
+- Existing authorized Sanity editors can see unpublished landing changes while editing, navigate from rendered content to its source field, and exit preview to return to published content. Shared preview access is disabled.
+- Editorial preview is a browser session capability in Local, Development and Production using the existing `production` dataset. Deployment Preview remains isolated on the read-only non-production `preview` dataset, with no editorial authoring.
+- Ordinary visitors continue seeing published content with existing invalidation and recovery behavior. Only an authorized draft response may receive the read-only draft token; write-capable editor credentials never reach the application frontend.
+- [TST-LANDING-004](../../decisions/TESTING.md#tst-landing-004) owns new preview evidence. Existing published-content verification does not establish this planned capability.
 
 ### 5.5 Surfaces
 

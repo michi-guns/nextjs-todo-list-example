@@ -1412,6 +1412,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 - [ ] Deliver the accepted recovery and abuse-resistance scope after consolidated implementation planning and task breakdown. This decision-recording change does not start implementation or create a second overlapping plan.
 - Accepted scope, 2026-09-19: [D-011](.dwf/decisions/PRODUCT.md#d-011), [TD-032](.dwf/decisions/TECHNICAL.md#td-032), and [SPEC account recovery and abuse resistance](.dwf/output/agent/SPEC.md#account-recovery-and-abuse). No broad account-flow product choice remains open; exact lifetimes, limits, windows and copy are grounded implementation proposals.
+- Proposed approach: [account recovery and abuse resistance plan](docs/agentforge/plans/2026-09-19-t-27-account-recovery.md). This is the consolidated planning input; final task breakdown and implementation remain pending.
 - Decision-record checks, 2026-09-19: nine documentation files pass scoped Prettier and diff checks; all 537 local links/anchors resolve. The 31 existing test-contract statuses and TD-029–031/T-26 scope are preserved; three new auth contracts are `specified`. Normal commit hooks and a fresh exact-tip independent review gate delivery. No runtime, provider, migration or hosted verification is claimed.
 - Files: Better Auth configuration/routes, verification and password-reset UI, existing auth-mail seam, shared PostgreSQL rate-limit persistence and any required forward migration, focused tests, and security/runbook documentation. No new mail provider or auth architecture.
 - Interfaces: Better Auth request/reset and verification-resend APIs, automatic session revocation on successful reset, supported per-IP limits, and atomic shared recipient mail admission across instances.
@@ -1446,14 +1447,16 @@ Verification and evidence for this slice:
 
 ### T-28: Add Sanity authenticated preview and live authoring
 
-- [ ] Complete T-28 only after an explicit product decision moves the deferred Sanity capabilities into scope.
+- Planning checks, 2026-09-19: all nine affected documentation files pass scoped Prettier and diff checks; 611 local links/anchors resolve. The 35 existing test-contract statuses are preserved and TST-LANDING-004 is `specified`. Normal commit hooks, fresh exact-tip independent review and main-push CI gate delivery; no editorial preview or hosted evidence is claimed.
+
+- [ ] Implement the next-cycle editorial preview scope activated by [D-013](.dwf/decisions/PRODUCT.md#d-013) and [TD-034](.dwf/decisions/TECHNICAL.md#td-034). The owner has accepted the scope; the [editorial preview plan](docs/agentforge/plans/2026-09-19-t-28-editorial-preview.md) is Proposed. Plan acceptance and subsequent task breakdown remain prerequisites before implementation.
 - Files: Sanity presentation/preview routes and configuration, authenticated Draft Mode/Visual Editing/Live integration, webhook/revalidation handling, browser tests, and Sanity runbooks.
-- Interfaces: authenticated preview session, Preview/Development/Production dataset policy, webhook validation and recovery, live content refresh, and safe separation of editor credentials from public read configuration.
-- Acceptance: the selected Sanity live-authoring capability is explicit, authenticated, tested against the chosen dataset policy, and does not expose editor credentials; deployed webhook delivery/recovery evidence is real before its contract is marked verified.
-- Contracts/evidence: extend the canonical Sanity contracts after the T-18.1 dataset decision; preserve `TST-LANDING-002` and `TST-LANDING-003` evidence boundaries.
-- Checks: focused Sanity tests, real deployed webhook/live smoke when credentials are available, browser verification, `pnpm test`, `pnpm typecheck`, `pnpm lint`, and `git diff --check`.
-- Dependencies/unblock: T-22, T-24, and an explicit product decision to move the current deferred Sanity capabilities into scope.
-- Recommended AgentForge skills: `sanity-best-practices`, `sanity-migration`, `browser-testing-with-devtools`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
+- Interfaces: existing Sanity editor identity and supported private-secret Draft Mode handshake; authorized draft reads/live subscriptions/field navigation/exit; published cache and webhook/recovery preservation. Local, Development and Production editorial sessions use the existing `production` dataset. Deployment Preview remains read-only on non-production `preview` with no editorial activation or draft token.
+- Acceptance: editors see unpublished changes update live and click through to Studio fields; ordinary visitors retain published content. Only authorized draft responses may receive a read-only Viewer token, never write-capable editor credentials. Shared preview access is disabled; session, secret and membership/token revocation limits follow TD-034.
+- Contracts/evidence: new `TST-LANDING-004` is `specified`; preserve existing `TST-LANDING-001`–`003` statuses and evidence boundaries. Fixtures and ordinary Playwright cannot substitute for real Studio/provider/browser proof; the read-only smoke and real deployed webhook clauses remain intact.
+- Checks: focused Sanity tests, authorized real Studio/live/browser evidence, existing read-only/deployed Sanity checks at their required boundary, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file formatting and `git diff --check`; `pnpm test:pipeline` when environment/delivery wiring changes.
+- Dependencies/unblock: T-22/T-24 and the product/dataset decisions are satisfied. Implementation waits for its accepted plan/task breakdown and scoped prerequisite checks. Real hosted verification needs Viewer credentials, existing editor access, trusted origins/CORS, an allowed running target and authorization for the demonstrated provider actions. Planning creates no resources, edits no provider content and performs no deployment.
+- Recommended AgentForge skills: `planning`, `source-driven-development`, `documentation-and-adrs`, `browser-testing-with-devtools`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 ### T-29: Publish the derived-application extension and replacement guide
 
@@ -1616,5 +1619,5 @@ Accepted plan: [workflow, documentation, and dependencies](docs/agentforge/plans
 - Real-time collaboration, offline/PWA behavior, mobile apps, or multi-region operations.
 - Recurring tasks, subtasks, tags, attachments, comments, or payments.
 - Polished verification and password-reset flows were outside the original baseline; the later [T-27 recovery scope](#t-27-complete-authentication-product-flows-and-abuse-resistance) is accepted and awaiting implementation.
-- Sanity Live, Draft Mode, Presentation Tool, and visual editing. These are deferred until after the webhook and manual-recovery baseline.
+- Sanity Live, Draft Mode, Presentation Tool, and visual editing were outside the original baseline; [T-28](#t-28-add-sanity-authenticated-preview-and-live-authoring) now has accepted next-cycle scope under D-013/TD-034, with implementation still planned.
 - Speculative database indexes, Redis, application-level query caching, and provider-swapping abstractions.

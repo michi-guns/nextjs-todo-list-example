@@ -59,9 +59,29 @@ PostgreSQL on Neon with Drizzle owns Better Auth records, lists, tasks, ownershi
 
 ## Sanity boundary
 
-Sanity is used only for landing content through a dedicated project and dataset containing one singleton landing document. Infrastructure validates unknown CMS payloads and maps them to a plain landing view model. GROQ, client setup, and raw Sanity documents must not cross into application or page code. Published landing reads have one stable cache identity. A signature-verified Sanity webhook and a separately authorized manual recovery mechanism call the same server-only, idempotent invalidation service. Provider and operator secrets remain server-side. After the real CMS path is wired, required-content failures are explicit integration failures rather than a permanent silent fallback. Routine Playwright may use deterministic test-only content through the same application-facing landing contract, but that source is unavailable in deployed runtime modes.
+Sanity is used only for landing content through a dedicated project and dataset containing one singleton landing document. Infrastructure validates unknown CMS payloads and maps them to a plain landing view model. GROQ, client setup, and raw Sanity documents must not cross into application or page code. Published landing reads have one stable cache identity. A signature-verified Sanity webhook and a separately authorized manual recovery mechanism call the same server-only, idempotent invalidation service. Webhook and recovery secrets remain server-side; the planned read-only preview-token exception is described below. After the real CMS path is wired, required-content failures are explicit integration failures rather than a permanent silent fallback. Routine Playwright may use deterministic test-only content through the same application-facing landing contract, but that source is unavailable in deployed runtime modes.
 
-Live draft preview is an accepted later phase. It will use authenticated Next.js Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live so editors can read drafts, click through to source fields, and see changes while editing. It is not part of the initial webhook and manual-recovery delivery.
+[TD-034](../../decisions/TECHNICAL.md#td-034) activates the next-cycle editorial
+phase using Next.js Draft Mode, Sanity Presentation, Visual Editing and Sanity
+Live. Implementation remains planned. Existing Studio editors create a private
+preview secret; the supported helper validates it with a separate server-side
+Viewer token. This is possession-based preview access, not an application role
+or a fresh membership check on every request. The secret's validity and the
+browser session have separate lifetimes. Removing Studio membership does not
+itself revoke an existing draft session or Viewer token. The integration must
+document its actual exit and revocation limits, with shared preview access
+disabled and no previously active shared secret at hosted acceptance.
+
+Only an allowed editorial Draft Mode response receives the read-only Viewer
+browser token, live subscription and editing controls. Write-capable editor
+credentials never reach the application frontend. Draft data stays outside
+the published cache; the plain landing model remains intact and field-editing
+metadata belongs to presentation. Preview credentials are unnecessary for
+ordinary published reads, and invalid preview configuration fails closed.
+The [Agent SPEC](../agent/SPEC.md#editorial-draft-preview) owns the integration
+contract and [TST-LANDING-004](../../decisions/TESTING.md#tst-landing-004) owns
+new browser/provider proof. Existing webhook and read-only smoke evidence
+retains its original scope.
 
 ## Environment and delivery
 
@@ -78,6 +98,11 @@ and the implementation contract is in the [Agent SPEC](../agent/SPEC.md#11-envir
 | Development | Durable owner-authorized non-default Neon branch; pooled runtime URL and direct migration URL     | Dedicated published `production` dataset read-only; local mailbox may be used by the developer-owned process                              | Direct migration and scoped synthetic seed; no reset or Production deploy                                                    |
 | Preview     | Temporary Neon branch derived from durable Development; pooled runtime and direct migration roles | Dedicated non-production `preview` dataset read-only; controlled pre-seeded verified account; no local mailbox or arbitrary outbound mail | Manual exact-ref workflow, branch-scoped migration/seed, smoke, cleanup, and expiry                                          |
 | Production  | Separately provisioned protected Neon project/branch; pooled runtime URL and direct migration URL | Dedicated published `production` dataset read-only plus webhook/recovery; owner-approved provider; no local mailbox                       | Manual exact tag/SHA workflow after CI evidence and protected approval; forward migration, deploy, smoke, rollback reference |
+
+The table describes ordinary published access. TD-034 adds a planned editorial
+session exception for Local, Development and Production on their existing
+`production` dataset, with read-only application runtime access. Deployment
+Preview remains on `preview` with no editorial Draft Mode or live authoring.
 
 The current linked Neon default `main` is not silently promoted to Development
 or Production. The exact durable Development and protected Production

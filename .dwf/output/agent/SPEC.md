@@ -369,7 +369,7 @@ No list/task documents.
 - Expose one server-only, idempotent invalidation service for that cached content.
 - Configure a Sanity webhook for relevant published singleton changes. Its Route Handler verifies the Sanity signature before trusting the event, rejects irrelevant or invalid requests, and calls the shared invalidation service.
 - Provide a separately authorized manual recovery mechanism that calls the same invalidation service. Exact route or command shape and operator-authentication mechanism remain implementation choices; provider and operator secrets never enter client bundles.
-- Deliver authenticated Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live after the webhook and manual-recovery baseline. The deferred phase reads drafts and subscribes to draft changes only for authorized preview sessions; it is not required for current starter-baseline completion.
+- [TD-034](../../decisions/TECHNICAL.md#td-034) activates the planned [editorial preview integration](#editorial-draft-preview) for the next development cycle. It preserves the published-content baseline and its evidence.
 - Until Sanity is wired, a temporary fallback is allowed only if clearly marked; remove fallback once CMS read works.
 
 ### 6.3 Seat
@@ -377,6 +377,48 @@ No list/task documents.
 - Application published-content client and config: `src/sanity/`.
 - Studio schemas and Sanity config: `sanity/`.
 - Module adapter maps CMS payload → landing view model (no raw CMS types past infrastructure).
+
+<a id="editorial-draft-preview"></a>
+
+### 6.4 Editorial draft preview, planned
+
+- Use existing Sanity Studio editor identity and the supported
+  `defineEnableDraftMode` handshake. Studio creates a private bearer preview
+  secret using the editor's existing permission; a server-only Viewer client
+  reads it for validation. Application sign-in is not editorial authorization.
+- Enable editorial Draft Mode only in explicitly configured Local, Development
+  and Production profiles, against the existing `production` dataset. Deployment
+  Preview remains on read-only `preview`, with preview activation refused and
+  no draft token. These are session-specific read capabilities, not new runtime
+  CMS write permissions or application roles.
+- Preserve the helper's installed-version cookie and redirect behavior. The
+  private preview secret's expiry is separate from the resulting Draft Mode
+  browser session. The helper validates possession, not current user membership
+  on every render. Removing Studio access does not itself revoke an existing
+  draft session or Viewer token. Document actual exit/revocation behavior and
+  limits; do not promise immediate per-editor revocation.
+- Disable shared preview access. Hosted preflight must also confirm there is
+  no previously active shared-access secret. Trust only the intended origins
+  for Presentation communication and configure the required Sanity CORS access.
+- Use `defineLive` with a read-only Viewer token for server and browser draft
+  access. Only an allowed Draft Mode response may receive the browser token,
+  live subscription or Visual Editing controls. Keep write-capable editor
+  credentials out of the application frontend and all tokens out of public
+  environment variables, logs and evidence. Missing/invalid configuration must
+  fail closed for preview while ordinary published reads remain independent.
+- Compose preview in the landing surface, excluding the embedded Studio route.
+  Fetch draft content through landing infrastructure, validate unknown input
+  and return the plain landing view model. Keep field-editing metadata in the
+  presentation adapter. Provide click-to-edit for the singleton's fields and
+  an explicit exit that returns to published content.
+- Preserve the public reader, published cache identity, signed webhook and
+  manual recovery service. Draft data must not enter the public cache or become
+  an unauthenticated fallback. Sanity Live refreshes authorized preview only;
+  it does not replace public webhook invalidation.
+
+Implementation and verification remain planned. [TST-LANDING-004](../../decisions/TESTING.md#tst-landing-004)
+owns the new local and real-provider/browser evidence; provisioning, content
+mutation and deployment retain their existing authorization boundaries.
 
 ---
 
@@ -439,7 +481,7 @@ The individual test obligations for this contract are owned by the [Testing Deci
 | Data model, migrations, and connections | `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-PERSISTENCE-001`     |
 | Domain and application behavior         | `TST-LISTS-001`–`TST-LISTS-003`, `TST-TASKS-001`–`TST-TASKS-003`, `TST-CONCURRENCY-001` |
 | Server boundaries and validation        | `TST-BOUNDARY-001`                                                                      |
-| Sanity landing behavior                 | `TST-LANDING-001`–`TST-LANDING-003`                                                     |
+| Sanity landing behavior                 | `TST-LANDING-001`–`TST-LANDING-004`                                                     |
 | UI and browser acceptance               | `TST-UI-001`, `TST-E2E-001`–`TST-E2E-003`                                               |
 | Neon performance                        | `TST-PERFORMANCE-001`                                                                   |
 | Shared backend logging                  | `TST-LOGGING-001`, `TST-LOGGING-002`                                                    |
@@ -515,6 +557,7 @@ The individual test obligations for this contract are owned by the [Testing Deci
 - Keep one separate read-only live smoke that uses the real Sanity client and query to fetch the published singleton from the dedicated project and dataset, validate it, and map it to the landing view model.
 - The live smoke must pass before starter-baseline completion and before a deployment counts as release evidence. Missing configuration, missing or unpublished content, query failure, validation failure, or mapping failure is reported clearly rather than skipped.
 - The live smoke never creates or edits Sanity content.
+- Planned editorial-preview verification is owned by [TST-LANDING-004](../../decisions/TESTING.md#tst-landing-004): prove authorization refusal, environment/token boundaries, public/draft cache isolation, live changes, field navigation and exit. Fixture or ordinary Playwright evidence cannot replace its real Studio/provider/browser proof or the existing deployed webhook clause.
 - Exact fixture representation, test-source wiring, command name, and evidence format remain implementation choices.
 
 ### 10.5 Performance evidence
@@ -563,6 +606,12 @@ profile. A friendly branch label alone is not target identity.
 | Development | Explicit local origin; owner-authorized durable non-default Neon branch; pooled runtime `DATABASE_URL`, direct migration `DATABASE_URL_UNPOOLED`                 | Dedicated project's published `production` dataset, read-only                                                           | Local mailbox may be used by the developer-owned process; no production delivery                | Direct migration and scoped synthetic seed; no reset or Production deployment                                                                             |
 | Preview     | Deployment-assigned origin mirrored by `BETTER_AUTH_URL`; temporary Neon branch derived from durable Development, with pooled runtime and direct migration roles | Dedicated project's non-production `preview` dataset, read-only; no live authoring or CMS writes                        | Controlled pre-seeded verified account; local mailbox prohibited and no arbitrary outbound mail | Manual exact-ref preview, branch-scoped migration/seed, smoke, and identity-checked cleanup/expiry                                                        |
 | Production  | Canonical HTTPS origin; separately provisioned protected Neon project and branch, with pooled runtime and direct migration roles                                 | Dedicated project's published `production` dataset, read-only runtime plus the trusted webhook/manual recovery boundary | Owner-approved production provider; local mailbox prohibited; release blocked until configured  | Manual exact tag/SHA release after CI evidence and protected approval; forward migration, deployment, smoke, and application rollback reference; no reset |
+
+The matrix describes ordinary published runtime access. [TD-034](../../decisions/TECHNICAL.md#td-034)
+adds the planned editorial-session exception in [§6.4](#editorial-draft-preview)
+for Local, Development and Production using their existing `production`
+dataset. Deployment Preview remains read-only on `preview`, with no editorial
+Draft Mode or live authoring. This does not broaden runtime CMS write access.
 
 For Local and Development, the origin is an explicitly configured local
 process origin even though their database targets differ. `APP_ENV=development`
@@ -907,7 +956,7 @@ The exact implementation may group or split these functions while preserving the
 
 ### 14.5 Landing/Sanity boundary
 
-The landing module exposes a plain landing view model and repository/application read path. Sanity client setup, GROQ, external payload validation, mapping, and published-content cache identity remain infrastructure details. Raw CMS documents do not cross into application or presentation code. A signed webhook and a separately authorized manual recovery mechanism call one server-only, idempotent invalidation service. Once the real CMS read path works, missing/invalid required content is an explicit integration failure rather than an invisible permanent hardcoded fallback. Routine Playwright may substitute deterministic test-only landing content at the application-facing contract, but that source is unavailable in deployed runtime modes. Authenticated Draft Mode, Visual Editing, and Sanity Live are deferred until after this invalidation baseline.
+The landing module exposes a plain landing view model and repository/application read path. Sanity client setup, GROQ, external payload validation, mapping, and published-content cache identity remain infrastructure details. Raw CMS documents do not cross into application or presentation code. A signed webhook and a separately authorized manual recovery mechanism call one server-only, idempotent invalidation service. Once the real CMS read path works, missing/invalid required content is an explicit integration failure rather than an invisible permanent hardcoded fallback. Routine Playwright may substitute deterministic test-only landing content at the application-facing contract, but that source is unavailable in deployed runtime modes. The activated, planned [editorial preview integration](#editorial-draft-preview) adds isolated authorized draft reads and presentation metadata while preserving this published boundary.
 
 ### 14.6 Presentation boundary
 

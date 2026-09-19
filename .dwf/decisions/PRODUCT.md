@@ -80,6 +80,7 @@ Concurrent list and task edits do not require version tokens, merge prompts, or 
 - **Status:** ACCEPTED
 - **Source:** current Sanity capability and delivery-sequencing review
 - **Related:** [Agent PRD](../output/agent/PRD.md#54-editorial-publishing-and-preview)
+- **Later decision:** [D-013](#d-013) activates the editorial phase for the next development cycle; the published-content baseline remains unchanged.
 
 Published landing-content changes automatically invalidate the affected public cache through a trusted Sanity webhook, and an authorized operator can invoke the same invalidation as a recovery action. Live draft preview with click-to-edit visual editing is also an intended starter capability, but it is deferred until after the webhook and manual-recovery baseline. The deferred preview must let an authorized editor read drafts and see draft changes in the Sanity Presentation Tool without publishing them.
 
@@ -161,3 +162,34 @@ Next.js application. Each incident and notification has one owner, preventing
 duplicate incidents or delivery paths. The first transport and precise alert
 policy remain unresolved in [OD-027](OPEN-DECISIONS.md#od-027). This decision
 authorizes no implementation or service provisioning.
+
+<a id="d-013"></a>
+
+## D-013 — Activate authenticated editorial preview
+
+- **Status:** ACCEPTED, planned implementation
+- **Source:** owner-approved next-cycle T-28 activation, 2026-09-19
+- **Related:** [D-005](#d-005), [D-008](#d-008), [TD-034](TECHNICAL.md#td-034), [Agent PRD](../output/agent/PRD.md#54-editorial-publishing-and-preview), [T-28](../../TODO.md#t-28-add-sanity-authenticated-preview-and-live-authoring)
+- **Related test contract:** [TST-LANDING-004](TESTING.md#tst-landing-004)
+- **Supersedes:** the continued deferral of D-008's editorial-preview phase only
+
+Activate authenticated draft preview, live draft updates and click-to-edit
+Sanity Studio editing for the next development cycle. Existing authorized
+Sanity editors can preview the landing singleton without publishing, see
+changes while editing, navigate from rendered content to its source field,
+and exit preview to return to published content. Use their existing Studio
+identity; application sign-in does not grant editorial access and no
+application administrator role is added. Shared preview access is disabled.
+
+Editorial preview is a browser session capability, distinct from a deployment
+named Preview. Local, Development and Production editorial sessions use the
+existing `production` dataset under TD-034. Deployment Preview keeps its
+non-production `preview` dataset and read-only/no-editorial-authoring policy.
+Ordinary visitors continue seeing published content with the existing webhook
+and manual recovery behavior. A read-only draft token may reach an authorized
+preview response; write-capable editor credentials must never reach the
+application frontend.
+
+Implementation and verification remain planned. This activation preserves
+historical baseline evidence and does not authorize provider provisioning,
+content mutation or deployment during planning.

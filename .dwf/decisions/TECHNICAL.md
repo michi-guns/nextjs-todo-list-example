@@ -265,6 +265,7 @@ Treat the list and task JSON Route Handlers as same-origin application endpoints
 - **Related product decisions:** D-005, D-008
 - **Source:** current Sanity architecture and delivery-sequencing review
 - **Supersedes:** TD-007
+- **Later decision:** [TD-034](#td-034) activates the editorial phase without replacing published-content invalidation.
 
 Keep the dedicated Sanity project, singleton landing document, server-side query, unknown-payload validation, and mapping into a plain landing view model. Raw CMS documents and provider types remain inside landing infrastructure. Published landing reads use a stable cache identity, and one server-only invalidation service expires that cached content.
 
@@ -319,6 +320,7 @@ confirmation remains required before rewriting files or realigning targets.
 - **Related product decisions:** D-009, D-010
 - **Related resolutions:** [OD-003](OPEN-DECISIONS.md#od-003), [OD-005](OPEN-DECISIONS.md#od-005), [OD-006](OPEN-DECISIONS.md#od-006), [OD-021](OPEN-DECISIONS.md#od-021), [OD-025](OPEN-DECISIONS.md#od-025)
 - **Source:** T-18.1 environment and delivery contract reconciliation
+- **Later exception:** [TD-034](#td-034) permits authenticated editorial draft sessions on the existing `production` dataset in Local, Development and Production. The matrix remains the ordinary published-runtime policy; deployment Preview is unchanged.
 
 The application owns an explicit `APP_ENV` with the values `local`,
 `development`, `preview`, and `production`. `NODE_ENV` remains reserved for
@@ -583,3 +585,51 @@ transports or a requirement to implement all three. The first transport and
 detailed policy remain open. No new service, queue or implementation is
 authorized. [Agent SPEC](../output/agent/SPEC.md#operational-alerts) owns the
 boundary; the existing logger/diagnostics slices remain unchanged.
+
+<a id="td-034"></a>
+
+## TD-034 — Editorial Draft Mode within existing Sanity environments
+
+- **Status:** ACCEPTED, planned implementation
+- **Source:** owner-approved T-28 activation and environment clarification, 2026-09-19
+- **Related product decisions:** [D-008](PRODUCT.md#d-008), [D-013](PRODUCT.md#d-013)
+- **Related technical decisions:** [TD-018](#td-018), [TD-023](#td-023), [TD-026](#td-026)
+- **Related test contract:** [TST-LANDING-004](TESTING.md#tst-landing-004)
+- **Supersedes:** continued editorial-phase deferral in TD-023 and TD-026's published-only restriction solely for the editorial sessions described here
+
+Use the installed Next.js Draft Mode and `next-sanity` integration with Sanity
+Presentation, Visual Editing and Sanity Live. Permit the capability only in
+explicitly configured Local, Development and Production editorial sessions,
+using the existing dedicated project's `production` dataset. Application
+runtime access remains read-only. Studio authoring and preview-secret creation
+use the existing signed-in editor's Sanity permissions. Deployment Preview
+continues to use the non-production `preview` dataset read-only, with no
+editorial Draft Mode, draft token or live-authoring activation.
+
+Use the supported `defineEnableDraftMode` helper to validate a private bearer
+preview secret created by Studio. A separate server-side Viewer token suffices
+to read the secret for validation and fetch drafts; it grants no CMS writes.
+This handshake is not an application session or a fresh editor-membership
+check on every request. The preview secret's validity and the resulting
+Draft Mode session have separate lifetimes. Removing Studio membership does
+not by itself revoke an already issued browser session or Viewer token;
+document the supported exit, credential revocation and access-removal limits.
+Disable shared preview access and verify that no previously enabled shared
+secret remains active before hosted acceptance.
+
+Supply only a read-only Viewer token to `defineLive`'s server/browser token
+options. Deliver the browser token and mount live subscriptions and editing
+controls only after the server confirms an allowed editorial session. Never
+expose write-capable Studio/editor credentials to the application frontend,
+put tokens in public environment variables, or record preview secrets in
+logs/evidence. Restrict Presentation communication to trusted origins and
+preserve the library's supported cookie and redirect handling. Missing or
+invalid preview configuration fails closed for preview without requiring
+preview credentials for ordinary published reads.
+
+Keep draft reads and editing metadata separate from the published cache and
+plain landing-content boundary. Ordinary visitors retain TD-023's published
+reader, stable cache identity, signed webhook and protected manual recovery.
+Draft subscriptions do not replace or broaden that invalidation service.
+The [Agent SPEC](../output/agent/SPEC.md#editorial-draft-preview) owns integration
+boundaries; implementation and provider/browser proof remain future work.

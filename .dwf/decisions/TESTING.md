@@ -141,6 +141,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-LANDING-001](#tst-landing-001)         | Sanity payloads are validated and mapped without leaking provider records            | Fixture integration                                                  | T-12                                                               | `verified`  |
 | [TST-LANDING-002](#tst-landing-002)         | The published Sanity singleton can be fetched, validated, and mapped                 | Read-only live smoke                                                 | T-02, T-12                                                         | `verified`  |
 | [TST-LANDING-003](#tst-landing-003)         | Sanity publishing and recovery invalidate content safely                             | Boundary integration, deployed webhook evidence                      | T-13                                                               | `verified`  |
+| [TST-LANDING-004](#tst-landing-004)         | Authorized editorial preview isolates drafts and supports live field editing         | Boundary, fixture, browser and real Studio/provider evidence         | T-28                                                               | `specified` |
 | [TST-UI-001](#tst-ui-001)                   | The selected UI direction materializes usable product states                         | Browser/runtime inspection, UI acceptance                            | T-09A, T-09B, T-10, T-11, T-12A, T-15                              | `verified`  |
 | [TST-E2E-001](#tst-e2e-001)                 | The core authenticated todo journey works in a real browser                          | Playwright Chromium                                                  | T-15                                                               | `verified`  |
 | [TST-E2E-002](#tst-e2e-002)                 | The magic-link journey works in a real browser                                       | Playwright Chromium                                                  | T-15                                                               | `verified`  |
@@ -539,6 +540,28 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Required evidence:** Boundary tests for signatures, relevance, authorization, duplication, and shared service routing, plus one real deployed webhook delivery for release evidence.
 - **Dependencies:** T-12 cache identity/read path and the deployed webhook prerequisite.
 - **Evidence:** Local boundary tests pass in `pnpm test` (6 files, 32 tests at the implementation checkpoint) and cover generated valid/invalid Sanity signatures, malformed payloads, irrelevant and draft events, duplicate deliveries, the stable tag with immediate-expiration profile `{ expire: 0 }`, manual authorization, and shared invalidation routing. The deployed webhook-delivery clause passed on 2026-09-16 through Sanity attempts `atm-3JPmRI2RJHyFNpC93aLuz4p6vMT` and `atm-3JPoK9DYctGZPssOOuAIotTmau8`, both HTTP 200 after identical-content publishes. See [live release evidence](../../docs/agentforge/evidence/2026-09-16-production-release-live.md).
+
+<a id="tst-landing-004"></a>
+
+### TST-LANDING-004 — Authenticated editorial preview and live editing
+
+- **Status:** `specified`
+- **Capability:** Editorial landing preview
+- **Evidence layers/modes:** Infrastructure and HTTP boundary / fixture and refusal tests; browser / real Sanity Studio and provider integration
+- **Verifies product decisions:** D-005, D-008, D-013
+- **Verifies technical decisions:** TD-018, TD-023, TD-026, TD-034
+- **Edge cases:** Existing [EC-007](EDGE-CASES.md#ec-007) and [EC-025](EDGE-CASES.md#ec-025) content failures; preview authorization, credential and cache boundaries below
+- **SPEC:** [6.4 Editorial draft preview](../output/agent/SPEC.md#editorial-draft-preview), [10.4 Sanity verification](../output/agent/SPEC.md#104-sanity-verification), [11 Environment and delivery](../output/agent/SPEC.md#11-environment-and-delivery-contract)
+- **Owner:** T-28
+- **Contract:** Existing authorized Sanity editors can activate draft preview, see unpublished landing changes update live, click rendered fields to their Studio source and exit to published content. Ordinary visitors retain published content and existing freshness/recovery behavior. Local, Development and Production editorial sessions use the existing `production` dataset; deployment Preview refuses the capability and remains read-only on `preview`.
+- **Required evidence:**
+  - Boundary tests reject missing, invalid and expired private preview secrets and disallowed environment/configuration, and prove redirects remain within the application. Ordinary application authentication alone cannot activate preview. Tests follow the installed helper's supported cookie/redirect lifecycle rather than replacing it.
+  - Prove that draft reads, subscriptions, controls and the read-only Viewer browser token require an allowed Draft Mode session; public responses and deployment Preview contain none of them. Verify no write-capable editor credential reaches the application frontend and preview secrets are absent from logs/evidence.
+  - Fixture tests retain unknown-payload validation, required/optional field behavior and plain-content mapping. Verify draft data cannot populate the published cache or an unauthenticated fallback, and the existing webhook/manual recovery service is preserved.
+  - Real browser evidence uses separate editor and public contexts: an explicitly authorized Studio draft edit updates the editor preview without publishing; the ordinary visitor remains on published content; click-to-edit opens the correct singleton field; exiting removes controls and returns to published content.
+  - Hosted preflight records the intended dataset/origins, Viewer permissions and disabled shared access, including absence of a previously active shared secret. Evidence distinguishes private-secret validity, Draft Mode session lifetime and membership/token revocation limits; it must not claim immediate per-editor revocation unsupported by the integration.
+- **Dependencies:** Accepted D-013/TD-034 scope, the T-12/T-13 published baseline and T-22/T-24 delivery boundaries. Real proof additionally requires configured read credentials, existing editor access, allowed origins/CORS, a running allowed target and explicit authorization for the demonstrated provider actions.
+- **Evidence:** No implementation or runtime evidence yet. Local fixtures and the routine Playwright landing fixture cannot establish real Sanity authorization, live updates or field navigation. Keep missing hosted evidence visible. This contract neither changes the verified statuses/history of `TST-LANDING-001`–`003` nor substitutes for `TST-LANDING-002`'s read-only smoke or `TST-LANDING-003`'s real deployed webhook clause.
 
 <a id="tst-ui-001"></a>
 

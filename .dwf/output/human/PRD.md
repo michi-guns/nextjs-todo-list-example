@@ -90,7 +90,23 @@ Concurrent list and task edits do not show a merge prompt or reject an otherwise
 
 PostgreSQL owns authenticated users/session records, lists, tasks, ownership, status, timestamps, and relational integrity. Sanity owns editable landing headline, blurb, and CTA content only. Todo records never live in Sanity.
 
-Publishing the landing document automatically invalidates its public cache through a trusted Sanity webhook. An authorized operator has a manual recovery control that performs the same invalidation. Live draft preview and click-to-edit visual editing are accepted starter capabilities, but they follow the webhook and manual-recovery baseline rather than blocking it.
+Publishing the landing document automatically invalidates its public cache through a trusted Sanity webhook. An authorized operator has a manual recovery control that performs the same invalidation.
+
+[D-013](../../decisions/PRODUCT.md#d-013) activates editorial preview for the
+next development cycle; implementation remains planned. Existing Sanity editors
+will preview unpublished landing changes, see edits update live, click content
+to open its Studio field, and exit to published content. Application sign-in
+does not grant editor access, and shared preview links are disabled.
+
+This editorial session is distinct from a deployment named Preview. It uses
+the existing `production` dataset in Local, Development and Production.
+Deployment Preview remains on the non-production `preview` dataset read-only,
+without editorial authoring. Ordinary visitors retain published content and
+the existing cache/recovery behavior. Only an authorized preview response may
+receive a read-only draft token; write-capable editor credentials never reach
+the application frontend. Existing baseline evidence does not prove these
+planned capabilities; [TST-LANDING-004](../../decisions/TESTING.md#tst-landing-004)
+owns their verification.
 
 ## Starter-baseline acceptance
 
