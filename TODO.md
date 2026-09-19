@@ -1263,9 +1263,11 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.2: Share logger settings safely across backend instances
 
-- [ ] Add the environment-local settings store, bounded refresh cache and the
-      accepted protected TypeScript CLI. Await execution authorization;
-      TD-031 resolves the interface choice previously tracked as OD-026.
+- [~] Add the environment-local settings store, bounded refresh cache and the
+  accepted protected TypeScript CLI. Execution authorized by the owner's
+  next-task instruction on 2026-09-19. Docker, installed dependencies and
+  the existing non-default Neon Development target pass read-only preflight.
+  TD-031 resolves the interface choice previously tracked as OD-026.
 - Files: `db/schema/logging.ts`, `db/schema/index.ts`, a new forward migration
   with generated metadata, `src/shared/logging/` settings store/cache/composition,
   colocated unit tests, `src/test/logging-settings.integration.test.ts`, and the

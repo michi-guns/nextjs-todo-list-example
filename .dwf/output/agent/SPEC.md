@@ -668,9 +668,10 @@ effect, and Preview/Production jobs receive only their scoped secrets.
 
 [TD-029](../../decisions/TECHNICAL.md#td-029) and its protected settings CLI in
 [TD-031](../../decisions/TECHNICAL.md#td-031) define the accepted logging contract.
-The database-independent core is implemented; shared settings and application
-adoption remain planned. [Core evidence](../../../docs/agentforge/evidence/2026-09-19-logger-core.md)
-records the current limits. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
+The database-independent core and shared settings/CLI are implemented;
+application adoption remains planned. [Core evidence](../../../docs/agentforge/evidence/2026-09-19-logger-core.md)
+and [settings evidence](../../../docs/agentforge/evidence/2026-09-19-logger-settings.md)
+record the current limits. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
 [T-26.2](../../../TODO.md#t-262) and [T-26.3](../../../TODO.md#t-263), with proof
 defined by [TST-LOGGING-001](../../decisions/TESTING.md#tst-logging-001) and
 [TST-LOGGING-002](../../decisions/TESTING.md#tst-logging-002).
@@ -727,7 +728,7 @@ extension in [section 11.2](#diagnostics-provider-adapters).
 - Controls govern only future facade events. They cannot recover suppressed
   history or promise to suppress Next.js, provider or other independent logs.
 - Provide the protected repository-local TypeScript CLI accepted in
-  [TD-031](../../decisions/TECHNICAL.md#td-031). One future `pnpm logging` entry
+  [TD-031](../../decisions/TECHNICAL.md#td-031). The `pnpm logging` entry
   point supports `inspect` and `set --file policy.json --expected-revision n`.
   Require explicit environment and mutation-target selection with the existing
   profile/target-identity guards before writes; exact guard argument syntax is
@@ -737,9 +738,9 @@ extension in [section 11.2](#diagnostics-provider-adapters).
 - Keep `scripts/logging/cli.ts` as the thin argument/output adapter and
   `scripts/logging/core.ts` as testable typed command logic, with focused
   `core.test.ts` tests. Follow existing `tsx` script commands, `pnpm test` and
-  `pnpm typecheck`. During implementation, add `scripts/logging/**/*.test.ts`
-  to the existing Vitest include list and confirm nonzero test discovery. The
-  current strict TypeScript configuration already includes `**/*.ts`; no new
+  `pnpm typecheck`. The existing Vitest include list covers
+  `scripts/logging/**/*.test.ts`; retain nonzero focused test discovery. The
+  strict TypeScript configuration includes `**/*.ts`; no new
   test infrastructure is required.
 - Use existing operator credentials from secure configuration, never command
   arguments, policy files or output. Access rights plus the existing target

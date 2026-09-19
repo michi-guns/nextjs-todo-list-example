@@ -75,6 +75,13 @@ it is missing. It does not reset `main` and does not accept `reset`.
 explicit port and database path. Ordinary seed replaces only
 `dev-user@example.test`. Performance seed reuses `pnpm neon:performance`.
 
+## Logging settings
+
+`scripts/logging/` owns the protected `pnpm logging -- inspect|set` command.
+It requires an explicit environment/target and a secure process profile; it does
+not load `.env.local`. See the [logging runbook](../docs/runbooks/logging.md#inspect-and-change-policy)
+for complete examples, revision conflicts and the Production approval boundary.
+
 ## Preview delivery
 
 `scripts/deploy/preview/` owns manual Preview branch, seed, Vercel deploy,

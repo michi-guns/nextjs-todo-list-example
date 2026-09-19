@@ -19,6 +19,7 @@
     "better-auth-mcp": "tsx scripts/better-auth-mcp/cli.ts",
     "environment:inspect": "tsx scripts/environment/cli.ts inspect",
     "neon:development": "tsx scripts/neon-development/cli.ts",
+    "logging": "tsx scripts/logging/cli.ts",
     "preview": "tsx scripts/deploy/preview/cli.ts",
     "release": "tsx scripts/deploy/production/cli.ts",
     "sanity:smoke": "tsx scripts/verify-sanity.ts",

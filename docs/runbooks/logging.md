@@ -2,9 +2,10 @@
 
 The database-independent logger core lives in `src/shared/logging/`. T-26.1
 provides filtering, request/job context, safe metadata and Pino output. Application
-adoption belongs to T-26.3. Shared database settings and the operator CLI belong
-to T-26.2; neither exists yet. See the [accepted contract](../../.dwf/output/agent/SPEC.md#shared-backend-logging)
-and [task evidence](../agentforge/evidence/2026-09-19-logger-core.md).
+adoption belongs to T-26.3. T-26.2 adds shared database settings, bounded refresh
+and the operator CLI. See the [accepted contract](../../.dwf/output/agent/SPEC.md#shared-backend-logging),
+[core evidence](../agentforge/evidence/2026-09-19-logger-core.md) and
+[settings evidence](../agentforge/evidence/2026-09-19-logger-settings.md).
 
 ## Use the core
 
@@ -55,7 +56,8 @@ owners. It does not yet change any application's logging behavior.
 validated schema-version-1 snapshot only at a newer revision and returns a
 boolean. Snapshots are copied and frozen. Invalid updates retain the previous
 snapshot. There are at most 100 module overrides and 100 event suppressions.
-This is in-memory publication only, with no persistence or refresh promise.
+This helper only publishes in memory; the settings adapter below supplies
+persistence and refresh.
 
 Global off, exact event suppression and exact module off veto emission. Otherwise
 the exact module threshold replaces the default threshold. Existing logger
@@ -99,3 +101,91 @@ does not promise durable storage or prove deployed delivery. See
 Run `pnpm exec vitest run src/shared/logging` for the core evidence. Next.js
 request-boundary lifecycle and once-only application failure reporting remain
 T-26.3 obligations. Hosted ingestion has its own authorized tasks.
+
+## Shared settings and refresh
+
+`createLoggingRuntime(pool, environment)` composes the store, cache and logger
+with the existing application pool. Create it once after the database boundary
+exists. Do not import this composition from `db/pool.ts`; the logger core stays
+database-independent. T-26.3 will wire application entries to `await refresh()`
+and use its `logger` factory. This task provides the composition but does not
+change current application request logging.
+
+The selected database owns one `logging_settings` row, with singleton ID 1,
+revision and a full JSON policy. Reads never insert defaults. A missing table,
+missing row, malformed policy or failed query retains the last valid policy,
+including off. Cold start uses enabled `info` with no overrides/suppressions.
+Lower or equal revisions cannot replace a newer cached snapshot.
+
+Refresh occurs at the first entry/checkpoint at least 30 seconds after the
+previous attempt completed. Concurrent callers share that attempt. Long jobs
+should call at safe checkpoints at most 30 seconds apart. A single blocking
+operation is not interrupted. Idle instances wait until the next invocation;
+there is no background polling, and emitting an event never reads the database.
+
+The shared pool retains its existing 10-second connection/checkout deadline.
+Once checked out, the settings operation has a one-second deadline that destroys
+its connection on timeout. Thus an attempt can take at most approximately 11
+seconds, subject to Node event-loop scheduling. This deliberately replaces the
+plan's illustrative one-second total budget: installed pg-pool has no public
+per-checkout timeout/cancellation API, and changing every application connection
+or using a second runtime pool would alter unrelated behavior. Saturated pool
+waiters are removed by pg-pool's deadline; timed-out SQL is not left running.
+Retries wait another 30 seconds after either result. Healthy active instances
+converge at their next eligible checkpoint plus this bounded attempt; outages
+can preserve stale settings indefinitely. The cache emits no recursive failure
+logs. Operator inspection distinguishes persisted state from instance adoption.
+
+## Inspect and change policy
+
+Load the complete selected [environment profile](environment-profiles.md) into
+the process using existing secure operator configuration. The CLI never loads
+`.env.local` automatically. The authenticated Neon CLI supplies independent
+branch/endpoint observations; the supplied direct database role supplies actual
+database access. No credentials belong in arguments, policy JSON or output.
+
+Select every target explicitly. Examples assume the corresponding profile and
+credentials are already in the process environment:
+
+```powershell
+pnpm logging -- inspect --environment local --host 127.0.0.1 --port 5432 --database todo
+pnpm logging -- inspect --environment development --project curly-dust-60603928 --branch development --database neondb
+pnpm logging -- set --environment development --project curly-dust-60603928 --branch development --database neondb --file policy.json --expected-revision 0
+```
+
+An absent row inspects as `policy: null, revision: 0`. For the first write,
+`policy.json` contains this full snapshot, at most 32 KiB:
+
+```json
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "enabled": true,
+  "minimumLevel": "info",
+  "moduleLevels": {},
+  "suppressedEvents": []
+}
+```
+
+For later updates, inspect the current revision, increment `revision` by one
+in the full policy file, and pass the old revision as `--expected-revision`.
+Use static module/event names only. Updates commit one snapshot atomically.
+A concurrent update returns `revision_conflict`; inspect again before deciding
+what to publish. To restore defaults, publish them at a new revision rather
+than deleting the row. If a write times out, it might already have committed:
+inspect before retrying, and never assume timeout means rollback.
+
+JSON results go to stdout; fixed diagnostics go to stderr. `invalid_policy`
+means the snapshot/version/revision is invalid; `revision_conflict` means the
+expected revision is stale; `settings_unavailable` means the database operation
+failed, including missing schema or insufficient role permissions. Other
+configuration/provider refusals use `refused_or_failed` without printing raw
+exceptions. Check profile/explicit target agreement and apply the reviewed
+forward migration through the owning environment workflow when needed.
+
+Production inspection and updates require the existing protected GitHub main-job
+boundary, a clean reviewed checkout, passing main CI and matching
+`RELEASE_COMMIT_SHA` / `RELEASE_APPROVED_SHA`. Provider identity must match
+`productionTarget` from the release adapter. There is no `--approve` flag or
+new HTTP/admin interface. This command does not add or dispatch a Production
+workflow; invoking it there still needs the owner-approved protected operation.

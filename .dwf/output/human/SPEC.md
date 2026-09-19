@@ -113,7 +113,7 @@ show safe target names and metadata, but never connection strings, credentials,
 tokens, mailbox URLs, or auth secrets. Preview and Production delivery are
 manual; CI verifies the repository without deployment side effects.
 
-## Shared backend logging, planned
+## Shared backend logging
 
 The accepted [shared logger design](../agent/SPEC.md#shared-backend-logging)
 adds a small Pino-backed server logger for useful backend events, with request
@@ -124,8 +124,10 @@ logging, change severity thresholds, override exact modules and suppress exact
 events. Generic user-facing errors stay unchanged, and private content and raw
 error messages stay out of logs.
 
-This work is not implemented. [TD-031](../../decisions/TECHNICAL.md#td-031)
-accepts a protected repository-local TypeScript CLI to inspect policy and
+The core and shared settings are implemented; application adoption remains
+T-26.3 work. [Settings evidence](../../../docs/agentforge/evidence/2026-09-19-logger-settings.md)
+records the current limits. [TD-031](../../decisions/TECHNICAL.md#td-031)
+defines the protected repository-local TypeScript CLI to inspect policy and
 revision, then publish a validated full policy atomically. It rejects stale
 revisions and requires existing operator access plus explicit environment and
 target checks. Credentials stay outside command arguments, policy files and

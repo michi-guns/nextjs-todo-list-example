@@ -17,6 +17,8 @@ Use node-postgres through Drizzle's node-postgres adapter as the shared runtime 
 - Enforce relational integrity and list/task cascade behavior.
 - Support ownership-aware queries.
 - Support local integration testing through PostgreSQL 18 Testcontainers.
+- Store one revisioned logging-policy snapshot per selected application database.
+  See the [logging runbook](../runbooks/logging.md) for guarded updates and refresh limits.
 
 ## Persistence rules
 
