@@ -151,7 +151,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-PIPELINE-001](#tst-pipeline-001)       | Preview and release orchestration preserves ref, target, and failure boundaries      | Workflow/static, orchestration, controlled hosted                    | T-21, T-21.5, T-22, T-23, T-24                                     | `verified`  |
 | [TST-PREVIEW-001](#tst-preview-001)         | A requested Preview is isolated, seeded, functional, and traceable                   | Controlled Neon/Vercel/browser Preview                               | T-22, T-24                                                         | `verified`  |
 | [TST-RELEASE-001](#tst-release-001)         | An approved exact-ref release is migrated, deployed, smoked, and recorded            | Protected release rehearsal and Production evidence                  | T-21.5, T-23, T-24                                                 | `verified`  |
-| [TST-LOGGING-001](#tst-logging-001)         | Backend events preserve context, privacy and application outcomes                    | Unit, boundary, Node/Next output lifecycle                           | T-26.1, T-26.3                                                     | `specified` |
+| [TST-LOGGING-001](#tst-logging-001)         | Backend events preserve context, privacy and application outcomes                    | Unit, boundary, Node/Next output lifecycle                           | T-26.1, T-26.3                                                     | `partial`   |
 | [TST-LOGGING-002](#tst-logging-002)         | Shared policy refresh and protected edits preserve environment isolation             | Unit, PostgreSQL integration, operator refusal checks                | T-26.2, T-26.3                                                     | `specified` |
 | [TST-DIAGNOSTICS-001](#tst-diagnostics-001) | Safe diagnostics preserve routing, privacy and lifecycle                             | Unit, PostgreSQL policy, isolated Next runtime                       | T-26.4–T-26.6                                                      | `specified` |
 | [TST-DIAGNOSTICS-002](#tst-diagnostics-002) | Both providers receive useful safe logs and grouped errors                           | Local wire and real hosted ingestion/grouping                        | T-26.5–T-26.7                                                      | `specified` |
@@ -837,7 +837,7 @@ provider/configuration changes. All original evidence limits remain intact.
 
 ### TST-LOGGING-001 - Backend event safety and context
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Shared backend logging
 - **Evidence layers/modes:** Unit, application boundary, local Node/Next output lifecycle
 - **Verifies product decisions:** D-009
@@ -848,7 +848,7 @@ provider/configuration changes. All original evidence limits remain intact.
 - **Contract:** Meaningful facade events retain trusted fields, isolated request/job context and safe metadata. Filtering follows the accepted precedence before expensive debug data is constructed. Unexpected propagated failures are reported once; expected auth/validation/domain refusals and generic client results retain their existing meaning. Logging failure never changes the application outcome or replaces its original error.
 - **Required evidence:** Focused tests for global off, default/module thresholds, module off and exact event suppression; stable fields and metadata override refusal; concurrent context isolation; privacy sentinels in nested data and error message/cause/stack strings before serialization; serializer/output-writer failure containment; and lazy debug filtering. Adopted boundaries must prove safe failure/outcome events and no duplicate reports. Local Node/Next runtime checks cover JSON/readable output, stdout/stderr severity, request completion and process exit, reconciled with official Vercel lifecycle/severity documentation. This is not deployed-provider delivery proof.
 - **Dependencies:** T-26.1 core and T-26.3 adoption; installed Pino/Next documentation and a local runtime for the named lifecycle checks. Actual deployed delivery checks require separate release authorization.
-- **Current evidence:** None. Planned work only; no tests or runtime checks have run for this contract.
+- **Current evidence:** [T-26.1 core evidence, 2026-09-19](../../docs/agentforge/evidence/2026-09-19-logger-core.md) records 30 focused tests for policy precedence, lazy metadata, trusted fields, isolated context, privacy projection and failure containment, including real Node processes for both output formats and console stream failure. Full unit tests, typecheck, lint and build pass. T-26.3 still owns application adoption, once-only failure reporting and local Next request lifecycle evidence; this is not deployed delivery proof.
 
 <a id="tst-logging-002"></a>
 

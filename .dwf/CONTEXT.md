@@ -19,6 +19,7 @@
 - `db/schema/auth.ts`, `db/schema/lists.ts`, and `db/schema/tasks.ts` contain the Better Auth and todo tables. Active schema exports are those three modules.
 - `src/sanity/` and `src/modules/landing/infrastructure/` contain the Sanity client/configuration, validated read path, and invalidation boundary.
 - `src/test/`, `scripts/playwright-local/`, and `e2e/` contain the local PostgreSQL 18 Testcontainers and dedicated Playwright lifecycle. The normal browser suite contains eight Chromium journeys, including fresh signup, pending-access refusal, email verification and subsequent password sign-in.
+- `src/shared/logging/` contains the database-independent Pino core with safe metadata, current-policy filtering and isolated Node request/job context. Shared database settings and application adoption remain future T-26.2/T-26.3 work; [core evidence](../docs/agentforge/evidence/2026-09-19-logger-core.md) records local proof and limits.
 
 ## Technology facts
 

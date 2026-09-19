@@ -667,8 +667,10 @@ effect, and Preview/Production jobs receive only their scoped secrets.
 ### 11.1 Shared backend logging
 
 [TD-029](../../decisions/TECHNICAL.md#td-029) and its protected settings CLI in
-[TD-031](../../decisions/TECHNICAL.md#td-031) are accepted planned work, not a
-claim of implementation. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
+[TD-031](../../decisions/TECHNICAL.md#td-031) define the accepted logging contract.
+The database-independent core is implemented; shared settings and application
+adoption remain planned. [Core evidence](../../../docs/agentforge/evidence/2026-09-19-logger-core.md)
+records the current limits. Delivery is owned by [T-26.1](../../../TODO.md#t-261),
 [T-26.2](../../../TODO.md#t-262) and [T-26.3](../../../TODO.md#t-263), with proof
 defined by [TST-LOGGING-001](../../decisions/TESTING.md#tst-logging-001) and
 [TST-LOGGING-002](../../decisions/TESTING.md#tst-logging-002).

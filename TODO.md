@@ -1211,8 +1211,10 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.1: Provide a reusable contextual backend logger
 
-- [ ] Implement the database-independent Pino facade and prove its emission,
-      privacy and request-context contract. Await a separate execution instruction.
+- [~] Implement the database-independent Pino facade and prove its emission,
+  privacy and request-context contract. Execution authorized by the owner's
+  next-task instruction on 2026-09-19. Registry and installed dependencies
+  pass preflight; this unit needs no Docker or provider access.
 - Files: new `src/shared/logging/` core, configuration schema, context,
   sanitizer, Pino writer and colocated `*.test.ts`; `package.json` and generated
   `pnpm-lock.yaml` for authorized dependencies. No database or application
@@ -1237,6 +1239,12 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Dependencies/prerequisites: accepted TD-029 direction, explicit execution and
   dependency-install authorization, registry access and installed dependencies.
   Scope is one core-library review unit. No Docker/provider operation needed.
+- Local evidence, 2026-09-19: [logger core](docs/agentforge/evidence/2026-09-19-logger-core.md)
+  records 30 focused tests, 445 total unit tests, passing typecheck/build and
+  lint with only the existing `Geist` warning. Real short Node processes cover
+  both formats, channels and destination failures. `TST-LOGGING-001` is partial
+  until T-26.3 adoption/runtime proof. Independent exact-tip review and main-push
+  CI remain the integration gates.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `source-driven-development`,
   `observability-and-instrumentation`, `security-and-hardening`,
