@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 46 files and 445 tests (T-26.1 logger core, 2026-09-19).
+- [x] `pnpm test` passes 49 files and 468 tests (T-26.2 shared logger settings, 2026-09-19).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1129,8 +1129,8 @@ has been performed by this planning delivery.
 #### Consolidated execution order and checkpoints
 
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
-T-27.1–T-27.4 and T-28.1–T-28.3. The owner's next-task instruction authorized
-T-26.1 on 2026-09-19; that core unit is complete, leaving 20 unchecked children.
+T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
+T-26.1 and T-26.2 on 2026-09-19; both units are complete, leaving 19 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
 and subagents only for independent review, as the owner requested.
@@ -1206,7 +1206,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 is complete; the remaining 13 children have accepted plans and await execution authorization plus their named prerequisites. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 and T-26.2 are complete; the remaining 12 children have accepted plans and await execution authorization plus their named prerequisites. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1263,11 +1263,11 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.2: Share logger settings safely across backend instances
 
-- [~] Add the environment-local settings store, bounded refresh cache and the
-  accepted protected TypeScript CLI. Execution authorized by the owner's
-  next-task instruction on 2026-09-19. Docker, installed dependencies and
-  the existing non-default Neon Development target pass read-only preflight.
-  TD-031 resolves the interface choice previously tracked as OD-026.
+- [x] Add the environment-local settings store, bounded refresh cache and the
+      accepted protected TypeScript CLI. Execution authorized by the owner's
+      next-task instruction on 2026-09-19. Docker, installed dependencies and
+      the existing non-default Neon Development target pass read-only preflight.
+      TD-031 resolves the interface choice previously tracked as OD-026.
 - Files: `db/schema/logging.ts`, `db/schema/index.ts`, a new forward migration
   with generated metadata, `src/shared/logging/` settings store/cache/composition,
   colocated unit tests, `src/test/logging-settings.integration.test.ts`, and the
@@ -1308,6 +1308,20 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   migration check. Follow TD-025 and the migration-history skill; no reset,
   applied-history rewrite or Production migration is implied. One settings
   delivery/review unit; stop for a missing prerequisite before coding.
+- Evidence, 2026-09-19: [shared settings](docs/agentforge/evidence/2026-09-19-logger-settings.md)
+  records 33 focused logging tests, 20 focused CLI tests, 468 total unit tests,
+  28 integration tests, strict typecheck, lint with the existing warning, build,
+  migration-shape, formatting and links. Real local CLI inspect/set/conflict
+  proof passes. The direct non-default Neon Development smoke applied only the
+  additive settings migration, preserved both old hashes and confirmed an empty
+  settings table through the real CLI. No Production operation ran.
+- Review: GPT-6-Astra `xhigh` identified and verified fixes for server timeout
+  cleanup and test-order dependence. A fresh reviewer approved `9a59be9` with
+  no actionable findings. This completion metadata receives its own exact-tip
+  review before direct merge; main-push CI is checked afterward.
+  `TST-LOGGING-002` remains partial until T-26.3 application adoption/runtime
+  proof. T-26.3 is next in the serial order and requires its next-task instruction
+  plus the existing Docker/Chromium prerequisites. No later task was started.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `migration-history-workflow`,
   `observability-and-instrumentation`, `security-and-hardening`,

@@ -187,12 +187,18 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 - **Verifies technical decisions:** TD-013, TD-014, TD-019, TD-026
 - **Edge cases:** [EC-020](EDGE-CASES.md#ec-020), [EC-021](EDGE-CASES.md#ec-021)
 - **SPEC:** [3.3 Migration workflow](../output/agent/SPEC.md#33-migration-workflow), [10.2 PostgreSQL integration](../output/agent/SPEC.md#102-postgresql-integration)
-- **Owners:** T-01, T-04, T-14, T-20
+- **Owners:** T-01, T-04, T-14, T-20, T-26.2
 - **Contract:** The complete versioned Drizzle migration chain applies to an empty PostgreSQL 18 Testcontainer and the reviewed migration applies successfully to the non-default Neon development branch before promotion.
 - **Required evidence:** Harness-owned empty-database migration run and non-destructive Neon development-branch migration smoke.
 - **Dependencies:** T-04 schema work, T-14 Testcontainers harness, and a durable non-default Neon development branch.
 - **Current evidence:** T-04's `pnpm test:integration` applied the complete consolidated versioned chain to an isolated schema in a fresh disposable local `postgres:18-alpine` container. The T-14 harness now applies that same chain to the empty database of one harness-owned PostgreSQL 18 Testcontainer per integration suite. T-20 provisioned durable Neon branch `development` (`br-super-leaf-axfwoi2e`) in project `curly-dust-60603928` from default `main` without expiration. `pnpm neon:development -- migrate` applied the second committed migration through the direct endpoint. Catalog inspection showed `lists`/`tasks` with native UUID keys and `uuidv7()` defaults, both committed hashes, and no `posts_table`. Read-only inspection of `main` still showed the scaffold-only catalog (`posts_table`, one migration hash). Redacted evidence: [`docs/agentforge/evidence/t20-neon-development.json`](../../docs/agentforge/evidence/t20-neon-development.json).
 - **Follow-up:** None for this contract. Production remains a separately provisioned protected project/branch and was not used.
+
+T-26.2 adds [logging-settings migration evidence](../../docs/agentforge/evidence/2026-09-19-logger-settings.md).
+The full three-migration chain and a prior-schema upgrade pass on disposable
+PostgreSQL 18. The direct non-default Neon Development smoke applied the additive
+settings table, retained both earlier journal hashes and left settings empty.
+This supplements the existing contract; no Production migration is claimed.
 
 <a id="tst-harness-001"></a>
 

@@ -5,6 +5,13 @@ definition on 2026-09-18. Implementation is not authorized by this document.
 The owner also accepted the protected TypeScript settings CLI under
 [TD-031](../../../.dwf/decisions/TECHNICAL.md#td-031), resolving OD-026.
 
+Execution update, 2026-09-19: subsequent next-task instructions authorized
+T-26.1 and T-26.2 separately. Their [core evidence](../evidence/2026-09-19-logger-core.md)
+and [settings evidence](../evidence/2026-09-19-logger-settings.md) record completed
+implementation and verification. The settings evidence refines the illustrative
+refresh budget using installed pg-pool behavior. T-26.3 remains unstarted;
+the earlier planning-state descriptions below are historical.
+
 **Goal:** Diagnose meaningful backend operations and failures through one small
 Pino-backed logger whose shared filters can change without redeploying.
 

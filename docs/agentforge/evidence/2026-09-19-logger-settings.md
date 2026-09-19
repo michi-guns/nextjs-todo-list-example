@@ -96,7 +96,11 @@ the store now consistently returns a rejected promise from its async write API.
   schema/logger files; those are outside this task. The newly generated snapshot
   was formatted without changing its metadata values.
 
-Independent review, non-default Neon smoke and main-push CI gate closeout.
+The real CLI was also exercised on a fresh disposable local PostgreSQL database,
+including after the timeout fix: inspection returned revision 0 and no policy,
+set published revision 1 with global off, a new process read that policy, and a
+repeated expected-revision-0 write failed with safe stderr. Each successful
+result was valid JSON on stdout. The test container stopped afterward.
 
 ## Independent review and fixes
 
@@ -109,7 +113,51 @@ blocker was released. The store now adds PostgreSQL `SET LOCAL statement_timeout
 within a bounded transaction, and each integration case creates its own state.
 The formerly dependent test passes in isolation. The review's optional schema
 inventory correction and two related stale Agent SPEC paragraphs were also fixed.
-A fresh review of the changed tip is required before integration.
+A fresh GPT-6-Astra `xhigh` reviewer approved the corrected source tip
+`9a59be96f5c3b79f34997a6bf20066ef2030e415`, with no actionable findings or contract
+conflicts. Its independent checks passed 53 logging/CLI unit tests, five focused
+integration cases, the isolated revision-conflict case, migration-shape and diff
+checks. The full 468-unit/28-integration suite, typecheck, lint and build also
+passed again after the fix.
+
+## Non-default Neon migration smoke
+
+After source review, the existing guarded Development command ran through a
+task-local wrapper with an explicit secure process profile. It inspected the
+provider-observed branch before migration, used the direct migration role and
+verified the result through PostgreSQL and the real logging CLI:
+
+```json
+{
+  "project": "curly-dust-60603928",
+  "branch": "br-super-leaf-axfwoi2e",
+  "migrationsBefore": 2,
+  "migrationsAfter": 3,
+  "originalHashesPreserved": true,
+  "settingsRows": 0,
+  "cliInspection": {
+    "environment": "development",
+    "revision": 0,
+    "policy": null
+  }
+}
+```
+
+The guarded `runNeonDevelopmentCommand` invoked `pnpm exec drizzle-kit migrate
+--config drizzle.config.ts`. The real `pnpm logging` entry point's equivalent
+Node/tsx process inspected the explicitly selected Development project, branch
+and database. No settings row, seed or automatic defaults were written. No
+Production target was inspected or mutated by this smoke.
+
+## Closeout
+
+The task is complete subject to the final exact-tip metadata review and normal
+direct-merge/main-push CI gates. Completion metadata is reviewed independently;
+the parent reports the exact merged SHA and CI result after integration. No PR
+or deployment is part of this task. T-26.3 is the next serial task, awaiting its
+execution instruction and runtime/browser prerequisites. Parent T-26 remains
+open. The original dependency stash is preserved; the lockfile's normalized
+content matched Git and needed only an index stat refresh.
 
 ## Evidence limits
 
