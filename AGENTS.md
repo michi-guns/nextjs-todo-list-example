@@ -14,6 +14,31 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - `.local/` is git-ignored and holds machine-local files that never ship with the repository. When `.local/README.md` exists, read it before starting work: it routes to the operator's personal agent preferences, such as the language and tone of chat replies. Those preferences apply on top of these notes and never override the `.dwf/` contracts or the engineering rules below.
 
+## Personal browser and provider dashboards
+
+- The owner grants standing permission to use their personal Chrome through
+  Computer Use and the Chrome extension for this project's provider dashboards,
+  including Resend, GitHub, Vercel, Neon, Sanity, Sentry, Better Stack and other
+  providers already accepted for the task. Use the available authenticated session
+  and follow the active Computer Use tool instructions.
+- Within an already authorized task, this includes inspecting dashboards and
+  applying necessary routine setup/configuration changes, such as project settings,
+  environment variables, secret configuration, integrations and monitoring settings.
+  Check the intended account, project and environment before writes. No additional
+  permission is needed merely to access the personal browser or save those changes.
+- Prefer an available reliable connector, API or CLI when it fits. When a needed
+  operation requires the dashboard, use the browser instead of asking the owner
+  to perform the clicks or treating the missing API as a blocker. Keep access
+  task-scoped, preserve unrelated tabs and never expose secrets in chat, logs,
+  screenshots used as evidence, or committed files.
+- This permission satisfies routine dashboard access/setup authorization
+  prerequisites in plans and tasks once the underlying work is authorized.
+  It does not start an unapproved implementation task or waive destructive-action
+  confirmation, paid commitments, explicit email-send/outage-exercise authorization,
+  or protected Production release/migration approvals. Do not self-approve a
+  protected release through the owner's browser. Request owner involvement only
+  for a remaining concrete boundary or an authentication step that requires them.
+
 ## Product intent
 
 - Read [`.dwf/README.md`](.dwf/README.md), [`.dwf/RULES.md`](.dwf/RULES.md), [`.dwf/CONTEXT.md`](.dwf/CONTEXT.md), and [`docs/documentation-protocol.md`](docs/documentation-protocol.md) before meaningful changes.
