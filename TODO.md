@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 49 files and 468 tests (T-26.2 shared logger settings, 2026-09-19).
+- [x] `pnpm test` passes 51 files and 479 tests (T-26.3 backend logger adoption, 2026-09-19).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1130,7 +1130,7 @@ has been performed by this planning delivery.
 
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
-T-26.1 and T-26.2 on 2026-09-19; both units are complete, leaving 19 unchecked children.
+T-26.1 through T-26.3 on 2026-09-19; all three are complete, leaving 18 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
 and subagents only for independent review, as the owner requested.
@@ -1206,7 +1206,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 and T-26.2 are complete; the remaining 12 children have accepted plans and await execution authorization plus their named prerequisites. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.3 are complete; the remaining 11 children have accepted plans and await execution authorization plus their named prerequisites. T-26.4 is next in the serial order. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1331,10 +1331,10 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.3: Adopt the logger at meaningful backend boundaries
 
-- [~] Instrument the plan's initial boundaries and publish the usage/diagnosis
-  runbook. Execution authorized by the owner's next-task instruction on
-  2026-09-19. Dependencies, Docker, matching Chromium and the isolated Next.js
-  runtime/browser preflight pass. Keep this unit within parent T-26's scope.
+- [x] Instrument the plan's initial boundaries and publish the usage/diagnosis
+      runbook. Execution authorized by the owner's next-task instruction on
+      2026-09-19. Dependencies, Docker, matching Chromium and the isolated Next.js
+      runtime/browser preflight pass. Keep this unit within parent T-26's scope.
 - Files: list/task route/action adapters and server composition, shared entry
   error reporting, auth-mail boundary, Sanity read/invalidation boundaries,
   `db/pool.ts`, affected boundary tests and runtime evidence; new
@@ -1364,6 +1364,22 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Dependencies/prerequisites: T-26.2; installed dependencies, available Docker
   and matching Chromium for the isolated browser/runtime checks. Scope is one
   adoption/runbook review unit. Parent T-26 remains incomplete afterward.
+- Evidence, 2026-09-19: [logger adoption](docs/agentforge/evidence/2026-09-19-logger-adoption.md)
+  records 118 focused tests, 479 total unit tests, 28 integration tests and all
+  eight Chromium journeys passing, plus typecheck, lint with the existing
+  warning, build, runtime/browser inspection, formatting and 618 document links.
+  Two independent local Next processes prove JSON channels, request isolation,
+  safe failure reporting and policy changes without restart. The build-time
+  request gate prevents false prerender failures and settings reads.
+  `TST-LOGGING-001`/`002` are verified for their local obligations; hosted
+  diagnostics, Production changes and later parent work remain separate.
+- Review: fresh GPT-6-Astra `xhigh` review approved implementation commit
+  `9b7e9ae14901c1ff9eb4912d66f7e74aa0cde4d0` with no actionable findings.
+  This completion metadata receives a fresh exact-tip review before direct
+  merge and main-push CI. The predecessor's final `f236f29` also passed
+  [main CI](https://github.com/michi-guns/nextjs-todo-list-example/actions/runs/35456518430).
+  T-26.4 now has its delivery dependency satisfied and needs its own execution
+  instruction and Docker/dependency preflight. No later task was started.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `next-dev-loop`, `browser-testing-with-devtools`,
   `observability-and-instrumentation`, `security-and-hardening`,
