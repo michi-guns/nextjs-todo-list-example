@@ -169,13 +169,43 @@ change business or health logic. Do not add an unused provider framework.
 Separately scoped application/tool alerts retain a small outbound notification
 port with formatting and credentials in adapters. Native downtime notifications
 do not run through that port. One owner prevents duplicate incidents or
-notifications, and the diagnostics Strategy stays independent. The first
-channel, precise policy and app/tool transport details remain
-[open](../../decisions/OPEN-DECISIONS.md#od-027). The
+notifications, and the diagnostics Strategy stays independent. Initial native
+uptime notifications use Email only; Slack, Telegram and Pushover are outside
+the initial scope. The accepted native policy monitors Production only, with
+distinct app/database/CMS status. Poll every three minutes, require another
+three minutes of persistent failure after detection, then send one opening
+Email. Send one recovery Email after three minutes of stable successful checks,
+resetting recovery confirmation if a check fails. No periodic reminders are
+included. Polling and delivery add to confirmation time; CMS-only degradation
+must not be reported as total application downtime. The
+[exact policy](../agent/SPEC.md#native-uptime-policy) stays in operational
+configuration. [Separate accepted conditions](../agent/SPEC.md#application-tool-alert-policy)
+cover failed Production releases (migration/deployment/final checks) and new
+unexpected Production error groups or recurrence after resolution. Group repeats
+without an Email for each occurrence; expected user errors and ordinary warnings
+remain diagnostics and native uptime gets no duplicate application alert.
+No custom incident queue/state machine or per-request direct mail is authorized.
+The initial allocation is accepted: Sentry Free sends native group-transition
+emails, while GitHub Actions uses a reusable NotificationPort with a Resend
+Email adapter for failed Production releases. Native Sentry and uptime alerts
+stay outside that port. Both diagnostics adapters remain available through
+startup configuration. Release alerts need no running app/database, keep secrets
+and the recipient in protected configuration, and cannot hide the original
+release failure. Resend deduplication lasts 24 hours, not forever. OD-027 is
+resolved; recipient/account access are setup prerequisites. The
 [plan](../../../docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md#accepted-external-monitoring-and-remaining-alert-policy)
 records dated free-tier evidence without promising indefinite pricing or free
 advanced features. No provider setup, paid subscription, notification adapter,
 queue or runtime implementation is authorized yet.
+
+## Runtime target safety and dependency health, planned
+
+[TD-035](../../decisions/TECHNICAL.md#td-035) adds runtime-specific target
+validation without giving the app migration/admin credentials. Separate bounded
+app, database and fresh CMS health checks expose safe status; remote dependency
+probes require an operator/monitor secret. Deployment smoke verifies the actual
+running release and readiness alongside existing provider identity checks.
+These extensions still need implementation and their own evidence.
 
 ## Required application behavior
 

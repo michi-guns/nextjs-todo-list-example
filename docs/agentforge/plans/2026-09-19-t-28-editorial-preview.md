@@ -1,8 +1,8 @@
 # Sanity editorial preview implementation plan
 
-> AgentForge plan. Use `task-breakdown` after the consolidated approach is accepted. This document does not finalize the TODO queue.
+> Accepted AgentForge approach. The authorized consolidated breakdown is T-28.1–T-28.3 in TODO.md.
 
-**Status:** Proposed implementation approach. The owner accepted next-cycle scope and its editorial-session exception on 2026-09-19; implementation remains future work.
+**Status:** Accepted for consolidated task definition on 2026-09-19, including the editorial-session exception. Implementation and provider operations remain future work with explicit execution/prerequisite gates.
 
 **Goal:** Existing Sanity editors preview unpublished landing changes, see live updates, click through to the corresponding Studio field, and exit to published content.
 
@@ -195,7 +195,7 @@ verification/documentation. Establish refusal/token boundaries before the UI;
 prove real behavior before closeout while preserving published-path evidence.
 
 - Required to implement: existing installed dependencies/source, accepted
-  decisions and this plan's acceptance followed by task breakdown. No new
+  decisions and T-28.1–T-28.3's accepted task breakdown. No new
   database schema, packages or provider resources are required.
 - Required for local automated runtime proof: the existing browser harness,
   its disposable PostgreSQL prerequisites and matching browsers. Keep ordinary
@@ -264,7 +264,7 @@ Official references: [Next.js visual editing](https://www.sanity.io/docs/visual-
 Installed types take precedence over stale snippets, including deprecated
 `previewMode.disable`, old `draftMode` configuration and removed Live props.
 
-After approach acceptance, task breakdown should produce coherent verified
-outcomes for the configuration/authorization seam, preview/Studio composition,
-and evidence/runbook closeout. No final task sizing or TODO subtask sequence is
-created here. Planning itself has no application or hosted verification claim.
+TODO.md now assigns T-28.1 to configuration/authorization, T-28.2 to
+preview/Studio composition and local evidence, and T-28.3 to authorized real
+provider/Production proof and runbook closeout. Planning itself has no
+application or hosted verification claim.

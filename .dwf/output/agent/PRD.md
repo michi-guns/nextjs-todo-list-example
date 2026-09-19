@@ -174,8 +174,25 @@ verification belongs to [TST-AUTH-004](../../decisions/TESTING.md#tst-auth-004),
 for operational incidents, including total application outage. Detection and
 delivery must still work when the monitored Next.js application is unavailable.
 Each incident and notification has one owner, avoiding duplicate notifications.
-The first transport and detailed policy remain open in
-[OD-027](../../decisions/OPEN-DECISIONS.md#od-027). This later T-26 scope is
+Initial native uptime notifications use Email only; Slack, Telegram and
+Pushover are outside the initial scope. Monitor Production only and distinguish
+app, database and CMS status; a CMS-only failure is not total application downtime.
+Check every three minutes, confirm persistent failure for three further minutes
+after detection, and confirm recovery after three minutes of stable successful
+checks. Send one Email on opening and one on recovery, with no periodic reminders.
+The confirmation period is additional to detection delay, not a three-minute
+end-to-end notification guarantee.
+
+Also alert on failed Production releases (migration, deployment or final
+post-deploy verification), and on a new unexpected Production error group or
+recurrence of a resolved group, such as auth-email delivery or data-persistence
+failure. Repeated occurrences do not each send Email; expected user errors and
+ordinary warnings stay diagnostics. Native uptime incidents must not generate
+a second application notification. Sentry Free is the initial Production
+diagnostics provider and sends native group-transition Email; a reusable
+NotificationPort with a Resend Email adapter reports failed releases from
+GitHub Actions independently of the app/database. This resolves OD-027.
+This later T-26 scope is
 separate from the accepted logger/diagnostics slices and does not authorize
 implementation or provision a service. [SPEC](SPEC.md#operational-alerts)
 owns its technical boundary.

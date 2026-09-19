@@ -22,6 +22,13 @@ safe records, reports errors and flushes within a deadline. Startup selects
 application code; each selected adapter maps its safe records to supported
 provider APIs.
 
+Owner selection, 2026-09-19: [TD-033](../../../.dwf/decisions/TECHNICAL.md#td-033)
+chooses Sentry Free initially for Production diagnostics and its native
+new/regressed-group Email. Both adapters and startup selection remain required.
+Native alert setup/evidence is delivered by T-26.13 in the separate
+[runtime/alerts plan](2026-09-19-t-26-runtime-safety-and-alerts.md); it does not
+add notification dispatch to this diagnostics Strategy or change T-26.4–T-26.7.
+
 **Global constraints:** No provider changes while a process is running, dual
 export, provider plugin system, browser instrumentation, replay, metrics,
 tracing, profiling, uptime, alerts or health/readiness changes. Preserve

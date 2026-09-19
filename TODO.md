@@ -1093,25 +1093,83 @@ Automatic alerts decision, 2026-09-19: [D-012](.dwf/decisions/PRODUCT.md#d-012)
 and [TD-033](.dwf/decisions/TECHNICAL.md#td-033) accept a provider/channel-neutral
 alert contract and outbound notification port, separate from diagnostics.
 Total-outage detection and delivery must work independently of the monitored
-Next.js app, with one incident/notification owner. Slack, Telegram and Pushover
-are examples only. [OD-027](.dwf/decisions/OPEN-DECISIONS.md#od-027) retains
-first-transport and exact-policy choices; no service, queue or implementation
-is authorized. [TST-ALERTS-001](.dwf/decisions/TESTING.md#tst-alerts-001) is
-`specified`. T-26.1–T-26.7 remain unchanged and unchecked; consolidated
-breakdown of the remaining work is deferred until scope decisions are settled.
+Next.js app, with one incident/notification owner. The final accepted routing is
+Better Stack Uptime native Email for availability, Sentry Free native Email for
+new/regressed unexpected Production error groups, and NotificationPort with a
+Resend Email adapter from protected GitHub Actions for failed Production releases.
+The native paths do not run through our TypeScript port. Both diagnostics
+adapters remain supported; Slack, Telegram and Pushover are future extensions.
+OD-027 is resolved. No paid integration, custom relay, incident queue or state
+machine is selected.
 
 Remaining baseline plan, 2026-09-19: the owner accepted runtime target safety,
 separate app/database/CMS health, safe diagnosis/runbooks and resolved release
 identity checks. The [runtime safety and alerts plan](docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md)
 maps these to existing boundaries and verification without creating the final
-task queue. Runtime/test obligations must be reconciled before implementation.
-The owner subsequently selected Better Stack Uptime's free tier and its native
-external downtime notifications, with no custom relay. [TD-033](.dwf/decisions/TECHNICAL.md#td-033)
-keeps monitor setup replaceable through operational configuration and health
-logic provider-neutral; diagnostics selection and the app/tool notification
-port remain separate. [OD-027](.dwf/decisions/OPEN-DECISIONS.md#od-027) still
-owns channel/policy and app/tool transport details. This records no provider
-setup, paid commitment or runtime implementation. T-26.1–T-26.7 stay unchecked.
+task queue itself. The accepted breakdown below adds T-26.8–T-26.14 and keeps
+T-26.1–T-26.7 unchanged and unchecked. [TD-035](.dwf/decisions/TECHNICAL.md#td-035)
+and [TST-RUNTIME-001](.dwf/decisions/TESTING.md#tst-runtime-001) own the runtime
+extension; [TST-ALERTS-001](.dwf/decisions/TESTING.md#tst-alerts-001) owns all three
+notification paths. Both remain `specified`, with no runtime/provider proof.
+
+Native uptime policy accepted, 2026-09-19: [SPEC](.dwf/output/agent/SPEC.md#native-uptime-policy)
+records Production-only app/database/CMS monitoring, three-minute polling,
+three further minutes of persistent failure after detection, three-minute stable
+recovery, one opening and one recovery Email, and no periodic reminders.
+Component identity and native/application single ownership remain mandatory.
+Separately accepted [app/tool conditions](.dwf/output/agent/SPEC.md#application-tool-alert-policy)
+cover failed Production release (migration/deployment/final post-deploy checks)
+and new or regressed unexpected Production error groups, without Email per
+repeated occurrence. Expected user errors/ordinary warnings remain diagnostics;
+native uptime incidents get no second application alert. Recipient addresses,
+protected secrets and actual free-account eligibility are execution prerequisites,
+not open product choices. No implementation, provider setup, send or deployment
+has been performed by this planning delivery.
+
+#### Consolidated execution order and checkpoints
+
+The accepted plans now map to **21 unchecked child tasks**: T-26.1–T-26.14,
+T-27.1–T-27.4 and T-28.1–T-28.3. This authorizes task definition only; await a
+separate execution instruction. Use one implementing agent and subagents only
+for independent review, as the owner requested.
+
+- Default serial implementation order: T-26.1–T-26.6, T-26.8–T-26.11,
+  T-27.1–T-27.3, then T-28.1–T-28.2. This avoids concurrent edits to auth,
+  environment and deployment composition; it is not a new product dependency.
+- T-26.7, T-26.12–T-26.14, T-27.4 and T-28.3 obtain separately gated hosted
+  evidence after their named predecessors. Missing access cannot be replaced
+  with local mocks or silently skipped. T-26.2 and any schema-changing T-26.4
+  also retain their existing required non-default Neon migration check; the
+  default order is not a promise that every early task is fully offline.
+- Before each task, classify required implementation and named verification
+  prerequisites and run the cheap preflight. Stop on a missing required
+  prerequisite; do not begin a partial slice or change targets to bypass it.
+  Recompute all authorized unblocked work after each completed task.
+- Each new code task below includes a final local gate of `pnpm test`,
+  `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file Prettier and
+  `git diff --check`, plus its explicitly named integration/browser/pipeline
+  checks. Focused Vitest runs must discover nonzero tests. Existing tasks
+  T-26.1–T-26.7 retain their own checks. Normal hooks, exact-tip independent
+  review, direct merge and main-push CI apply to every task.
+- Checkpoint after T-26.6: contextual logging and local adapter/runtime proof,
+  with hosted ingestion still distinct. After T-26.11: guarded runtime,
+  bounded health, deployment smoke and local workflow Email path. After T-27.3
+  and T-28.2: their local integrated journeys, without hosted readiness claims.
+  Each checkpoint records partial versus complete `TST-*` evidence.
+- Close each parent only after all its child tasks and required evidence pass.
+  Provider/Production operations, recipient configuration and deliberate failure
+  exercises retain their explicit target/authorization boundaries. No parent
+  or test contract is complete from this documentation change.
+
+Consolidated planning checks, 2026-09-19: 13 changed Markdown files pass scoped
+Prettier, `git diff --check` and 667 local link/anchor checks. The 21 child
+definitions have acceptance, files/interfaces, verification, prerequisites and
+repository-local skills. All 36 existing `TST-*` statuses and the seven original
+logger/diagnostics task definitions are preserved; the new runtime contract is
+`specified`, bringing the ledger to 37 contracts. No application test or hosted
+proof is claimed by these document checks. Normal commit hooks, one fresh
+independent exact-tip review and main-push CI gate this consolidated delivery.
+The unrelated local lockfile change remains outside its commits.
 
 Remaining-plan checks, 2026-09-19: the seven affected documentation files pass
 scoped formatting/diff checks and 531 local link/anchor checks. All 36 existing
@@ -1144,9 +1202,9 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Files: application startup/configuration boundaries, health/readiness endpoints, accepted logging/diagnostics and operational-notification adapters, thin monitor configuration/runbook, deployment smoke helpers, safe error handling and focused tests. Metrics, tracing and a generic monitoring framework are outside this scope.
 - Interfaces: sanitized startup target summary; readiness that distinguishes app, database, and CMS dependencies; correlation/request identifiers; structured failure events for migration/deployment/runtime target mismatch; no secret-bearing logs; release evidence links.
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
-- Contracts/evidence: add or reconcile the smallest observability/security contracts after the core pipeline is accepted; preserve current route behavior and existing `TST-*` obligations.
+- Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24 and T-25 are complete. Accepted logger/diagnostics slices await execution authorization; the remaining proposed runtime/alerts approach awaits final policy resolution and consolidated plan/task breakdown. Provider setup and hosted evidence retain separate authorization prerequisites.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. All 14 child tasks have accepted plans and await execution authorization plus their named prerequisites. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1429,18 +1487,214 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   `code-review-and-quality`, `git-workflow-and-versioning`;
   `test-driven-development` if executable smoke code or behavior changes.
 
+<a id="t-268"></a>
+
+#### T-26.8: Refuse unsafe runtime targets before client initialization
+
+- [ ] Deliver the runtime-specific validation boundary from the accepted
+      [runtime plan](docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md).
+- Files: pure/runtime modules under `src/shared/environment/`, shared rules in
+  `scripts/environment/core.ts`, `db/db.ts`, `lib/auth.ts`, `src/sanity/config.ts`
+  and client composition; focused configuration and environment tests.
+- Interfaces: validated runtime inputs distinct from operator/migration inputs,
+  safe target/release identity and sanitized initialization failure.
+- Acceptance: refuse wrong profile, DB identity, origin, dataset or mail policy
+  before constructing unsafe clients; Production needs no direct migration URL
+  or provider-admin credentials. Preserve assigned Preview origins, build-time
+  behavior and existing pool lifecycle; validation performs no import/build I/O.
+- Contracts/checks: local configuration portion of `TST-RUNTIME-001`, preserving
+  `TST-ENV-001`, auth and landing boundaries. Run `pnpm exec vitest run src/shared/environment src/test/environment`,
+  `pnpm test:pipeline`, `pnpm test:integration`, `pnpm test:e2e` and the common
+  final gate. Test secret sentinels and refusal before client construction.
+- Dependencies/prerequisites: T-26.6 in the default shared-file sequence;
+  installed dependencies, Docker and Chromium for required runtime regressions.
+  One runtime-composition review unit; no hosted change in this task.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `security-and-hardening`, `next-dev-loop`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-269"></a>
+
+#### T-26.9: Expose bounded, independent dependency health
+
+- [ ] Deliver app, database and CMS probes with protected remote dependency access.
+- Files: `src/shared/health/` probes/tests, thin
+  `app/api/health/[component]/route.ts`, local integration/runtime tests and
+  `docs/runbooks/operations.md` with configuration and safe troubleshooting.
+- Interfaces: `/api/health/app`, `/api/health/database`, `/api/health/cms`;
+  safe component/status/release identity, HTTP 200/503 and secret-header refusal.
+- Acceptance: reuse the pool for read-only `SELECT 1`; fetch fresh published CMS
+  content without CDN/indefinite cache or Draft Mode. Bound acquisition, query
+  and network work to the plan's initial three-second budget, release resources
+  and cap in-flight work. Missing monitor setup is not readiness. CMS-only
+  failure remains distinguishable; no target URLs/secrets/raw errors escape.
+- Contracts/checks: health portion of `TST-RUNTIME-001`; preserve
+  `TST-FOUNDATION-001`, `TST-LANDING-001`/`003`, `TST-ENV-001`. Run
+  `pnpm exec vitest run src/shared/health`, `pnpm test:integration`,
+  `pnpm test:e2e` and the common gate. Use real disposable PostgreSQL, a
+  controlled CMS HTTP server and isolated Next endpoints for success/refusal,
+  failure/timeouts, cache bypass and resource-release proof. Unit mocks alone
+  do not establish bounded DB work. Native monitor setup belongs to T-26.12.
+- Dependencies/prerequisites: T-26.8; dependencies, Docker and Chromium.
+  One health/readiness review unit; no external uptime account required locally.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `api-and-interface-design`, `next-dev-loop`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-2610"></a>
+
+#### T-26.10: Verify the running release during deployment smoke
+
+- [ ] Extend delivery smoke to compare actual runtime identity and readiness.
+- Files: Production `scripts/deploy/production/runtime.ts`, core/tests;
+  Preview `scripts/deploy/preview/vercel.ts`, core/tests; environment projection,
+  both deployment workflows and their static tests; release/Preview runbooks.
+- Interfaces: trusted deployment-observed identity supplied to runtime;
+  bounded authenticated health smoke against the exact intended deployment.
+- Acceptance: preserve provider project/ref/alias guards, then reject wrong
+  runtime SHA or failed relevant readiness. A redirect or cached landing page
+  is not DB/CMS health. Keep new monitor credentials environment-scoped and out
+  of artifacts/errors. Preserve protected release approval and safe stage records.
+- Contracts/checks: local delivery portion of `TST-RUNTIME-001`; preserve
+  `TST-ENV-001`, `TST-PIPELINE-001`, `TST-PREVIEW-001`, `TST-RELEASE-001`.
+  Run `pnpm test:pipeline`, controlled HTTP tests of smoke and the common gate.
+  Cover mismatch, refused/timed-out health and valid identity. Actual deployed
+  proof remains in T-26.12 and must not be inferred from local adapter tests.
+- Dependencies/prerequisites: T-26.9, installed dependencies; one delivery
+  integration review unit. No provider credentials/deployment required locally.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `ci-cd-and-automation`, `security-and-hardening`, `documentation-and-adrs`,
+  `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-2611"></a>
+
+#### T-26.11: Send release-failure alerts through the workflow Email adapter
+
+- [ ] Implement the complete local release-notification path, including workflow wiring.
+- Files: `src/shared/operational-alerts/contracts.ts`, `resend-email.ts` and tests;
+  `scripts/deploy/production/notify.ts` with testable core, workflow/static tests,
+  `docs/runbooks/operations.md` and Production release guidance. Preserve auth mail.
+- Interfaces: safe `OperationalAlert`, `NotificationPort.send(alert)` and the
+  protected runner command `pnpm exec tsx scripts/deploy/production/notify.ts`.
+- Acceptance: notify after the protected release step fails in migration,
+  deployment or final smoke; success/skipped/unapproved execution and unrelated
+  artifact failures do not notify. Validate the safe release record against
+  trusted run/ref identity; use minimal unknown-stage metadata if absent.
+  No database, auth-admission or live-app dependency. Protect sender/recipient/key,
+  bound HTTP/retries, keep a stable attempt key and immutable retry payload,
+  and preserve the original failure if notification fails. Document the 24-hour
+  idempotency limit. Native uptime/Sentry events do not call this port.
+- Contracts/checks: local release portion of `TST-ALERTS-001`, preserving
+  `TST-RELEASE-001`/`TST-PIPELINE-001`. Run
+  `pnpm exec vitest run src/shared/operational-alerts scripts/deploy/production`,
+  `pnpm test:pipeline` and the common gate. Capture actual HTTP against a local
+  collector for mapping, retries and secret sentinels; cover failed/slow/invalid
+  responses, absent records and retained nonzero release result. No real mail.
+- Dependencies/prerequisites: T-26.10 for serialized workflow integration;
+  installed dependencies, no new SDK/account or local database required.
+  One port/adapter/workflow review unit. Real runner/receipt proof is T-26.14.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `api-and-interface-design`, `ci-cd-and-automation`,
+  `security-and-hardening`, `documentation-and-adrs`, `code-review-and-quality`,
+  `git-workflow-and-versioning`.
+
+<a id="t-2612"></a>
+
+#### T-26.12: Prove deployed health and independent uptime Email
+
+- [ ] Obtain the authorized deployed/runtime and Better Stack Uptime evidence.
+- Files: operations/environment/release runbooks, redacted dated evidence and
+  the testing ledger. Keep monitor configuration outside application health code.
+- Interfaces: the implemented deployment smoke and generic health endpoints;
+  native free-tier monitors and Email settings, with no custom relay.
+- Acceptance: verify actual deployed target/SHA/readiness for Production and
+  an authorized Preview, preserving their target guards. Configure Production-only
+  app/DB/CMS monitors under the accepted timing policy; verify header protection,
+  component distinction, one opening/recovery Email and no reminders or duplicate
+  app notifications. A controlled external exercise proves detection/delivery
+  independent of the app/DB. Record times without an onset-to-alert guarantee.
+- Contracts/checks: deployed `TST-RUNTIME-001` and native-uptime portion of
+  `TST-ALERTS-001`; preserve release/Preview and `TST-LANDING-002`/`003` obligations.
+  Follow the exact implemented runbook commands from T-26.9/.10; inspect real
+  monitor settings, recovery reset after another failure, and mailbox receipt.
+  Check free-account entitlement, links, formatting and `git diff --check`.
+  Reuse unchanged-code checks; repairs require their affected checks/review.
+- Dependencies/prerequisites: T-26.10, separately approved exact-ref deployments,
+  protected monitor secret and recipient, provider access and an approved
+  disposable/controlled outage target. No unapproved Production failure injection,
+  content publish, paid upgrade or permanent non-Production monitor. One hosted
+  evidence unit; unavailable access leaves the required proof pending.
+- Recommended AgentForge skills: `testing-first-class`, `shipping-and-launch`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-2613"></a>
+
+#### T-26.13: Prove native Sentry group-transition Email
+
+- [ ] Configure and verify the initial Production Sentry Free notification route.
+- Files: diagnostics/operations runbooks and redacted `TST-ALERTS-001` evidence.
+- Interfaces: existing Sentry adapter, Production startup selection and native
+  first-seen/regression Email settings. Retain Better Stack adapter support.
+- Acceptance: one Email for a new unexpected group and for recurrence after
+  provider resolution; repeated occurrences, expected user errors and ordinary
+  warnings do not each notify. Inspect overlapping issue rules and Issue Workflow
+  preferences. No app port/relay duplicates native delivery; quotas/disabled
+  ingestion are documented limits and never trigger a silent provider fallback.
+- Contracts/checks: native-group portion of `TST-ALERTS-001`, preserving
+  `TST-DIAGNOSTICS-001`/`002`. Use T-26.6's documented synthetic-event invocation,
+  approved real provider observations and mailbox receipt. Recheck free-tier
+  availability; local capture cannot prove grouping or delivery. Check sanitized
+  evidence, local links, formatting and `git diff --check`.
+- Dependencies/prerequisites: T-26.7, authorized Production Sentry configuration,
+  recipient/account preferences and synthetic event/send permission. One hosted
+  evidence unit; no paid/API integration procurement or forced real app failure.
+- Recommended AgentForge skills: `testing-first-class`, `observability-and-instrumentation`,
+  `security-and-hardening`, `documentation-and-adrs`, `code-review-and-quality`,
+  `git-workflow-and-versioning`.
+
+<a id="t-2614"></a>
+
+#### T-26.14: Prove protected release Email and close operational evidence
+
+- [ ] Verify real workflow-side Resend delivery and reconcile the complete T-26 baseline.
+- Files: protected workflow configuration/runbook, dated sanitized evidence,
+  testing ledger and this tracker; any small controlled exercise helper/tests.
+- Interfaces: the implemented NotificationPort/Resend path and protected-runner
+  failure record. Use the existing verified sender and configured operator recipient.
+- Acceptance: an authorized controlled runner exercise sends an accepted message
+  that is actually received, without calling the monitored app/DB. Prove bounded
+  notification failure preserves the original failed result; local negative-path
+  evidence may cover provider refusal without deliberately breaking Production.
+  Record idempotency/receipt limits and all three ownership paths in the runbook.
+- Contracts/checks: final release-delivery portion of `TST-ALERTS-001`, plus
+  reconciliation of logging/diagnostics/runtime contracts and historical release
+  evidence. Follow T-26.11's exact documented runner invocation, inspect protected
+  settings and recipient receipt; links, formatting and `git diff --check`.
+  Code/helper changes also require focused tests, the common gate and fresh review.
+- Dependencies/prerequisites: T-26.11–T-26.13 and T-26.7; explicit recipient/send
+  and controlled-run authorization, protected Resend credential, verified sender
+  and permitted runner access. One evidence/parent-closeout review unit. No real
+  failed migration or destructive outage is required to simulate a failed record.
+  Close T-26 only when every required child/evidence boundary is complete.
+- Recommended AgentForge skills: `testing-first-class`, `ci-cd-and-automation`,
+  `observability-and-instrumentation`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`;
+  `test-driven-development` for executable helpers or repairs.
+
 ### T-27: Complete authentication product flows and abuse resistance
 
-- [ ] Deliver the accepted recovery and abuse-resistance scope after consolidated implementation planning and task breakdown. This decision-recording change does not start implementation or create a second overlapping plan.
+- [ ] Deliver the accepted recovery and abuse-resistance scope through T-27.1–T-27.4 below. Planning does not start implementation.
 - Accepted scope, 2026-09-19: [D-011](.dwf/decisions/PRODUCT.md#d-011), [TD-032](.dwf/decisions/TECHNICAL.md#td-032), and [SPEC account recovery and abuse resistance](.dwf/output/agent/SPEC.md#account-recovery-and-abuse). No broad account-flow product choice remains open; exact lifetimes, limits, windows and copy are grounded implementation proposals.
-- Proposed approach: [account recovery and abuse resistance plan](docs/agentforge/plans/2026-09-19-t-27-account-recovery.md). This is the consolidated planning input; final task breakdown and implementation remain pending.
+- Accepted approach: [account recovery and abuse resistance plan](docs/agentforge/plans/2026-09-19-t-27-account-recovery.md). The breakdown below uses it without creating an overlapping plan; implementation remains pending.
 - Decision-record checks, 2026-09-19: nine documentation files pass scoped Prettier and diff checks; all 537 local links/anchors resolve. The 31 existing test-contract statuses and TD-029–031/T-26 scope are preserved; three new auth contracts are `specified`. Normal commit hooks and a fresh exact-tip independent review gate delivery. No runtime, provider, migration or hosted verification is claimed.
 - Files: Better Auth configuration/routes, verification and password-reset UI, existing auth-mail seam, shared PostgreSQL rate-limit persistence and any required forward migration, focused tests, and security/runbook documentation. No new mail provider or auth architecture.
 - Interfaces: Better Auth request/reset and verification-resend APIs, automatic session revocation on successful reset, supported per-IP limits, and atomic shared recipient mail admission across instances.
 - Acceptance: neutral recovery request; expiring single-use reset link; successful reset revokes all sessions and requires ordinary sign-in, while requesting mail does not change authentication state. Verification supports bounded resend and expired/invalid-link recovery with normal framework behavior. IP and recipient limits cover verification/reset/magic-link mail including automatic sends, cause a temporary wait without account lockout, and preserve privacy and environment mail policy. The SPEC owns the exact contract.
 - Contracts/evidence: [TST-AUTH-004](.dwf/decisions/TESTING.md#tst-auth-004), [TST-AUTH-005](.dwf/decisions/TESTING.md#tst-auth-005), and [TST-AUTH-006](.dwf/decisions/TESTING.md#tst-auth-006) are `specified`, with implementation and executable evidence pending. Preserve TST-AUTH-001–003 and the completed local browser slice; local capture does not prove hosted delivery.
 - Checks: TDD-focused auth tests, integration/browser journeys, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, and `git diff --check`.
-- Dependencies/unblock: T-21.5's Production mail foundation, T-18's environment/mail policy and T-24's environment test boundaries are complete; the owner has accepted the account scope. Remaining work is consolidated planning/breakdown and implementation, with installed-version grounding, Docker/Chromium for local evidence, and the existing separate approvals for hosted operations. Account deletion, profile/email editing, social login, MFA, CAPTCHA procurement and new services are outside scope.
+- Dependencies/unblock: T-21.5's Production mail foundation, T-18's environment/mail policy and T-24's test boundaries are complete. The scope, plan and breakdown are accepted; execution needs installed-version grounding, Docker/Chromium for local evidence and the separate hosted approvals. Account deletion, profile/email editing, social login, MFA, CAPTCHA procurement and new services are outside scope.
 - Recommended AgentForge skills: `better-auth-best-practices`, `email-and-password-best-practices`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 Local email-verification browser journey, explicit T-27 acceptance:
@@ -1466,19 +1720,220 @@ Verification and evidence for this slice:
 - Reconcile the exact signup/verification browser evidence through `testing-first-class` with [TST-AUTH-001](.dwf/decisions/TESTING.md#tst-auth-001) and [TST-E2E-001](.dwf/decisions/TESTING.md#tst-e2e-001), adding or extending the canonical contract before implementation if needed. Keep the separate [TST-AUTH-002](.dwf/decisions/TESTING.md#tst-auth-002) magic-link evidence intact. Do not infer remote delivery or inbox placement from local capture.
 - Coverage clarification: T-15's browser test covers magic-link request/read/consume; the 2026-09-09 T-27 slice now proves signup email verification through the real browser UI as well as the existing backend integration coverage. Earlier T-11/T-15 closeout wording did not establish this journey. T-27's parent dependencies remain in force for its other work; the owner-approved local slice is complete.
 
+<a id="t-271"></a>
+
+#### T-27.1: Provide atomic shared authentication admission
+
+- [ ] Deliver the auth-owned PostgreSQL counter store and supported limiter adapter.
+- Files: `db/schema/auth-rate-limit.ts`, schema exports, generated forward
+  migration/metadata, `src/modules/auth/infrastructure/auth-rate-limit.ts`,
+  policy defaults and colocated unit/real integration tests. Preserve applied history.
+- Interfaces: Better Auth's supported `customStorage.consume(key, rule)` and
+  separate namespaced recipient request/send admission using opaque HMAC keys.
+- Acceptance: atomic first-use, exhaustion and window expiry across independent
+  connections; reject without extending a window. Use database time and bounded
+  expired-row cleanup. No raw email/IP keys or per-instance fallback; common
+  store failure denies mail admission safely. Do not mutate credentials/sessions.
+- Contracts/checks: storage portion of `TST-AUTH-006`; preserve foundation,
+  migration and harness contracts. Run `pnpm exec vitest run src/modules/auth`,
+  `pnpm exec vitest run --config vitest.integration.config.ts src/modules/auth`,
+  `pnpm test:integration`, `pnpm exec drizzle-kit check --config drizzle.config.ts`
+  and the common final gate. Prove fresh-chain/prior-schema upgrade and concurrent
+  independent limiters on disposable local PostgreSQL. Hosted proof is T-27.4.
+- Dependencies/prerequisites: completed T-18/T-21.5/T-24 and execution authority;
+  installed Better Auth API review and Docker/PostgreSQL 18. No dependency on
+  logger implementation. One storage/admission review unit, no hosted mutation.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `better-auth-best-practices`,
+  `migration-history-workflow`, `security-and-hardening`, `documentation-and-adrs`,
+  `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-272"></a>
+
+#### T-27.2: Integrate native recovery and bounded auth-mail delivery
+
+- [ ] Wire recovery, shared admission and explicit mail lifetime through Better Auth.
+- Files: `lib/auth.ts`, auth configuration/factory and mail scheduler,
+  `src/modules/auth/infrastructure/auth-mail.ts`, `resend-mail.ts`, auth route,
+  standalone seed callers named in the account plan and focused integration tests.
+- Interfaces: native reset/verification APIs, trusted `password-reset` message,
+  Next `after()` scheduler and awaited/drained standalone scheduler; shared IP,
+  recipient request and actual-send budgets from T-27.1.
+- Acceptance: neutral known/unknown reset requests with expiring single-use
+  tokens; successful reset revokes all sessions and does not auto-sign-in.
+  Requests/invalid/expired/replayed/throttled links leave sessions and credentials
+  unchanged. Cover automatic and `auth.api` sends without relying on HTTP limits.
+  Preserve native verification semantics, Preview suppression and local mailbox.
+  Denied actual-send admission does not reveal account existence or lock accounts.
+- Contracts/checks: backend portions of `TST-AUTH-004`–`006`; preserve AUTH-001–003
+  and environment boundaries. Run `pnpm exec vitest run src/modules/auth`,
+  `pnpm test:integration`, `pnpm test:e2e` and the common gate. Prove concurrent
+  token consumption, refusal of two previous sessions only after reset, trusted
+  proxy IP handling and all send paths. A controlled pending mail operation proves
+  responses do not await provider latency; seeds must explicitly drain delivery.
+- Dependencies/prerequisites: T-27.1; installed dependencies, Docker and Chromium.
+  One auth/mail integration review unit; no new provider, queue or auth architecture.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `better-auth-best-practices`,
+  `email-and-password-best-practices`, `security-and-hardening`, `next-dev-loop`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-273"></a>
+
+#### T-27.3: Deliver recovery screens and real local browser journeys
+
+- [ ] Add password/verification recovery UI and integrate local evidence/runbooks.
+- Files: `app/(auth)/forgot-password`, `reset-password`, `verify-email`, matching
+  `components/auth/` forms, sign-in/sign-up recovery links, auth-flow helpers,
+  `src/test/browser-diagnostics.ts` and tests; new recovery E2E specs and auth runbook.
+- Interfaces: supported auth-client recovery/resend APIs, bounded retry feedback,
+  safe local callbacks and the existing explicitly enabled test mailbox.
+- Acceptance: request/capture/consume reset via actual UI, reject old password
+  and sessions, then ordinary new-password sign-in. Pending/invalid/expired
+  verification has a resend path without bypassing private-access checks.
+  Redact both reset-token path and query forms; no token/email in callback logs
+  or public evidence. Preserve accessible labels, native auth and old journeys.
+- Contracts/checks: local completion of `TST-AUTH-004`–`006`, preserving UI/E2E
+  and baseline auth evidence. Run `pnpm exec vitest run src/modules/auth src/test/browser-diagnostics.test.ts`,
+  `pnpm exec playwright test e2e/password-recovery.spec.ts e2e/verification-recovery.spec.ts e2e/email-verification.spec.ts e2e/magic-link.spec.ts --project=chromium`,
+  `pnpm test:integration`, `pnpm test:e2e` and the common gate. Use fresh recipients,
+  retrying assertions, real browser navigation and inspect sanitized artifacts;
+  no seeded verified user or direct token/session writes replace the journeys.
+- Dependencies/prerequisites: T-27.2; Docker, matching Chromium and installed
+  dependencies. One UI/browser/runbook review unit. Remote receipt remains T-27.4.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `frontend-ui-engineering`, `email-and-password-best-practices`, `next-dev-loop`,
+  `browser-testing-with-devtools`, `security-and-hardening`, `documentation-and-adrs`,
+  `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-274"></a>
+
+#### T-27.4: Prove protected migration and hosted recovery mail
+
+- [ ] Obtain the account extension's authorized hosted migration and mail evidence.
+- Files: auth-mail/release runbooks, dated redacted evidence, testing ledger and TODO.
+- Interfaces: reviewed forward migration, protected exact-ref release and native
+  password/verification browser flows using the selected Production mail transport.
+- Acceptance: first prove the migration on the authorized non-default Neon branch,
+  then apply through the protected release gate. With approved test identities,
+  verify actual reset/resend receipt and consumption, stale-session refusal and
+  ordinary new-password sign-in. Preserve environment and privacy controls;
+  old transport evidence is not proof of these new journeys or inbox placement.
+- Contracts/checks: hosted AUTH-004–006 and migration/environment/release evidence;
+  use the exact implemented auth-mail and release runbook commands after target
+  checks. Inspect mailbox receipt and deployed browser results, preserve required
+  deployed Sanity smoke/webhook proof, check links/formatting and `git diff --check`.
+  Reuse unchanged local evidence; any repair receives affected checks/review.
+- Dependencies/prerequisites: T-27.3, authorized non-default branch/direct role,
+  protected Production migration/release approval, configured verified sender,
+  recipient/test accounts and explicit send permission. One hosted closeout unit;
+  no destructive migration, account cleanup or real-user session reset is implied.
+- Recommended AgentForge skills: `testing-first-class`, `migration-history-workflow`,
+  `better-auth-best-practices`, `email-and-password-best-practices`,
+  `shipping-and-launch`, `browser-testing-with-devtools`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
 ### T-28: Add Sanity authenticated preview and live authoring
 
 - Planning checks, 2026-09-19: all nine affected documentation files pass scoped Prettier and diff checks; 611 local links/anchors resolve. The 35 existing test-contract statuses are preserved and TST-LANDING-004 is `specified`. Normal commit hooks, fresh exact-tip independent review and main-push CI gate delivery; no editorial preview or hosted evidence is claimed.
 - Review repair: a network-free synthetic probe found that the installed preview helper logs a present secret when redirect syntax is malformed in development. The plan and TST-LANDING-004 now require a quiet syntax precheck and log-refusal evidence while preserving framework authorization/cookies. This is a planning correction, not a runtime fix or verified preview contract.
 
-- [ ] Implement the next-cycle editorial preview scope activated by [D-013](.dwf/decisions/PRODUCT.md#d-013) and [TD-034](.dwf/decisions/TECHNICAL.md#td-034). The owner has accepted the scope; the [editorial preview plan](docs/agentforge/plans/2026-09-19-t-28-editorial-preview.md) is Proposed. Plan acceptance and subsequent task breakdown remain prerequisites before implementation.
+- [ ] Implement the next-cycle editorial preview scope activated by [D-013](.dwf/decisions/PRODUCT.md#d-013) and [TD-034](.dwf/decisions/TECHNICAL.md#td-034), using the accepted [editorial preview plan](docs/agentforge/plans/2026-09-19-t-28-editorial-preview.md) and T-28.1–T-28.3 below. Await execution authority and scoped prerequisites.
 - Files: Sanity presentation/preview routes and configuration, authenticated Draft Mode/Visual Editing/Live integration, webhook/revalidation handling, browser tests, and Sanity runbooks.
 - Interfaces: existing Sanity editor identity and supported private-secret Draft Mode handshake; authorized draft reads/live subscriptions/field navigation/exit; published cache and webhook/recovery preservation. Local, Development and Production editorial sessions use the existing `production` dataset. Deployment Preview remains read-only on non-production `preview` with no editorial activation or draft token.
 - Acceptance: editors see unpublished changes update live and click through to Studio fields; ordinary visitors retain published content. Only authorized draft responses may receive a read-only Viewer token, never write-capable editor credentials. Shared preview access is disabled; session, secret and membership/token revocation limits follow TD-034.
 - Contracts/evidence: new `TST-LANDING-004` is `specified`; preserve existing `TST-LANDING-001`–`003` statuses and evidence boundaries. Fixtures and ordinary Playwright cannot substitute for real Studio/provider/browser proof; the read-only smoke and real deployed webhook clauses remain intact.
 - Checks: focused Sanity tests, authorized real Studio/live/browser evidence, existing read-only/deployed Sanity checks at their required boundary, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, changed-file formatting and `git diff --check`; `pnpm test:pipeline` when environment/delivery wiring changes.
-- Dependencies/unblock: T-22/T-24 and the product/dataset decisions are satisfied. Implementation waits for its accepted plan/task breakdown and scoped prerequisite checks. Real hosted verification needs Viewer credentials, existing editor access, trusted origins/CORS, an allowed running target and authorization for the demonstrated provider actions. Planning creates no resources, edits no provider content and performs no deployment.
+- Dependencies/unblock: T-22/T-24 and the product/dataset/plan decisions are satisfied. Execution waits for its scoped prerequisite checks. Real hosted verification needs Viewer credentials, existing editor access, trusted origins/CORS, an allowed running target and authorization for the demonstrated provider actions. Planning creates no resources, edits no provider content and performs no deployment.
 - Recommended AgentForge skills: `planning`, `source-driven-development`, `documentation-and-adrs`, `browser-testing-with-devtools`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
+
+<a id="t-281"></a>
+
+#### T-28.1: Guard editorial configuration and preview authorization
+
+- [ ] Add the environment/token boundary and supported Draft Mode entry/exit routes.
+- Files: `src/sanity/preview-config.ts`, server-only preview composition,
+  `app/api/draft-mode/enable/route.ts`, `disable/route.ts`, environment safe
+  projection/tests, deployment adapters/workflows and refusal tests.
+- Interfaces: disabled-by-default public capability flag, private Viewer token,
+  existing Sanity private-secret handshake, async Draft Mode cookies and safe exit.
+- Acceptance: allow only Local/Development/Production editorial sessions on
+  `production`; deployment Preview omits the token and refuses activation.
+  Disabled preview needs no token and does not break public build/read behavior.
+  Quietly reject missing secret/malformed redirect before the helper can log a
+  secret-bearing URL. Preserve native authorization, redirects and cookie behavior;
+  public flag or Better Auth session alone grants no editorial access.
+- Contracts/checks: boundary portion of `TST-LANDING-004`, preserving environment,
+  Preview/release and published landing contracts. Run
+  `pnpm exec vitest run src/sanity src/modules/landing src/test/environment`,
+  `pnpm test:pipeline`, `pnpm test:e2e` and the common gate. Require focused route
+  test discovery, secret sentinels, invalid/expired authorization and safe exit
+  in the isolated Next runtime; no real Sanity credential required for local refusal.
+- Dependencies/prerequisites: completed T-22/T-24, execution instruction,
+  installed-version Next/Sanity guides, Docker and Chromium. Follow the default
+  serial order to avoid shared environment/workflow edits; no auth feature dependency.
+  One configuration/authorization review unit; no new packages or hosted mutation.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `source-driven-development`, `security-and-hardening`,
+  `next-dev-loop`, `ci-cd-and-automation`, `documentation-and-adrs`,
+  `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-282"></a>
+
+#### T-28.2: Compose Studio preview, Live and field navigation
+
+- [ ] Integrate the authorized preview branch and local regression evidence.
+- Files: `sanity/presentation.ts`, `sanity.config.ts`, `src/sanity/preview.ts`,
+  landing preview reader/presentation attributes, `app/page.tsx`,
+  `components/landing/landing-page.tsx`, `exit-preview.tsx`, focused tests and
+  Sanity/environment runbooks. Preserve root layout and published invalidation.
+- Interfaces: supported Presentation/defineLive/VisualEditing APIs, clean
+  validated landing model and four optional `data-sanity` attributes.
+- Acceptance: only authorized landing preview mounts Live/overlays and receives
+  the read-only Viewer browser token. Plain content retains validation; public
+  output has no token, attributes or draft subscription. No draft data enters
+  published cache. Explicit non-prefetched exit returns to published content;
+  Studio stays out of the shared Live layout and shared preview access is disabled.
+- Contracts/checks: local composition portion of `TST-LANDING-004`, preserving
+  LANDING-001–003 and E2E published behavior. Run
+  `pnpm exec vitest run src/sanity src/modules/landing`, `pnpm test:e2e`,
+  `pnpm test:pipeline` if delivery changes, and the common gate. Inspect actual
+  public/refusal Next responses and clean fixture mapping. These checks do not
+  prove real provider draft authorization, Live or overlays; T-28.3 owns that proof.
+- Dependencies/prerequisites: T-28.1; installed dependencies, Docker and Chromium.
+  One preview-composition review unit. Leave unused Sanity scaffold intact.
+- Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
+  `incremental-implementation`, `frontend-ui-engineering`, `source-driven-development`,
+  `next-dev-loop`, `browser-testing-with-devtools`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+
+<a id="t-283"></a>
+
+#### T-28.3: Prove real editorial preview and protected Production activation
+
+- [ ] Obtain real Sanity/browser proof and reconcile the editorial runbook/evidence.
+- Files: Sanity/environment/release runbooks, redacted evidence, testing ledger
+  and TODO; actual provider configuration only within the approved target/scope.
+- Interfaces: existing authorized Studio editor, Viewer credential, exact
+  same-origin Presentation/CORS settings and protected deployment configuration.
+- Acceptance: preflight intended dataset, read-only Viewer access and absence
+  of active shared secrets. In separate editor/public contexts, make an approved
+  unpublished edit, observe Live refresh, click the correct field and exit to
+  published content. Anonymous visitors see published content and no token or
+  draft subscription. Document secret/session/membership revocation limits accurately.
+- Contracts/checks: actual-provider and hosted `TST-LANDING-004`; retain
+  `pnpm sanity:smoke` and real signed webhook delivery for the deployed revision
+  under LANDING-002/003. Follow T-28.2's exact runbook and the protected release
+  process, inspect browser/network results without leaking tokens/draft content;
+  links, formatting and `git diff --check`. Local fixtures are not hosted proof.
+- Dependencies/prerequisites: T-28.2; approved editorial/content exercise,
+  authorized editor/Viewer access, exact origins/CORS and protected Production
+  configuration/release approval. One hosted closeout unit. Content publishing,
+  deletion/cleanup or credential revocation needs its explicit scope; no bypass
+  of access/framing protections or silent paid upgrade. Close T-28 only with proof.
+- Recommended AgentForge skills: `testing-first-class`, `source-driven-development`,
+  `shipping-and-launch`, `browser-testing-with-devtools`, `security-and-hardening`,
+  `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
 
 ### T-29: Publish the derived-application extension and replacement guide
 

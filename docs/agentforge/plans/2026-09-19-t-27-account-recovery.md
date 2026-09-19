@@ -1,8 +1,8 @@
 # Account recovery and abuse resistance implementation plan
 
-> AgentForge plan. Use `task-breakdown` only after the remaining large-task decisions are settled. This document does not finalize the consolidated TODO queue.
+> Accepted AgentForge approach. The authorized consolidated breakdown is T-27.1–T-27.4 in TODO.md.
 
-**Status:** Proposed implementation approach; the owner authorized planning and accepted the product/technical scope on 2026-09-19. Implementation is not authorized by this plan.
+**Status:** Accepted for consolidated task definition on 2026-09-19. Implementation and hosted operations still require execution authorization and their scoped prerequisites.
 
 **Goal:** Deliver usable password and verification recovery with shared abuse limits, neutral responses and automatic session revocation after a successful reset.
 
@@ -36,7 +36,7 @@ The [2026-09-09 plan](2026-09-09-t-27-email-verification-browser.md) remains the
 
 The Production mail foundation (T-21.5), environment/mail policy (T-18) and pipeline boundaries (T-24) are complete. No broad account-flow decision remains open. Docker, installed dependencies and Chromium are execution prerequisites for local evidence, not newly missing product decisions. Real hosted migrations/mail journeys still require their existing concrete authorization.
 
-The coarse work packages are shared admission/schema, recovery/mail integration, UI recovery, and integrated evidence/runbooks. Storage and scheduler contracts precede integration. UI work can proceed independently once the API/callback vocabulary is fixed; final lifecycle and concurrency evidence follows the integrated system. These are architectural packages, not a finalized task sequence.
+The work packages are shared admission/schema, recovery/mail integration, UI recovery and integrated evidence/runbooks. T-27.1 establishes storage, T-27.2 integrates recovery/admission/mail lifecycle, T-27.3 delivers UI/browser evidence and T-27.4 obtains separately authorized hosted proof. TODO.md owns the exact sequence; UI integration follows the implemented API/callback contract.
 
 ### Shared admission and migration
 
@@ -118,4 +118,4 @@ No additional broad product decision blocks this plan. Hosted target access, Doc
 
 ## Handoff to task breakdown
 
-After the remaining large-task scope decisions are settled, decompose the four work packages above into reviewable tasks with their exact TST obligations and execution prerequisites. Reuse this plan and the completed browser-slice record; do not create an overlapping account plan. Keep runtime-safety/notification and Sanity decisions separate. This plan does not start implementation, update contract verification status or authorize hosted operations.
+The owner authorized the consolidated T-27.1–T-27.4 breakdown. Reuse this plan and the completed browser-slice record; do not create an overlapping account plan. Keep runtime-safety/notification and Sanity product scope separate while preserving any shared-file integration order in TODO.md. Plan acceptance does not start implementation, update verification status or authorize hosted operations.

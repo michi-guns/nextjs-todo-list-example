@@ -868,13 +868,116 @@ The [plan](../../../docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-ale
 records dated free-tier evidence, without promising indefinite pricing or free
 advanced escalation/incident-ingress features. No account provisioning, paid
 subscription, provider operation, queue or implementation is authorized.
-[OD-027](../../decisions/OPEN-DECISIONS.md#od-027) retains the first channel
-(email versus Slack), exact policy and separate app/tool event/transport
-details; do not assume Production-only or a cooldown. Telegram and Pushover
-remain future adapter examples, not native free-tier promises.
-Implement nothing until that policy and the resulting plan are accepted.
+Initial native uptime notifications use Email only. Slack, Telegram and
+Pushover are outside the initial scope.
+
+<a id="native-uptime-policy"></a>
+
+#### Accepted native uptime policy
+
+Owner-accepted on 2026-09-19; configure the native external monitors as follows:
+
+| Concern               | Accepted behavior                                                                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Environment           | Production only; do not enable native monitoring for Local, Development or deployment Preview.                                                                                          |
+| Components            | Distinguish application liveness, database readiness and CMS availability in status, monitor identity and notification context. CMS-only degradation is not total application downtime. |
+| Polling               | Check each monitored target every three minutes.                                                                                                                                        |
+| Incident confirmation | Open after failure persists for three minutes following first detection. This period is additional to polling/detection delay.                                                          |
+| Recovery              | Resolve after three minutes of stable successful checks; a failed check during that period resets recovery confirmation.                                                                |
+| Notifications         | One Email when the incident opens and one on recovery. No periodic reminder emails initially.                                                                                           |
+| Ownership             | Native monitoring owns these incidents and their notifications; application/tool code must not send a second alert for the same condition.                                              |
+
+Do not promise an alert within three minutes of actual failure onset: polling,
+failure confirmation and provider/delivery latency contribute to elapsed time.
+Keep timing/notification settings in the thin operational configuration, not
+application health logic. Validate the configured opening/recovery notifications
+and absence of repeated or duplicate delivery during separately authorized
+provider evidence; documented settings alone do not prove actual delivery.
+
+<a id="application-tool-alert-policy"></a>
+
+#### Accepted application/tool alert conditions
+
+Owner-accepted on 2026-09-19, alongside the initial Email-only channel:
+
+- Failed Production release, including migration, deployment or final post-deploy verification.
+- A new unexpected Production error group or recurrence of a previously resolved
+  group. Auth-email delivery and data-persistence failures are examples, not a
+  requirement to alert separately for every failed request or retry.
+
+Group repeated occurrences without sending one Email per occurrence. Expected
+user errors and ordinary warnings remain diagnostics. Native uptime incidents
+must not trigger a second application notification. Keep one incident/notification
+owner and the existing diagnostics grouping boundary; do not add a custom
+incident state machine/queue, direct per-request Email or an unapproved paid
+integration to satisfy these conditions.
+
+#### Accepted initial notification ownership
+
+| Condition                                          | Owner and delivery                                                                                                                                            |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production app/database/CMS availability           | Better Stack Uptime free-tier native detection and Email, under the native policy above; outside the TypeScript NotificationPort.                             |
+| New or regressed unexpected Production error group | Sentry Free native group lifecycle and Email; outside the TypeScript NotificationPort. Configure Production filtering and a single native notification route. |
+| Failed Production release                          | Protected GitHub Actions workflow calls the reusable NotificationPort through its initial Resend Email adapter; no app/database dependency.                   |
+
+Sentry Free is the initial Production diagnostics selection. Keep both Sentry
+and Better Stack adapters and startup configuration (`none`, `sentry`,
+`better-stack`) under TD-030; no dual export or hot provider switch. Native
+Sentry issue-alert and Issue Workflow notification settings can overlap, so
+configure one owner for new/regressed-group Email and prove repeats do not
+notify per occurrence. Quotas or disabled diagnostics can prevent ingestion;
+record actual setup/evidence rather than claiming unconditional delivery.
+
+The shared NotificationPort accepts a safe provider-neutral operational alert;
+only its Resend adapter owns Email formatting and HTTP transport. The workflow
+constructs a safe release-failure value from trusted run/ref/stage identity.
+Keep this path independent of auth-mail callbacks, recipient rate-limit storage
+and the failed application's database. Reuse the existing Resend service,
+verified sender and bounded/sanitized HTTP conventions; no new service or SDK
+is required merely to send a release alert. Secrets and recipient configuration
+stay in the protected workflow, not arguments, published artifacts or logs.
+
+Use stable release-attempt identity for idempotent retries with the same payload.
+Resend retains idempotency keys for 24 hours; this is not permanent exactly-once
+delivery. A new workflow attempt is a distinct release attempt. Report an alert
+failure safely as a secondary outcome; preserve the original release failure,
+exit status and evidence even if notification fails or times out. The provider
+accepting a request is not proof of mailbox receipt.
+
+OD-027 is resolved. No Better Stack incident-ingress adapter, custom relay,
+queue or per-request direct Email is selected. Recipient setup is a prerequisite,
+not an open product choice. Do not copy native uptime polling/recovery timings
+onto error-group or release-failure events. Implementation and hosted operations
+still require their stated prerequisites and execution authorization.
 [TST-ALERTS-001](../../decisions/TESTING.md#tst-alerts-001) owns future evidence;
 existing diagnostics tests cannot prove outage notification delivery.
+
+<a id="runtime-health-safety"></a>
+
+### 11.4 Runtime target safety and dependency health
+
+[TD-035](../../decisions/TECHNICAL.md#td-035) extends the tooling environment
+contract into runtime initialization. Share pure validation rules while keeping
+runtime and operator inputs distinct: the app needs its pooled runtime URL,
+not DATABASE_URL_UNPOOLED or provider administration credentials. Preserve
+Preview's assigned origin and the build/runtime distinction. Compare configured
+target identity with safe delivery-observed identity; labels alone are not proof.
+Validation performs no provider/database I/O at import/build time.
+
+Expose separate provider-neutral app liveness, database readiness and CMS
+availability, with safe component/status and resolved release identity only.
+Reuse the existing pool for a read-only database probe and fetch current
+published CMS data without the indefinite content/CDN cache or Draft Mode.
+Use bounded deadlines and actual resource acquisition/work, not an abandoned
+operation behind a response-only timeout. Protect remote dependency probes with
+a secret header and safe refusal; missing optional monitor setup does not break
+ordinary app startup or count as monitored readiness. Never return target URLs,
+credentials or raw errors. CMS-only failure must remain distinguishable.
+
+Delivery smoke retains provider project/deployment/ref/alias checks and also
+compares actual running release identity and relevant readiness. Preserve
+protected release authorization. [TST-RUNTIME-001](../../decisions/TESTING.md#tst-runtime-001)
+owns new evidence separately from the previously verified tooling contracts.
 
 ## 12. Implementation notes vs current scaffold
 

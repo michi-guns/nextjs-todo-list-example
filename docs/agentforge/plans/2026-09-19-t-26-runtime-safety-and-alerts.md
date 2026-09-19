@@ -1,14 +1,14 @@
 # Remaining runtime safety and operational alerts plan
 
-> AgentForge plan. Keep final consolidated task breakdown pending the unresolved notification decisions.
+> Accepted AgentForge approach. TODO.md adds T-26.8–T-26.14 to the existing logger/diagnostics tasks.
 
-**Status:** Proposed implementation approach. The owner accepted runtime target safety, application/database/CMS health distinction, safe diagnosis and runbooks, deployment identity checks, and automatic alerts. The later owner decision selects Better Stack Uptime's free tier for external native outage detection and direct notification, with no custom relay. First channel and detailed policy remain open in OD-027. No implementation or hosted operation is authorized by this document.
+**Status:** Accepted for consolidated task definition on 2026-09-19. Native uptime uses Better Stack Free, Production diagnostics initially use Sentry Free with native new/regressed-group Email, and protected release failures use the NotificationPort's Resend Email adapter from GitHub Actions. OD-027 is resolved. No runtime implementation, provider setup, paid service or email send is authorized by this document.
 
 **Goal:** Detect unsafe runtime targets and operational failures, distinguish affected dependencies, verify the running release, and deliver actionable alerts even during total application outage.
 
-**Spec and decisions:** [TD-026](../../../.dwf/decisions/TECHNICAL.md#td-026), [D-012](../../../.dwf/decisions/PRODUCT.md#d-012), [TD-033](../../../.dwf/decisions/TECHNICAL.md#td-033), [SPEC environment contract](../../../.dwf/output/agent/SPEC.md#11-environment-and-delivery-contract), [operational notification boundary](../../../.dwf/output/agent/SPEC.md#operational-alerts), [OD-027](../../../.dwf/decisions/OPEN-DECISIONS.md#od-027), and [T-26](../../../TODO.md#t-26-add-runtime-safety-and-observability-hardening).
+**Spec and decisions:** [TD-026](../../../.dwf/decisions/TECHNICAL.md#td-026), [D-012](../../../.dwf/decisions/PRODUCT.md#d-012), [TD-033](../../../.dwf/decisions/TECHNICAL.md#td-033), [TD-035](../../../.dwf/decisions/TECHNICAL.md#td-035), [runtime health contract](../../../.dwf/output/agent/SPEC.md#runtime-health-safety), [operational notification boundary](../../../.dwf/output/agent/SPEC.md#operational-alerts), and [T-26](../../../TODO.md#t-26-add-runtime-safety-and-observability-hardening).
 
-**Architecture:** Share pure environment-validation rules with tooling, add a runtime-specific configuration boundary and bounded dependency probes, and bind deployed smoke to safe release identity. Keep reusable alert values and an outbound port for separately scoped application/tool events distinct from diagnostics storage. Use accepted Better Stack Uptime native monitoring/direct outage notifications, consuming provider-neutral HTTP health/status contracts through a thin operational integration.
+**Architecture:** Share pure environment-validation rules with tooling, add runtime-specific configuration and bounded dependency probes, and bind deployed smoke to safe release identity. Better Stack Uptime and Sentry send their respective native notifications outside the TypeScript port. A provider-neutral OperationalAlert/NotificationPort and Resend Email adapter report failed releases directly from the protected runner, independent of application/database availability.
 
 **Global constraints:** Preserve [the logger plan](2026-09-18-t-26-shared-logger.md), [diagnostics plan](2026-09-18-t-26-diagnostics.md), TD-029–031 and their seven unchecked slices. Do not rebuild logging, add metrics/tracing/browser telemetry, provision a service/queue, expose credentials, or depend on the monitored app/database for outage detection or delivery. This plan covers only the remaining T-26 responsibilities.
 
@@ -20,7 +20,7 @@
 | `db/db.ts`, `lib/auth.ts`, `src/sanity/config.ts`, `src/sanity/client-factory.ts`                                         | Compose clients only after coherent runtime target/policy validation; preserve current pool lifecycle and auth/CMS ownership.                                |
 | New `src/shared/health/*`; thin `app/api/health/[component]/route.ts`                                                     | Bounded Node-only liveness/database/CMS probes and safe response mapping. No todo entity or business use case dependency.                                    |
 | `scripts/deploy/production/runtime.ts`, `scripts/deploy/preview/vercel.ts`, their smoke orchestration/tests and workflows | Supply safe provider-observed target/release identity and check actual runtime identity/readiness in addition to existing provider metadata.                 |
-| New `src/shared/operational-alerts/contracts.ts` and one selected adapter after OD-027                                    | Small safe alert value/outbound notification port for owned app/tool events. No incident database, custom queue or duplicate diagnostics facade.             |
+| New `src/shared/operational-alerts/contracts.ts`, `resend-email.ts` and `scripts/deploy/production/notify.ts`             | Safe release alert, outbound notification port, Resend adapter and protected-runner entry point. No incident database, queue or diagnostics facade.          |
 | Thin monitor configuration/runbook; provisioning adapter only if actual provisioning code is accepted                     | Better Stack-specific target, interval, confirmation and channel setup outside application/health logic; preserve replacement through operational changes.   |
 | Existing logging/diagnostics boundaries; new focused operations runbook                                                   | Reuse safe failure reporting and correlation; explain target mismatch, DB/CMS/mail failures, release mismatch and alert ownership.                           |
 | Environment/pipeline tests, new focused runtime/health/adapter tests                                                      | Prove refused unsafe targets, bounded probes, release binding and notification boundaries; keep hosted evidence separate.                                    |
@@ -31,9 +31,9 @@ There are no health routes. The published landing source caches validated conten
 
 ## Dependencies and work order
 
-Runtime validation precedes client composition and trustworthy health reporting. Health/release identity precede strengthened deployment smoke. Alert wiring requires OD-027 resolution and explicit trigger ownership; it does not reopen logger/diagnostics design. The existing implementation of protected environment delivery remains the foundation.
+Runtime validation precedes trustworthy health reporting, then actual-runtime release smoke. The release-Email slice follows the safe release record/notification contract, not logger database availability. Sentry native alert proof follows implemented Sentry diagnostics; the independent Better Stack uptime proof follows deployed health. TODO.md owns T-26.8–T-26.14 and the cross-task order. Existing protected environment delivery remains the foundation.
 
-The source modules proposed here are implementation locations, not finalized TODO subtasks. T-27 auth and T-28 editorial preview keep their own plans; this work must consume their environment boundaries without changing their product behavior.
+The modules below are planned implementation locations. T-27 auth and T-28 editorial preview keep their own plans; consume their environment boundaries without changing product behavior. Serialized shared-file work in TODO.md avoids conflicting edits to runtime/environment/deployment composition.
 
 ### Runtime target and release identity
 
@@ -45,7 +45,7 @@ Expose only the resolved release SHA and a small safe environment/status vocabul
 
 ### Dependency-distinguishing health
 
-Proposed minimal interface: `/api/health/app`, `/api/health/database` and `/api/health/cms` use one thin dynamic Route Handler and separate bounded probe functions. App liveness reports that this runtime can answer; database readiness uses a read-only `SELECT 1` through the existing bounded pool; CMS status performs a fresh published singleton read through the existing query/validation boundary with `useCdn:false` and `cache:'no-store'`. Do not route the CMS probe through the indefinite published-content cache or editorial Draft Mode.
+Use `/api/health/app`, `/api/health/database` and `/api/health/cms` through one thin dynamic Route Handler and separate bounded probe functions. App liveness reports that this runtime can answer; database readiness uses a read-only `SELECT 1` through the existing bounded pool; CMS status performs a fresh published singleton read through the existing query/validation boundary with `useCdn:false` and `cache:'no-store'`. Do not route the CMS probe through the indefinite published-content cache or editorial Draft Mode.
 
 Each successful probe returns HTTP 200 with component, safe status and resolved release identity. Failed/timed-out probes return 503 with a fixed safe code, never raw errors or target URLs. A CMS failure does not report the private todo database as unavailable. Dependency probes run independently, have a three-second initial deadline and bounded per-instance in-flight work; do not add a second database pool or an unbounded wait queue. Bound acquisition and actual query/network work, release acquired resources on all paths, and preserve the shared pool. A response-only `Promise.race` is not evidence that the underlying operation is bounded.
 
@@ -55,37 +55,94 @@ Deployment smoke retains provider-observed project/deployment/alias/ref checks, 
 
 ### Accepted external monitoring and remaining alert policy
 
-Use Better Stack Uptime's free tier for native availability monitoring and direct outage notifications, as selected by the owner on 2026-09-19. Native checks and delivery remain operational when this app and database are down. These notifications **do not execute our TypeScript notification port**; do not describe native routing as our adapter implementation. This uptime choice is independent of TD-030's startup-selected diagnostics provider (Sentry, Better Stack or none).
+Use Better Stack Uptime's free tier for native Production availability monitoring and direct Email notifications, following the [accepted native policy](../../../.dwf/output/agent/SPEC.md#native-uptime-policy). Native checks and delivery remain operational when this app and database are down. These notifications **do not execute our TypeScript notification port**; do not describe native routing as our adapter implementation. This uptime choice is independent of TD-030's startup-selected diagnostics provider (Sentry, Better Stack or none).
 
 Keep stable provider-neutral HTTP liveness/readiness/status contracts and target URLs. Application/domain health logic must contain no Better Stack SDK, provider types, credentials or conditionals. Put monitor target, interval, confirmation and selected-channel configuration in a thin operational integration or runbook. Replacing the monitor provider should change that integration/configuration, not business or health logic. Add a provisioning port/adapter only if the accepted task contains actual provisioning code; do not create an unused runtime `UptimeProvider` class or configurable monitoring framework.
 
-For explicitly application/tool-owned conditions, retain the neutral `OperationalAlert` value and outbound notification port. The proposed incident-ingress adapter to the same external incident owner still requires its feature/entitlement check and policy acceptance: Better Stack's supported incoming-webhook integration can map a stable Alert ID, deduplicate repeats and resolve by the same ID, but the free uptime selection does not establish free access to this separate integration. If unavailable on the accepted tier, resolve the app/tool transport through OD-027 without assuming a paid upgrade. Let the selected incident owner hold incident state and route the selected channel, without an application DB incident table or custom retry queue.
+The [accepted application/tool conditions](../../../.dwf/output/agent/SPEC.md#application-tool-alert-policy) cover failed Production releases (migration, deployment or final post-deploy verification) and new unexpected Production error groups or recurrence after resolution. Auth-email delivery and data-persistence failures are examples. Group repeated occurrences without one Email per occurrence; expected user errors and ordinary warnings remain diagnostics. Native uptime must not generate a second application notification.
 
-| Condition owner                                                                               | Detection/submission path                                                       | Duplicate prevention                                                              |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| External availability monitor                                                                 | Provider-native app/DB/CMS monitor → incident → selected routing policy         | No second application notification for the same availability incident.            |
-| Explicit application/tool condition outside monitor ownership, such as a failed release stage | Safe alert value → outbound port → selected adapter (incident ingress proposed) | Stable scoped alert identity; selected owner handles deduplication/recovery.      |
-| Selected grouped-error condition, if later included in policy                                 | Supported diagnostics-provider incident integration                             | No parallel Errors webhook plus application notification for that same condition. |
+Retain a neutral `OperationalAlert` and reusable `NotificationPort.send(alert): Promise<void>`. The initial concrete implementation is a Resend Email adapter for failed releases. Sentry Free is the initial Production diagnostics provider and sends native Email for new/regressed unexpected groups. Both native paths stay outside the TypeScript port. Preserve both diagnostics adapters and startup selection under TD-030. No Better Stack incident-ingress adapter, custom relay/state machine/queue or per-request direct mail is selected.
 
-Before wiring triggers, record this ownership map with the chosen policy. Individual request failures remain diagnostics evidence unless explicitly selected as a distinct actionable condition. Adapter credentials and provider formatting stay outside the shared value; responses/failures are sanitized and bounded. A tool-originated alert can run outside the app, but an in-app producer still cannot report its own total outage reliably.
+| Condition owner                                                      | Detection/submission path                                                 | Duplicate prevention                                                                    |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| External availability monitor                                        | Provider-native app/DB/CMS monitor → incident → selected routing policy   | No second application notification for the same availability incident.                  |
+| Failed Production migration/deployment/final verification            | Protected GitHub Actions runner → NotificationPort → Resend Email adapter | Stable release-attempt identity; bounded 24-hour provider idempotency, no app/DB state. |
+| New unexpected Production error group or recurrence after resolution | Sentry Free native Production group-transition Email                      | One native route; suppress overlapping workflow notices and per-occurrence Email.       |
 
-The external native path and free Better Stack selection resolve the architecture/provider choices; do not reopen a separately hosted relay merely to force outage delivery through application adapters. Select a supported free-tier channel and policy. If a later requirement conflicts with that accepted path or tier, surface the conflict before expanding infrastructure or cost. No provider setup or paid commitment is authorized.
+Use this accepted ownership map when wiring triggers. Individual request failures contribute to diagnostics groups and must not directly send Email; expected user errors and ordinary warnings do not trigger alerts. Adapter credentials and provider formatting stay outside the shared value; responses/failures are sanitized and bounded. The protected runner can report release failure while the app/database are down; native uptime owns total-outage notification.
 
-The first channel (email or Slack on the researched free tier), monitored environments, trigger/confirmation thresholds and repeat/recovery policy remain open in OD-027, along with the separately scoped app/tool event policy and transport entitlement. Email, Production-only operation and cooldowns have not been selected. Telegram and Pushover remain possible future extension examples, not native free-tier promises or implementation requirements.
+The external native path, free Better Stack selection, Email-only channel and full native policy are accepted; do not reopen a separately hosted relay merely to force outage delivery through application adapters. If an implementation prerequisite conflicts with the accepted path or tier, surface the concrete conflict before expanding infrastructure or cost. No provider setup or paid commitment is authorized.
 
-Provider research supporting the owner choice, checked 2026-09-19: [Better Stack Uptime](https://betterstack.com/uptime) advertises 10 monitors, 10 heartbeats and one status page with three-minute checks free. Its [pricing page](https://betterstack.com/pricing) labels the $0 tier for personal projects and includes email/Slack alerts; [check-frequency documentation](https://betterstack.com/docs/uptime/check-frequency/) distinguishes free three-minute checks from paid checks as often as 30 seconds. These are dated advertised entitlements, not indefinite pricing, confirmed account eligibility or free access to every escalation, incoming-webhook/incident-ingress or application-alert feature. Recheck actual entitlement before separately authorized setup; the proposed application/tool adapter is not claimed to be free.
+Owner policy decision, 2026-09-19: monitor Production application, database and CMS with distinguishable status; poll every three minutes, confirm failure for three further minutes after detection, and recover after three minutes of stable successful checks. Send one Email on opening and one on recovery, with no periodic reminders. Slack, Telegram and Pushover are outside initial scope. Monitor identity/notification context must distinguish CMS-only degradation from total downtime. Do not duplicate native incidents through application notifications or copy native polling/recovery timings onto error-group or release-failure events.
 
-Source grounding: [Better Stack HTTP monitors](https://betterstack.com/docs/uptime/uptime-monitor/), [incoming incident webhooks](https://betterstack.com/docs/uptime/incoming-webhooks/), [Errors-to-incidents integration](https://betterstack.com/docs/errors/integrations/creating-incidents/) and [Sentry uptime monitoring](https://docs.sentry.io/product/monitors-and-alerts/monitors/uptime-monitoring/). The native path needs no custom outgoing-webhook relay. For any separately proposed future integration, [Errors outgoing webhooks](https://betterstack.com/docs/errors/integrations/outgoing-webhooks/) and [Uptime outgoing webhooks](https://betterstack.com/docs/uptime/webhooks/) are distinct protocols; do not transfer authentication or retry assumptions between them.
+Operational mapping, checked 2026-09-19: the [monitor API](https://betterstack.com/docs/uptime/api/create-a-new-monitor/) documents seconds-valued `check_frequency`, `confirmation_period` and `recovery_period`; map each to `180` in any later authorized setup. The [confirmation/recovery guide](https://betterstack.com/docs/uptime/confirmation-and-recovery-period/) starts confirmation after first failure observation and resets recovery when a check fails. Polling/detection delay comes before confirmation; provider processing and mail delivery add latency, so this is not an alert-within-three-minutes guarantee from actual onset. Keep these settings in operational configuration, never an application timer.
+
+Configure one opening and one recovery Email, disabling periodic repeats and duplicate delivery paths in the actual monitor/recipient settings. The [escalation guide](https://betterstack.com/docs/uptime/escalation-policies/) warns that simple escalation can alert the rest of the team and trigger integrations; an Email switch alone is not proof that other delivery paths are off. Verify those settings and recovery delivery during separately authorized free-tier setup/evidence. Do not assume an advanced escalation policy is included or silently add a paid feature/custom relay to satisfy the accepted behavior; surface an actual entitlement/configuration conflict if encountered.
+
+Provider research supporting the owner choice, checked 2026-09-19: [Better Stack Uptime](https://betterstack.com/uptime) advertises 10 monitors, 10 heartbeats and one status page with three-minute checks free. Its [pricing page](https://betterstack.com/pricing) labels the $0 tier for personal projects and includes email/Slack alerts; [check-frequency documentation](https://betterstack.com/docs/uptime/check-frequency/) distinguishes free three-minute checks from paid checks as often as 30 seconds. These are dated advertised entitlements, not indefinite pricing or confirmed account eligibility. Recheck the actual free account during authorized setup without enabling paid escalation/integrations.
+
+### Native Sentry error-group Email
+
+Select `sentry` for Production at startup; retain `none` and the Better Stack
+adapter as supported configurations without dual export. Configure a
+Production-filtered native Email route for first-seen unexpected groups and
+regression of resolved groups, not every event. Keep expected user errors and
+ordinary warnings out of those triggers. [Sentry pricing](https://sentry.io/pricing/)
+lists the $0 Developer plan with Email alerts (checked 2026-09-19); quotas and
+actual account settings remain verification prerequisites, not paid-upgrade
+authorization. [Native alert conditions](https://docs.sentry.io/api/monitors/create-an-alert-for-an-organization/)
+document first-seen/regression triggers; using those semantics does not require
+automated provisioning through a possibly restricted API.
+
+Inspect both native issue-alert rules and [Issue Workflow regression notifications](https://www.sentry.help/en/articles/13964392-why-do-i-still-receive-regression-emails)
+so a transition has one Email owner. Prove a new group, repeated occurrences,
+explicit provider resolution and recurrence with real authorized synthetic
+events and mailbox evidence. Do not add an application event-history table or
+webhook relay. Missing/disabled ingestion or quota exhaustion is a reporting
+limitation, not a reason to silently fall back to another provider.
+
+### Release-failure Email from the protected runner
+
+Add `src/shared/operational-alerts/contracts.ts` and `resend-email.ts` plus a
+small `scripts/deploy/production/notify.ts` entry point. The shared value carries
+safe alert kind, Production environment, trusted release/run identity and failed
+stage context; no raw provider error, shell arguments or credentials. The
+adapter uses the existing Resend account/sender and bounded HTTP conventions,
+without importing auth callbacks, recipient counters, the database or app startup.
+Retain the current auth mail behavior; extract only a genuinely shared small
+HTTP seam if needed, not a mail framework or new SDK.
+
+The protected workflow gives its release step a stable ID and invokes
+`pnpm exec tsx scripts/deploy/production/notify.ts` only after that step actually
+fails. Reuse `$RUNNER_TEMP/production-release-record.json`, validating its safe
+schema and matching trusted workflow identity. If unavailable, report only a
+minimal failed-step envelope from trusted workflow metadata with unknown stage;
+never reconstruct secrets from logs. Success, skipped/unapproved execution and
+unrelated later artifact failures must not produce a release-failure Email.
+Keep sender, Resend secret and configured recipient in protected step
+environment variables, never CLI arguments or committed fixtures. Recipient
+is a configuration prerequisite, not another product choice.
+
+Use repository/run ID/run attempt plus the release-failure kind as stable
+idempotency identity. Retrying the same attempt uses the same immutable payload;
+a new workflow attempt has a different identity. [Resend idempotency](https://resend.com/docs/dashboard/emails/idempotency-keys)
+retains keys for 24 hours, not forever. Keep retries bounded, send no periodic
+reminders, and document possible duplicate delivery outside that window rather
+than adding persistent incident state. Provider acceptance is not receipt proof.
+An adapter timeout/refusal produces only a safe secondary notice; the original
+release remains failed and its record/exit result remain intact. Workflow
+failure notification cannot guarantee delivery when the runner itself never
+executes; do not imply a new independent runner-monitoring service.
 
 ## Verification strategy
 
-Reconcile the new runtime obligations through the canonical testing ledger before implementation; preserve the historical `verified` evidence of [TST-ENV-001](../../../.dwf/decisions/TESTING.md#tst-env-001), [pipeline/release contracts](../../../.dwf/decisions/TESTING.md#tst-pipeline-001), and the logger/diagnostics `specified` contracts. [TST-ALERTS-001](../../../.dwf/decisions/TESTING.md#tst-alerts-001) owns independent outage delivery evidence and remains `specified`.
+[TST-RUNTIME-001](../../../.dwf/decisions/TESTING.md#tst-runtime-001) owns the new runtime guard/probe/release obligations. Preserve historical `verified` evidence of [TST-ENV-001](../../../.dwf/decisions/TESTING.md#tst-env-001), [pipeline/release contracts](../../../.dwf/decisions/TESTING.md#tst-pipeline-001), and logger/diagnostics contracts. [TST-ALERTS-001](../../../.dwf/decisions/TESTING.md#tst-alerts-001) owns all three notification paths; both new extension contracts remain `specified`.
 
 - Unit/configuration: runtime-only Production inputs work without migration credentials; unsafe profile/target/origin/dataset/mail combinations fail before client construction; safe errors omit supplied secrets; preserve Preview assigned-origin behavior.
 - Health integration: successful and failing/timed-out DB/CMS probes remain distinguishable; unknown/unauthorized probes refuse safely; CMS probes bypass published cache; no client/connection leaks, mutation or credential-bearing body.
 - Pipeline: expected SHA/project/alias comparisons remain; wrong runtime SHA and readiness failures block successful smoke; new operational/read tokens stay environment-scoped and out of records/command output.
-- Port/adapter: safe payload mapping, stable incident identity, recovery mapping and bounded provider refusal; no duplicate native/app ownership, no recursive diagnostics/notification failure loop. Fake transport checks do not prove provider delivery.
-- Hosted evidence after authorization: correct deployed target and identity, fresh real dependency checks, and controlled external proof that detection **and selected-channel delivery** still occur when the monitored app is unavailable and without its DB. Do not cause an unapproved Production outage to obtain evidence; use an approved disposable target or provider-supported controlled exercise that proves the same dependency boundary.
+- Application/tool alerts and port/adapter: prove failed Production migration/deployment/final-verification triggers, new unexpected groups and recurrence after resolution, grouped suppression of repeated occurrences, and no alerts for expected user errors/ordinary warnings or duplicate native uptime incidents. Verify safe payload mapping and bounded Resend refusal; no recursive diagnostics/notification failure loop. No direct request Email or custom incident state machine is implied. Fake transport checks do not prove provider delivery.
+- Hosted evidence after authorization: correct deployed target and identity, fresh real dependency checks, and controlled external proof that detection **and Email delivery** still occur when the monitored app is unavailable and without its DB. Record actual detection, confirmed incident opening, recovery confirmation and Email times, verify no repeats or duplicate native/application delivery, and distinguish a CMS-only incident. Check the three timing settings and Production-only targets without claiming an onset-to-alert deadline. Do not cause an unapproved Production outage to obtain evidence; use an approved disposable target or provider-supported controlled exercise that proves the same dependency boundary. A test monitor used for that authorized exercise does not authorize ongoing non-Production monitoring.
 
 Focused future commands are `pnpm exec vitest run src/shared/health src/shared/operational-alerts src/test/environment`, `pnpm test:pipeline`, and the relevant integration/browser suites when new runtime behavior changes their paths. Final implementation gates include `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, required real integration/browser checks, scoped Prettier and `git diff --check`, independent review and main CI. This planning pass runs documentation checks only; normal hooks remain enabled.
 
@@ -93,8 +150,8 @@ Focused future commands are `pnpm exec vitest run src/shared/health src/shared/o
 
 The critical risks are expanding runtime credential access, confusing cached content with live dependency health, coupling alerts to a failed app/database, and notifying twice for one incident. Separate input/probe boundaries and explicit external ownership address them. Do not broaden the plan into a generic monitoring framework, infrastructure platform or durable delivery system.
 
-OD-027 is a real remaining owner decision; exact type/file names and safe implementation mechanics are engineering choices. Hosted accounts, monitoring configuration, credentials and approved failure exercises are subsequent concrete prerequisites, not permission implied by a plan.
+OD-027 is resolved; exact type/file names and safe implementation mechanics are engineering choices. Hosted accounts, sender/recipient/secret configuration and approved failure exercises are concrete execution prerequisites. A verified domain or previous mail success does not prove the new alert receipt. Actual free-tier/account restrictions must be checked before setup, without paid upgrades or weakened acceptance.
 
 ## Handoff to task breakdown
 
-After OD-027 is resolved, finalize the channel/policy and separate app/tool adapter details within the accepted Better Stack free-tier/native-monitoring arrangement and reconcile their canonical contracts, then combine this plan with the existing logger/diagnostics plans without duplicate tasks. Divide runtime guards, health/release smoke, selected notification adapter/monitor setup and evidence/runbooks into reviewable units. Do not create that full TODO queue or start implementation during this planning pass.
+The owner authorized T-26.8–T-26.14 in TODO.md: runtime guards, dependency health, actual-release smoke, workflow release Email, native uptime evidence, native Sentry evidence and real release-Email/runbook closeout. Keep T-26.1–T-26.7 as the existing logger/diagnostics foundation. TODO.md owns order and prerequisites; no implementation or provider operation has run in this planning pass.

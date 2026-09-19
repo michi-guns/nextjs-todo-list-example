@@ -159,9 +159,34 @@ The reusable starter supports automatic operator alerts for operational
 incidents, including total application outage. Detection and notification
 delivery for a total outage must continue independently of the monitored
 Next.js application. Each incident and notification has one owner, preventing
-duplicate incidents or delivery paths. The first transport and precise alert
-policy remain unresolved in [OD-027](OPEN-DECISIONS.md#od-027). This decision
-authorizes no implementation or service provisioning.
+duplicate incidents or delivery paths. Owner follow-up, 2026-09-19: the initial
+native uptime notification channel is Email only; Slack, Telegram and Pushover
+are outside the initial scope.
+
+The subsequently accepted native uptime policy monitors Production only,
+distinguishing application, database and CMS status. Check every three minutes;
+open an incident after failure persists for three minutes after first detection.
+Resolve after three minutes of stable successful checks. Send one Email on
+incident opening and one on recovery, with no periodic reminder emails initially.
+Confirmation is additional to polling/detection, not a guarantee of notification
+within three minutes of actual onset. CMS-only degradation is not total
+application downtime; native and application paths must not duplicate ownership.
+
+The owner also accepted alerts for failed Production releases, including
+migration, deployment or final post-deploy verification, and for a new unexpected
+Production error group or a previously resolved group that recurs. Auth-email
+delivery and data-persistence failures are examples. Do not send Email for each
+repeated occurrence; expected user errors and ordinary warnings stay diagnostics.
+Native uptime incidents must not cause a second application notification.
+
+The accepted initial delivery arrangement uses Sentry Free native Email for
+new/regressed unexpected Production error groups and a Resend Email adapter
+behind the reusable NotificationPort for failed Production releases, running
+from GitHub Actions independently of the failed app/database. TD-033 owns the
+technical boundaries. This resolves OD-027 without authorizing per-request
+direct mail, a custom incident state machine/queue or a paid integration.
+Planning and consolidated task definition are authorized; implementation,
+provider setup and email sends remain future work with their own prerequisites.
 
 <a id="d-013"></a>
 

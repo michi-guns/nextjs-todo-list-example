@@ -569,7 +569,8 @@ future work under [T-27](../../TODO.md#t-27-complete-authentication-product-flow
 
 - **Status:** ACCEPTED, planned implementation
 - **Source:** owner-approved notification architecture, 2026-09-19
-- **Related:** [D-012](PRODUCT.md#d-012), [TD-030](#td-030), [OD-027](OPEN-DECISIONS.md#od-027), [TST-ALERTS-001](TESTING.md#tst-alerts-001)
+- **Related:** [D-012](PRODUCT.md#d-012), [TD-030](#td-030), [TST-ALERTS-001](TESTING.md#tst-alerts-001)
+- **Resolves:** OD-027, initial notification ownership, policy and transports
 
 Use a small provider- and channel-neutral operational-alert contract and an
 outbound notification port. Concrete adapters own transport credentials and
@@ -582,26 +583,59 @@ notifications under one incident/notification owner.
 
 Owner follow-up, 2026-09-19: use Better Stack Uptime's free tier for native
 external outage monitoring and direct notifications, with no custom relay.
-The reusable notification port owns separately scoped application/tool events;
-native downtime delivery does not execute that port. Keep HTTP health/status
+The reusable NotificationPort's initial implementation is the release-failure
+Email adapter; native uptime and Sentry group notifications do not execute it.
+Keep HTTP health/status
 contracts and stable target URLs provider-neutral. Better Stack setup, monitor
 intervals/confirmation/channel configuration and any provisioning code belong
 in a thin operational integration or runbook, not application/domain health
 logic. Add a provisioning port only for actual accepted provisioning code;
 do not invent an unused runtime provider class or monitoring framework.
 Provider replacement must not require business or health-logic changes.
-This choice does not select TD-030's independent diagnostics provider.
+This uptime choice is independent of TD-030's diagnostics Strategy.
 
 The [runtime/alerts plan](../../docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md#accepted-external-monitoring-and-remaining-alert-policy)
-records dated primary-source free-tier evidence and its limits. The uptime
-choice does not establish free access to the proposed app/tool incident-ingress
-adapter or advanced escalation features. Resolve their entitlement and policy
-before implementation; do not infer a paid upgrade.
+records dated primary-source free-tier and delivery-limit evidence. No Better
+Stack incident-ingress adapter, custom relay or advanced paid escalation is
+part of the accepted initial arrangement.
 
-Slack, Telegram and Pushover are possible future adapters, not selected
-transports or a requirement to implement all three. The first transport and
-detailed policy remain open in OD-027; choosing the uptime provider does not
-choose email versus Slack. No account provisioning, provider operation, paid
+The later owner channel decision, 2026-09-19, selects Email only for initial
+native uptime notifications. Slack, Telegram and Pushover are outside the
+initial scope. The owner also accepted the Production-only app/database/CMS
+native monitoring policy in [SPEC](../output/agent/SPEC.md#native-uptime-policy):
+three-minute polling, a further three-minute failure confirmation, three-minute
+stable recovery, one opening and one recovery Email, and no periodic reminders.
+Apply these through the external monitor's operational configuration, preserving
+component identity and one notification owner. The separately accepted
+[application/tool conditions](../output/agent/SPEC.md#application-tool-alert-policy)
+cover failed Production releases and new or regressed unexpected Production
+error groups, with no Email per repeated occurrence or duplicate native uptime
+notification.
+
+Final owner selection, 2026-09-19: use Sentry Free as the initial Production
+diagnostics provider and Sentry-native Email for new or regressed unexpected
+Production error groups. Retain both Sentry and Better Stack adapters and
+startup selection of `none`, `sentry` or `better-stack`; no dual export or
+runtime provider switch. Native grouping, alert rules and notification settings
+own group lifecycle and deduplication; suppress overlapping workflow/regression
+emails so one group transition has one notification owner. Changing the selected
+provider later requires compatible operational alert configuration/evidence,
+not changes to application business logic.
+
+Use a reusable provider-neutral `NotificationPort` with an initial Resend Email
+adapter for failed Production releases, including migration/deployment/final
+verification. Invoke it from the protected GitHub Actions release workflow,
+without application or database availability, auth-mail admission or a custom
+incident state machine/queue. Keep credentials, sender and configured recipient
+in protected workflow configuration, never arguments or records. Recipient
+selection is a setup prerequisite, not a new product decision. Stable release
+attempt identity plus Resend idempotency provides duplicate protection within
+the provider's 24-hour window, not permanent exactly-once delivery. Notification
+failure is separately reported safely and must not hide or alter the original
+failed release result. Preserve the existing protected release gates.
+
+This resolves OD-027. Planning and consolidated task breakdown are authorized;
+no account provisioning, provider operation, email send, paid
 subscription, queue or implementation is authorized.
 [Agent SPEC](../output/agent/SPEC.md#operational-alerts) owns the
 boundary; the existing logger/diagnostics slices remain unchanged.
@@ -653,3 +687,27 @@ reader, stable cache identity, signed webhook and protected manual recovery.
 Draft subscriptions do not replace or broaden that invalidation service.
 The [Agent SPEC](../output/agent/SPEC.md#editorial-draft-preview) owns integration
 boundaries; implementation and provider/browser proof remain future work.
+
+<a id="td-035"></a>
+
+## TD-035 — Runtime target safety and dependency health
+
+- **Status:** ACCEPTED, planned implementation
+- **Source:** owner-approved remaining T-26 runtime baseline, 2026-09-19
+- **Related:** [TD-026](#td-026), [D-012](PRODUCT.md#d-012), [TD-033](#td-033), [TST-RUNTIME-001](TESTING.md#tst-runtime-001)
+
+Share pure environment/target rules between tooling and a runtime-specific
+configuration boundary. Refuse unsafe client initialization without requiring
+migration or provider-administration credentials in the application. Bind safe
+runtime target/release identity to the observed deployment input; retain existing
+provider project/ref/alias checks and avoid network work during import/build.
+
+Provide bounded, provider-neutral app/database/CMS health with distinguishable
+safe status, fresh CMS evidence and protected remote dependency probes. Probe
+failure must not leak secrets or mislabel CMS degradation as whole-app downtime.
+Deployment smoke checks actual runtime release identity and relevant readiness,
+not just provider metadata or cached content. Reuse the existing database pool,
+published-content validation and safe logging; add no metrics/tracing framework.
+[SPEC](../output/agent/SPEC.md#runtime-health-safety) owns the detailed boundary;
+the runtime plan and T-26.8–T-26.10 own implementation/evidence. Existing verified
+environment/pipeline evidence stays historical, not proof of this extension.

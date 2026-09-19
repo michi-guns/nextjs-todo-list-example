@@ -629,34 +629,6 @@ Choose the split between local Sanity tests, routine browser tests, and live int
 
 Use local fixture tests to cover valid Sanity payload mapping, optional fields, and missing or invalid required-content failures. Routine Playwright uses deterministic test-only landing content through the same application-facing landing contract and requires no Sanity credentials or network access; this test source is unavailable in deployed runtime modes and is not a production fallback. Provide one separate, read-only live Sanity smoke that fetches the published singleton from the dedicated project and dataset, validates it, and maps it to the landing view model. The live smoke must pass before the starter baseline is declared complete and before a deployment is treated as release evidence. It fails clearly when configuration, the document, validation, or mapping is unavailable and never creates or edits CMS content. Exact fixture format, test-source wiring, command name, and evidence output remain implementation choices.
 
-<a id="od-027"></a>
-
-## OD-027 — First operational alert transport and policy
-
-- **Status:** OPEN
-- **Impact:** PRD and SPEC
-- **Blocking:** YES — finalizing operational-alert implementation planning; not the accepted logger/diagnostics slices, runtime foundations or account-recovery planning
-- **Related:** [D-012](PRODUCT.md#d-012), [TD-033](TECHNICAL.md#td-033), [T-26](../../TODO.md#t-26-add-runtime-safety-and-observability-hardening)
-
-The owner selected external native outage monitoring/direct notifications,
-with no custom relay, and Better Stack Uptime's free tier as the initial
-provider on 2026-09-19. [TD-033](TECHNICAL.md#td-033) owns those accepted
-choices and the replaceable operational integration boundary; do not reopen
-them here. The [runtime/alerts plan](../../docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md)
-records dated free-tier evidence and the proposed remaining implementation.
-
-Choose the first native notification channel (email or Slack) and policy:
-environment coverage, actionable conditions, confirmation thresholds and
-repeat/recovery behavior. Separately settle which application/tool conditions
-use the accepted outbound port and its transport, including the proposed
-incident-ingress adapter's actual entitlement on the selected tier. Basic free
-uptime does not establish free access to every integration or escalation.
-Production-only operation, email delivery and cooldown rules are not accepted
-choices. Telegram and Pushover remain future extension examples. Preserve one
-incident/notification owner and independence from the monitored app/database.
-No account provisioning, provider operation, paid subscription, new queue or
-implementation is authorized by this open entry.
-
 ## Non-blocking implementation freedom
 
 Dashboard chrome, empty-state copy, exact Sanity document type naming, and exact environment-variable names remain implementation details unless they change observable product behavior or require a new architectural decision.

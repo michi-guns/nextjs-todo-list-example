@@ -153,7 +153,10 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-RELEASE-001](#tst-release-001)         | An approved exact-ref release is migrated, deployed, smoked, and recorded            | Protected release rehearsal and Production evidence                  | T-21.5, T-23, T-24                                                 | `verified`  |
 | [TST-LOGGING-001](#tst-logging-001)         | Backend events preserve context, privacy and application outcomes                    | Unit, boundary, Node/Next output lifecycle                           | T-26.1, T-26.3                                                     | `specified` |
 | [TST-LOGGING-002](#tst-logging-002)         | Shared policy refresh and protected edits preserve environment isolation             | Unit, PostgreSQL integration, operator refusal checks                | T-26.2, T-26.3                                                     | `specified` |
-| [TST-ALERTS-001](#tst-alerts-001)           | Operational alerts stay independent of app outage and have one delivery owner        | Contract, adapter, external outage evidence                          | T-26                                                               | `specified` |
+| [TST-DIAGNOSTICS-001](#tst-diagnostics-001) | Safe diagnostics preserve routing, privacy and lifecycle                             | Unit, PostgreSQL policy, isolated Next runtime                       | T-26.4–T-26.6                                                      | `specified` |
+| [TST-DIAGNOSTICS-002](#tst-diagnostics-002) | Both providers receive useful safe logs and grouped errors                           | Local wire and real hosted ingestion/grouping                        | T-26.5–T-26.7                                                      | `specified` |
+| [TST-ALERTS-001](#tst-alerts-001)           | Operational alerts stay independent of app outage and have one delivery owner        | Contract, adapter, external outage and Email evidence                | T-26.11–T-26.14                                                    | `specified` |
+| [TST-RUNTIME-001](#tst-runtime-001)         | Runtime targets, health and deployed identity are safe and verifiable                | Configuration, local database/Next, pipeline and hosted smoke        | T-26.8–T-26.10, T-26.12                                            | `specified` |
 
 ## Test contracts
 
@@ -305,7 +308,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Verifies product decisions:** D-002, D-011
 - **Verifies technical decisions:** TD-004, TD-026, TD-027, TD-032
 - **SPEC:** [Account recovery and abuse resistance](../output/agent/SPEC.md#account-recovery-and-abuse)
-- **Owners:** [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+- **Owners:** T-27.2–T-27.4 under [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
 - **Contract:** Recovery requests remain neutral regardless of account existence. An expiring, single-use link permits a new password; successful reset revokes every existing session and requires ordinary sign-in. Requesting mail, invalid/expired/replayed links and throttled requests do not revoke sessions, lock the account or change credentials.
 - **Required evidence:** Focused boundary checks for neutral responses and timing-safe mail scheduling; real PostgreSQL checks for expiry, malformed/reused links, concurrent consumption without two successful resets, and revocation of at least two prior sessions only after a successful reset. A real browser journey requests/captures/consumes the reset link through the existing local mailbox, rejects old session cookies and the old password, and signs in normally with the new password. Logs and browser artifacts exclude reset credentials and URLs.
 - **Dependencies:** The existing Better Auth/mail seam, database and browser harnesses; implementation planning supplies exact lifetime and ordinary password-policy cases. Hosted delivery requires separately authorized evidence under the existing environment policy.
@@ -322,7 +325,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Verifies product decisions:** D-002, D-011
 - **Verifies technical decisions:** TD-004, TD-026, TD-027, TD-032
 - **SPEC:** [Account recovery and abuse resistance](../output/agent/SPEC.md#account-recovery-and-abuse)
-- **Owners:** [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+- **Owners:** T-27.2–T-27.4 under [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
 - **Contract:** Pending verification offers explicit resend; expired/invalid links have clear guidance and a fresh-link path. Resend is bounded, account existence remains private, and normal Better Auth verification/session behavior is preserved.
 - **Required evidence:** Boundary/database checks for pending, absent and already-verified recipients, invalid/expired links and resend throttling; browser journeys exercise resend and recovery through the local mailbox and prove private access only after normal successful verification. Preserve the existing fresh-signup verification journey and redact link-bearing diagnostics/artifacts. Do not impose password-reset single-use semantics on native verification tokens.
 - **Dependencies:** Existing verification UI/mail seam and database/browser harnesses, plus the shared controls in TST-AUTH-006. Hosted mail evidence remains separate.
@@ -339,7 +342,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Verifies product decisions:** D-011
 - **Verifies technical decisions:** TD-026, TD-027, TD-032
 - **SPEC:** [Account recovery and abuse resistance](../output/agent/SPEC.md#account-recovery-and-abuse)
-- **Owners:** [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+- **Owners:** T-27.1–T-27.4 under [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
 - **Contract:** Supported per-IP limits protect relevant sign-up, sign-in and auth-email paths. A shared per-recipient budget bounds verification, reset and magic-link mail, including automatic and server-side sends. Environment-scoped PostgreSQL counters admit requests atomically across instances. Excess requests produce a safe temporary wait, no account lockout or enumeration signal, and no sensitive logging.
 - **Required evidence:** Real database concurrency across independent limiter instances at first use, limit exhaustion and window expiry; prove IP rotation cannot bypass the recipient bound and independent environments do not share budgets. Exercise automatic signup/sign-in, explicit resend/reset/magic-link and relevant `auth.api` send paths, accounting for the HTTP limiter's server-call bypass and development defaults. Check common counter failures do not silently allow unbounded mail, recipient cooldown responses do not distinguish absent accounts, and retry feedback allows recovery without changing credentials or active sessions. Retain the existing migration and environment safety obligations for any new schema; in-memory mocks alone cannot verify shared atomicity.
 - **Dependencies:** Existing environment-selected PostgreSQL and Better Auth/Drizzle integration; planning specifies supported integration, concrete windows/counts and trusted IP handling. No new service is required.
@@ -552,7 +555,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Verifies technical decisions:** TD-018, TD-023, TD-026, TD-034
 - **Edge cases:** Existing [EC-007](EDGE-CASES.md#ec-007) and [EC-025](EDGE-CASES.md#ec-025) content failures; preview authorization, credential and cache boundaries below
 - **SPEC:** [6.4 Editorial draft preview](../output/agent/SPEC.md#editorial-draft-preview), [10.4 Sanity verification](../output/agent/SPEC.md#104-sanity-verification), [11 Environment and delivery](../output/agent/SPEC.md#11-environment-and-delivery-contract)
-- **Owner:** T-28
+- **Owner:** T-28.1–T-28.3
 - **Contract:** Existing authorized Sanity editors can activate draft preview, see unpublished landing changes update live, click rendered fields to their Studio source and exit to published content. Ordinary visitors retain published content and existing freshness/recovery behavior. Local, Development and Production editorial sessions use the existing `production` dataset; deployment Preview refuses the capability and remains read-only on `preview`.
 - **Required evidence:**
   - Boundary tests reject missing, invalid and expired private preview secrets and disallowed environment/configuration, and prove redirects remain within the application. Before delegating, reject missing secrets and malformed redirect syntax without exposing a present synthetic secret through the helper's development parse-error log. Ordinary application authentication alone cannot activate preview. Tests follow the installed helper's supported authorization and cookie/redirect lifecycle rather than replacing it.
@@ -911,31 +914,52 @@ These original logger contracts retain their stage-specific meaning.
 - **Verifies product decisions:** D-012
 - **Verifies technical decisions:** TD-030, TD-033
 - **SPEC:** [Operational alert delivery boundary](../output/agent/SPEC.md#operational-alerts)
-- **Owners:** [T-26](../../TODO.md#t-26-add-runtime-safety-and-observability-hardening)
-- **Contract:** Separately scoped application/tool alerts use a small provider/channel-neutral value and outbound notification port, with transport credentials/formatting in adapters. Diagnostics storage/error tracking stays separate. Better Stack Uptime's accepted native external downtime path does not execute that port; detection and direct delivery operate independently of the app and its database, with one incident/notification owner and no duplicate delivery path. Provider-neutral HTTP health/status contracts and stable target URLs isolate health/business logic from monitor setup and replacement.
-- **Required evidence:** Contract and selected-adapter checks for neutral payloads, safe credential/format boundaries and single incident/notification ownership. Verify health logic contains no provider-specific SDK/types/credentials/branches and monitor configuration remains operationally replaceable; do not implement a second provider merely to prove this boundary. Once channel/policy and the resulting plan are accepted, controlled external evidence proves native detection and selected-channel delivery while the monitored app is unavailable; an in-app test or successful log ingestion cannot substitute for that proof. Date-check actual free-tier entitlements for the selected setup and assess the separate app/tool adapter without assuming paid features are free.
-- **Dependencies:** [OD-027](OPEN-DECISIONS.md#od-027) channel/policy and app/tool transport resolution and the resulting accepted plan; separate authorization for real provider configuration or outage exercises. The external native arrangement and initial free-tier uptime provider are already selected.
+- **Owners:** T-26.11–T-26.14 under [T-26](../../TODO.md#t-26-add-runtime-safety-and-observability-hardening)
+- **Contract:** [TD-033](TECHNICAL.md#td-033) and SPEC own the accepted three-path arrangement: Better Stack native Production uptime Email, Sentry Free native new/regressed-group Email, and a reusable NotificationPort with a workflow-side Resend Email adapter for failed Production releases. The two native paths stay outside the port. Preserve the complete native timing/component policy, provider-neutral health logic, safe payloads and one incident/notification owner. Keep both diagnostics adapters/startup selection. Release delivery has no app/database/auth-mail-admission dependency, no custom incident queue/state machine, and cannot hide the original release failure.
+- **Required evidence:** Prove the Production-only native policy with real authorized external evidence: distinguish app/database/CMS failure, record detection/confirmation/recovery and Email timestamps, reset unstable recovery, and verify one opening/recovery Email with no repeats or duplicate application alerts. A CMS failure is not total downtime and confirmation is not an onset-to-alert deadline. Prove Sentry new-group and resolved-then-regressed Email, no per-occurrence repeats or expected-error/warning alerts, and no overlapping Issue Workflow/issue-alert notifications. Local mocks/log ingestion cannot establish native delivery or free-account entitlement.
+- **Release port/adapter evidence:** Exercise migration, deployment and final-verification failures from trusted workflow outcomes and sanitized release records, including missing-record fallback. Inspect actual Resend HTTP payloads against a local collector, same-key/same-payload retries, distinct workflow attempts, the 24-hour idempotency limit, timeout/refusal/invalid responses, secret/recipient redaction and preservation of the original nonzero release result. Prove no database/auth imports or live-app calls are required. Separately authorized real Resend acceptance and receipt, using the protected runner, remain required; HTTP acceptance alone is not mailbox proof.
+- **Dependencies:** Accepted plans and task breakdown; installed dependencies and local harness where named; protected account/project access, sender/recipient/secret configuration and explicit hosted verification authorization. Recipient configuration is not an open product decision. Recheck current free-tier eligibility/quotas at setup; no paid upgrade is authorized.
 - **Current evidence:** None. Existing logger/diagnostics contracts and source inspection do not verify this extension.
-- **Follow-up:** Complete policy/design planning under T-26 before implementation or final consolidated task breakdown; do not infer new service/queue authorization.
+- **Follow-up:** Implement T-26.11's local release path, then T-26.12 uptime, T-26.13 Sentry and T-26.14 protected release-Email evidence. Reconcile partial versus complete proof without reopening accepted policy or claiming hosted readiness from local tests.
+
+<a id="tst-runtime-001"></a>
+
+### TST-RUNTIME-001 — Runtime target, health and release identity
+
+- **Status:** `specified`
+- **Capability:** Runtime safety and operational readiness
+- **Evidence layers/modes:** Configuration/unit, real local PostgreSQL integration, isolated Next runtime, pipeline adapter and authorized deployed smoke
+- **Verifies product decisions:** D-012
+- **Verifies technical decisions:** TD-026, TD-033, TD-035
+- **SPEC:** [Runtime target safety and dependency health](../output/agent/SPEC.md#runtime-health-safety)
+- **Owners:** T-26.8–T-26.10, with deployed evidence reconciled in T-26.12
+- **Contract:** Runtime validation refuses unsafe target/profile/origin/dataset/mail combinations before client creation while accepting runtime-only Production configuration without migration/admin credentials. No network work occurs at import/build. Provider-neutral bounded app/database/CMS health distinguishes failures, checks fresh published CMS content, protects remote dependency probes and exposes only safe status/release identity. Delivery compares actual runtime SHA/readiness with the intended deployment while retaining provider project/ref/alias guards.
+- **Required evidence:** Pure rule/input-boundary tests; real local PostgreSQL success/failure/acquisition/query timeout and connection-release evidence; controlled HTTP CMS success/failure/timeout and cache-bypass checks; real isolated Next endpoint/refusal behavior; sanitized mismatch/secret sentinels; adapter tests for wrong SHA and failed readiness; authorized deployed target/probe evidence. A timeout must bound actual work and resources. Missing monitor settings are not successful readiness. CMS-only degradation is not total-app failure.
+- **Dependencies:** Accepted runtime plan and task prerequisites; Docker/browser prerequisites for named local checks; explicit target/configuration/release authorization for hosted evidence.
+- **Current evidence:** None. Existing `TST-ENV-001`, pipeline/release and published CMS evidence do not verify the new runtime extension.
+- **Follow-up:** Implement T-26.8–T-26.10, then reconcile separately authorized deployed evidence without changing historical verified statuses.
 
 ## SPEC traceability map
 
 The Agent SPEC remains the technical contract and this ledger owns the individual test obligations. The current mapping is:
 
-| SPEC area                                        | Test contracts                                                                                          |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| Auth and session rules                           | `TST-AUTH-001`–`TST-AUTH-006`                                                                           |
-| Data model, migrations, indexes, and connections | `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-PERSISTENCE-001`                     |
-| Domain rules and application use cases           | `TST-LISTS-001`–`TST-LISTS-003`, `TST-TASKS-001`–`TST-TASKS-003`, `TST-CONCURRENCY-001`                 |
-| Sanity landing boundary                          | `TST-LANDING-001`–`TST-LANDING-003`                                                                     |
-| HTTP, Server Actions, and Zod validation         | `TST-BOUNDARY-001`, with capability contracts below it                                                  |
-| UI and presentation boundary                     | `TST-UI-001`, `TST-E2E-001`–`TST-E2E-003`                                                               |
-| Testing, migration, and performance requirements | `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-PERFORMANCE-001`, plus the applicable capability contracts |
-| Environment profiles and target safety           | `TST-ENV-001`                                                                                           |
-| CI, Preview, and Production delivery             | `TST-PIPELINE-001`, `TST-PREVIEW-001`, `TST-RELEASE-001`                                                |
-| Shared backend logging and settings              | `TST-LOGGING-001`, `TST-LOGGING-002`                                                                    |
-| Optional application diagnostics                 | `TST-DIAGNOSTICS-001`, `TST-DIAGNOSTICS-002`                                                            |
+| SPEC area                                              | Test contracts                                                                                          |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Auth and session rules                                 | `TST-AUTH-001`–`TST-AUTH-006`                                                                           |
+| Data model, migrations, indexes, and connections       | `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-PERSISTENCE-001`                     |
+| Domain rules and application use cases                 | `TST-LISTS-001`–`TST-LISTS-003`, `TST-TASKS-001`–`TST-TASKS-003`, `TST-CONCURRENCY-001`                 |
+| Sanity landing and editorial preview                   | `TST-LANDING-001`–`TST-LANDING-004`                                                                     |
+| HTTP, Server Actions, and Zod validation               | `TST-BOUNDARY-001`, with capability contracts below it                                                  |
+| UI and presentation boundary                           | `TST-UI-001`, `TST-E2E-001`–`TST-E2E-003`                                                               |
+| Testing, migration, and performance requirements       | `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-PERFORMANCE-001`, plus the applicable capability contracts |
+| Environment profiles and target safety                 | `TST-ENV-001`                                                                                           |
+| CI, Preview, and Production delivery                   | `TST-PIPELINE-001`, `TST-PREVIEW-001`, `TST-RELEASE-001`                                                |
+| Shared backend logging and settings                    | `TST-LOGGING-001`, `TST-LOGGING-002`                                                                    |
+| Optional application diagnostics                       | `TST-DIAGNOSTICS-001`, `TST-DIAGNOSTICS-002`                                                            |
+| Runtime target, dependency health and release identity | `TST-RUNTIME-001`, preserving `TST-ENV-001` and delivery baseline evidence                              |
+| Operational notification ownership and delivery        | `TST-ALERTS-001`                                                                                        |
 
 When a SPEC behavior changes, update the owning Product or Technical Decision first when necessary, then update its linked `TST-*` contract and affected delivery tasks. Do not silently alter a contract only in `TODO.md` or in a test file.
 
-Operational alert delivery in SPEC section 11.3 maps to `TST-ALERTS-001`.
+SPEC sections 11.3 and 11.4 distinguish operational alerts from runtime health;
+their extension contracts remain `specified` until the required evidence exists.

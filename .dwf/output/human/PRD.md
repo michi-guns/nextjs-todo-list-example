@@ -61,9 +61,22 @@ product contract; existing baseline evidence does not verify this later work.
 Automatic operational alerts are accepted future work under
 [D-012](../../decisions/PRODUCT.md#d-012). Alerts must still reach the operator
 when the monitored application is completely unavailable, without duplicate
-notifications. The first delivery channel and exact alert policy remain
-[undecided](../../decisions/OPEN-DECISIONS.md#od-027); no implementation or new
-service is authorized.
+notifications. Initial native uptime notifications use Email only, with no
+Slack, Telegram or Pushover. Monitor Production only, with distinct application,
+database and CMS status. Checks run every three minutes; a detected failure must
+persist for another three minutes before an incident opens. Recovery needs
+three minutes of stable successful checks. Send one opening and one recovery
+Email, without periodic reminders. Total alert delay includes detection time;
+CMS-only degradation must not be called total application downtime.
+Also alert on failed Production releases, including migration/deployment/final
+verification, and new unexpected Production error groups or recurrence of a
+resolved group. Auth-email delivery and data-persistence failures are examples.
+Do not send Email for every repeat; expected user errors and ordinary warnings
+stay diagnostics, and uptime incidents get no duplicate application alert.
+Sentry Free sends native emails for those error-group transitions; failed
+releases use the reusable NotificationPort's Resend Email adapter from GitHub
+Actions, independently of the application/database. Planning and task definition
+are accepted; implementation, provider setup and email sends remain future work.
 
 ## Lists and tasks
 
