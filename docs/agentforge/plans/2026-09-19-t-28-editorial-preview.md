@@ -216,8 +216,10 @@ and their recorded scope. Exercise `TST-ENV-001`, `TST-PREVIEW-001` and
 
 Use focused colocated tests for configuration, missing/invalid/expired secret
 refusal and a present synthetic secret with malformed redirect syntax under
-development mode. Prove those refusals never invoke the helper or print the
-secret-bearing URL. Also cover safe redirects, token isolation, preview/public selection, clean
+development mode. Prove the missing-secret and malformed-redirect prechecks
+never invoke the helper or print the secret-bearing URL; well-formed requests
+with invalid or expired secrets still use native validation. Also cover safe
+redirects, token isolation, preview/public selection, clean
 mapping and four field attributes. Verify disabled/missing credentials do not
 break the public route/build; Preview refuses activation even with a true
 display flag. Assert the Preview adapter never injects the token and Production
