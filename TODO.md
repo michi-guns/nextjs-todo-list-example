@@ -1086,7 +1086,8 @@ The separately accepted [diagnostics plan](docs/agentforge/plans/2026-09-18-t-26
 adds T-26.4 through T-26.7 for optional central logs and grouped errors using
 one startup-selected Sentry or Better Stack adapter. It also authorizes task
 definition only. Runtime target validation, health/readiness and observability
-beyond these two plans remain pending. The parent task is not complete.
+beyond these two plans follow the later remaining-scope plan below. The parent
+task is not complete.
 
 Automatic alerts decision, 2026-09-19: [D-012](.dwf/decisions/PRODUCT.md#d-012)
 and [TD-033](.dwf/decisions/TECHNICAL.md#td-033) accept a provider/channel-neutral
@@ -1098,6 +1099,26 @@ first-transport and exact-policy choices; no service, queue or implementation
 is authorized. [TST-ALERTS-001](.dwf/decisions/TESTING.md#tst-alerts-001) is
 `specified`. T-26.1–T-26.7 remain unchanged and unchecked; consolidated
 breakdown of the remaining work is deferred until scope decisions are settled.
+
+Remaining baseline plan, 2026-09-19: the owner accepted runtime target safety,
+separate app/database/CMS health, safe diagnosis/runbooks and resolved release
+identity checks. The [runtime safety and alerts plan](docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md)
+maps these to existing boundaries and verification without creating the final
+task queue. Runtime/test obligations must be reconciled before implementation.
+The owner subsequently selected Better Stack Uptime's free tier and its native
+external downtime notifications, with no custom relay. [TD-033](.dwf/decisions/TECHNICAL.md#td-033)
+keeps monitor setup replaceable through operational configuration and health
+logic provider-neutral; diagnostics selection and the app/tool notification
+port remain separate. [OD-027](.dwf/decisions/OPEN-DECISIONS.md#od-027) still
+owns channel/policy and app/tool transport details. This records no provider
+setup, paid commitment or runtime implementation. T-26.1–T-26.7 stay unchecked.
+
+Remaining-plan checks, 2026-09-19: the seven affected documentation files pass
+scoped formatting/diff checks and 531 local link/anchor checks. All 36 existing
+test-contract statuses and the seven logger/diagnostics slices are preserved.
+TST-ALERTS-001 remains `specified`; no runtime, provider setup or alert-delivery
+proof is claimed. Normal hooks, fresh exact-tip independent review and
+main-push CI gate this documentation delivery.
 
 Alert decision-record checks, 2026-09-19: nine documentation files pass scoped
 Prettier and diff checks; 563 local links/anchors resolve. Existing contract
@@ -1120,12 +1141,12 @@ T-26.1 through T-26.7 remain unchecked, awaiting execution authorization.
 Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` without the tooling's full environment-profile guard, and unexpected application failures mapped through `src/shared/entry-contract.ts` lose their diagnostic cause. Address runtime target validation and safe failure reporting within this task's accepted scope and prerequisites. Preserve generic client errors; do not describe all database errors as silent because `db/pool.ts` already logs idle-client failures.
 
 - [ ] Complete T-26 as a separately scoped post-baseline hardening task.
-- Files: application startup/configuration boundaries, health/readiness endpoints or checks, structured logging/metrics/tracing adapters, deployment smoke helpers, security headers/error handling, focused tests, and observability runbooks.
+- Files: application startup/configuration boundaries, health/readiness endpoints, accepted logging/diagnostics and operational-notification adapters, thin monitor configuration/runbook, deployment smoke helpers, safe error handling and focused tests. Metrics, tracing and a generic monitoring framework are outside this scope.
 - Interfaces: sanitized startup target summary; readiness that distinguishes app, database, and CMS dependencies; correlation/request identifiers; structured failure events for migration/deployment/runtime target mismatch; no secret-bearing logs; release evidence links.
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: add or reconcile the smallest observability/security contracts after the core pipeline is accepted; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24 and T-25; production-like observability requirements must be agreed before implementation.
+- Dependencies/unblock: T-24 and T-25 are complete. Accepted logger/diagnostics slices await execution authorization; the remaining proposed runtime/alerts approach awaits final policy resolution and consolidated plan/task breakdown. Provider setup and hosted evidence retain separate authorization prerequisites.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>

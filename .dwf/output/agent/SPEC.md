@@ -849,12 +849,29 @@ single-report ownership. Provider-native and application-originated incident
 notifications must have one explicit owner, not parallel duplicate paths.
 
 Total-outage detection and delivery must operate independently of the monitored
-Next.js application and its database. An in-app dispatcher cannot be the only path. The later
-design must demonstrate that independence; this decision does not select or
-authorize a new external service, queue or dispatcher deployment. Slack,
-Telegram and Pushover are examples of possible adapters, not selected channels.
-[OD-027](../../decisions/OPEN-DECISIONS.md#od-027) retains the first transport
-and exact policy choices; do not assume Production-only, email or a cooldown.
+Next.js application and its database. Use the accepted Better Stack Uptime free
+tier's native external monitoring and direct notification path, with no custom
+relay. This native path does not execute the reusable notification port; that
+port serves separately scoped application/tool events. Preserve one explicit
+incident/notification owner across both paths.
+
+Expose provider-neutral HTTP liveness/readiness/status contracts and stable
+target URLs. No Better Stack SDK, types, credentials or provider branches belong
+in application/domain health logic. Monitor targets, intervals, confirmation,
+channel setup and any provider-specific provisioning belong in a thin
+operational integration or runbook. A provisioning port/adapter is warranted
+only for actual accepted provisioning code, not an unused runtime provider
+class. Provider replacement changes operational integration/configuration,
+not business or health logic; the diagnostics Strategy remains independent.
+
+The [plan](../../../docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md#accepted-external-monitoring-and-remaining-alert-policy)
+records dated free-tier evidence, without promising indefinite pricing or free
+advanced escalation/incident-ingress features. No account provisioning, paid
+subscription, provider operation, queue or implementation is authorized.
+[OD-027](../../decisions/OPEN-DECISIONS.md#od-027) retains the first channel
+(email versus Slack), exact policy and separate app/tool event/transport
+details; do not assume Production-only or a cooldown. Telegram and Pushover
+remain future adapter examples, not native free-tier promises.
 Implement nothing until that policy and the resulting plan are accepted.
 [TST-ALERTS-001](../../decisions/TESTING.md#tst-alerts-001) owns future evidence;
 existing diagnostics tests cannot prove outage notification delivery.

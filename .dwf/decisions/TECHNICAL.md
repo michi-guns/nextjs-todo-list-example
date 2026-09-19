@@ -580,10 +580,30 @@ independently of the monitored application and its database; an in-app dispatche
 satisfy that requirement. Coordinate provider-native and application-originated
 notifications under one incident/notification owner.
 
+Owner follow-up, 2026-09-19: use Better Stack Uptime's free tier for native
+external outage monitoring and direct notifications, with no custom relay.
+The reusable notification port owns separately scoped application/tool events;
+native downtime delivery does not execute that port. Keep HTTP health/status
+contracts and stable target URLs provider-neutral. Better Stack setup, monitor
+intervals/confirmation/channel configuration and any provisioning code belong
+in a thin operational integration or runbook, not application/domain health
+logic. Add a provisioning port only for actual accepted provisioning code;
+do not invent an unused runtime provider class or monitoring framework.
+Provider replacement must not require business or health-logic changes.
+This choice does not select TD-030's independent diagnostics provider.
+
+The [runtime/alerts plan](../../docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md#accepted-external-monitoring-and-remaining-alert-policy)
+records dated primary-source free-tier evidence and its limits. The uptime
+choice does not establish free access to the proposed app/tool incident-ingress
+adapter or advanced escalation features. Resolve their entitlement and policy
+before implementation; do not infer a paid upgrade.
+
 Slack, Telegram and Pushover are possible future adapters, not selected
 transports or a requirement to implement all three. The first transport and
-detailed policy remain open. No new service, queue or implementation is
-authorized. [Agent SPEC](../output/agent/SPEC.md#operational-alerts) owns the
+detailed policy remain open in OD-027; choosing the uptime provider does not
+choose email versus Slack. No account provisioning, provider operation, paid
+subscription, queue or implementation is authorized.
+[Agent SPEC](../output/agent/SPEC.md#operational-alerts) owns the
 boundary; the existing logger/diagnostics slices remain unchanged.
 
 <a id="td-034"></a>

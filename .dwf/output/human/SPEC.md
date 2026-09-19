@@ -159,13 +159,23 @@ will also edit the diagnostics policy; no editor choice remains open.
 
 ## Operational alerts, planned separately
 
-[TD-033](../../decisions/TECHNICAL.md#td-033) keeps notification delivery
-behind a small outbound port, with channel-specific formatting and credentials
-in adapters. It is separate from diagnostics storage and error tracking.
-Outage detection and delivery must continue when the Next.js application is
-down, and one owner prevents duplicate incidents or notifications. The first
-channel and precise policy remain [open](../../decisions/OPEN-DECISIONS.md#od-027).
-No notification adapter, new service or queue is implemented or authorized yet.
+[TD-033](../../decisions/TECHNICAL.md#td-033) selects Better Stack Uptime's free
+tier for external outage monitoring and direct notifications, even when this
+application and its database are down. No custom relay is required. Health
+checks expose provider-neutral HTTP status contracts; provider setup belongs
+in a thin operational integration/runbook so replacing the monitor does not
+change business or health logic. Do not add an unused provider framework.
+
+Separately scoped application/tool alerts retain a small outbound notification
+port with formatting and credentials in adapters. Native downtime notifications
+do not run through that port. One owner prevents duplicate incidents or
+notifications, and the diagnostics Strategy stays independent. The first
+channel, precise policy and app/tool transport details remain
+[open](../../decisions/OPEN-DECISIONS.md#od-027). The
+[plan](../../../docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md#accepted-external-monitoring-and-remaining-alert-policy)
+records dated free-tier evidence without promising indefinite pricing or free
+advanced features. No provider setup, paid subscription, notification adapter,
+queue or runtime implementation is authorized yet.
 
 ## Required application behavior
 

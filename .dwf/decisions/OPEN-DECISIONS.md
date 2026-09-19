@@ -635,17 +635,27 @@ Use local fixture tests to cover valid Sanity payload mapping, optional fields, 
 
 - **Status:** OPEN
 - **Impact:** PRD and SPEC
-- **Blocking:** YES — operational-alert implementation planning; not the accepted logger/diagnostics slices or account-recovery planning
+- **Blocking:** YES — finalizing operational-alert implementation planning; not the accepted logger/diagnostics slices, runtime foundations or account-recovery planning
 - **Related:** [D-012](PRODUCT.md#d-012), [TD-033](TECHNICAL.md#td-033), [T-26](../../TODO.md#t-26-add-runtime-safety-and-observability-hardening)
 
-Select the first notification transport and the operational policy: environment
-coverage, actionable conditions, repeat/recovery behavior and incident ownership.
-Production-only operation, email delivery and cooldown rules are proposals,
-not accepted choices. Slack, Telegram and Pushover are examples of potential
-adapters only. The chosen arrangement must detect and deliver total-outage
-alerts independently of the monitored Next.js application, retain one incident
-and notification owner, and use the accepted Ports and Adapters boundary.
-No new service/queue or hosted configuration is authorized by this open entry.
+The owner selected external native outage monitoring/direct notifications,
+with no custom relay, and Better Stack Uptime's free tier as the initial
+provider on 2026-09-19. [TD-033](TECHNICAL.md#td-033) owns those accepted
+choices and the replaceable operational integration boundary; do not reopen
+them here. The [runtime/alerts plan](../../docs/agentforge/plans/2026-09-19-t-26-runtime-safety-and-alerts.md)
+records dated free-tier evidence and the proposed remaining implementation.
+
+Choose the first native notification channel (email or Slack) and policy:
+environment coverage, actionable conditions, confirmation thresholds and
+repeat/recovery behavior. Separately settle which application/tool conditions
+use the accepted outbound port and its transport, including the proposed
+incident-ingress adapter's actual entitlement on the selected tier. Basic free
+uptime does not establish free access to every integration or escalation.
+Production-only operation, email delivery and cooldown rules are not accepted
+choices. Telegram and Pushover remain future extension examples. Preserve one
+incident/notification owner and independence from the monitored app/database.
+No account provisioning, provider operation, paid subscription, new queue or
+implementation is authorized by this open entry.
 
 ## Non-blocking implementation freedom
 
