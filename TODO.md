@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 42 files and 415 tests (T-33 dependency refresh, 2026-09-18).
+- [x] `pnpm test` passes 46 files and 445 tests (T-26.1 logger core, 2026-09-19).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1128,10 +1128,12 @@ has been performed by this planning delivery.
 
 #### Consolidated execution order and checkpoints
 
-The accepted plans now map to **21 unchecked child tasks**: T-26.1–T-26.14,
-T-27.1–T-27.4 and T-28.1–T-28.3. This authorizes task definition only; await a
-separate execution instruction. Use one implementing agent and subagents only
-for independent review, as the owner requested.
+The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
+T-27.1–T-27.4 and T-28.1–T-28.3. The owner's next-task instruction authorized
+T-26.1 on 2026-09-19; that core unit is complete, leaving 20 unchecked children.
+The plans themselves authorize task definition only. Further execution requires
+the owner's instruction and the named prerequisites. Use one implementing agent
+and subagents only for independent review, as the owner requested.
 
 - Default serial implementation order: T-26.1–T-26.6, T-26.8–T-26.11,
   T-27.1–T-27.3, then T-28.1–T-28.2. This avoids concurrent edits to auth,
@@ -1204,17 +1206,17 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. All 14 child tasks have accepted plans and await execution authorization plus their named prerequisites. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 is complete; the remaining 13 children have accepted plans and await execution authorization plus their named prerequisites. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
 
 #### T-26.1: Provide a reusable contextual backend logger
 
-- [~] Implement the database-independent Pino facade and prove its emission,
-  privacy and request-context contract. Execution authorized by the owner's
-  next-task instruction on 2026-09-19. Registry and installed dependencies
-  pass preflight; this unit needs no Docker or provider access.
+- [x] Implement the database-independent Pino facade and prove its emission,
+      privacy and request-context contract. Execution authorized by the owner's
+      next-task instruction on 2026-09-19. Registry and installed dependencies
+      pass preflight; this unit needs no Docker or provider access.
 - Files: new `src/shared/logging/` core, configuration schema, context,
   sanitizer, Pino writer and colocated `*.test.ts`; `package.json` and generated
   `pnpm-lock.yaml` for authorized dependencies. No database or application
@@ -1245,6 +1247,13 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   both formats, channels and destination failures. `TST-LOGGING-001` is partial
   until T-26.3 adoption/runtime proof. Independent exact-tip review and main-push
   CI remain the integration gates.
+- Closeout: fresh GPT-6-Astra `xhigh` review approved implementation commit
+  `57aa12f0dc77a850175b5e40e8cebacb53663367` without actionable findings.
+  All 447 local Markdown destinations, scoped formatting and diff checks pass.
+  This completion metadata receives its own fresh exact-tip review before
+  direct merge and main-push CI. T-26.2 is next in serial order and needs its
+  execution instruction plus Docker and an authorized non-default Neon
+  migration target. No later task or hosted operation was started.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `source-driven-development`,
   `observability-and-instrumentation`, `security-and-hardening`,
