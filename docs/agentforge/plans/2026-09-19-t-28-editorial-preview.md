@@ -114,9 +114,12 @@ or framing restriction is a concrete prerequisite, not permission to add a bypas
 
 The enable handler imports `defineEnableDraftMode` from `next-sanity/draft-mode`
 and delegates to `defineEnableDraftMode({client: viewerClient}).GET(request)`
-after its profile/configuration guard. Reject an absent secret before calling
-the helper: the installed dependency's development parse-error diagnostic may
-otherwise print request/client details. Do not log the request URL or client.
+after its profile/configuration guard. Before calling the helper, quietly
+reject an absent secret and malformed `sanity-preview-pathname` URL syntax.
+Use a narrow `URL` syntax check with a fixed local base; leave authorization
+and relative redirect normalization to the helper. The installed dependency's
+development parse-error diagnostic otherwise prints the request URL even when
+a secret is present. Do not log the rejected URL, error input or client.
 Preserve the helper's validation, relative redirect normalization, async cookie
 handling and supported secure/partitioned-cookie behavior. Do not catch and
 convert Next.js's successful redirect into an integration failure.
@@ -212,7 +215,9 @@ and their recorded scope. Exercise `TST-ENV-001`, `TST-PREVIEW-001` and
 `TST-RELEASE-001` boundaries when environment/delivery wiring changes.
 
 Use focused colocated tests for configuration, missing/invalid/expired secret
-refusal, safe redirects, token isolation, preview/public selection, clean
+refusal and a present synthetic secret with malformed redirect syntax under
+development mode. Prove those refusals never invoke the helper or print the
+secret-bearing URL. Also cover safe redirects, token isolation, preview/public selection, clean
 mapping and four field attributes. Verify disabled/missing credentials do not
 break the public route/build; Preview refuses activation even with a true
 display flag. Assert the Preview adapter never injects the token and Production

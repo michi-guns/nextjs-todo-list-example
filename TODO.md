@@ -1448,6 +1448,7 @@ Verification and evidence for this slice:
 ### T-28: Add Sanity authenticated preview and live authoring
 
 - Planning checks, 2026-09-19: all nine affected documentation files pass scoped Prettier and diff checks; 611 local links/anchors resolve. The 35 existing test-contract statuses are preserved and TST-LANDING-004 is `specified`. Normal commit hooks, fresh exact-tip independent review and main-push CI gate delivery; no editorial preview or hosted evidence is claimed.
+- Review repair: a network-free synthetic probe found that the installed preview helper logs a present secret when redirect syntax is malformed in development. The plan and TST-LANDING-004 now require a quiet syntax precheck and log-refusal evidence while preserving framework authorization/cookies. This is a planning correction, not a runtime fix or verified preview contract.
 
 - [ ] Implement the next-cycle editorial preview scope activated by [D-013](.dwf/decisions/PRODUCT.md#d-013) and [TD-034](.dwf/decisions/TECHNICAL.md#td-034). The owner has accepted the scope; the [editorial preview plan](docs/agentforge/plans/2026-09-19-t-28-editorial-preview.md) is Proposed. Plan acceptance and subsequent task breakdown remain prerequisites before implementation.
 - Files: Sanity presentation/preview routes and configuration, authenticated Draft Mode/Visual Editing/Live integration, webhook/revalidation handling, browser tests, and Sanity runbooks.
