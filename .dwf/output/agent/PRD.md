@@ -45,6 +45,7 @@ A todo list is a universally understood reference domain, so the architecture an
 11. Demonstrate that the core cursor reads are index-backed and comfortably fast on a representative Neon development dataset.
 12. Prefer current stable best practices and high-leverage production safeguards without adding speculative framework machinery.
 13. Provide manually requested isolated Preview and manually approved exact-ref Production delivery paths with explicit target, secret, approval, migration, smoke, and evidence boundaries.
+14. Extend the delivered authentication baseline with the accepted, planned [account recovery and abuse resistance](#account-recovery-and-abuse) scope.
 
 ## 3. Non-goals (explicit)
 
@@ -55,7 +56,7 @@ Out of scope for the current todo reference baseline:
 - Real-time / multiplayer collaboration
 - Native mobile apps
 - OAuth / social login
-- Polished email verification and password-reset product flows
+- Polished email verification and password-reset product flows were outside the original baseline; the later accepted [T-27 recovery scope](#account-recovery-and-abuse) is now planned
 - Sanity Live draft preview and click-to-edit visual editing in the initial delivery phase; this accepted capability follows the webhook and manual-recovery baseline
 - Internationalization (English only)
 - Recurring tasks, subtasks, tags, attachments, comments
@@ -73,6 +74,7 @@ Out of scope for the current todo reference baseline:
 | Signed-in | Manage only their own lists and tasks; sign out                   |
 
 - Anyone may register.
+- The planned T-27 recovery flows are available without an existing session; they do not grant access to private data before successful authentication.
 - There is **no** tenant, organization, or `Workspace` entity. Lists belong directly to the authenticated user through `userId`.
 - Authorization rule: **must be signed in** to read or write lists/tasks.
 - Requests for another user's list or task do not reveal whether that resource exists.
@@ -119,8 +121,44 @@ Out of scope for the current todo reference baseline:
 ### 5.5 Surfaces
 
 1. **Public landing** — copy from Sanity (headline, blurb, CTAs).
-2. **Auth screens** — sign-up, sign-in, magic link, sign-out.
+2. **Auth screens** — sign-up, sign-in, magic link, sign-out; planned T-27 password and verification recovery.
 3. **App shell** — dashboard-style layout: list sidebar + task main panel.
+
+<a id="account-recovery-and-abuse"></a>
+
+### 5.6 Account recovery and abuse resistance
+
+[D-011](../../decisions/PRODUCT.md#d-011) accepts this later extension to the
+delivered authentication baseline. Implementation remains planned under
+[T-27](../../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance);
+the existing baseline evidence does not establish these recovery and abuse
+controls.
+
+- Password recovery accepts an email address and returns a neutral response
+  independent of account existence. An expiring, single-use reset link lets
+  the recipient set a new password, then return to ordinary sign-in.
+- A successful password reset automatically revokes all existing sessions and
+  requires sign-in. Requesting recovery mail must not revoke sessions, lock
+  the account or otherwise change authentication state.
+- Verification recovery offers explicit resend, understandable expired/invalid
+  link handling and a fresh-link path, with resend-frequency limits. Preserve
+  normal verification and session behavior.
+- Relevant sign-up, sign-in and auth-email paths have per-IP limits. A shared
+  per-recipient auth-email bound prevents rotating IPs from flooding one
+  mailbox across verification, reset and magic-link messages, including
+  automatic sends. Limits apply across application instances.
+- A limit produces a temporary wait and a clear message, never an account
+  lockout. Preserve neutral account-existence responses and redact sensitive
+  data from logs and evidence.
+
+Exact windows, counts, token lifetimes and copy are routine, grounded
+implementation proposals within this scope. Account deletion, profile/email
+editing, social login, MFA, CAPTCHA procurement, a new auth architecture and
+provider replacement remain outside T-27. The technical contract is
+[SPEC account recovery and abuse resistance](SPEC.md#account-recovery-and-abuse);
+verification belongs to [TST-AUTH-004](../../decisions/TESTING.md#tst-auth-004),
+[TST-AUTH-005](../../decisions/TESTING.md#tst-auth-005) and
+[TST-AUTH-006](../../decisions/TESTING.md#tst-auth-006).
 
 ## 6. Data ownership (product view)
 

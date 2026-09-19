@@ -2,6 +2,13 @@
 
 **Status:** Accepted by the owner's 2026-09-09 authorization to deliver this local slice independently.
 
+**Current status, 2026-09-19:** This local slice is complete; its recorded
+evidence is in [T-27](../../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance).
+The later [D-011](../../../.dwf/decisions/PRODUCT.md#d-011)/[TD-032](../../../.dwf/decisions/TECHNICAL.md#td-032)
+recovery and abuse decisions await consolidated planning and implementation.
+This historical plan covers only the completed browser slice; its original
+dependency and review wording records that slice's context.
+
 **Goal:** Prove fresh browser signup, pending-access refusal, email verification, Inbox access, and password sign-in after sign-out.
 
 **Spec and decisions:** [PRD](../../../.dwf/output/agent/PRD.md), [SPEC §2](../../../.dwf/output/agent/SPEC.md#2-auth-better-auth), [TST-AUTH-001](../../../.dwf/decisions/TESTING.md#tst-auth-001), [TST-E2E-001](../../../.dwf/decisions/TESTING.md#tst-e2e-001), [T-27](../../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance).

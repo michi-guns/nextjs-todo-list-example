@@ -28,6 +28,34 @@ The starter uses modern recommended practices and production-minded safeguards, 
 - There is no tenant, organization, or `Workspace` entity. Lists belong directly to the signed-in user.
 - Teams, organizations, shared lists, collaboration, OAuth, recurring tasks, attachments, payments, offline mode, and multi-region operations are outside the current todo reference baseline. Derived applications may choose different domain scope.
 
+## Account recovery and abuse resistance
+
+The original baseline excluded polished verification and password-reset flows.
+[D-011](../../decisions/PRODUCT.md#d-011) now accepts them as later
+[T-27](../../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+scope; implementation remains planned.
+
+Password recovery will accept an email address and respond neutrally whether
+an account exists or not. An expiring, single-use link lets the recipient set
+a new password. A successful reset signs out every existing session and
+requires ordinary sign-in. Simply requesting the email does not change the
+account's authentication state or lock it.
+
+Verification recovery will provide resend and clear guidance for expired or
+invalid links, including a way to request a fresh link. Normal verification
+and session behavior stays intact. Temporary limits on relevant sign-up,
+sign-in and auth-email traffic, plus a shared limit for each recipient across
+verification, reset and magic-link sends, will prevent mailbox flooding from
+rotating IP addresses. Automatic sends are included. Limits give a clear wait
+message without locking an account or revealing whether it exists; logs and
+evidence remain redacted.
+
+Exact limits, token lifetimes and wording will be grounded implementation
+choices. Account deletion, profile/email editing, social login, MFA, CAPTCHA
+procurement, a new auth architecture and provider replacement are outside this
+scope. The [Agent PRD](../agent/PRD.md#account-recovery-and-abuse) owns the exact
+product contract; existing baseline evidence does not verify this later work.
+
 ## Lists and tasks
 
 A user can own many lists. List names are trimmed, contain 1–80 characters, and are unique for that user under case-insensitive comparison. Whenever the private workspace loads with no lists, the product creates exactly one `Inbox`. The automatic Inbox is an ordinary list after creation and may be renamed or deleted. If the final list is deleted, the next private workspace load creates a new empty Inbox. Any existing list prevents automatic Inbox creation. Deleting a list removes its tasks. Lists are shown oldest-created first through forward cursor pagination, 20 at a time by default, with a visible way to load more.

@@ -527,3 +527,35 @@ operations retain their existing protected authorization boundaries.
 This resolves only the editor choice. Logger storage, cache, filtering and
 diagnostics provider decisions remain unchanged. Implementation, verification
 and separately authorized hosted work remain future work.
+
+<a id="td-032"></a>
+
+## TD-032 — Better Auth recovery and shared PostgreSQL abuse limits
+
+- **Status:** ACCEPTED, planned implementation
+- **Related product decisions:** [D-002](PRODUCT.md#d-002), [D-011](PRODUCT.md#d-011)
+- **Related technical decisions:** [TD-004](#td-004), [TD-026](#td-026), [TD-027](#td-027)
+- **Related test contracts:** [TST-AUTH-004](TESTING.md#tst-auth-004), [TST-AUTH-005](TESTING.md#tst-auth-005), [TST-AUTH-006](TESTING.md#tst-auth-006)
+- **Source:** owner-approved T-27 account decisions, 2026-09-19
+
+Implement D-011 through the installed Better Auth recovery APIs and existing
+auth-mail boundary. Better Auth owns reset token expiry and single use; select
+its supported automatic session revocation on successful password reset.
+Preserve the ordinary verification/session lifecycle and environment-specific
+mail policy.
+
+Use Better Auth's supported per-IP limiting for relevant authentication paths
+and a recipient-level bound at the auth-email boundary that also covers
+automatic verification, reset and magic-link sends. Store shared counters in
+the selected environment's existing application PostgreSQL database through
+the supported integration. Verify atomic concurrent check/increment behavior
+across instances; database-backed storage alone is insufficient evidence of
+that guarantee. These counters are distinct from the logger's cached
+configuration. Add no Redis, new service or generic rate-limiting framework.
+
+The [Agent SPEC](../output/agent/SPEC.md#account-recovery-and-abuse) owns
+installed-version integration caveats and the verification boundary. Exact
+limits, windows, token lifetimes and copy remain grounded implementation
+proposals within the accepted behavior. This extends TD-004 without replacing
+the auth architecture or mail provider; implementation and verification remain
+future work under [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance).

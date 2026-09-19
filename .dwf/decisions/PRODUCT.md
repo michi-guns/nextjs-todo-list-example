@@ -112,3 +112,36 @@ approved exact-ref Production release path. Hosted resources, credentials, and
 protected approvals remain explicit prerequisites; local configuration must
 never imply them. CI cannot access Production secrets or create Preview
 deployments, and ordinary pull requests do not create deployed Previews.
+
+<a id="d-011"></a>
+
+## D-011 — Account recovery and abuse resistance
+
+- **Status:** ACCEPTED, planned implementation
+- **Source:** owner-approved T-27 account decisions, 2026-09-19
+- **Related:** [D-002](#d-002), [TD-032](TECHNICAL.md#td-032), [Agent PRD](../output/agent/PRD.md#account-recovery-and-abuse), [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+- **Related test contracts:** [TST-AUTH-004](TESTING.md#tst-auth-004), [TST-AUTH-005](TESTING.md#tst-auth-005), [TST-AUTH-006](TESTING.md#tst-auth-006)
+
+Extend D-002's delivered baseline with password recovery, verification recovery,
+and bounded authentication traffic. Password recovery accepts an email address
+and gives a neutral response regardless of account existence. An expiring,
+single-use link lets its recipient set a new password. A successful reset
+automatically revokes all existing sessions and requires ordinary sign-in.
+Requesting the email must not revoke sessions, lock the account, or otherwise
+change authentication state. Automatic revocation is the owner's selected
+policy.
+
+Verification recovery provides explicit resend, understandable expired/invalid
+link handling and a fresh-link path, with resend-frequency limits. Preserve
+normal verification and session behavior. Limit relevant sign-up, sign-in and
+auth-email paths per IP, and bound auth email per recipient so rotating IPs
+cannot flood a mailbox. Cover verification, reset and magic-link messages,
+including automatic sends. Limits cause a temporary wait with a clear message,
+never an account lockout; retain neutral account-existence responses and
+redacted logs/evidence.
+
+Exact windows, counts, token lifetimes and copy remain routine, grounded
+implementation proposals. Account deletion, profile/email editing, social
+login, MFA, CAPTCHA procurement, a new auth architecture and provider replacement
+are outside this decision. This later scope does not rewrite baseline evidence
+or authorize hosted mail sends or deployment.

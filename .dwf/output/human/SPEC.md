@@ -36,6 +36,19 @@ authenticate → authorize → validate with Zod → call use case → map resul
 
 Better Auth remains behind a server-only application boundary exposing current-user helpers. Private reads and writes require the session user; client-provided owner IDs are never trusted.
 
+The accepted, planned [T-27 recovery extension](../agent/SPEC.md#account-recovery-and-abuse)
+keeps Better Auth responsible for password-reset tokens and sessions. A
+successful reset revokes every existing session and requires sign-in; asking
+for the email does not affect active sessions. Verification gains resend and
+expired/invalid-link recovery while preserving its normal session behavior.
+Per-IP limits and a shared recipient mail budget use the existing environment's
+PostgreSQL database with atomic admission across instances. The budget covers
+verification, reset and magic-link messages, including automatic sends. Limits
+mean a temporary wait, preserve neutral account-existence responses and never
+lock an account. No Redis, new service or logger configuration cache is involved.
+[TD-032](../../decisions/TECHNICAL.md#td-032) records the technical decision;
+implementation and its real database/browser evidence remain future work.
+
 Local magic-link verification uses an explicitly enabled, temporary, gitignored, file-backed mailbox. Playwright clears it, requests a link, reads the captured URL, and visits it. The mailbox is unavailable outside local/test mode.
 
 A missing private resource and one owned by another user produce the same application-level `not_found` outcome. JSON handlers map both to `404` with code `not_found`; Server Actions expose the equivalent generic result.

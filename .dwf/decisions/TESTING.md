@@ -127,6 +127,9 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-AUTH-001](#tst-auth-001)               | Email/password sessions can be created, used, and ended                              | Boundary integration, end-to-end                                     | T-05, T-15                                                         | `verified`  |
 | [TST-AUTH-002](#tst-auth-002)               | Magic-link request and consumption work in local/test mode                           | Mailbox integration, end-to-end                                      | T-05, T-15                                                         | `verified`  |
 | [TST-AUTH-003](#tst-auth-003)               | Private operations require the real session owner                                    | Application, boundary, end-to-end                                    | T-05, T-09, T-15                                                   | `verified`  |
+| [TST-AUTH-004](#tst-auth-004)               | Password recovery revokes all sessions only after successful reset                   | Auth boundary, PostgreSQL, browser                                   | T-27                                                               | `specified` |
+| [TST-AUTH-005](#tst-auth-005)               | Verification resend and invalid-link recovery preserve normal auth                   | Auth boundary, PostgreSQL, browser                                   | T-27                                                               | `specified` |
+| [TST-AUTH-006](#tst-auth-006)               | Shared IP and recipient limits bound all auth-email paths                            | HTTP/mail boundaries, PostgreSQL concurrency, browser                | T-27                                                               | `specified` |
 | [TST-LISTS-001](#tst-lists-001)             | Inbox creation and list lifecycle remain correct                                     | Domain, application, PostgreSQL integration, browser                 | T-06, T-10, T-14                                                   | `verified`  |
 | [TST-LISTS-002](#tst-lists-002)             | List validation, CRUD, uniqueness, and deletion behavior are correct                 | Domain, application, PostgreSQL, boundary                            | T-04, T-06, T-09, T-14                                             | `verified`  |
 | [TST-LISTS-003](#tst-lists-003)             | List pagination is bounded, deterministic, and context-safe                          | Application, PostgreSQL, boundary, UI                                | T-06, T-08, T-10, T-14                                             | `verified`  |
@@ -289,6 +292,57 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Dependencies:** T-05 session helpers, T-09 entry paths, and T-15 browser harness.
 - **Current evidence:** `src/modules/auth/auth.integration.test.ts` proves the current-user boundary fails closed without a session and rejects bearer-only access even when paired with a client-supplied `x-user-id`. The T-09 list/task request and action suites prove session-derived owner propagation, anonymous `401` outcomes, privacy-preserving `404` outcomes, rejection of spoofed body fields, and rejection of foreign-origin mutations. The deterministic Chromium privacy journey signs in two seeded users, confirms each sees only its own list/task, and confirms a private task endpoint for the other user returns the ordinary `404` outcome; the full local browser run passes 7/7 journeys.
 - **Follow-up:** None for the accepted local/test ownership contract; broader authorization models remain outside the baseline.
+
+<a id="tst-auth-004"></a>
+
+### TST-AUTH-004 — Password recovery and automatic session revocation
+
+- **Status:** `specified`
+- **Capability:** Account recovery
+- **Evidence layers/modes:** Auth boundary, PostgreSQL integration, browser
+- **Verifies product decisions:** D-002, D-011
+- **Verifies technical decisions:** TD-004, TD-026, TD-027, TD-032
+- **SPEC:** [Account recovery and abuse resistance](../output/agent/SPEC.md#account-recovery-and-abuse)
+- **Owners:** [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+- **Contract:** Recovery requests remain neutral regardless of account existence. An expiring, single-use link permits a new password; successful reset revokes every existing session and requires ordinary sign-in. Requesting mail, invalid/expired/replayed links and throttled requests do not revoke sessions, lock the account or change credentials.
+- **Required evidence:** Focused boundary checks for neutral responses and timing-safe mail scheduling; real PostgreSQL checks for expiry, malformed/reused links, concurrent consumption without two successful resets, and revocation of at least two prior sessions only after a successful reset. A real browser journey requests/captures/consumes the reset link through the existing local mailbox, rejects old session cookies and the old password, and signs in normally with the new password. Logs and browser artifacts exclude reset credentials and URLs.
+- **Dependencies:** The existing Better Auth/mail seam, database and browser harnesses; implementation planning supplies exact lifetime and ordinary password-policy cases. Hosted delivery requires separately authorized evidence under the existing environment policy.
+- **Current evidence:** None for this extension. Existing TST-AUTH-001–003 evidence remains valid only for its original scope.
+- **Follow-up:** Implement and reconcile under T-27 after consolidated planning; do not infer completion from this decision record.
+
+<a id="tst-auth-005"></a>
+
+### TST-AUTH-005 — Verification resend and invalid-link recovery
+
+- **Status:** `specified`
+- **Capability:** Account recovery
+- **Evidence layers/modes:** Auth boundary, PostgreSQL integration, browser
+- **Verifies product decisions:** D-002, D-011
+- **Verifies technical decisions:** TD-004, TD-026, TD-027, TD-032
+- **SPEC:** [Account recovery and abuse resistance](../output/agent/SPEC.md#account-recovery-and-abuse)
+- **Owners:** [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+- **Contract:** Pending verification offers explicit resend; expired/invalid links have clear guidance and a fresh-link path. Resend is bounded, account existence remains private, and normal Better Auth verification/session behavior is preserved.
+- **Required evidence:** Boundary/database checks for pending, absent and already-verified recipients, invalid/expired links and resend throttling; browser journeys exercise resend and recovery through the local mailbox and prove private access only after normal successful verification. Preserve the existing fresh-signup verification journey and redact link-bearing diagnostics/artifacts. Do not impose password-reset single-use semantics on native verification tokens.
+- **Dependencies:** Existing verification UI/mail seam and database/browser harnesses, plus the shared controls in TST-AUTH-006. Hosted mail evidence remains separate.
+- **Current evidence:** The completed T-27 local signup/verification slice proves the baseline only; no resend/recovery evidence yet.
+- **Follow-up:** Implement and reconcile under T-27 after consolidated planning.
+
+<a id="tst-auth-006"></a>
+
+### TST-AUTH-006 — Shared authentication and recipient mail limits
+
+- **Status:** `specified`
+- **Capability:** Authentication abuse resistance
+- **Evidence layers/modes:** HTTP/auth-mail boundaries, real PostgreSQL concurrency, browser feedback
+- **Verifies product decisions:** D-011
+- **Verifies technical decisions:** TD-026, TD-027, TD-032
+- **SPEC:** [Account recovery and abuse resistance](../output/agent/SPEC.md#account-recovery-and-abuse)
+- **Owners:** [T-27](../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+- **Contract:** Supported per-IP limits protect relevant sign-up, sign-in and auth-email paths. A shared per-recipient budget bounds verification, reset and magic-link mail, including automatic and server-side sends. Environment-scoped PostgreSQL counters admit requests atomically across instances. Excess requests produce a safe temporary wait, no account lockout or enumeration signal, and no sensitive logging.
+- **Required evidence:** Real database concurrency across independent limiter instances at first use, limit exhaustion and window expiry; prove IP rotation cannot bypass the recipient bound and independent environments do not share budgets. Exercise automatic signup/sign-in, explicit resend/reset/magic-link and relevant `auth.api` send paths, accounting for the HTTP limiter's server-call bypass and development defaults. Check common counter failures do not silently allow unbounded mail, recipient cooldown responses do not distinguish absent accounts, and retry feedback allows recovery without changing credentials or active sessions. Retain the existing migration and environment safety obligations for any new schema; in-memory mocks alone cannot verify shared atomicity.
+- **Dependencies:** Existing environment-selected PostgreSQL and Better Auth/Drizzle integration; planning specifies supported integration, concrete windows/counts and trusted IP handling. No new service is required.
+- **Current evidence:** None; database storage support in the library is not proof of the application's concurrent guarantee.
+- **Follow-up:** Implement and reconcile under T-27 after consolidated planning, together with TST-AUTH-004/005.
 
 <a id="tst-lists-001"></a>
 
@@ -829,7 +883,7 @@ The Agent SPEC remains the technical contract and this ledger owns the individua
 
 | SPEC area                                        | Test contracts                                                                                          |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| Auth and session rules                           | `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`                                                          |
+| Auth and session rules                           | `TST-AUTH-001`–`TST-AUTH-006`                                                                           |
 | Data model, migrations, indexes, and connections | `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-PERSISTENCE-001`                     |
 | Domain rules and application use cases           | `TST-LISTS-001`–`TST-LISTS-003`, `TST-TASKS-001`–`TST-TASKS-003`, `TST-CONCURRENCY-001`                 |
 | Sanity landing boundary                          | `TST-LANDING-001`–`TST-LANDING-003`                                                                     |

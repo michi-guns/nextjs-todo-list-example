@@ -130,6 +130,76 @@ Run this check whenever the authenticated private workspace loads. Keep it atomi
 - Optional thin `src/modules/auth` for app-facing helpers (`requireUser()`, session DTO). Avoid duplicating library internals.
 - In explicitly enabled local/test mode, the magic-link `sendMagicLink` adapter writes the generated email and verification URL to a temporary, gitignored, file-backed mailbox. The mailbox is unavailable outside local/test mode; exact path, format, and configuration names are implementation choices.
 
+<a id="account-recovery-and-abuse"></a>
+
+### 2.5 Account recovery and abuse resistance
+
+[D-011](../../decisions/PRODUCT.md#d-011) and
+[TD-032](../../decisions/TECHNICAL.md#td-032) accept this planned extension.
+[T-27](../../../TODO.md#t-27-complete-authentication-product-flows-and-abuse-resistance)
+owns subsequent planning and implementation; baseline auth evidence does not
+verify the new behavior.
+
+**Password recovery:** use Better Auth's request/reset APIs and
+`emailAndPassword.sendResetPassword` through the existing `deliverAuthEmail`
+boundary. Keep token generation, expiry, single consumption, password policy
+and credential updates inside Better Auth. Return neutral request responses
+for existing and absent accounts, including common failure/throttle paths;
+avoid an account-existence timing signal from synchronous mail delivery. Any
+background mail scheduling must use a supported server lifetime mechanism.
+An expired, malformed or consumed link cannot change a password. Successful
+reset uses `emailAndPassword.revokeSessionsOnPasswordReset: true`, revokes all
+existing sessions and requires ordinary sign-in; existing session cookies must
+fail subsequent authentication. Merely requesting mail, a rejected reset, or a
+throttle must not revoke sessions, lock the account or change authentication
+state.
+
+**Verification recovery:** provide explicit resend from the pending state and
+clear expired/invalid-link guidance with a fresh-link path. Preserve Better
+Auth's normal verification and session behavior, including the existing
+`autoSignInAfterVerification` policy. Bound resend frequency and automatic
+verification sends. Do not replace verification with a second token system or
+claim that its token semantics are identical to password-reset tokens.
+
+**Shared abuse limits:** use supported Better Auth per-IP limits for relevant
+sign-up, sign-in and auth-email HTTP paths, backed by the selected environment's
+existing PostgreSQL database. Add a shared recipient budget for verification,
+reset and magic-link mail through the auth-email boundary, including automatic
+sign-up/sign-in sends and server-side calls. An IP change must not bypass that
+recipient bound. Counter admission must atomically check and increment across
+instances, including simultaneous first use and expiry; verify the real
+Drizzle/PostgreSQL path. Do not use per-instance memory, logger configuration
+caches, Redis, a new service or a generic limiter framework as counter storage.
+Counter failure must not silently permit unbounded mail through a fallback.
+
+Excess requests produce a temporary wait with clear, safe retry guidance;
+there is no persistent account lockout. Any observable recipient cooldown
+must be independent of account existence: throwing only from a real user's
+send callback would create an enumeration signal. Preserve the framework's
+neutral responses while enforcing the shared send budget. Keep passwords,
+tokens, full auth URLs and recipient addresses out of logs and evidence.
+The existing Local/Development/Preview/Production mail policies remain in
+force; local mailbox evidence never establishes hosted delivery.
+
+**Installed-version grounding:** Better Auth 1.7.5 supports database storage
+and an atomic `customStorage.consume(key, rule)` integration. Its HTTP limiter
+does not cover `auth.api` calls, defaults off in development, and derives keys
+from trusted IP configuration; implementation must account for those boundaries
+and prove intended limits without disrupting unrelated fixture setup. Use the
+existing Drizzle migration workflow for any required schema, with TD-025's
+branch-first hosted migration gate. Exact limits, windows, token lifetimes and
+copy remain grounded implementation proposals, not unresolved broad product
+choices. See [Better Auth recovery](https://better-auth.com/docs/authentication/email-password),
+[rate limiting](https://better-auth.com/docs/concepts/rate-limit), and the
+installed `better-auth/dist/api/routes/password.mjs` and
+`better-auth/dist/api/rate-limiter/index.mjs`. OWASP permits either user-chosen
+or automatic session invalidation; automatic invalidation here is the owner's
+choice ([recovery guidance](https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html)).
+
+Required future evidence is owned by [TST-AUTH-004](../../decisions/TESTING.md#tst-auth-004),
+[TST-AUTH-005](../../decisions/TESTING.md#tst-auth-005) and
+[TST-AUTH-006](../../decisions/TESTING.md#tst-auth-006).
+
 ---
 
 ## 3. Data model (Postgres)
@@ -365,7 +435,7 @@ The individual test obligations for this contract are owned by the [Testing Deci
 
 | SPEC area                               | Test contracts                                                                          |
 | --------------------------------------- | --------------------------------------------------------------------------------------- |
-| Auth and session rules                  | `TST-AUTH-001`, `TST-AUTH-002`, `TST-AUTH-003`                                          |
+| Auth and session rules                  | `TST-AUTH-001`–`TST-AUTH-006`                                                           |
 | Data model, migrations, and connections | `TST-FOUNDATION-001`, `TST-MIGRATION-001`, `TST-HARNESS-001`, `TST-PERSISTENCE-001`     |
 | Domain and application behavior         | `TST-LISTS-001`–`TST-LISTS-003`, `TST-TASKS-001`–`TST-TASKS-003`, `TST-CONCURRENCY-001` |
 | Server boundaries and validation        | `TST-BOUNDARY-001`                                                                      |
