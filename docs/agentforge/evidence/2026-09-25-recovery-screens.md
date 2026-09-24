@@ -119,4 +119,8 @@ incoming request URLs (including callback tokens) to a developer's own
 terminal, as it already did for verification and magic links;
 `logging.incomingRequests` in `next.config.ts` could quiet it.
 
-Confirmation review pending.
+Confirmation review (`77e46cc`, opus, xhigh): approved, no blockers or
+should-fix items; it reproduced 83 focused tests, typecheck, lint and the 14
+browser journeys, and confirmed the resend-button proof is now strict.
+Optional follow-ups: drop the unreachable last `Object.hasOwn` branch in
+`getAuthErrorMessage` and add a `toString` case to its tests.
