@@ -1963,7 +1963,11 @@ Verification and evidence for this slice:
   controls, the reset and verification browser journeys with real limits,
   and a decoded report archive with no tokens. Also closes the two T-27.2
   review deferrals. `TST-AUTH-004`–`006` stay `partial` for T-27.4 only.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the first review approved `57a9499`; its four optional nits are
+  fixed (reset copy after refresh, strict resend proof, token-safe path
+  check, `Object.hasOwn`). Follow-up: `next dev` request logging can show
+  callback tokens in a developer terminal (`logging.incomingRequests`).
+  Confirmation review pending.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `frontend-ui-engineering`, `email-and-password-best-practices`, `next-dev-loop`,
   `browser-testing-with-devtools`, `security-and-hardening`, `documentation-and-adrs`,

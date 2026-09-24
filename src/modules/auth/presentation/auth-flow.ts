@@ -108,12 +108,15 @@ export function getAuthErrorMessage(error: unknown): string {
   const status =
     isRecord(error) && typeof error.status === "number" ? error.status : null
 
-  if (code && code in authErrorMessages) return authErrorMessages[code]
+  if (code && Object.hasOwn(authErrorMessages, code))
+    return authErrorMessages[code]
   if (status === 429) {
     return "Too many attempts. Wait a moment and try again."
   }
 
   return code
-    ? (authErrorMessages[code] ?? genericAuthErrorMessage)
+    ? Object.hasOwn(authErrorMessages, code)
+      ? authErrorMessages[code]
+      : genericAuthErrorMessage
     : genericAuthErrorMessage
 }

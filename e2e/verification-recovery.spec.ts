@@ -106,6 +106,9 @@ test("TST-AUTH-005 recovers an invalid link and an unverified sign-in with a fre
         hasText: "Check your email to verify your account before signing in.",
       })
     ).toBeVisible()
+    // The failed sign-in already mailed a link; only the resend may refill it.
+    await readMagicLinkWithRetry(email)
+    await clearMagicLinkMailbox()
     await page
       .getByRole("button", { name: "Send a new verification email" })
       .click()

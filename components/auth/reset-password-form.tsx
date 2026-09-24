@@ -68,7 +68,7 @@ export function ResetPasswordForm({ token, error }: ResetPasswordFormProps) {
       <AuthCard
         eyebrow="Password reset"
         title="This link cannot be used"
-        description="Reset links work once and expire after 30 minutes."
+        description="Reset links work once and expire after 30 minutes. If you just refreshed this page, open the link from your email again."
       >
         <div className="space-y-5">
           <AuthNotice kind="error">{getAuthErrorMessage(linkError)}</AuthNotice>

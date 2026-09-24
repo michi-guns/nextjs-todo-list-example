@@ -106,4 +106,17 @@ read `partial`. AUTH-001–003, UI and E2E journeys pass unchanged.
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+First independent review (`57a9499`, opus, xhigh): approved, no blockers or
+should-fix items. It reproduced 83 focused, 698 unit and 20 auth integration
+tests and the 14 browser journeys, and decoded the report archive: 0 real
+tokens (only the spec's literal `not-a-real-token`). Four optional nits were
+fixed: the reset page's invalid-link copy now tells a visitor who refreshed
+to reopen the emailed link; the unverified sign-in journey clears the
+automatic sign-in mail so the resend button itself is proven; the reset-link
+path check is a boolean, so a failure cannot print the token; known error
+codes use `Object.hasOwn`. Follow-up, not in scope: `next dev` prints
+incoming request URLs (including callback tokens) to a developer's own
+terminal, as it already did for verification and magic links;
+`logging.incomingRequests` in `next.config.ts` could quiet it.
+
+Confirmation review pending.

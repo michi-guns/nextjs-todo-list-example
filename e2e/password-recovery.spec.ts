@@ -50,9 +50,10 @@ test("TST-AUTH-004 resets a forgotten password through the UI and ends the old s
 
     const reset = await readMagicLinkWithRetry(email)
     expect(reset.metadata).toMatchObject({ kind: "password-reset" })
-    expect(new URL(reset.url).pathname).toMatch(
-      /^\/api\/auth\/reset-password\/[^/]+$/
-    )
+    // A boolean keeps the token-bearing path out of any failure message.
+    expect(
+      /^\/api\/auth\/reset-password\/[^/]+$/.test(new URL(reset.url).pathname)
+    ).toBe(true)
     await page.evaluate((url) => {
       window.location.href = url
     }, reset.url)
