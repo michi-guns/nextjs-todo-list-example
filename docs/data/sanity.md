@@ -65,7 +65,9 @@ commits and command examples.
    origins** with credentials (for example `http://localhost:3000` locally).
 3. Set `NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED=true` and the server-only
    `SANITY_API_READ_TOKEN` for the profile, with
-   `NEXT_PUBLIC_SANITY_DATASET=production`. Production takes them from the
+   `NEXT_PUBLIC_SANITY_DATASET=production` and `APP_ENV` set to `local`,
+   `development` or `production` (an unprofiled run with the flag on refuses
+   to start). Production takes them from the
    protected GitHub `production` Environment (variable and secret); see the
    [environment profiles](../runbooks/environment-profiles.md).
 4. Restart or redeploy. The flag is read at build time by the Studio.

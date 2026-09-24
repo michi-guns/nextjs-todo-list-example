@@ -2089,7 +2089,10 @@ Verification and evidence for this slice:
   Presentation, Live, overlays and exit are composed behind Draft Mode plus the
   enabled capability; public HTML carries none of them. 727 unit, 275 pipeline
   and 17 browser checks pass. `TST-LANDING-004` stays `partial` until T-28.3.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the independent review approved `f8a82a9` with no blockers; its
+  should-fix (logging catalogue entries) and setup nit are applied. Optional
+  follow-ups: flush the `503` event before answering, lazy logger import in
+  the entry route, and a page-level Draft Mode render test.
 
 <a id="t-283"></a>
 

@@ -104,4 +104,16 @@ token (T-28.3).
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+Independent review (`f8a82a9`, opus, xhigh): approved, no blockers. It
+reproduced 57 focused, 727 unit, 275 pipeline and 17 browser checks, the
+build, typecheck and lint, and confirmed against installed sources that Draft
+Mode bypasses Next's Data Cache (so drafts never reach the published cache),
+that `defineLive` reads the `drafts` perspective from the cookie, and that
+the Presentation options match `sanity` 6.15.0. Its should-fix is applied:
+the logging catalogue now lists `landing.preview` and
+`sanity.preview.unavailable`. Its setup nit is applied (the steps name the
+required `APP_ENV`). Deferred as optional follow-ups: await
+`logging.flush()` for the `503` event so serverless provider export is not
+dropped; import the logger lazily so a broken profile keeps entry's quiet
+`404` instead of `500` (the whole app already refuses that state); and a
+page-level render test for Draft Mode on with the capability off.
