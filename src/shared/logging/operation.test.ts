@@ -188,6 +188,46 @@ describe("TST-DIAGNOSTICS-001 failure ownership and completion flush", () => {
     expect(f.flush).toHaveBeenCalledTimes(2)
   })
 
+  it.each([
+    ["redirect", "NEXT_REDIRECT;replace;/;307;"],
+    ["notFound", "NEXT_HTTP_ERROR_FALLBACK;404"],
+    ["forbidden", "NEXT_HTTP_ERROR_FALLBACK;403"],
+  ])(
+    "treats Next %s control flow inside an operation as no failure",
+    async (_, digest) => {
+      const f = reporting()
+      const control = Object.assign(new Error("x"), { digest })
+      await expect(
+        f.run("items", "items.read", async () => {
+          throw control
+        })
+      ).rejects.toBe(control)
+      expect(f.diagnostics.reportError).not.toHaveBeenCalled()
+      expect(wasReported(control)).toBe(false)
+    }
+  )
+
+  it("reports a failure once when operations are nested", async () => {
+    const f = reporting()
+    const failure = new Error("x")
+    await expect(
+      f.run("jobs", "jobs.run", () =>
+        f.run("lists", "lists.read", async () => {
+          throw failure
+        })
+      )
+    ).rejects.toBe(failure)
+    expect(f.diagnostics.reportError).toHaveBeenCalledOnce()
+    // A reused error object (e.g. a memoized rejection) is a new occurrence
+    // in each separate operation.
+    await expect(
+      f.run("lists", "lists.read", async () => {
+        throw failure
+      })
+    ).rejects.toBe(failure)
+    expect(f.diagnostics.reportError).toHaveBeenCalledTimes(2)
+  })
+
   it("keeps results and errors when the completion flush fails", async () => {
     const f = reporting()
     f.flush.mockRejectedValue(new Error("network"))

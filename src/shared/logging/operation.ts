@@ -2,7 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks"
 import { mapApplicationError } from "../error-contract"
 import { withLogContext } from "./context"
 import type { createLogger } from "./logger"
-import type { SafeMetadata } from "./sanitize"
+import { ownValue, type SafeMetadata } from "./sanitize"
 
 type LoggerFactory = ReturnType<typeof createLogger>
 type ObservationOptions = { level?: "info" | "debug"; metadata?: SafeMetadata }
@@ -40,6 +40,16 @@ export function wasReported(error: unknown): boolean {
   )
 }
 
+/** Next's control-flow digests: redirect, notFound/forbidden/unauthorized, dynamic usage, bailouts. */
+const controlFlow =
+  /^(NEXT_REDIRECT|NEXT_HTTP_ERROR_FALLBACK|NEXT_NOT_FOUND|DYNAMIC_SERVER_USAGE|BAILOUT_TO_CLIENT_SIDE_RENDERING|NEXT_PRERENDER_INTERRUPTED)/
+
+/** Framework control flow is navigation, not a failure; it never creates an issue. */
+export function isFrameworkControlFlow(error: unknown): boolean {
+  const digest = ownValue(error, "digest")
+  return typeof digest === "string" && controlFlow.test(digest)
+}
+
 /** Called before mapping a caught failure; the pure response mapper stays pure. */
 export function reportOperationError(
   error: unknown,
@@ -52,7 +62,7 @@ export function reportOperationError(
 ): void {
   try {
     const state = activeOperation.getStore()
-    if (!state) return
+    if (!state || isFrameworkControlFlow(error)) return
     if (mapApplicationError(error).status !== 500) {
       if (state.outcome !== "failed") state.outcome = "refused"
       return
@@ -90,7 +100,9 @@ export function createOperationRunner(runtime: {
     return withLogContext(operation, () =>
       activeOperation.run(
         {
-          reported: new Set(),
+          // A nested operation shares its enclosing owner's occurrences, so
+          // the outer boundary does not report the same failure again.
+          reported: activeOperation.getStore()?.reported ?? new Set(),
           logger: runtime.logger,
           module,
           operation,

@@ -999,9 +999,10 @@ reintroduce the old scaffold or a parallel architecture in `lib/`. The
 canonical design authority is `.dwf/`; Delivery artifacts, when created,
 belong outside `.dwf/`.
 
-The shared logger core/settings in section 11.1 are implemented. Application
-adoption and the diagnostics extension in section 11.2 remain planned work;
-the baseline checklist below does not cover these later tasks.
+The shared logger core/settings and application adoption in section 11.1 and
+the diagnostics extension in section 11.2 are implemented and verified
+locally; hosted provider proof (T-26.7) remains planned. The baseline
+checklist below does not cover these later tasks.
 
 ---
 
@@ -1204,8 +1205,8 @@ Adapters keep Drizzle row types private. Repository methods enforce ownership th
 The environment direction and target-safety choices are accepted in
 [`TD-026`](../../decisions/TECHNICAL.md#td-026) and [`TD-027`](../../decisions/TECHNICAL.md#td-027).
 The shared logger's protected TypeScript settings CLI is implemented under
-[`TD-031`](../../decisions/TECHNICAL.md#td-031); application adoption and separately
-authorized Production operation remain later work. Current provisioning and verification facts
+[`TD-031`](../../decisions/TECHNICAL.md#td-031) and adopted by the application;
+separately authorized Production operation remains later work. Current provisioning and verification facts
 are recorded in [`../../CONTEXT.md`](../../CONTEXT.md), with delivery follow-ups
 in [`../../../TODO.md`](../../../TODO.md). Use those records for current
 Development, Preview, owner-domain and Production readiness instead of a

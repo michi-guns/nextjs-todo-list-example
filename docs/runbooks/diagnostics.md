@@ -19,13 +19,16 @@ The [logging runbook](logging.md) owns the facade, events and policy CLI.
    boundary writes one safe `error` log and one explicit issue report, then
    marks the error object as reported.
 3. Expected refusals (validation, auth, not found, conflict) and Next
-   `redirect`/`notFound` control flow create no issue.
+   `redirect`/`notFound`/`forbidden`/`unauthorized` control flow create no
+   issue, whether thrown inside an adopted boundary or reaching Next.
 4. If the error is rethrown to Next, `instrumentation.ts` `onRequestError`
    sees the same object and skips it. A failure no boundary owned is reported
    there as `next.<render|route|action|proxy>.failed`.
 5. Before the response completes, the boundary awaits a flush bounded to one
    second. A hanging provider is aborted at that deadline; the response and
-   the original error are unchanged.
+   the original error are unchanged. Next awaits `onRequestError` for route
+   handlers but not for render/action failures, so that hook also registers
+   its flush with the platform's `waitUntil` (a no-op off Vercel).
 
 Each report carries the error class, a classified kind/code, a static message,
 repository-relative frame locations and up to three cause facts. Messages,
@@ -113,6 +116,13 @@ unsent records.
   and [T-26.6 runtime evidence](../agentforge/evidence/2026-09-24-diagnostics-adoption.md)
   are local. A local collector proves payload shape and behavior, not that
   a hosted product accepts, searches or groups the data.
+- Ownership is tracked by error-object identity. A thrown primitive cannot be
+  marked, so a boundary report and Next's hook can both report it. Adopted
+  boundaries report every occurrence, but Next's hook reports an unowned
+  failure that rethrows the same object every time (a module constant or
+  memoized rejection) only once per process.
+- Under `next dev` the process-wide logging runtime survives hot reload;
+  restart the dev server after changing logging or diagnostics composition.
 - Hosted proof for each provider is T-26.7. Sentry Free is the initial
   Production choice under [TD-033](../../.dwf/decisions/TECHNICAL.md#td-033);
   its native alert Email is T-26.13.

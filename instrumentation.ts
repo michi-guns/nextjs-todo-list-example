@@ -22,7 +22,12 @@ export const onRequestError: Instrumentation.onRequestError = async (
   _request,
   context
 ) => {
-  if (process.env.NEXT_RUNTIME !== "nodejs") return
+  // Build-time prerender failures are Next's to report; no runtime exists yet.
+  if (
+    process.env.NEXT_RUNTIME !== "nodejs" ||
+    process.env.NEXT_PHASE === "phase-production-build"
+  )
+    return
   const { reportRequestError } =
     await import("./src/shared/diagnostics/startup")
   // The raw request (path, headers) is deliberately never read.

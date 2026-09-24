@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 59 files and 572 tests (T-26.6 diagnostics adoption, 2026-09-24).
+- [x] `pnpm test` passes 59 files and 577 tests (T-26.6 diagnostics adoption, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1525,13 +1525,16 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   matching Chromium for the isolated runtime/browser harness. One adoption
   and runbook review unit. T-26.7's hosted readiness remains pending.
 - Evidence, 2026-09-24: [diagnostics adoption](docs/agentforge/evidence/2026-09-24-diagnostics-adoption.md)
-  records 152 focused tests, 572 unit tests, 29 integration tests, 8 Chromium
+  records 157 focused tests, 577 unit tests, 29 integration tests, 8 Chromium
   journeys, typecheck, lint with the existing warning, build, a clean client
   bundle and a two-process local Next runtime proof with real adapter payloads.
   The probe found and fixed per-bundle module copies by making the logging
   runtime, context stores and report registry process-wide.
   `TST-DIAGNOSTICS-001` is verified locally; `TST-DIAGNOSTICS-002` awaits T-26.7.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the first independent review found Next control flow inside an
+  operation reported as a failure and an unawaited render/action hook flush;
+  both were fixed with tests, plus nested-operation dedupe and a build-phase
+  hook guard. A fresh exact-tip review confirmed the fixes before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `next-dev-loop`, `browser-testing-with-devtools`,
   `observability-and-instrumentation`, `security-and-hardening`,

@@ -1,19 +1,17 @@
 import { mapApplicationError } from "../error-contract"
 import { currentLogContext, withLogContext } from "../logging/context"
 import type { createLogger } from "../logging/logger"
-import { markReported, wasReported } from "../logging/operation"
-import { ownValue } from "../logging/sanitize"
+import {
+  isFrameworkControlFlow,
+  markReported,
+  wasReported,
+} from "../logging/operation"
 
 const routeTypes = new Set(["render", "route", "action", "proxy"])
-/** Next's own control-flow digests (redirect, notFound, dynamic usage, bailout). */
-const controlFlow =
-  /^(NEXT_REDIRECT|NEXT_HTTP_ERROR_FALLBACK|NEXT_NOT_FOUND|DYNAMIC_SERVER_USAGE|BAILOUT_TO_CLIENT_SIDE_RENDERING|NEXT_PRERENDER_INTERRUPTED)/
 
 function expected(error: unknown): boolean {
-  const digest = ownValue(error, "digest")
   return (
-    (typeof digest === "string" && controlFlow.test(digest)) ||
-    mapApplicationError(error).status !== 500
+    isFrameworkControlFlow(error) || mapApplicationError(error).status !== 500
   )
 }
 
@@ -23,10 +21,14 @@ function expected(error: unknown): boolean {
  * attached), so a boundary's earlier report is recognized by identity.
  * https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation#onrequesterror-optional
  */
-export function createRequestErrorReporter(runtime: {
-  logger: ReturnType<typeof createLogger>
-  flush: () => Promise<void>
-}) {
+export function createRequestErrorReporter(
+  runtime: {
+    logger: ReturnType<typeof createLogger>
+    flush: () => Promise<void>
+  },
+  /** Platform lifetime extension; a no-op outside a Vercel request context. */
+  waitUntil: (promise: Promise<unknown>) => void = () => {}
+) {
   return async function reportRequestError(
     error: unknown,
     context: { routeType?: string }
@@ -47,7 +49,15 @@ export function createRequestErrorReporter(runtime: {
       // Keep the request's correlation when Next runs the hook inside it.
       if (currentLogContext()) record()
       else withLogContext(`next.${kind}`, record)
-      await runtime.flush()
+      // Next awaits this hook for route handlers but drops its promise on
+      // render/action paths, so the platform must keep the flush alive.
+      const flushed = runtime.flush()
+      try {
+        waitUntil(flushed)
+      } catch {
+        /* No request context: the awaited flush below still runs. */
+      }
+      await flushed
     } catch {
       // Next logs hook failures; never add noise or replace the original error.
     }

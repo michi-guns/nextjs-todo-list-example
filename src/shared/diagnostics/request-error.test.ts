@@ -24,6 +24,7 @@ function setup() {
   const write = vi.fn()
   const diagnostics = { active: () => true, log: vi.fn(), reportError: vi.fn() }
   const flush = vi.fn(async () => {})
+  const waitUntil = vi.fn()
   const logger = createLogger({
     environment: "production",
     policy: policy.current,
@@ -34,8 +35,9 @@ function setup() {
     write,
     diagnostics,
     flush,
+    waitUntil,
     logger,
-    report: createRequestErrorReporter({ logger, flush }),
+    report: createRequestErrorReporter({ logger, flush }, waitUntil),
   }
 }
 
@@ -62,6 +64,11 @@ describe("TST-DIAGNOSTICS-001 Next onRequestError ownership", () => {
         failure
       )
       expect(f.flush).toHaveBeenCalledOnce()
+      // Next drops the hook's promise on render/action paths; the platform
+      // keeps the bounded flush alive past the response.
+      expect(f.waitUntil).toHaveBeenCalledExactlyOnceWith(
+        f.flush.mock.results[0].value
+      )
       expect(JSON.stringify(f.write.mock.calls)).not.toContain("person@")
       // Next may call the hook again for the same object (e.g. HTML and RSC).
       await f.report(failure, { routeType })
@@ -118,6 +125,9 @@ describe("TST-DIAGNOSTICS-001 Next onRequestError ownership", () => {
     })
     expect(f.write.mock.calls[0][1].correlationId).toBe(correlation)
     f.flush.mockRejectedValue(new Error("network"))
+    f.waitUntil.mockImplementation(() => {
+      throw new Error("no request context")
+    })
     await expect(
       f.report(new Error("y"), { routeType: "unknown-kind" })
     ).resolves.toBeUndefined()

@@ -11,8 +11,10 @@ Clean `main` at `27e1150` (main CI passed) matched the remote before creating
 `codex/t-26.6-diagnostics-adoption`. Docker 29.7.2, matching Chromium, Node
 24.18.0 and installed dependencies were available. The installed Next.js 16.3.5
 `instrumentation` reference and its `create-error-handler` source were read:
-`register` runs once per server instance, `onRequestError` is awaited, the
-error it receives is the thrown object with a digest attached, and `redirect`,
+`register` runs once per server instance; `onRequestError` is awaited by
+route handlers and the outer request catches, but render/action errors reach
+it through React's `onError`, which drops the returned promise. The error it
+receives is the thrown object with a digest attached, and `redirect`,
 `notFound` and similar control flow are filtered before the hook.
 
 ## Delivered behavior
@@ -24,9 +26,14 @@ error it receives is the thrown object with a digest attached, and `redirect`,
   failures, now also sends one explicit issue report and marks the error.
   `onRequestError` reports only unreported failures as
   `next.<route type>.failed` and skips control-flow digests and expected
-  refusals. The idle pool callback reports its swallowed failure.
+  refusals. Framework control flow thrown inside an adopted operation is not
+  a failure either, and nested operations report once. The idle pool callback
+  reports its swallowed failure.
 - `runLoggedOperation` awaits the bounded diagnostics flush when each request
-  or job completes; flush failures cannot change results or errors.
+  or job completes; flush failures cannot change results or errors. The hook
+  also hands its flush to `waitUntil` from `@vercel/functions`, so a
+  render/action report is not abandoned when Next ignores the hook's promise.
+- `onRequestError` is inert during `next build`, like `register`.
 - The runtime probe exposed a real defect: Next compiles instrumentation, SSR
   and route handlers into separate module copies, so a dispatcher started in
   `register` never reached request handlers, and ownership and request
@@ -43,8 +50,8 @@ error it receives is the thrown object with a digest attached, and `redirect`,
 
 | Command                                                                          | Result                                       |
 | -------------------------------------------------------------------------------- | -------------------------------------------- |
-| `pnpm exec vitest run src/shared/logging src/shared/diagnostics scripts/logging` | 17 files, 152 tests passed                   |
-| `pnpm test`                                                                      | 59 files, 572 tests passed                   |
+| `pnpm exec vitest run src/shared/logging src/shared/diagnostics scripts/logging` | 17 files, 157 tests passed                   |
+| `pnpm test`                                                                      | 59 files, 577 tests passed                   |
 | `pnpm test:integration`                                                          | 7 files, 29 tests passed                     |
 | `pnpm test:e2e`                                                                  | 8 Chromium journeys passed                   |
 | `pnpm typecheck`                                                                 | Passed                                       |
@@ -98,4 +105,27 @@ bounded awaited flush, failure containment and unsent-policy drops.
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+The first independent review (read-only, against `5507389`) confirmed error
+identity through Next, the loopback exception, the build guard, the clean
+client bundle and the process-wide singletons, and raised:
+
+- **Fixed:** Next `redirect`/`notFound`/`forbidden`/`unauthorized` thrown
+  inside an adopted operation was reported as a failure. The control-flow
+  check is now shared by both owners.
+- **Fixed:** Next drops the hook's promise on render/action paths, so the
+  hook's flush now also goes to `waitUntil`; the preflight wording above was
+  corrected.
+- **Fixed:** nested operations share the enclosing occurrence set and report
+  once; a reused error object is still a new occurrence per operation.
+- **Fixed:** `onRequestError` is inert during `next build`.
+- **Documented:** thrown primitives can be reported twice, Next's hook reports
+  a reused unowned error object once per process, and `next dev` keeps the
+  logging runtime across hot reloads.
+- **Deferred (T-26.5 behavior):** a flush timeout aborts every in-flight send
+  of the shared Sentry-compatible client, including another request's report.
+  Hosted proof in T-26.7 should watch for it.
+
+After the fixes, the checks above were rerun, including the build, client
+bundle scan (Sanity Studio's own bundled telemetry strings are pre-existing and
+unrelated), the runtime probe, integration and browser journeys. A fresh
+exact-tip review confirmed the fixes before merge.

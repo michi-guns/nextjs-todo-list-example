@@ -62,4 +62,21 @@ describe("TST-DIAGNOSTICS-001 Next instrumentation entry", () => {
     )
     expect(reportRequestError).toHaveBeenCalledOnce()
   })
+
+  it("ignores prerender failures during build, where no runtime exists", async () => {
+    vi.stubEnv("NEXT_RUNTIME", "nodejs")
+    vi.stubEnv("NEXT_PHASE", "phase-production-build")
+    await onRequestError(
+      new Error("x"),
+      { path: "/", method: "GET", headers: {} },
+      {
+        routerKind: "App Router",
+        routePath: "/",
+        routeType: "render",
+        renderSource: "react-server-components",
+        revalidateReason: undefined,
+      }
+    )
+    expect(reportRequestError).not.toHaveBeenCalled()
+  })
 })
