@@ -65,6 +65,9 @@ authorization.
 
 - Each probe has a three-second budget and runs at most once at a time per
   instance; concurrent callers share the in-flight result instead of queueing.
+  A failing answer may add up to one second of bounded log flush when a
+  diagnostics provider is active, so give monitors a timeout above four
+  seconds.
 - **Database:** acquisition and query share the deadline. The statement runs
   as `BEGIN READ ONLY; SET LOCAL statement_timeout = …; SELECT 1; COMMIT`, so
   the server ends slow work itself. A timed-out or failed connection is

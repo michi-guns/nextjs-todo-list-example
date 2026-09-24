@@ -120,6 +120,9 @@ modes and constant-time comparison, and the route composition, and raised:
   flushed before the response and the runbooks say so.
 - **Fixed:** `timeout` troubleshooting now includes network black holes and
   a waking compute.
+- **Fixed (confirmation review):** the new test's unused mock parameter added
+  a lint warning; it was removed, and the runbook now states the up-to-one-second
+  flush on failing answers.
 - **Disclosed:** the real `next start` proof is a task-local script under the
   ignored `.local/`, as for T-26.6 and T-26.8.
 

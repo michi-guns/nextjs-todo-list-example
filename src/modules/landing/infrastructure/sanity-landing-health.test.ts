@@ -5,7 +5,7 @@ import { LANDING_PAGE_QUERY } from "./sanity-landing-repository"
 
 describe("TST-RUNTIME-001 CMS probe freshness", () => {
   it("bypasses the CDN, the Next data cache and drafts on every read", async () => {
-    const fetch = vi.fn(async (..._args: unknown[]) => ({
+    const fetch = vi.fn<(...args: unknown[]) => Promise<unknown>>(async () => ({
       _id: "landingPage",
       _type: "landingPage",
       headline: "h",
