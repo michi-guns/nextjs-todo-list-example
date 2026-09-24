@@ -14,7 +14,31 @@ type OperationState = {
   readonly started: number
   outcome: "completed" | "refused" | "failed"
 }
-const activeOperation = new AsyncLocalStorage<OperationState>()
+const OPERATION = Symbol.for("nextjs-todo.logging.operation")
+// Shared across Next's separately bundled module copies, like the log context.
+const activeOperation = ((
+  globalThis as { [OPERATION]?: AsyncLocalStorage<OperationState> }
+)[OPERATION] ??= new AsyncLocalStorage<OperationState>())
+/**
+ * Occurrence identity across owners: an error object reported at its boundary
+ * is not reported again by Next's onRequestError, which receives the same
+ * object (with a digest attached). Weak references keep this bounded.
+ */
+const REPORTED = Symbol.for("nextjs-todo.diagnostics.reported-errors")
+// Next compiles instrumentation, SSR and route handlers into separate module
+// copies; a process-global registry keeps ownership visible across them.
+const registry = globalThis as { [REPORTED]?: WeakSet<object> }
+const reportedErrors = (registry[REPORTED] ??= new WeakSet<object>())
+
+export function markReported(error: unknown): void {
+  if (typeof error === "object" && error !== null) reportedErrors.add(error)
+}
+
+export function wasReported(error: unknown): boolean {
+  return (
+    typeof error === "object" && error !== null && reportedErrors.has(error)
+  )
+}
 
 /** Called before mapping a caught failure; the pure response mapper stays pure. */
 export function reportOperationError(
@@ -37,14 +61,16 @@ export function reportOperationError(
     if (state.reported.has(error)) return
     state.reported.add(error)
     const boundary = owner ?? state
-    state
-      .logger(boundary.module)
-      .emit("error", `${boundary.operation}.failed`, {
-        ...owner?.metadata,
-        outcome: "failed",
-        durationMs: performance.now() - boundary.started,
-        error,
-      })
+    const log = state.logger(boundary.module)
+    log.emit("error", `${boundary.operation}.failed`, {
+      ...owner?.metadata,
+      outcome: "failed",
+      durationMs: performance.now() - boundary.started,
+      error,
+    })
+    // One explicit issue report per owned failure, independent of log thresholds.
+    log.reportError(`${boundary.operation}.failed`, error)
+    markReported(error)
   } catch {
     // Diagnostics must never replace the application result or original error.
   }
@@ -53,6 +79,8 @@ export function reportOperationError(
 export function createOperationRunner(runtime: {
   logger: LoggerFactory
   refresh: () => Promise<void>
+  /** Bounded diagnostics flush awaited at request/job completion. */
+  flush?: () => Promise<void>
 }) {
   async function run<T>(
     module: string,
@@ -90,6 +118,13 @@ export function createOperationRunner(runtime: {
           } catch (error) {
             reportOperationError(error)
             throw error
+          } finally {
+            // Serverless instances may freeze after the response; send now.
+            try {
+              await runtime.flush?.()
+            } catch {
+              /* The dispatcher bounds and contains export failures. */
+            }
           }
         }
       )

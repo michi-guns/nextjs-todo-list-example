@@ -179,3 +179,34 @@ describe("TST-DIAGNOSTICS-002 startup adapter map", () => {
     expect(notice).not.toHaveBeenCalled()
   })
 })
+
+describe("TST-DIAGNOSTICS-001 local collector endpoints", () => {
+  const loopback = "http://publickey@127.0.0.1:4318/1"
+  it("accepts plain-HTTP loopback endpoints only for the local environment", () => {
+    expect(
+      parseDiagnosticsConfig({
+        APP_ENV: "local",
+        DIAGNOSTICS_PROVIDER: "sentry",
+        SENTRY_DSN: loopback,
+      })
+    ).toMatchObject({ provider: "sentry", dsn: loopback })
+    for (const environment of [
+      { APP_ENV: "development", SENTRY_DSN: loopback },
+      { APP_ENV: "production", SENTRY_DSN: loopback },
+      { APP_ENV: "local", SENTRY_DSN: "http://publickey@collector.example/1" },
+    ])
+      expect(
+        parseDiagnosticsConfig({
+          ...environment,
+          DIAGNOSTICS_PROVIDER: "sentry",
+        })
+      ).toEqual({ provider: "invalid" })
+    expect(
+      parseDiagnosticsConfig({
+        ...betterStack,
+        APP_ENV: "preview",
+        BETTER_STACK_LOGS_URL: "http://localhost:4319",
+      })
+    ).toEqual({ provider: "invalid" })
+  })
+})

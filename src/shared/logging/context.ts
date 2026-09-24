@@ -4,7 +4,11 @@ import { randomUUID } from "node:crypto"
 import { logName } from "./config"
 
 type LogContext = Readonly<{ correlationId: string; operation?: string }>
-const context = new AsyncLocalStorage<LogContext>()
+const CONTEXT = Symbol.for("nextjs-todo.logging.context")
+// Next compiles instrumentation, SSR and route handlers into separate module
+// copies; one process-wide store keeps request context visible across them.
+const registry = globalThis as { [CONTEXT]?: AsyncLocalStorage<LogContext> }
+const context = (registry[CONTEXT] ??= new AsyncLocalStorage<LogContext>())
 
 export function currentLogContext(): LogContext | undefined {
   return context.getStore()

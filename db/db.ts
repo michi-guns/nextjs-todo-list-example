@@ -18,4 +18,14 @@ export const pool = createDatabasePool(databaseUrl, (error) =>
 attachDatabasePool(pool)
 
 export const db = drizzle({ client: pool })
-export const logging = createLoggingRuntime(pool, loggingEnvironment())
+
+const LOGGING = Symbol.for("nextjs-todo.logging.runtime")
+type LoggingRuntime = ReturnType<typeof createLoggingRuntime>
+/**
+ * Next compiles instrumentation, SSR and route handlers into separate module
+ * copies. One process-wide runtime keeps a single settings cache, diagnostics
+ * dispatcher and provider client, so startup selection reaches every request.
+ */
+export const logging = ((globalThis as { [LOGGING]?: LoggingRuntime })[
+  LOGGING
+] ??= createLoggingRuntime(pool, loggingEnvironment()))

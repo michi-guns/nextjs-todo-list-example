@@ -30,9 +30,11 @@ export type DiagnosticsAdapters = Partial<{
   ) => Promise<DiagnosticsStrategy>
 }>
 
+/** HTTPS, or plain HTTP to a loopback collector (checked below: local only). */
 const https = z
-  .url({ protocol: /^https$/ })
+  .url({ protocol: /^https?$/ })
   .refine((value) => !/[?#]/.test(value))
+const loopback = new Set(["127.0.0.1", "localhost", "[::1]"])
 /** Sentry-compatible DSN: public key user part and numeric project path. */
 const dsn = https.refine((value) => {
   const url = URL.parse(value)
@@ -71,9 +73,22 @@ export function parseDiagnosticsConfig(
   if (!parsed.success) return { provider: "invalid" }
   const selected = parsed.data
   if (selected.DIAGNOSTICS_PROVIDER === "none") return { provider: "none" }
+  const appEnvironment = loggingEnvironment(environment)
+  const endpoints =
+    selected.DIAGNOSTICS_PROVIDER === "sentry"
+      ? [selected.SENTRY_DSN]
+      : [selected.BETTER_STACK_ERRORS_DSN, selected.BETTER_STACK_LOGS_URL]
+  for (const endpoint of endpoints) {
+    const url = new URL(endpoint)
+    if (
+      url.protocol === "http:" &&
+      (appEnvironment !== "local" || !loopback.has(url.hostname))
+    )
+      return { provider: "invalid" }
+  }
   const release = releaseSchema.safeParse(environment.VERCEL_GIT_COMMIT_SHA)
   const identity: Identity = {
-    environment: loggingEnvironment(environment),
+    environment: appEnvironment,
     ...(release.success ? { release: release.data } : {}),
   }
   return selected.DIAGNOSTICS_PROVIDER === "sentry"

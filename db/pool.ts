@@ -14,10 +14,10 @@ export function reportIdlePoolError(
   logger = defaultLogger
 ): void {
   withLogContext("database.pool.idle", () => {
-    logger("database.pool").emit("error", "database.pool.idle.failed", {
-      outcome: "failed",
-      error,
-    })
+    const log = logger("database.pool")
+    log.emit("error", "database.pool.idle.failed", { outcome: "failed", error })
+    // Swallowed process-level failure: this is its only reporting owner.
+    log.reportError("database.pool.idle.failed", error)
   })
 }
 

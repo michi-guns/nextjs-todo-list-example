@@ -129,6 +129,11 @@ Values below describe categories, not credentials.
 | `BETTER_AUTH_LOCAL_MAILBOX`      | Local/Development | Must be `true`; must be absent or `false` in deployed profiles                                   |
 | `DEPLOYMENT_OWNER`               | Every profile     | `local`, `github`, or `vercel`, constrained by profile                                           |
 | `SECRET_NAMESPACE`               | Every profile     | `local`/`ci` for Local, otherwise exactly `development`, `preview`, or `production`              |
+| `DIAGNOSTICS_PROVIDER`           | Optional          | `none` (default), `sentry` or `better-stack`; see the [diagnostics runbook](diagnostics.md)      |
+| `SENTRY_DSN`                     | Sentry selected   | Server-only HTTPS DSN; never `NEXT_PUBLIC_*`                                                     |
+| `BETTER_STACK_ERRORS_DSN`        | Better Stack      | Server-only Sentry-compatible HTTPS error DSN                                                    |
+| `BETTER_STACK_LOGS_URL`          | Better Stack      | HTTPS log-ingestion host                                                                         |
+| `BETTER_STACK_LOGS_TOKEN`        | Better Stack      | Server-only source token; never print or commit it                                               |
 
 Production remote mail requires `APP_MAIL_PROVIDER=resend`, protected
 `RESEND_API_KEY`, and `APP_MAIL_FROM` on an owner-verified domain. See the

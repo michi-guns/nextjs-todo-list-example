@@ -41,5 +41,7 @@ export function createLoggingRuntime(pool: Pool, environment: LogEnvironment) {
     diagnostics,
     refresh: settings.refresh,
     current: settings.current,
+    /** Bounded; resolves immediately when no provider was selected. */
+    flush: () => diagnostics.flush(),
   }
 }

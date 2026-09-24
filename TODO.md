@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 56 files and 550 tests (T-26.5 diagnostics adapters, 2026-09-24).
+- [x] `pnpm test` passes 59 files and 572 tests (T-26.6 diagnostics adoption, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1131,7 +1131,7 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 and T-26.5 are complete, leaving 16
+remaining locally executable children on 2026-09-24; T-26.4 through T-26.6 are complete, leaving 15
 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
@@ -1208,7 +1208,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.5 are complete; the remaining 9 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.6 is next in the serial order. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.6 are complete; the remaining 8 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.8 is next in the serial order; T-26.7 awaits hosted provider authorization. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1494,8 +1494,9 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.6: Report backend failures once and document diagnostics operation
 
-- [ ] Connect Node startup, error ownership and bounded completion to the
-      existing logger adoption; publish the runbook. Await execution authorization.
+- [x] Connect Node startup, error ownership and bounded completion to the
+      existing logger adoption; publish the runbook. Execution authorized by the
+      owner's instruction on 2026-09-24; Docker, Chromium and dependencies passed.
 - Files: new root `instrumentation.ts`; adopted route/action/server composition,
   auth-mail/Sanity/pool reporting owners; boundary/runtime tests; new
   `docs/runbooks/diagnostics.md`, logger runbook/index and environment guidance.
@@ -1523,6 +1524,14 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Dependencies/prerequisites: T-26.5, installed dependencies, Docker and
   matching Chromium for the isolated runtime/browser harness. One adoption
   and runbook review unit. T-26.7's hosted readiness remains pending.
+- Evidence, 2026-09-24: [diagnostics adoption](docs/agentforge/evidence/2026-09-24-diagnostics-adoption.md)
+  records 152 focused tests, 572 unit tests, 29 integration tests, 8 Chromium
+  journeys, typecheck, lint with the existing warning, build, a clean client
+  bundle and a two-process local Next runtime proof with real adapter payloads.
+  The probe found and fixed per-bundle module copies by making the logging
+  runtime, context stores and report registry process-wide.
+  `TST-DIAGNOSTICS-001` is verified locally; `TST-DIAGNOSTICS-002` awaits T-26.7.
+- Review: pending a fresh exact-tip independent review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `next-dev-loop`, `browser-testing-with-devtools`,
   `observability-and-instrumentation`, `security-and-hardening`,

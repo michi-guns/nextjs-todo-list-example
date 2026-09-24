@@ -756,11 +756,12 @@ extension in [section 11.2](#diagnostics-provider-adapters).
 ### 11.2 Diagnostics provider adapters
 
 [TD-030](../../decisions/TECHNICAL.md#td-030) accepts this later extension to the
-planned logger. The policy/routing core and both provider adapters are
-implemented with local evidence
+planned logger. Routing, both provider adapters and Node startup/boundary
+adoption are implemented with local evidence
 ([routing](../../../docs/agentforge/evidence/2026-09-24-diagnostics-routing.md),
-[adapters](../../../docs/agentforge/evidence/2026-09-24-diagnostics-adapters.md));
-startup adoption and hosted proof are not. [T-26.4](../../../TODO.md#t-264),
+[adapters](../../../docs/agentforge/evidence/2026-09-24-diagnostics-adapters.md),
+[adoption](../../../docs/agentforge/evidence/2026-09-24-diagnostics-adoption.md));
+hosted provider proof is not. [T-26.4](../../../TODO.md#t-264),
 [T-26.5](../../../TODO.md#t-265), [T-26.6](../../../TODO.md#t-266) and
 [T-26.7](../../../TODO.md#t-267) own delivery; evidence belongs to
 [TST-DIAGNOSTICS-001](../../decisions/TESTING.md#tst-diagnostics-001) and

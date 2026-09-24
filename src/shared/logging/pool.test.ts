@@ -30,3 +30,33 @@ it("projects idle pool errors without inheriting an unrelated request or leaking
     await pool.end()
   }
 })
+
+it("TST-DIAGNOSTICS-001 reports a swallowed idle pool failure once as its only owner", async () => {
+  const { createLogger } = await import("./logger")
+  const { reportIdlePoolError } = await import("../../../db/pool")
+  const { defaultLogPolicy } = await import("./config")
+  const diagnostics = { active: () => true, log: vi.fn(), reportError: vi.fn() }
+  const logger = createLogger({
+    environment: "production",
+    write: vi.fn(),
+    diagnostics,
+    policy: () => ({
+      ...defaultLogPolicy,
+      diagnostics: {
+        ...defaultLogPolicy.diagnostics,
+        enabled: true,
+        errorReportsEnabled: true,
+      },
+    }),
+  })
+  const failure = Object.assign(new Error("private"), { code: "ECONNRESET" })
+  reportIdlePoolError(failure, logger)
+  expect(diagnostics.reportError).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      module: "database.pool",
+      event: "database.pool.idle.failed",
+      operation: "database.pool.idle",
+    }),
+    failure
+  )
+})

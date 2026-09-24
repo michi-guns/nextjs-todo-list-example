@@ -5,6 +5,8 @@ import {
   createOperationRunner,
   observeOperation,
   reportOperationError,
+  wasReported,
+  markReported,
 } from "./operation"
 
 vi.mock("server-only", () => ({}))
@@ -116,5 +118,106 @@ describe("adopted backend operations", () => {
         throw failure
       })
     ).rejects.toBe(failure)
+  })
+})
+
+describe("TST-DIAGNOSTICS-001 failure ownership and completion flush", () => {
+  function reporting() {
+    const policy = createLogPolicy()
+    policy.update({
+      ...defaultLogPolicy,
+      revision: 1,
+      diagnostics: {
+        ...defaultLogPolicy.diagnostics,
+        enabled: true,
+        errorReportsEnabled: true,
+      },
+    })
+    const diagnostics = {
+      active: () => true,
+      log: vi.fn(),
+      reportError: vi.fn(),
+    }
+    const flush = vi.fn(async () => {})
+    const logger = createLogger({
+      environment: "preview",
+      policy: policy.current,
+      write: vi.fn(),
+      diagnostics,
+    })
+    return {
+      diagnostics,
+      flush,
+      ...createOperationRunner({ logger, refresh: async () => {}, flush }),
+    }
+  }
+
+  it("reports a caught unexpected failure once at its owning boundary and marks it", async () => {
+    const f = reporting()
+    const failure = new Error("private")
+    await expect(
+      f.run("landing", "landing.read", () =>
+        observeOperation("sanity", "sanity.read", async () => {
+          throw failure
+        })
+      )
+    ).rejects.toBe(failure)
+    expect(f.diagnostics.reportError).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        module: "sanity",
+        event: "sanity.read.failed",
+      }),
+      failure
+    )
+    expect(wasReported(failure)).toBe(true)
+    expect(f.flush).toHaveBeenCalledOnce()
+  })
+
+  it("does not report expected refusals and awaits flush after successful work", async () => {
+    const f = reporting()
+    const { InvalidEntryInputError } = await import("../entry-contract")
+    const refusal = new InvalidEntryInputError()
+    await expect(
+      f.run("lists", "lists.create", async () => {
+        throw refusal
+      })
+    ).rejects.toBe(refusal)
+    expect(f.diagnostics.reportError).not.toHaveBeenCalled()
+    expect(wasReported(refusal)).toBe(false)
+    await expect(f.run("lists", "lists.read", async () => 7)).resolves.toBe(7)
+    expect(f.flush).toHaveBeenCalledTimes(2)
+  })
+
+  it("keeps results and errors when the completion flush fails", async () => {
+    const f = reporting()
+    f.flush.mockRejectedValue(new Error("network"))
+    await expect(f.run("lists", "lists.read", async () => 7)).resolves.toBe(7)
+    const failure = new Error("x")
+    await expect(
+      f.run("lists", "lists.read", async () => {
+        throw failure
+      })
+    ).rejects.toBe(failure)
+  })
+})
+
+describe("TST-DIAGNOSTICS-001 process-wide report ownership", () => {
+  it("shares reported-error identity across separately bundled module copies", async () => {
+    const failure = new Error("x")
+    markReported(failure)
+    vi.resetModules()
+    const copy = await import("./operation")
+    expect(copy.wasReported(failure)).toBe(true)
+  })
+})
+
+describe("TST-LOGGING-001 process-wide request context", () => {
+  it("lets a logger from one module copy see context set by another copy", async () => {
+    const { withLogContext: setInOriginal } = await import("./context")
+    vi.resetModules()
+    const copy = await import("./context")
+    setInOriginal("lists.read", () => {
+      expect(copy.currentLogContext()?.operation).toBe("lists.read")
+    })
   })
 })
