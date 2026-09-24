@@ -144,8 +144,9 @@ is `none` (default), `sentry` (`SENTRY_DSN`) or `better-stack`
 (`BETTER_STACK_ERRORS_DSN`, `BETTER_STACK_LOGS_URL`, `BETTER_STACK_LOGS_TOKEN`).
 These are server-only environment values, never policy fields. Invalid selected
 configuration disables export with one local `diagnostics.config_invalid` notice
-and never falls back to another provider. The provider adapters and their setup
-guide arrive with T-26.5/T-26.6; until then the application exports nothing.
+and never falls back to another provider. Both adapters exist
+(`src/shared/diagnostics/sentry.ts`, `better-stack.ts`); Node startup wiring and
+the setup guide arrive with T-26.6, so until then the application exports nothing.
 Explicit error reports carry only an error class, classified kind/code, static
 message, repository-relative frame locations, up to three cause facts and a
 stable fingerprint; the occurrence ID and correlation ID stay out of grouping.

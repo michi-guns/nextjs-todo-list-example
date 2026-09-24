@@ -53,8 +53,8 @@ export type SafeErrorReport = Readonly<
  * point before transmission so refreshed policy drops unsent buffered records.
  */
 export interface ExportGate {
-  allowsLog(event: SafeLogEvent): boolean
-  allowsReport(report: SafeErrorReport): boolean
+  allowsLog(event: Pick<SafeLogEvent, "module" | "event" | "level">): boolean
+  allowsReport(report: Pick<SafeErrorReport, "module" | "event">): boolean
 }
 
 /** The Strategy each provider adapter implements. Log and report stay distinct. */

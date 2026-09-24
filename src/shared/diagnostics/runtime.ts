@@ -2,6 +2,7 @@ import { z } from "zod"
 import type { LogEnvironment } from "../logging/config"
 import { loggingEnvironment } from "../logging/environment"
 import type {
+  DiagnosticsNotice,
   DiagnosticsProvider,
   DiagnosticsStrategy,
   ExportGate,
@@ -24,7 +25,8 @@ type SelectedConfig = Exclude<DiagnosticsConfig, { provider: "none" }>
 export type DiagnosticsAdapters = Partial<{
   [P in SelectedConfig["provider"]]: (
     config: Extract<SelectedConfig, { provider: P }>,
-    gate: ExportGate
+    gate: ExportGate,
+    notice: (code: DiagnosticsNotice) => void
   ) => Promise<DiagnosticsStrategy>
 }>
 
@@ -106,13 +108,17 @@ export async function startDiagnostics(
     const factory = adapters[config.provider] as
       | ((
           config: SelectedConfig,
-          gate: ExportGate
+          gate: ExportGate,
+          notice: (code: DiagnosticsNotice) => void
         ) => Promise<DiagnosticsStrategy>)
       | undefined
     if (!factory) throw new Error("adapter unavailable")
-    dispatcher.install(await factory(config, dispatcher.gate), {
-      release: config.release,
-    })
+    dispatcher.install(
+      await factory(config, dispatcher.gate, dispatcher.notice),
+      {
+        release: config.release,
+      }
+    )
     return config.provider
   } catch {
     dispatcher.notice("provider_unavailable")

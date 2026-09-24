@@ -69,7 +69,8 @@ describe("TST-DIAGNOSTICS-001 startup selection", () => {
         environment: "preview",
         release: "0123456789abcdef0123456789abcdef01234567",
       },
-      dispatcher.gate
+      dispatcher.gate,
+      dispatcher.notice
     )
     expect(adapters["better-stack"]).not.toHaveBeenCalled()
     expect(dispatcher.active()).toBe(true)
@@ -147,5 +148,34 @@ describe("TST-DIAGNOSTICS-001 startup selection", () => {
     expect(failing.dispatcher.active()).toBe(false)
     expect(failing.notice.mock.calls).toEqual([["provider_unavailable"]])
     expect(failing.adapters.sentry).not.toHaveBeenCalled()
+  })
+})
+
+describe("TST-DIAGNOSTICS-002 startup adapter map", () => {
+  it("builds each selected provider strategy lazily without sending anything", async () => {
+    const { diagnosticsAdapters } = await import("./adapters")
+    const gate = { allowsLog: () => true, allowsReport: () => true }
+    const notice = vi.fn()
+    const sentry = await diagnosticsAdapters.sentry!(
+      { provider: "sentry", dsn: sentryDsn, environment: "local" },
+      gate,
+      notice
+    )
+    const betterStackStrategy = await diagnosticsAdapters["better-stack"]!(
+      {
+        provider: "better-stack",
+        errorsDsn: betterStack.BETTER_STACK_ERRORS_DSN,
+        logsUrl: betterStack.BETTER_STACK_LOGS_URL,
+        logsToken: betterStack.BETTER_STACK_LOGS_TOKEN,
+        environment: "local",
+      },
+      gate,
+      notice
+    )
+    for (const built of [sentry, betterStackStrategy])
+      expect(Object.keys(built).sort()).toEqual(["flush", "log", "reportError"])
+    await sentry.flush(10)
+    await betterStackStrategy.flush(10)
+    expect(notice).not.toHaveBeenCalled()
   })
 })

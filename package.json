@@ -41,6 +41,7 @@
     "@sanity/icons": "^5.2.2",
     "@sanity/image-url": "^2.1.1",
     "@sanity/vision": "^6.15.0",
+    "@sentry/core": "11.0.0",
     "@vercel/functions": "^3.9.8",
     "better-auth": "^1.7.5",
     "class-variance-authority": "^0.7.1",
