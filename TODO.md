@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 51 files and 479 tests (T-26.3 backend logger adoption, 2026-09-19).
+- [x] `pnpm test` passes 54 files and 528 tests (T-26.4 diagnostics routing, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1130,7 +1130,9 @@ has been performed by this planning delivery.
 
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
-T-26.1 through T-26.3 on 2026-09-19; all three are complete, leaving 18 unchecked children.
+T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
+remaining locally executable children on 2026-09-24; T-26.4 is complete, leaving 17
+unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
 and subagents only for independent review, as the owner requested.
@@ -1206,7 +1208,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.3 are complete; the remaining 11 children have accepted plans and await execution authorization plus their named prerequisites. T-26.4 is next in the serial order. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.4 are complete; the remaining 10 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.5 is next in the serial order. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1389,8 +1391,9 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.4: Route safe events under independent destination policies
 
-- [ ] Extend the logger with a small diagnostics Strategy and shared settings
-      transition. Await a separate execution instruction.
+- [x] Extend the logger with a small diagnostics Strategy and shared settings
+      transition. Execution authorized by the owner's instruction on 2026-09-24.
+      Docker, installed dependencies and the registry passed preflight.
 - Files: planned `src/shared/logging/` policy/facade/cache and tests; new
   `src/shared/diagnostics/contracts.ts`, `dispatcher.ts`, `runtime.ts` and
   colocated tests; the accepted TypeScript settings CLI and
@@ -1421,6 +1424,16 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   dependencies and Docker/PostgreSQL 18 for required verification. TD-031's
   accepted CLI is delivered by the upstream writer task. One policy/routing review
   unit; no hosted provider credentials required.
+- Evidence, 2026-09-24: [diagnostics routing](docs/agentforge/evidence/2026-09-24-diagnostics-routing.md)
+  records 108 focused tests, 528 total unit tests, 29 integration tests,
+  strict typecheck, lint with the existing warning, build, formatting and diff
+  checks. The policy stays in the existing `jsonb` row, so no migration or Neon
+  check applies. `TST-DIAGNOSTICS-001` is partial; SDK enrichment, boundary
+  ownership and runtime flush remain for T-26.5/T-26.6.
+- Review: a fresh Claude Opus 5.5 reviewer (xhigh effort requested) found one
+  narrow privacy gap in stack parsing and four nits; commit `f73846f` fixes
+  them with regression tests. The final tip receives its own fresh review before
+  direct merge and main-push CI. T-26.5 is next in serial order.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `api-and-interface-design`,
   `observability-and-instrumentation`, `security-and-hardening`,
