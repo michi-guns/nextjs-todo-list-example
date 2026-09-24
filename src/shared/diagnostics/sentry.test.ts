@@ -48,6 +48,13 @@ beforeAll(() => {
   getGlobalScope().setTag("secret", "secret-token")
   getIsolationScope().setExtra("host", "hostname-secret")
   getIsolationScope().addBreadcrumb({ message: "person@example.com" })
+  // Scope attributes join logs after beforeSendLog, including allowlisted keys.
+  getGlobalScope().setAttributes({
+    leak: "secret-token",
+    operation: "secret-token",
+    "sentry.release": "secret-token",
+  })
+  getIsolationScope().setAttributes({ other: "hostname-secret" })
 })
 
 async function setup(
@@ -182,7 +189,7 @@ describe("TST-DIAGNOSTICS-002 Sentry adapter local wire evidence", () => {
       expect(request.body).not.toMatch(sentinels)
   })
 
-  it("drops SDK-buffered logs and unsent reports that a refreshed policy disallows", async () => {
+  it("drops SDK-buffered logs that a refreshed policy disallows", async () => {
     const { collector, dispatcher, policy } = await setup()
     dispatcher.log("info", logRecord)
     dispatcher.log("info", { ...logRecord, module: "tasks" })
@@ -227,11 +234,13 @@ describe("TST-DIAGNOSTICS-002 Sentry adapter local wire evidence", () => {
       dispatcher.reportError(reportContext, new Error("x"))
     const started = performance.now()
     await dispatcher.flush(300)
-    expect(performance.now() - started).toBeLessThan(1500)
-    // Real sockets close when the request deadline aborts them.
+    expect(performance.now() - started).toBeLessThan(1000)
+    // Real sockets close when the flush deadline aborts the in-flight requests,
+    // well before the one-second per-request fallback.
     await vi.waitFor(() => expect(collector.aborted()).toBeGreaterThan(0), {
-      timeout: 3000,
+      timeout: 500,
     })
+    expect(performance.now() - started).toBeLessThan(900)
     expect(collector.requests.length).toBeLessThanOrEqual(10)
     expect(notice).toHaveBeenCalled()
   })
@@ -245,5 +254,49 @@ describe("TST-DIAGNOSTICS-002 Sentry adapter local wire evidence", () => {
     dispatcher.reportError(reportContext, new Error("x"))
     await dispatcher.flush(500)
     expect(collector.requests).toEqual([])
+  })
+
+  it("drops scope-attached attributes and gives each request its own trace id", async () => {
+    const { collector, dispatcher } = await setup()
+    dispatcher.log("info", {
+      module: "lists",
+      event: "list.read.started",
+      environment: "preview",
+    })
+    dispatcher.log("info", logRecord)
+    dispatcher.log("info", {
+      ...logRecord,
+      correlationId: "33333333-3333-4333-8333-333333333333",
+    })
+    await dispatcher.flush(2000)
+    const logs = collector.requests
+      .flatMap((request) => parseEnvelopeBody(request.body).items)
+      .filter((item) => item.type === "log")
+      .flatMap(
+        (item) =>
+          item.payload.items as Array<{
+            trace_id: string
+            attributes: Record<string, { value: unknown }>
+          }>
+      )
+    expect(Object.keys(logs[0].attributes).sort()).toEqual(
+      [
+        "environment",
+        "event",
+        "module",
+        "release",
+        "sentry.environment",
+        "sentry.release",
+        "sentry.timestamp.sequence",
+      ].sort()
+    )
+    expect(logs[0].attributes["sentry.release"].value).toBe("abc1234")
+    expect(logs.map((log) => log.trace_id)).toEqual([
+      expect.stringMatching(/^[0-9a-f]{32}$/),
+      "11111111111141118111111111111111",
+      "33333333333343338333333333333333",
+    ])
+    for (const request of collector.requests)
+      expect(request.body).not.toMatch(sentinels)
   })
 })

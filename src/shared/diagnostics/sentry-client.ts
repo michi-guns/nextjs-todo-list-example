@@ -1,5 +1,6 @@
 // Node-only. Shared by the Sentry adapter and Better Stack's Sentry-compatible
 // error ingestion; loaded only after startup selects one of them.
+import { randomUUID } from "node:crypto"
 import {
   createEnvelope,
   createStackParser,
@@ -22,12 +23,15 @@ import type {
   SafeLogEvent,
 } from "./contracts"
 
-/** Per-request network deadline; aborting the fetch bounds the actual I/O. */
+/**
+ * Per-request fallback deadline. An awaited flush that times out also aborts
+ * every in-flight request, so the flush deadline bounds the actual I/O.
+ */
 export const REQUEST_TIMEOUT_MS = 1000
 /** Maximum concurrent/pending envelope requests; excess is dropped by the SDK. */
 export const MAX_PENDING_REQUESTS = 10
 
-const logAttributeKeys = new Set([
+const ownLogKeys = new Set([
   "module",
   "event",
   "environment",
@@ -39,12 +43,9 @@ const logAttributeKeys = new Set([
   "error.kind",
   "error.code",
   "release",
-  "sentry.environment",
-  "sentry.release",
-  "sentry.sdk.name",
-  "sentry.sdk.version",
-  "sentry.timestamp.sequence",
 ])
+/** Names the attributes the facade itself set; scope attributes cannot forge it. */
+const OWN_KEYS = "diagnostics.keys"
 const tagKeys = [
   "module",
   "event",
@@ -65,7 +66,7 @@ function compact(entries: Array<[string, Attribute | undefined]>) {
 
 /** Explicit projection of a SafeLogEvent; nothing else becomes an attribute. */
 export function logAttributes(event: SafeLogEvent): Record<string, Attribute> {
-  return compact([
+  const own = compact([
     ["module", event.module],
     ["event", event.event],
     ["environment", event.environment],
@@ -78,6 +79,7 @@ export function logAttributes(event: SafeLogEvent): Record<string, Attribute> {
     ["error.code", event.error?.code],
     ["release", event.release],
   ])
+  return { ...own, [OWN_KEYS]: Object.keys(own).join(",") }
 }
 
 function toEvent(report: SafeErrorReport): ErrorEvent {
@@ -154,16 +156,40 @@ function allowlistEvent(event: ErrorEvent): ErrorEvent {
   }
 }
 
-function allowlistLog(log: Log): Log {
-  return {
-    level: log.level,
-    message: log.message,
-    attributes: Object.fromEntries(
-      Object.entries(log.attributes ?? {}).filter(([key]) =>
-        logAttributeKeys.has(key)
-      )
-    ),
+type Identity = { environment: string; release?: string }
+
+/**
+ * Keeps only the facade's own keys (as listed by the marker) plus SDK identity
+ * values that match this client's configuration. Scope attributes merged after
+ * `beforeSendLog` therefore cannot add or substitute an allowlisted key.
+ */
+function finalAttributes<T>(
+  attributes: Record<string, T> | undefined,
+  identity: Identity,
+  keepMarker = false
+): Record<string, T> {
+  const valueOf = (key: string) => {
+    const attribute = attributes?.[key] as unknown
+    return attribute && typeof attribute === "object" && "value" in attribute
+      ? attribute.value
+      : attribute
   }
+  const own = String(valueOf(OWN_KEYS) ?? "").split(",")
+  return Object.fromEntries(
+    Object.entries(attributes ?? {}).filter(
+      ([key]) =>
+        (ownLogKeys.has(key) && own.includes(key)) ||
+        // The transport still needs the marker after beforeSendLog.
+        (keepMarker && key === OWN_KEYS) ||
+        (key === "sentry.environment" &&
+          valueOf(key) === identity.environment) ||
+        (key === "sentry.release" &&
+          identity.release !== undefined &&
+          valueOf(key) === identity.release) ||
+        (key === "sentry.timestamp.sequence" &&
+          typeof valueOf(key) === "number")
+    )
+  ) as Record<string, T>
 }
 
 function attributeValue(attributes: unknown, key: string): unknown {
@@ -176,19 +202,24 @@ function attributeValue(attributes: unknown, key: string): unknown {
  * for every buffered item, re-allowlists log attributes added after
  * `beforeSendLog`, drops non-diagnostic item types and the trace header.
  */
-function gateEnvelope(envelope: Envelope, gate: ExportGate) {
+function gateEnvelope(
+  envelope: Envelope,
+  gate: ExportGate,
+  identity: Identity
+) {
   const items: unknown[] = []
   forEachEnvelopeItem(envelope, (item, type) => {
     const [header, payload] = item as [Record<string, unknown>, unknown]
     if (type === "event") {
-      const tags = (payload as ErrorEvent).tags ?? {}
+      // Also covers any SDK path that bypasses beforeSend.
+      const event = allowlistEvent(payload as ErrorEvent)
+      const { module, event: name } = event.tags ?? {}
       if (
-        gate.allowsReport({
-          module: String(tags.module),
-          event: String(tags.event),
-        })
+        typeof module === "string" &&
+        typeof name === "string" &&
+        gate.allowsReport({ module, event: name })
       )
-        items.push(item)
+        items.push([header, event])
     } else if (type === "log") {
       const kept = (
         (payload as { items: Array<Record<string, unknown>> }).items ?? []
@@ -200,14 +231,22 @@ function gateEnvelope(envelope: Envelope, gate: ExportGate) {
             level: log.level as LogLevel,
           })
         )
-        .map((log) => ({
-          ...log,
-          attributes: Object.fromEntries(
-            Object.entries(log.attributes as object).filter(([key]) =>
-              logAttributeKeys.has(key)
-            )
-          ),
-        }))
+        .map((log) => {
+          const correlation = attributeValue(log.attributes, "correlation_id")
+          return {
+            ...log,
+            // One private scope would give every log the same trace; use the
+            // request correlation (a server UUID) or a fresh random ID instead.
+            trace_id: (typeof correlation === "string"
+              ? correlation
+              : randomUUID()
+            ).replace(/-/g, ""),
+            attributes: finalAttributes(
+              log.attributes as Record<string, unknown>,
+              identity
+            ),
+          }
+        })
       if (kept.length > 0)
         items.push([
           { ...header, item_count: kept.length },
@@ -230,38 +269,64 @@ function gateEnvelope(envelope: Envelope, gate: ExportGate) {
 function gatedTransport(
   options: BaseTransportOptions,
   gate: ExportGate,
-  notice: (code: DiagnosticsNotice) => void
+  notice: (code: DiagnosticsNotice) => void,
+  identity: Identity
 ): Transport {
+  const inFlight = new Set<AbortController>()
   const inner = createTransport(
-    { ...options, bufferSize: MAX_PENDING_REQUESTS },
+    {
+      ...options,
+      bufferSize: MAX_PENDING_REQUESTS,
+      recordDroppedEvent: (reason, category, count) => {
+        if (reason === "queue_overflow" || reason === "ratelimit_backoff")
+          notice("record_dropped")
+        options.recordDroppedEvent(reason, category, count)
+      },
+    },
     async ({ body }) => {
-      const response = await fetch(options.url, {
-        method: "POST",
-        body: typeof body === "string" ? body : new Uint8Array(body),
-        headers: { "content-type": "application/x-sentry-envelope" },
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      })
-      if (!response.ok) notice("export_failed")
-      await response.body?.cancel()
-      return {
-        statusCode: response.status,
-        headers: {
-          "x-sentry-rate-limits": response.headers.get("x-sentry-rate-limits"),
-          "retry-after": response.headers.get("retry-after"),
-        },
+      const controller = new AbortController()
+      inFlight.add(controller)
+      try {
+        const response = await fetch(options.url, {
+          method: "POST",
+          body: typeof body === "string" ? body : new Uint8Array(body),
+          headers: { "content-type": "application/x-sentry-envelope" },
+          signal: AbortSignal.any([
+            controller.signal,
+            AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+          ]),
+        })
+        if (!response.ok) notice("export_failed")
+        await response.body?.cancel()
+        return {
+          statusCode: response.status,
+          headers: {
+            "x-sentry-rate-limits": response.headers.get(
+              "x-sentry-rate-limits"
+            ),
+            "retry-after": response.headers.get("retry-after"),
+          },
+        }
+      } finally {
+        inFlight.delete(controller)
       }
     }
   )
   return {
     send(envelope) {
-      const allowed = gateEnvelope(envelope, gate)
+      const allowed = gateEnvelope(envelope, gate, identity)
       if (!allowed) return Promise.resolve({})
       return Promise.resolve(inner.send(allowed)).catch(() => {
         notice("export_failed")
         return {}
       })
     },
-    flush: inner.flush,
+    async flush(timeout) {
+      const drained = await inner.flush(timeout)
+      // Deadline reached: stop the actual network work, not only the await.
+      if (!drained) for (const controller of inFlight) controller.abort()
+      return drained
+    },
   }
 }
 
@@ -276,6 +341,10 @@ export function createSentryCompatibleClient(options: {
   gate: ExportGate
   notice: (code: DiagnosticsNotice) => void
 }) {
+  const identity = {
+    environment: options.environment,
+    release: options.release,
+  }
   const client = new ServerRuntimeClient({
     dsn: options.dsn,
     environment: options.environment,
@@ -297,10 +366,14 @@ export function createSentryCompatibleClient(options: {
       frameContextLines: 0,
     },
     beforeSend: allowlistEvent,
-    beforeSendLog: allowlistLog,
+    beforeSendLog: (log: Log) => ({
+      level: log.level,
+      message: log.message,
+      attributes: finalAttributes(log.attributes, identity, true),
+    }),
     beforeSendTransaction: () => null,
     transport: (transportOptions) =>
-      gatedTransport(transportOptions, options.gate, options.notice),
+      gatedTransport(transportOptions, options.gate, options.notice, identity),
   })
   client.init()
   // A private scope keeps request context local and avoids global mutation.

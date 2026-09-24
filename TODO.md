@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 54 files and 530 tests (T-26.4 diagnostics routing, 2026-09-24).
+- [x] `pnpm test` passes 56 files and 549 tests (T-26.5 diagnostics adapters, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1131,7 +1131,7 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 is complete, leaving 17
+remaining locally executable children on 2026-09-24; T-26.4 and T-26.5 are complete, leaving 16
 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
@@ -1208,7 +1208,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.4 are complete; the remaining 10 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.5 is next in the serial order. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.5 are complete; the remaining 9 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.6 is next in the serial order. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1445,8 +1445,9 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.5: Add Sentry and Better Stack adapters with local wire evidence
 
-- [ ] Implement both concrete adapters behind the accepted Strategy, selecting
-      only one at startup. Await execution and dependency-install authorization.
+- [x] Implement both concrete adapters behind the accepted Strategy, selecting
+      only one at startup. Execution and the SDK install were authorized by the
+      owner's instruction on 2026-09-24; registry and dependencies passed preflight.
 - Files: `src/shared/diagnostics/sentry.ts`, `better-stack.ts`, startup
   composition, shared safe mapping where warranted, local wire tests and
   dependency manifest/lockfile. No browser SDK, public ingest proxy or account setup.
@@ -1473,6 +1474,15 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Dependencies/prerequisites: T-26.4; authorized compatible stable SDK install,
   registry access and installed-version public API/source review. One adapter
   delivery/review unit. Accounts/secrets are unnecessary for this local evidence.
+- Evidence, 2026-09-24: [diagnostics adapters](docs/agentforge/evidence/2026-09-24-diagnostics-adapters.md)
+  records 52 focused diagnostics tests against a local collector with the real
+  `@sentry/core` 11.0.0 client, 549 total unit tests, typecheck, lint with the
+  existing warning and build. `TST-DIAGNOSTICS-002` is partial: hosted ingestion
+  and grouping remain T-26.7.
+- Review: a fresh Claude Opus 5.5 reviewer (xhigh effort requested) found no
+  blockers and two should-fix items (shared log `trace_id`, unproven scope
+  attribute re-allowlisting) plus nits; all are fixed with regression tests.
+  The final tip receives its own fresh review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `source-driven-development`,
   `observability-and-instrumentation`, `security-and-hardening`,
