@@ -18,7 +18,10 @@ describe("getPublishedLandingContent", () => {
     const logging = createOperationRunner({
       logger: createLogger({
         environment: "preview",
-        policy: () => ({ ...defaultLogPolicy, minimumLevel: "debug" }),
+        policy: () => ({
+          ...defaultLogPolicy,
+          console: { ...defaultLogPolicy.console, minimumLevel: "debug" },
+        }),
         write,
       }),
       refresh: async () => {},

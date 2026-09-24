@@ -19,7 +19,7 @@ describe("TST-LOGGING-001 contextual facade", () => {
     policy.update({
       ...defaultLogPolicy,
       revision: 1,
-      moduleLevels: { auth: "debug" },
+      console: { ...defaultLogPolicy.console, moduleLevels: { auth: "debug" } },
     })
     log.emit("debug", "mail.sent", metadata)
     expect(write).toHaveBeenCalledWith(
@@ -147,5 +147,136 @@ describe("TST-LOGGING-001 contextual facade", () => {
       },
     })("jobs")
     expect(() => broken.emit("error", "job.failed")).not.toThrow()
+  })
+})
+
+describe("TST-DIAGNOSTICS-001 facade routing", () => {
+  const exporting = {
+    ...defaultLogPolicy,
+    revision: 1,
+    console: { ...defaultLogPolicy.console, minimumLevel: "error" as const },
+    diagnostics: {
+      ...defaultLogPolicy.diagnostics,
+      enabled: true,
+      minimumLevel: "info" as const,
+      errorReportsEnabled: true,
+    },
+  }
+  function sink(active = true) {
+    return {
+      active: vi.fn(() => active),
+      log: vi.fn(),
+      reportError: vi.fn(),
+    }
+  }
+
+  it("builds lazy metadata once for any accepting destination and skips it when none accepts", () => {
+    const policy = createLogPolicy()
+    policy.update(exporting)
+    const write = vi.fn()
+    const diagnostics = sink()
+    const log = createLogger({
+      environment: "local",
+      policy: policy.current,
+      write,
+      diagnostics,
+    })("lists")
+    const metadata = vi.fn(() => ({ durationMs: 3, outcome: "completed" }))
+    withLogContext("list.read", () =>
+      log.emit("info", "list.read.completed", metadata)
+    )
+    expect(write).not.toHaveBeenCalled()
+    expect(diagnostics.log).toHaveBeenCalledExactlyOnceWith(
+      "info",
+      expect.objectContaining({
+        module: "lists",
+        event: "list.read.completed",
+        durationMs: 3,
+        correlationId: expect.any(String),
+        operation: "list.read",
+      })
+    )
+    log.emit("error", "list.read.failed", metadata)
+    expect(write).toHaveBeenCalledOnce()
+    expect(diagnostics.log).toHaveBeenCalledTimes(2)
+    expect(metadata).toHaveBeenCalledTimes(2)
+    log.emit("debug", "list.read.completed", metadata)
+    expect(metadata).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not build remote-only metadata without an active startup provider", () => {
+    const write = vi.fn()
+    const metadata = vi.fn(() => ({}))
+    for (const diagnostics of [undefined, sink(false)]) {
+      createLogger({
+        environment: "local",
+        policy: () => exporting,
+        write,
+        diagnostics,
+      })("lists").emit("info", "list.read.completed", metadata)
+      if (diagnostics) expect(diagnostics.log).not.toHaveBeenCalled()
+    }
+    expect(metadata).not.toHaveBeenCalled()
+    expect(write).not.toHaveBeenCalled()
+  })
+
+  it("sends explicit reports independently of thresholds and only when policy allows", () => {
+    const policy = createLogPolicy()
+    policy.update({
+      ...exporting,
+      diagnostics: { ...exporting.diagnostics, minimumLevel: "fatal" },
+    })
+    const diagnostics = sink()
+    const log = createLogger({
+      environment: "production",
+      policy: policy.current,
+      write: vi.fn(),
+      diagnostics,
+    })("lists")
+    const failure = new Error("private text")
+    withLogContext("list.create", () =>
+      log.reportError("list.create.failed", failure)
+    )
+    expect(diagnostics.reportError).toHaveBeenCalledExactlyOnceWith(
+      {
+        module: "lists",
+        event: "list.create.failed",
+        environment: "production",
+        correlationId: expect.any(String),
+        operation: "list.create",
+      },
+      failure
+    )
+    policy.update({ ...exporting, revision: 2, disabledModules: ["lists"] })
+    log.reportError("list.create.failed", failure)
+    log.reportError("bad event\nname", failure)
+    expect(diagnostics.reportError).toHaveBeenCalledOnce()
+  })
+
+  it("contains diagnostics sink failures without affecting console output or callers", () => {
+    const write = vi.fn()
+    const diagnostics = {
+      active: () => true,
+      log: vi.fn(() => {
+        throw new Error("sink")
+      }),
+      reportError: vi.fn(() => {
+        throw new Error("sink")
+      }),
+    }
+    const log = createLogger({
+      environment: "local",
+      policy: () => ({
+        ...exporting,
+        console: { ...exporting.console, minimumLevel: "info" as const },
+      }),
+      write,
+      diagnostics,
+    })("lists")
+    expect(() => log.emit("info", "list.read.completed")).not.toThrow()
+    expect(() =>
+      log.reportError("list.read.failed", new Error("x"))
+    ).not.toThrow()
+    expect(write).toHaveBeenCalledOnce()
   })
 })

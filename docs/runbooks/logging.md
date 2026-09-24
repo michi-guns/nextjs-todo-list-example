@@ -66,10 +66,11 @@ the [mail runbook](auth-mail.md). For Sanity failures, use the
 check the selected database, migration and role through the guarded CLI below.
 
 To enable list diagnostics only, publish a new revision with
-`"moduleLevels": { "lists": "debug" }`. To quiet a specific event, add its exact
-full name, such as `lists.read.completed`, to `suppressedEvents`. `enabled: false`
-suppresses every facade event, including settings recovery, until a successful
-refresh adopts an enabled policy. Inspect persisted policy first when logs
+`"console": { ..., "moduleLevels": { "lists": "debug" } }`. To quiet a specific
+event, add its exact full name, such as `lists.read.completed`, to
+`suppressedEvents`; to silence a whole module, add it to `disabledModules`.
+`enabled: false` suppresses every facade event, including settings recovery,
+until a successful refresh adopts an enabled policy. Inspect persisted policy first when logs
 disappear; absence alone does not prove an outage or universal instance adoption.
 
 ## Use the core
@@ -117,17 +118,37 @@ uses in-memory policy; application entries use the shared composition above.
 
 ## Policy and privacy
 
-`createLogPolicy()` starts enabled at `info`. `update(unknown)` accepts a complete
-validated schema-version-1 snapshot only at a newer revision and returns a
-boolean. Snapshots are copied and frozen. Invalid updates retain the previous
-snapshot. There are at most 100 module overrides and 100 event suppressions.
+`createLogPolicy()` starts with console output enabled at `info` and remote
+diagnostics disabled. `update(unknown)` accepts a complete validated snapshot
+only at a newer revision and returns a boolean. Schema version 2 is current;
+a legacy version-1 snapshot is upgraded on read or write: its numeric thresholds
+become console thresholds, module `off` becomes a `disabledModules` entry and
+diagnostics stay disabled. Snapshots are copied and deeply frozen. Invalid updates
+retain the previous snapshot. Each list or override map holds at most 100 entries.
 This helper only publishes in memory; the settings adapter below supplies
 persistence and refresh.
 
-Global off, exact event suppression and exact module off veto emission. Otherwise
-the exact module threshold replaces the default threshold. Existing logger
-objects read current policy on every call. Use a metadata callback for expensive
-debug data so filtering happens before construction.
+Global `enabled: false`, `disabledModules` and exact `suppressedEvents` veto every
+destination, including explicit error reports. Otherwise each destination,
+`console` and `diagnostics`, applies its own `enabled` switch and threshold: an
+exact module entry in that destination's `moduleLevels` replaces its
+`minimumLevel`. A quiet console therefore never discards an eligible remote
+event, and a quiet remote threshold never hides console output. Explicit
+`reportError` calls ignore numeric thresholds and need both `diagnostics.enabled`
+and `diagnostics.errorReportsEnabled`. Existing logger objects read current
+policy on every call. Metadata callbacks run only when at least one destination
+accepts the event.
+
+Remote destinations also need a startup-selected provider. `DIAGNOSTICS_PROVIDER`
+is `none` (default), `sentry` (`SENTRY_DSN`) or `better-stack`
+(`BETTER_STACK_ERRORS_DSN`, `BETTER_STACK_LOGS_URL`, `BETTER_STACK_LOGS_TOKEN`).
+These are server-only environment values, never policy fields. Invalid selected
+configuration disables export with one local `diagnostics.config_invalid` notice
+and never falls back to another provider. The provider adapters and their setup
+guide arrive with T-26.5/T-26.6; until then the application exports nothing.
+Explicit error reports carry only an error class, classified kind/code, static
+message, repository-relative frame locations, up to three cause facts and a
+stable fingerprint; the occurrence ID and correlation ID stay out of grouping.
 
 Only `outcome`, `durationMs`, `transport` and classified `error` metadata survive.
 Outcomes and transports use the finite lists in
@@ -232,14 +253,22 @@ An absent row inspects as `policy: null, revision: 0`. For the first write,
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "revision": 1,
   "enabled": true,
-  "minimumLevel": "info",
-  "moduleLevels": {},
-  "suppressedEvents": []
+  "disabledModules": [],
+  "suppressedEvents": [],
+  "console": { "enabled": true, "minimumLevel": "info", "moduleLevels": {} },
+  "diagnostics": {
+    "enabled": false,
+    "minimumLevel": "warn",
+    "moduleLevels": {},
+    "errorReportsEnabled": false
+  }
 }
 ```
+
+A version-1 file is still accepted and stored as its version-2 upgrade.
 
 For later updates, inspect the current revision, increment `revision` by one
 in the full policy file, and pass the old revision as `--expected-revision`.

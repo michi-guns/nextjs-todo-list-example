@@ -7,7 +7,7 @@ const outcomes = [
   "fallback",
 ] as const
 const transports = ["mailbox", "suppressed", "resend"] as const
-const errorCodes = {
+export const errorCodes = {
   ETIMEDOUT: "timeout",
   ECONNREFUSED: "unavailable",
   ECONNRESET: "unavailable",
@@ -25,7 +25,7 @@ export type SafeMetadata = {
 }
 
 /** Read only own data properties. Do not run getters, toJSON or Error serializers. */
-function ownValue(input: unknown, key: string): unknown {
+export function ownValue(input: unknown, key: string): unknown {
   if (!input || typeof input !== "object") return undefined
   try {
     const descriptor = Object.getOwnPropertyDescriptor(input, key)

@@ -96,6 +96,53 @@ describe("TST-LOGGING-002 protected settings CLI", () => {
   })
 
   it.each([
+    [
+      "destination policy",
+      {
+        ...defaultLogPolicy,
+        revision: 1,
+        diagnostics: {
+          ...defaultLogPolicy.diagnostics,
+          enabled: true,
+          errorReportsEnabled: true,
+        },
+      },
+    ],
+    [
+      "legacy file",
+      {
+        schemaVersion: 1,
+        revision: 1,
+        enabled: true,
+        minimumLevel: "warn",
+        moduleLevels: { auth: "off" },
+        suppressedEvents: [],
+      },
+    ],
+  ])(
+    "TST-DIAGNOSTICS-001 publishes a %s as one normalized destination snapshot",
+    async (_, file) => {
+      const dependencies = runtime()
+      dependencies.readPolicy.mockResolvedValueOnce(file)
+      await runLoggingCommand(
+        parseLoggingCommand([
+          "set",
+          ...selection,
+          "--file",
+          "policy.json",
+          "--expected-revision",
+          "0",
+        ]),
+        environment,
+        dependencies
+      )
+      const saved = dependencies.store.set.mock.calls[0][0]
+      expect(saved).toMatchObject({ schemaVersion: 2, revision: 1 })
+      expect(saved.diagnostics.enabled).toBe(file.schemaVersion === 2)
+    }
+  )
+
+  it.each([
     ["inspect"],
     ["inspect", ...selection, "--api-key", "private"],
     ["inspect", ...selection, "--environment", "local"],

@@ -1,6 +1,10 @@
 import { Pool } from "pg"
 import { afterAll, describe, expect, inject, it, vi } from "vitest"
-import { defaultLogPolicy } from "../shared/logging/config"
+import {
+  allowsErrorReport,
+  defaultLogPolicy,
+  routeLog,
+} from "../shared/logging/config"
 import { createSettingsCache } from "../shared/logging/settings-cache"
 import { createSettingsStore } from "../shared/logging/settings-store"
 import {
@@ -74,6 +78,92 @@ describe("TST-LOGGING-002 real settings persistence", () => {
     }
   })
 
+  it("TST-DIAGNOSTICS-001 upgrades a legacy row to console-only and switches destinations atomically across instances", async () => {
+    const first = await isolatedTarget("destinations")
+    await first.query(
+      "INSERT INTO logging_settings (id, revision, policy) VALUES (1, 1, $1)",
+      [
+        {
+          schemaVersion: 1,
+          revision: 1,
+          enabled: true,
+          minimumLevel: "debug",
+          moduleLevels: { lists: "error", auth: "off" },
+          suppressedEvents: [],
+        },
+      ]
+    )
+    const peer = new Pool({ ...first.options })
+    pools.push(peer)
+    const a = createSettingsCache(createSettingsStore(first))
+    const b = createSettingsCache(createSettingsStore(peer))
+    await Promise.all([a.refresh(), b.refresh()])
+    for (const cache of [a, b]) {
+      expect(cache.current()).toMatchObject({
+        revision: 1,
+        disabledModules: ["auth"],
+        console: { minimumLevel: "debug", moduleLevels: { lists: "error" } },
+        diagnostics: { enabled: false, errorReportsEnabled: false },
+      })
+      expect(routeLog(cache.current(), "tasks", "t.read", "debug")).toEqual({
+        console: true,
+        diagnostics: false,
+      })
+    }
+    const store = createSettingsStore(first)
+    const remoteOnly = {
+      ...a.current(),
+      revision: 2,
+      console: { ...a.current().console, minimumLevel: "error" as const },
+      diagnostics: {
+        enabled: true,
+        minimumLevel: "info" as const,
+        moduleLevels: {},
+        errorReportsEnabled: true,
+      },
+    }
+    await store.set(remoteOnly, 1)
+    const clock = vi
+      .spyOn(performance, "now")
+      .mockReturnValue(performance.now() + 31_000)
+    try {
+      await Promise.all([a.refresh(), b.refresh()])
+      for (const cache of [a, b]) {
+        expect(routeLog(cache.current(), "tasks", "t.read", "info")).toEqual({
+          console: false,
+          diagnostics: true,
+        })
+        expect(allowsErrorReport(cache.current(), "tasks", "t.failed")).toBe(
+          true
+        )
+        expect(allowsErrorReport(cache.current(), "auth", "t.failed")).toBe(
+          false
+        )
+      }
+      await store.set(
+        {
+          ...remoteOnly,
+          revision: 3,
+          console: { ...remoteOnly.console, minimumLevel: "debug" },
+          diagnostics: { ...remoteOnly.diagnostics, minimumLevel: "warn" },
+        },
+        2
+      )
+      clock.mockReturnValue(performance.now() + 62_000)
+      await Promise.all([a.refresh(), b.refresh()])
+      for (const cache of [a, b])
+        expect(routeLog(cache.current(), "tasks", "t.read", "debug")).toEqual({
+          console: true,
+          diagnostics: false,
+        })
+    } finally {
+      clock.mockRestore()
+    }
+    expect(
+      (await first.query("SELECT policy FROM logging_settings")).rows[0].policy
+    ).toMatchObject({ schemaVersion: 2, revision: 3 })
+  })
+
   it("rejects invalid writes and atomically accepts only one concurrent revision", async () => {
     const first = await isolatedTarget("conflicts")
     const store = createSettingsStore(first)
@@ -83,9 +173,20 @@ describe("TST-LOGGING-002 real settings persistence", () => {
       store.set({ ...defaultLogPolicy, revision: 3, minimumLevel: "bogus" }, 2)
     ).rejects.toMatchObject({ code: "invalid_policy" })
     const updates = await Promise.allSettled([
-      store.set({ ...defaultLogPolicy, revision: 3, minimumLevel: "debug" }, 2),
+      store.set(
+        {
+          ...defaultLogPolicy,
+          revision: 3,
+          console: { ...defaultLogPolicy.console, minimumLevel: "debug" },
+        },
+        2
+      ),
       createSettingsStore(first).set(
-        { ...defaultLogPolicy, revision: 3, minimumLevel: "error" },
+        {
+          ...defaultLogPolicy,
+          revision: 3,
+          console: { ...defaultLogPolicy.console, minimumLevel: "error" },
+        },
         2
       ),
     ])
