@@ -9,9 +9,17 @@ export const metadata = {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[] }>
+  searchParams: Promise<{
+    next?: string | string[]
+    reset?: string | string[]
+  }>
 }) {
   const params = await searchParams
 
-  return <SignInForm next={getSafeAuthRedirect(params.next)} />
+  return (
+    <SignInForm
+      next={getSafeAuthRedirect(params.next)}
+      passwordReset={params.reset === "success"}
+    />
+  )
 }

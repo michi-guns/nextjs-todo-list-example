@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest"
 
 import {
   DEFAULT_AUTH_REDIRECT,
+  buildVerificationCallback,
   getAuthErrorMessage,
+  getRecoveryLinkError,
   getSafeAuthRedirect,
 } from "./auth-flow"
 
@@ -63,5 +65,42 @@ describe("getAuthErrorMessage", () => {
     expect(getAuthErrorMessage({ status: 429 })).toBe(
       "Too many attempts. Wait a moment and try again."
     )
+  })
+})
+
+describe("TST-AUTH-005/006 recovery vocabulary", () => {
+  it("explains a recipient cooldown and a temporary email outage before the generic limit", () => {
+    expect(
+      getAuthErrorMessage({ code: "RECIPIENT_COOLDOWN", status: 429 })
+    ).toBe(
+      "An email was sent recently. Wait a minute before requesting another."
+    )
+    expect(
+      getAuthErrorMessage({
+        code: "EMAIL_TEMPORARILY_UNAVAILABLE",
+        status: 503,
+      })
+    ).toBe("Email is temporarily unavailable. Please try again later.")
+    expect(getAuthErrorMessage({ code: "TOKEN_EXPIRED" })).toBe(
+      "That link has expired. Request a new link and try again."
+    )
+  })
+
+  it("routes verification callbacks through the recovery page with a safe next path", () => {
+    expect(buildVerificationCallback("/dashboard?list=2")).toBe(
+      "/verify-email?next=%2Fdashboard%3Flist%3D2"
+    )
+    expect(buildVerificationCallback("https://evil.example/")).toBe(
+      "/verify-email?next=%2Fdashboard"
+    )
+  })
+
+  it("accepts only the small public link-error vocabulary", () => {
+    expect(getRecoveryLinkError("TOKEN_EXPIRED")).toBe("TOKEN_EXPIRED")
+    expect(getRecoveryLinkError("INVALID_TOKEN")).toBe("INVALID_TOKEN")
+    expect(getRecoveryLinkError(["INVALID_TOKEN"])).toBe("INVALID_TOKEN")
+    expect(getRecoveryLinkError("USER_NOT_FOUND")).toBe("INVALID_TOKEN")
+    expect(getRecoveryLinkError("<script>")).toBe("INVALID_TOKEN")
+    expect(getRecoveryLinkError(undefined)).toBeNull()
   })
 })

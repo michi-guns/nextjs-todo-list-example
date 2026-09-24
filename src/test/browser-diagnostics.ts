@@ -1,6 +1,8 @@
 /** Keep auth link credentials out of browser failure messages and reports. */
 export function redactAuthTokens(message: string): string {
-  return message.replace(/([?&]token=)[^&\s"'<>]+/gi, "$1[redacted]")
+  return message
+    .replace(/([?&]token=)[^&\s"'<>]+/gi, "$1[redacted]")
+    .replace(/(\/reset-password\/)[^/?#\s"'<>]+/gi, "$1[redacted]")
 }
 
 /** Firefox reports interrupted Next.js chunk loads with its own cancellation code. */

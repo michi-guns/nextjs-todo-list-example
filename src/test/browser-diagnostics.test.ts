@@ -63,3 +63,20 @@ describe("browser diagnostic token redaction", () => {
     )
   })
 })
+
+describe("TST-AUTH-004 reset-link redaction", () => {
+  it("redacts the reset token path form and the reset page query form", () => {
+    expect(
+      redactAuthTokens(
+        "requestfailed: GET http://localhost:3100/api/auth/reset-password/AbC123xyz?callbackURL=%2Freset-password (net::ERR_ABORTED)"
+      )
+    ).toBe(
+      "requestfailed: GET http://localhost:3100/api/auth/reset-password/[redacted]?callbackURL=%2Freset-password (net::ERR_ABORTED)"
+    )
+    expect(
+      redactAuthTokens(
+        "console: http://localhost:3100/reset-password?token=AbC123xyz"
+      )
+    ).toBe("console: http://localhost:3100/reset-password?token=[redacted]")
+  })
+})

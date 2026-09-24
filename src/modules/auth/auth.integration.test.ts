@@ -661,7 +661,8 @@ describe("Better Auth boundary", { concurrent: false }, () => {
         (next) => resetPassword(token, next).then((response) => response.status)
       )
     )
-    expect(statuses.filter((status) => status === 200)).toHaveLength(1)
+    // One winner; the others are clean INVALID_TOKEN refusals, not errors.
+    expect([...statuses].sort()).toEqual([200, 400, 400])
   })
 
   it("TST-AUTH-004 leaves credentials and sessions unchanged for invalid, expired and throttled requests", async () => {

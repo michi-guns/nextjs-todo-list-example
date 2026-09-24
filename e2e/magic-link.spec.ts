@@ -6,6 +6,9 @@ import {
   test,
 } from "./fixtures"
 
+// Magic-link URLs contain credentials; keep them out of recorded traces.
+test.use({ trace: "off" })
+
 test("magic-link journey requests, reads, and consumes a local mailbox link", async ({
   page,
 }) => {
@@ -21,9 +24,12 @@ test("magic-link journey requests, reads, and consumes a local mailbox link", as
     const message = await readMagicLinkWithRetry(
       PLAYWRIGHT_USERS.magicLink.email
     )
-    expect(message.url).toContain("/api/auth/magic-link/verify")
+    expect(new URL(message.url).pathname).toBe("/api/auth/magic-link/verify")
 
-    await page.goto(message.url)
+    // The evaluated argument is absent from Playwright's report step title.
+    await page.evaluate((url) => {
+      window.location.href = url
+    }, message.url)
     await page.waitForURL((url) => url.pathname === "/dashboard")
     await expect(
       page.getByRole("heading", { name: PLAYWRIGHT_USERS.magicLink.listName })

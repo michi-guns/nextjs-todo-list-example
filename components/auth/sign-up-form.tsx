@@ -6,12 +6,14 @@ import Link from "next/link"
 
 import { AuthCard } from "@/components/auth/auth-card"
 import { AuthNotice } from "@/components/auth/auth-notice"
+import { VerificationResend } from "@/components/auth/verification-resend"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authClient } from "@/lib/auth-client"
 import {
   buildAuthHref,
+  buildVerificationCallback,
   getAuthErrorMessage,
   getSafeAuthRedirect,
 } from "@/src/modules/auth/presentation/auth-flow"
@@ -26,6 +28,7 @@ export function SignUpForm({ next }: SignUpFormProps) {
   const safeNext = getSafeAuthRedirect(next)
   const [status, setStatus] = useState<SignUpStatus>("idle")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [pendingEmail, setPendingEmail] = useState("")
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -48,7 +51,7 @@ export function SignUpForm({ next }: SignUpFormProps) {
         name,
         email,
         password,
-        callbackURL: safeNext,
+        callbackURL: buildVerificationCallback(safeNext),
       })
 
       if (error) {
@@ -57,6 +60,7 @@ export function SignUpForm({ next }: SignUpFormProps) {
         return
       }
 
+      setPendingEmail(email)
       setStatus("success")
     } catch {
       setStatus("idle")
@@ -76,6 +80,7 @@ export function SignUpForm({ next }: SignUpFormProps) {
             Your account is waiting for email verification. The link will take
             you to your private task space.
           </AuthNotice>
+          <VerificationResend email={pendingEmail} next={safeNext} />
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <Link
               href={buildAuthHref("/sign-in", safeNext)}

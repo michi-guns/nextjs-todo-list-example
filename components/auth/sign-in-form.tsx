@@ -7,12 +7,14 @@ import { useRouter } from "next/navigation"
 
 import { AuthCard } from "@/components/auth/auth-card"
 import { AuthNotice } from "@/components/auth/auth-notice"
+import { VerificationResend } from "@/components/auth/verification-resend"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authClient } from "@/lib/auth-client"
 import {
   buildAuthHref,
+  buildVerificationCallback,
   getAuthErrorMessage,
   getSafeAuthRedirect,
 } from "@/src/modules/auth/presentation/auth-flow"
@@ -21,17 +23,22 @@ type SignInStatus = "idle" | "submitting" | "redirecting"
 
 export interface SignInFormProps {
   readonly next: string
+  /** Shown once after a successful password reset. */
+  readonly passwordReset?: boolean
 }
 
-export function SignInForm({ next }: SignInFormProps) {
+export function SignInForm({ next, passwordReset = false }: SignInFormProps) {
   const router = useRouter()
   const safeNext = getSafeAuthRedirect(next)
   const [status, setStatus] = useState<SignInStatus>("idle")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  // Set when the account exists but is still waiting for verification.
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setErrorMessage(null)
+    setUnverifiedEmail(null)
     setStatus("submitting")
 
     const formData = new FormData(event.currentTarget)
@@ -44,12 +51,14 @@ export function SignInForm({ next }: SignInFormProps) {
         email,
         password,
         rememberMe,
-        callbackURL: safeNext,
+        // Used only for the verification email an unverified sign-in sends.
+        callbackURL: buildVerificationCallback(safeNext),
       })
 
       if (error) {
         setStatus("idle")
         setErrorMessage(getAuthErrorMessage(error))
+        if (error.code === "EMAIL_NOT_VERIFIED") setUnverifiedEmail(email)
         return
       }
 
@@ -74,6 +83,12 @@ export function SignInForm({ next }: SignInFormProps) {
         onSubmit={handleSubmit}
         aria-busy={isSubmitting}
       >
+        {passwordReset && !errorMessage ? (
+          <AuthNotice kind="success">
+            Your password was changed and every session was signed out. Sign in
+            with your new password.
+          </AuthNotice>
+        ) : null}
         {errorMessage ? (
           <AuthNotice kind="error">{errorMessage}</AuthNotice>
         ) : null}
@@ -92,7 +107,15 @@ export function SignInForm({ next }: SignInFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="sign-in-password">Password</Label>
+          <div className="flex items-baseline justify-between gap-3">
+            <Label htmlFor="sign-in-password">Password</Label>
+            <Link
+              href={buildAuthHref("/forgot-password", safeNext)}
+              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <Input
             id="sign-in-password"
             name="password"
@@ -144,6 +167,11 @@ export function SignInForm({ next }: SignInFormProps) {
           </Link>
         </div>
       </form>
+      {unverifiedEmail ? (
+        <div className="mt-5">
+          <VerificationResend email={unverifiedEmail} next={safeNext} />
+        </div>
+      ) : null}
     </AuthCard>
   )
 }

@@ -150,6 +150,23 @@ EMAIL_TEMPORARILY_UNAVAILABLE` appears only for `auth.api` calls or when
   closing the pool. Tests keep the real limits and use distinct synthetic
   client addresses instead of disabling them.
 
+## Recovery screens
+
+- `/forgot-password` requests a reset link and always answers neutrally.
+- `/reset-password` receives Better Auth's callback, removes the token from
+  the address bar at once, and returns to `/sign-in?reset=success` after a
+  new password is saved. Invalid, expired or reused links offer a new one.
+- `/verify-email` is where every verification link returns. It continues
+  only with a real session, otherwise asks for sign-in, and offers a fresh
+  link after `INVALID_TOKEN` or `TOKEN_EXPIRED`.
+- Sign-in links to "Forgot password?" and offers a new verification email
+  after an unverified sign-in; the pending sign-up screen offers the same.
+
+Browser journeys that provoke a refusal on purpose declare it with
+`test.use({ expectedRefusals: [...] })` in `e2e/fixtures.ts`; any other
+console error still fails. Navigate to captured links with `page.evaluate`
+and poll URLs as booleans, so no token reaches the HTML report.
+
 References: [Resend send API](https://resend.com/docs/api-reference/emails/send-email),
 [Resend test addresses](https://resend.com/docs/dashboard/emails/send-test-emails),
 [TD-027](../../.dwf/decisions/TECHNICAL.md#td-027).

@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto"
+
 import { expect, test as base, type Page } from "@playwright/test"
 import {
   isBrowserRequestCancellation,
@@ -20,19 +22,27 @@ export { PLAYWRIGHT_USERS }
 
 export { expect }
 
-let syntheticClients = 0
-
 export const test = base.extend<{
   browserDiagnostics: void
   syntheticClient: void
+  /**
+   * HTTP statuses a journey deliberately provokes (a wrong password, a
+   * cooldown). Chromium logs each as "Failed to load resource"; only those
+   * exact statuses are tolerated, every other diagnostic still fails.
+   */
+  expectedRefusals: readonly number[]
 }>({
-  // Real auth limits stay on. Each test (and retry) is its own synthetic
-  // client, so one journey cannot spend another's per-address budget. Only
-  // same-origin auth requests carry it; third-party requests are untouched.
+  expectedRefusals: [[], { option: true }],
+  // Real auth limits stay on. Each test and retry is its own synthetic client
+  // (derived from its id, so a restarted worker cannot reuse an address), and
+  // one journey cannot spend another's per-address budget. Only same-origin
+  // auth requests carry it; third-party requests are untouched.
   syntheticClient: [
-    async ({ context, baseURL }, use) => {
-      syntheticClients += 1
-      const address = `198.18.${Math.floor(syntheticClients / 250)}.${(syntheticClients % 250) + 1}`
+    async ({ context, baseURL }, use, testInfo) => {
+      const digest = createHash("sha256")
+        .update(`${testInfo.testId}:${testInfo.retry}`)
+        .digest()
+      const address = `198.18.${digest[0]}.${(digest[1] % 254) + 1}`
       await context.route(`${baseURL}/api/auth/**`, (route) =>
         route.continue({
           headers: { ...route.request().headers(), "x-forwarded-for": address },
@@ -43,11 +53,15 @@ export const test = base.extend<{
     { auto: true },
   ],
   browserDiagnostics: [
-    async ({ page }, use, testInfo) => {
+    async ({ page, expectedRefusals }, use, testInfo) => {
       const failures: string[] = []
+      const refusal =
+        /^Failed to load resource: the server responded with a status of (\d{3}) /
 
       page.on("console", (message) => {
         if (message.type() === "error") {
+          const status = refusal.exec(message.text())?.[1]
+          if (status && expectedRefusals.includes(Number(status))) return
           failures.push(`console: ${message.text()}`)
         }
       })

@@ -53,6 +53,27 @@ export function buildAuthHref(pathname: string, next: unknown): string {
   return `${pathname}?next=${encodeURIComponent(safeNext)}`
 }
 
+/**
+ * Every verification link returns through `/verify-email`, which requires a
+ * real session before continuing to the safe `next` path and offers a fresh
+ * link when Better Auth reports an invalid or expired token.
+ */
+export function buildVerificationCallback(next: unknown): string {
+  return buildAuthHref("/verify-email", next)
+}
+
+/** Password-reset links return to this page with `?token=` or `?error=`. */
+export const RESET_PASSWORD_CALLBACK = "/reset-password"
+
+export type RecoveryLinkError = "TOKEN_EXPIRED" | "INVALID_TOKEN"
+
+/** Collapse any callback `error` value into the small public vocabulary. */
+export function getRecoveryLinkError(value: unknown): RecoveryLinkError | null {
+  const candidate = Array.isArray(value) ? value[0] : value
+  if (typeof candidate !== "string" || candidate.length === 0) return null
+  return candidate === "TOKEN_EXPIRED" ? "TOKEN_EXPIRED" : "INVALID_TOKEN"
+}
+
 const authErrorMessages: Record<string, string> = {
   EMAIL_NOT_VERIFIED:
     "Check your email to verify your account before signing in.",
@@ -65,6 +86,11 @@ const authErrorMessages: Record<string, string> = {
     "That sign-up could not be completed. Try another email.",
   INVALID_TOKEN:
     "That link is invalid or has expired. Request a new link and try again.",
+  TOKEN_EXPIRED: "That link has expired. Request a new link and try again.",
+  RECIPIENT_COOLDOWN:
+    "An email was sent recently. Wait a minute before requesting another.",
+  EMAIL_TEMPORARILY_UNAVAILABLE:
+    "Email is temporarily unavailable. Please try again later.",
   NEW_USER_SIGNUP_DISABLED:
     "That link cannot create a new account. Request a new link or sign in another way.",
 }
@@ -82,6 +108,7 @@ export function getAuthErrorMessage(error: unknown): string {
   const status =
     isRecord(error) && typeof error.status === "number" ? error.status : null
 
+  if (code && code in authErrorMessages) return authErrorMessages[code]
   if (status === 429) {
     return "Too many attempts. Wait a moment and try again."
   }

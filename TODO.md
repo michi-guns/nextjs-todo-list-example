@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 72 files and 694 tests (T-27.2 native recovery, 2026-09-25).
+- [x] `pnpm test` passes 72 files and 698 tests (T-27.3 recovery screens, 2026-09-25).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1131,8 +1131,8 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 through T-26.11, T-27.1 and T-27.2 are
-complete, leaving 9 unchecked children.
+remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 through T-26.11 and T-27.1 through T-27.3
+are complete, leaving 8 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
 and subagents only for independent review, as the owner requested.
@@ -1939,7 +1939,7 @@ Verification and evidence for this slice:
 
 #### T-27.3: Deliver recovery screens and real local browser journeys
 
-- [ ] Add password/verification recovery UI and integrate local evidence/runbooks.
+- [x] Add password/verification recovery UI and integrate local evidence/runbooks.
 - Files: `app/(auth)/forgot-password`, `reset-password`, `verify-email`, matching
   `components/auth/` forms, sign-in/sign-up recovery links, auth-flow helpers,
   `src/test/browser-diagnostics.ts` and tests; new recovery E2E specs and auth runbook.
@@ -1958,6 +1958,12 @@ Verification and evidence for this slice:
   no seeded verified user or direct token/session writes replace the journeys.
 - Dependencies/prerequisites: T-27.2; Docker, matching Chromium and installed
   dependencies. One UI/browser/runbook review unit. Remote receipt remains T-27.4.
+- Evidence, 2026-09-25: [recovery screens](docs/agentforge/evidence/2026-09-25-recovery-screens.md) records the
+  `/forgot-password`, `/reset-password` and `/verify-email` screens, resend
+  controls, the reset and verification browser journeys with real limits,
+  and a decoded report archive with no tokens. Also closes the two T-27.2
+  review deferrals. `TST-AUTH-004`–`006` stay `partial` for T-27.4 only.
+- Review: pending a fresh exact-tip independent review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `frontend-ui-engineering`, `email-and-password-best-practices`, `next-dev-loop`,
   `browser-testing-with-devtools`, `security-and-hardening`, `documentation-and-adrs`,

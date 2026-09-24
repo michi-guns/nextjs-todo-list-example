@@ -206,8 +206,9 @@ and verified locally
 ([evidence](../../../docs/agentforge/evidence/2026-09-24-auth-admission.md)).
 Native password reset, session revocation, recipient/IP limits and
 post-response auth mail are wired through Better Auth (T-27.2,
-[evidence](../../../docs/agentforge/evidence/2026-09-25-native-recovery.md)). Recovery screens and browser journeys (T-27.3) and
-hosted proof (T-27.4) remain.
+[evidence](../../../docs/agentforge/evidence/2026-09-25-native-recovery.md)). Recovery screens (`/forgot-password`, `/reset-password`, `/verify-email`)
+and their browser journeys are verified locally (T-27.3,
+[evidence](../../../docs/agentforge/evidence/2026-09-25-recovery-screens.md)). Hosted proof (T-27.4) remains.
 
 ---
 
