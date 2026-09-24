@@ -77,7 +77,11 @@ export function createHealthHandler(dependencies: {
   probes: Record<DependencyComponent, () => Promise<ProbeResult>>
   release: string
   access: HealthAccess
-  onUnavailable?: (component: DependencyComponent, code: string) => void
+  /** Awaited so a bounded log flush completes before the response. */
+  onUnavailable?: (
+    component: DependencyComponent,
+    code: string
+  ) => void | Promise<void>
 }) {
   const { probes, release, access } = dependencies
   return async function GET(
@@ -110,7 +114,11 @@ export function createHealthHandler(dependencies: {
     if (result.status === "ok") {
       return respond(200, { component, status: "ok", release })
     }
-    dependencies.onUnavailable?.(component, result.code)
+    try {
+      await dependencies.onUnavailable?.(component, result.code)
+    } catch {
+      // Observability never changes the health answer.
+    }
     return respond(503, {
       component,
       status: "unavailable",

@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 64 files and 618 tests (T-26.9 dependency health, 2026-09-24).
+- [x] `pnpm test` passes 65 files and 619 tests (T-26.9 dependency health, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1639,10 +1639,13 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Evidence, 2026-09-24: [dependency health](docs/agentforge/evidence/2026-09-24-dependency-health.md)
   records bounded real-PostgreSQL and controlled-HTTP CMS probes (success,
   failure, acquisition/query/request timeouts, connection release, server-side
-  cancellation, cache bypass), 618 unit and 37 integration tests, 9 Chromium
+  cancellation, locked cache bypass), 619 unit and 37 integration tests, 9 Chromium
   tests, typecheck, lint, build and a real `next start` protection proof.
   `TST-RUNTIME-001` stays `partial` until T-26.10/T-26.12.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the first independent review asked for a test locking the CMS
+  cache bypass; it was added, the health warning is now flushed, and the
+  runbook wording was corrected. A fresh exact-tip review confirmed the fixes
+  before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `api-and-interface-design`, `next-dev-loop`,
   `observability-and-instrumentation`, `security-and-hardening`,

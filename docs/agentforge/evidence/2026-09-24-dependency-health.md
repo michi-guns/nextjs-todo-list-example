@@ -43,7 +43,7 @@ installed dependencies were available. Installed `pg` honors a per-query
 | Command                                   | Result                                    |
 | ----------------------------------------- | ----------------------------------------- |
 | `pnpm exec vitest run src/shared/health`  | 2 files, 11 tests passed                  |
-| `pnpm test`                               | 64 files, 618 tests passed                |
+| `pnpm test`                               | 65 files, 619 tests passed                |
 | `pnpm test:integration`                   | 9 files, 37 tests passed                  |
 | `pnpm test:e2e`                           | 9 Chromium tests passed                   |
 | `pnpm typecheck`                          | Passed                                    |
@@ -69,7 +69,10 @@ server compiled the new route; the rerun and the final gate passed all nine.
 ### Controlled CMS HTTP API (loopback)
 
 1. Two probes make two real `/data/query` requests with
-   `perspective=published`; nothing is served from a cache.
+   `perspective=published`. Plain Node has no Next data cache and a loopback
+   host has no separate CDN, so a unit test locks the exact fetch options
+   instead: `useCdn: false`, `cache: "no-store"`, `perspective: "published"`,
+   an abort signal and no `next` cache tags.
 2. A missing singleton is `invalid_content`; an HTTP 500 is `unreachable`.
 3. A hanging API answers `timeout` in under a second and the server observes
    the request connection closed before a response: the work is aborted.
@@ -83,7 +86,7 @@ secret, password and host sentinels:
 - `app` answered 200 with the supplied release SHA.
 - With `HEALTH_PROBE_SECRET` set: no or wrong header answered 401; the right
   header answered `503 unreachable`, and one `health.database.unavailable`
-  warning was logged.
+  warning was logged and flushed before the response.
 - Without the secret: `database` answered `503 monitor_unconfigured` for
   every request.
 - No response or server output contained the secret, the password, the host
@@ -104,4 +107,22 @@ external services.
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+The first independent review (read-only, against `5c2a956`) confirmed the
+bounded database probe (single outstanding acquisition, server-side
+cancellation, destroyed connections, pooler-safe `SET LOCAL`), that
+`@sanity/client` 8.6.2 passes `cache` and `signal` into fetch, the access
+modes and constant-time comparison, and the route composition, and raised:
+
+- **Fixed:** the CMS cache bypass was claimed but not locked by a test; a unit
+  test now asserts the exact fetch options, and the wording above says what
+  each test proves.
+- **Fixed:** the health warning can also reach provider logs; it is now
+  flushed before the response and the runbooks say so.
+- **Fixed:** `timeout` troubleshooting now includes network black holes and
+  a waking compute.
+- **Disclosed:** the real `next start` proof is a task-local script under the
+  ignored `.local/`, as for T-26.6 and T-26.8.
+
+After the fixes the unit, integration, browser, typecheck, lint, build and
+real-server checks were rerun. A fresh exact-tip review confirmed the fixes
+before merge.

@@ -72,6 +72,8 @@ describe("TST-RUNTIME-001 health endpoints", () => {
       cache: "no-store",
     })
     expect(f.onUnavailable).toHaveBeenCalledExactlyOnceWith("cms", "timeout")
+    f.onUnavailable.mockRejectedValue(new Error("log export failed"))
+    await expect(f.call("cms")).resolves.toMatchObject({ status: 503 })
   })
 
   it("requires the monitor secret header for protected dependency probes", async () => {

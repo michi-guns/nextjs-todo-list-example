@@ -26,10 +26,13 @@ export const GET = createHealthHandler({
   release: resolveRelease(),
   access: resolveHealthAccess(),
   // Operational signal only: the uptime monitor owns alerting, not issues.
-  onUnavailable: (component, code) =>
+  onUnavailable: async (component, code) => {
     withLogContext("health.read", () =>
       logging.logger("health").emit("warn", `health.${component}.unavailable`, {
         outcome: code === "timeout" ? "timeout" : "failed",
       })
-    ),
+    )
+    // Provider log export, when policy allows it, is sent before the answer.
+    await logging.flush()
+  },
 })

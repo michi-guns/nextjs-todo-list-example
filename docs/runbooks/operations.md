@@ -79,17 +79,19 @@ authorization.
 
 ## Troubleshooting
 
-| Symptom                         | Meaning and check                                                                             |
-| ------------------------------- | --------------------------------------------------------------------------------------------- |
-| `app` fails                     | The runtime itself is down or refused its configuration; see deployment logs                  |
-| `database` `unreachable`        | Connection refused, DNS or authentication; check the environment's database target and status |
-| `database` `timeout`            | Pool saturated or the database is slow; check load and connection limits                      |
-| `database` `query_failed`       | Connected but the read-only statement failed; check database health                           |
-| `cms` `unreachable` / `timeout` | Sanity API outage or network; the application may still serve cached landing content          |
-| `cms` `invalid_content`         | The published landing singleton is missing or invalid; fix it in Studio                       |
-| `503 monitor_unconfigured`      | Set `HEALTH_PROBE_SECRET` for that environment and redeploy                                   |
-| `401 unauthorized`              | The monitor's `x-health-secret` does not match the environment's secret                       |
+| Symptom                         | Meaning and check                                                                                                                  |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `app` fails                     | The runtime itself is down or refused its configuration; see deployment logs                                                       |
+| `database` `unreachable`        | Connection refused, DNS or authentication; check the environment's database target and status                                      |
+| `database` `timeout`            | Pool saturated, slow database, a network black hole or a sleeping compute still waking; check load, connectivity and compute state |
+| `database` `query_failed`       | Connected but the read-only statement failed; check database health                                                                |
+| `cms` `unreachable` / `timeout` | Sanity API outage or network; the application may still serve cached landing content                                               |
+| `cms` `invalid_content`         | The published landing singleton is missing or invalid; fix it in Studio                                                            |
+| `503 monitor_unconfigured`      | Set `HEALTH_PROBE_SECRET` for that environment and redeploy                                                                        |
+| `401 unauthorized`              | The monitor's `x-health-secret` does not match the environment's secret                                                            |
 
-Each dependency failure also writes one local `warn` log
+Each dependency failure also writes one `warn` log
 (`health.database.unavailable` or `health.cms.unavailable`) with a fixed
-outcome. It is not a diagnostics issue: the uptime monitor owns alerting.
+outcome: to the console, and to the diagnostics provider's logs when policy
+allows, flushed before the response. It never creates an issue: the uptime
+monitor owns alerting.
