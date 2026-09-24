@@ -156,7 +156,9 @@ pure functions the tooling parser uses, in `src/shared/environment/rules.ts`;
   auth secret, database provider/role/project/branch, Sanity dataset/policy
   and mail policy exactly as the matrix above. It needs only the pooled
   runtime `DATABASE_URL`: no `DATABASE_URL_UNPOOLED`, Neon, Vercel or GitHub
-  credentials, and no `DEPLOYMENT_OWNER`/`SECRET_NAMESPACE` (operator inputs).
+  credentials, and no `DEPLOYMENT_OWNER` (an operator input). Production
+  still needs `SECRET_NAMESPACE=production`, which the Resend mail check reads;
+  a Production mail misconfiguration now refuses startup, not only sending.
 - Preview may omit `BETTER_AUTH_URL`; the deployment-assigned `VERCEL_URL`
   origin is used and must be non-loopback HTTPS.
 - When `DATABASE_ENDPOINT_HOST` is present, the pooled runtime host must

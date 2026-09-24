@@ -139,6 +139,16 @@ describe("TST-RUNTIME-001 runtime configuration boundary", () => {
       "DATABASE_URL",
     ],
     [
+      "Local carrying a remote endpoint identity",
+      {
+        ...local(),
+        DATABASE_ENDPOINT_HOST:
+          "ep-quiet-sun-123456.eu-central-1.aws.neon.tech",
+      },
+      "database_target_mismatch",
+      "DATABASE_ENDPOINT_HOST",
+    ],
+    [
       "Local declaring a remote provider",
       { ...local(), DATABASE_PROVIDER: "neon" },
       "database_target_mismatch",

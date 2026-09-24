@@ -168,15 +168,18 @@ function parseRuntimeDatabase(
         "DATABASE_URL"
       )
     }
-    if (
-      optional(environment, "DATABASE_PROJECT_ID") ||
-      optional(environment, "DATABASE_BRANCH") ||
-      endpointHost
-    ) {
+    const remoteIdentity = (
+      [
+        "DATABASE_PROJECT_ID",
+        "DATABASE_BRANCH",
+        "DATABASE_ENDPOINT_HOST",
+      ] as const
+    ).find((variable) => optional(environment, variable))
+    if (remoteIdentity) {
       throw new EnvironmentProfileError(
         "database_target_mismatch",
         "local-postgres cannot carry a remote database identity",
-        "DATABASE_PROJECT_ID"
+        remoteIdentity
       )
     }
     return {

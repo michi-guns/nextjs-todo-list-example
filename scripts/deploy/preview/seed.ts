@@ -12,10 +12,17 @@ type BetterAuthHandler = {
 const RUNTIME_KEYS = [
   "NODE_ENV",
   "APP_ENV",
+  "DATABASE_PROVIDER",
+  "DATABASE_PROJECT_ID",
+  "DATABASE_BRANCH",
   "DATABASE_URL",
   "BETTER_AUTH_URL",
   "BETTER_AUTH_SECRET",
   "BETTER_AUTH_LOCAL_MAILBOX",
+  "NEXT_PUBLIC_SANITY_PROJECT_ID",
+  "NEXT_PUBLIC_SANITY_DATASET",
+  "SANITY_WRITE_POLICY",
+  "APP_MAIL_TRANSPORT",
 ] as const
 
 type RuntimeKey = (typeof RUNTIME_KEYS)[number]
@@ -172,14 +179,37 @@ function rememberEnvironment(): Record<RuntimeKey, string | undefined> {
   ) as Record<RuntimeKey, string | undefined>
 }
 
+/**
+ * The seed imports the application's auth and database modules, which run
+ * the runtime gate. Supply the observed Preview profile it would validate;
+ * `undefined` removes a variable for the seed's duration.
+ */
+export function previewSeedEnvironment(
+  profile: EnvironmentProfile
+): Record<RuntimeKey, string | undefined> {
+  return {
+    APP_ENV: "preview",
+    NODE_ENV: "production",
+    DATABASE_PROVIDER: profile.database.provider,
+    DATABASE_PROJECT_ID: profile.database.projectId,
+    DATABASE_BRANCH: profile.database.branch,
+    DATABASE_URL: profile.database.runtimeUrl,
+    BETTER_AUTH_URL: profile.betterAuth.url,
+    BETTER_AUTH_SECRET: profile.betterAuth.secret,
+    BETTER_AUTH_LOCAL_MAILBOX: undefined,
+    NEXT_PUBLIC_SANITY_PROJECT_ID: profile.sanity.projectId,
+    NEXT_PUBLIC_SANITY_DATASET: profile.sanity.dataset,
+    SANITY_WRITE_POLICY: profile.sanity.writePolicy,
+    APP_MAIL_TRANSPORT: profile.mail.transport,
+  }
+}
+
 function applyEnvironment(profile: EnvironmentProfile) {
   const mutableEnvironment = process.env as Record<string, string | undefined>
-  mutableEnvironment.APP_ENV = "preview"
-  mutableEnvironment.NODE_ENV = "production"
-  mutableEnvironment.DATABASE_URL = profile.database.runtimeUrl
-  mutableEnvironment.BETTER_AUTH_URL = profile.betterAuth.url
-  mutableEnvironment.BETTER_AUTH_SECRET = profile.betterAuth.secret
-  delete mutableEnvironment.BETTER_AUTH_LOCAL_MAILBOX
+  for (const [key, value] of Object.entries(previewSeedEnvironment(profile))) {
+    if (value === undefined) delete mutableEnvironment[key]
+    else mutableEnvironment[key] = value
+  }
 }
 
 function restoreEnvironment(original: Record<RuntimeKey, string | undefined>) {

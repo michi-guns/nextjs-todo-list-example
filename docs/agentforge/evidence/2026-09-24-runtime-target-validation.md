@@ -14,7 +14,10 @@ Clean `main` at `ce5fcd1` (main CI passed) before creating
 forwards the canonical `BETTER_AUTH_URL` and only the pooled `DATABASE_URL`;
 Preview forwards no `BETTER_AUTH_URL` and relies on the assigned `VERCEL_URL`. Both pass the same values at build and runtime.
 The owner's ignored `.env.local`, the Playwright harness and the CI build set
-no `APP_ENV`, and Vercel Git auto-deploy is disabled.
+no `APP_ENV`, and Vercel Git auto-deploy is disabled. Operator seeds import the
+application's auth and database modules: the Local and Development seeds run
+with their full profile in the process, the Playwright seed is unprofiled, and
+the Preview seed needed the change below.
 
 ## Delivered behavior
 
@@ -29,6 +32,10 @@ no `APP_ENV`, and Vercel Git auto-deploy is disabled.
   `NODE_ENV` pairing during `next build`. It performs no I/O.
 - `db/db.ts`, `lib/auth.ts` and `src/sanity/client.ts` call it before
   creating the pool, the Better Auth client or the Sanity client.
+- The Preview seed now applies the observed profile's database identity,
+  dataset, write and mail policy before importing those modules; previously
+  it applied only URL and auth values, which the runtime gate would refuse
+  because the per-preview `DATABASE_BRANCH` exists only in the adapter.
 - Without `APP_ENV`, local developer and test processes keep the unprofiled
   behavior; a Vercel deployment without `APP_ENV` is refused.
 - Refusals are `EnvironmentProfileError` with a stable code and variable name;
@@ -40,9 +47,9 @@ no `APP_ENV`, and Vercel Git auto-deploy is disabled.
 
 | Command                                                            | Result                                    |
 | ------------------------------------------------------------------ | ----------------------------------------- |
-| `pnpm exec vitest run src/shared/environment src/test/environment` | 5 files, 124 tests passed                 |
+| `pnpm exec vitest run src/shared/environment src/test/environment` | 5 files, 125 tests passed                 |
 | `pnpm test:pipeline`                                               | 14 files, 235 tests passed                |
-| `pnpm test`                                                        | 61 files, 605 tests passed                |
+| `pnpm test`                                                        | 62 files, 607 tests passed                |
 | `pnpm test:integration`                                            | 7 files, 29 tests passed                  |
 | `pnpm test:e2e`                                                    | 8 Chromium journeys passed                |
 | `pnpm typecheck`                                                   | Passed                                    |
@@ -80,4 +87,23 @@ developer loop, not a hosted path.
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+The first independent review (read-only, against `e143a14`) confirmed the
+unchanged tooling behavior, the Production and Preview Vercel inputs, the CI
+and owner builds, sanitized refusals, no import-time I/O and refusal before
+client construction, and raised:
+
+- **Fixed (blocker):** the Preview seed would have been refused for a missing
+  `DATABASE_BRANCH`, failing Preview delivery after migration. It now applies
+  the observed profile; a regression test runs the workflow environment plus
+  the seed environment through the runtime gate.
+- **Fixed:** the runbook claimed Production needs no `SECRET_NAMESPACE`; the
+  Resend check still requires `production`, and a Production mail
+  misconfiguration now refuses startup rather than only sending.
+- **Fixed:** a remote identity on `local-postgres` names the variable
+  actually present.
+- **Accepted as is:** the shared rules import the Resend configuration check
+  from the auth module, as the tooling already did.
+
+After the fixes the focused, pipeline, unit, integration and browser checks,
+typecheck, lint and build were rerun. A fresh exact-tip review confirmed the
+fixes before merge.

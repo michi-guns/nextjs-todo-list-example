@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 61 files and 605 tests (T-26.8 runtime target validation, 2026-09-24).
+- [x] `pnpm test` passes 62 files and 607 tests (T-26.8 runtime target validation, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1600,10 +1600,14 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   One runtime-composition review unit; no hosted change in this task.
 - Evidence, 2026-09-24: [runtime target validation](docs/agentforge/evidence/2026-09-24-runtime-target-validation.md)
   records shared pure rules, runtime-only Production inputs, Preview origin,
-  sanitized refusals before client construction, 124 focused, 235 pipeline,
-  605 unit and 29 integration tests, 8 Chromium journeys, typecheck, lint,
+  sanitized refusals before client construction, 125 focused, 235 pipeline,
+  607 unit and 29 integration tests, 8 Chromium journeys, typecheck, lint,
   build and a real `next start` refusal. `TST-RUNTIME-001` is `partial`.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the first independent review found that the Preview seed would be
+  refused for a missing per-preview `DATABASE_BRANCH`; it now applies the
+  observed profile with a regression test, and the runbook's
+  `SECRET_NAMESPACE` claim was corrected. A fresh exact-tip review confirmed
+  the fixes before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `security-and-hardening`, `next-dev-loop`,
   `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
