@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 74 files and 719 tests (T-28.1 preview authorization, 2026-09-25).
+- [x] `pnpm test` passes 75 files and 727 tests (T-28.2 Studio preview, 2026-09-25).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1132,7 +1132,7 @@ The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
 remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 through T-26.11, T-27.1 through T-27.3 and
-T-28.1 are complete, leaving 7 unchecked children.
+T-28.1 through T-28.2 are complete, leaving 6 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
 and subagents only for independent review, as the owner requested.
@@ -2061,7 +2061,7 @@ Verification and evidence for this slice:
 
 #### T-28.2: Compose Studio preview, Live and field navigation
 
-- [ ] Integrate the authorized preview branch and local regression evidence.
+- [x] Integrate the authorized preview branch and local regression evidence.
 - Files: `sanity/presentation.ts`, `sanity.config.ts`, `src/sanity/preview.ts`,
   landing preview reader/presentation attributes, `app/page.tsx`,
   `components/landing/landing-page.tsx`, `exit-preview.tsx`, focused tests and
@@ -2085,6 +2085,11 @@ Verification and evidence for this slice:
   `incremental-implementation`, `frontend-ui-engineering`, `source-driven-development`,
   `next-dev-loop`, `browser-testing-with-devtools`, `security-and-hardening`,
   `documentation-and-adrs`, `code-review-and-quality`, `git-workflow-and-versioning`.
+- Evidence: [Studio preview evidence](docs/agentforge/evidence/2026-09-25-studio-preview.md).
+  Presentation, Live, overlays and exit are composed behind Draft Mode plus the
+  enabled capability; public HTML carries none of them. 727 unit, 275 pipeline
+  and 17 browser checks pass. `TST-LANDING-004` stays `partial` until T-28.3.
+- Review: pending a fresh exact-tip independent review before merge.
 
 <a id="t-283"></a>
 

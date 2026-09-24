@@ -67,3 +67,15 @@ export function parseEditorialPreview(
     )
   return { enabled: true, token }
 }
+
+/**
+ * A request renders editorial preview only when Draft Mode is on and the
+ * capability is enabled for this profile. A leftover Draft Mode cookie on a
+ * disabled deployment still gets published content.
+ */
+export function isEditorialPreviewSession(
+  draftModeEnabled: boolean,
+  preview: EditorialPreview
+): preview is Extract<EditorialPreview, { enabled: true }> {
+  return draftModeEnabled && preview.enabled
+}

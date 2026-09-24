@@ -394,8 +394,11 @@ No list/task documents.
 
 Status: the configuration guard and Draft Mode entry/exit routes (T-28.1)
 are implemented and verified locally
-([evidence](../../../docs/agentforge/evidence/2026-09-25-preview-authorization.md)); the capability stays off until configured.
-Studio/Live composition (T-28.2) and real provider proof (T-28.3) remain.
+([evidence](../../../docs/agentforge/evidence/2026-09-25-preview-authorization.md)), and the Studio
+Presentation, Live draft reads, field overlays and exit (T-28.2) are composed
+and verified locally
+([evidence](../../../docs/agentforge/evidence/2026-09-25-studio-preview.md)).
+The capability stays off until configured; real provider proof (T-28.3) remains.
 
 - Use existing Sanity Studio editor identity and the supported
   `defineEnableDraftMode` handshake. Studio creates a private bearer preview
@@ -431,7 +434,7 @@ Studio/Live composition (T-28.2) and real provider proof (T-28.3) remain.
   an unauthenticated fallback. Sanity Live refreshes authorized preview only;
   it does not replace public webhook invalidation.
 
-Implementation and verification remain planned. [TST-LANDING-004](../../decisions/TESTING.md#tst-landing-004)
+Local implementation is complete; real provider verification remains. [TST-LANDING-004](../../decisions/TESTING.md#tst-landing-004)
 owns the new local and real-provider/browser evidence; provisioning, content
 mutation and deployment retain their existing authorization boundaries.
 

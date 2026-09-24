@@ -4,12 +4,20 @@ import { buttonVariants } from "@/components/ui/button"
 import { SkipLink } from "@/components/ui/skip-link"
 import { cn } from "@/lib/utils"
 import type { LandingContent } from "@/src/modules/landing/domain/landing-content"
+import type { LandingEditAttributes } from "@/src/modules/landing/presentation/sanity-preview"
 
 export interface LandingPageProps {
   readonly content: LandingContent
+  /** Editorial preview only: Studio click-to-edit targets per field. */
+  readonly editAttributes?: LandingEditAttributes
 }
 
-export function LandingPage({ content }: LandingPageProps) {
+/** Preview-only attribute; absent entirely (not even as a prop) otherwise. */
+function editAttribute(value: string | undefined) {
+  return value ? { "data-sanity": value } : {}
+}
+
+export function LandingPage({ content, editAttributes }: LandingPageProps) {
   const secondaryCtaLabel = content.secondaryCtaLabel ?? "Sign in"
 
   return (
@@ -58,15 +66,22 @@ export function LandingPage({ content }: LandingPageProps) {
               <p className="mb-5 text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
                 Personal task system
               </p>
-              <h1 className="max-w-xl text-4xl leading-[1.08] font-semibold tracking-tight text-balance wrap-anywhere sm:text-5xl lg:text-6xl">
+              <h1
+                {...editAttribute(editAttributes?.headline)}
+                className="max-w-xl text-4xl leading-[1.08] font-semibold tracking-tight text-balance wrap-anywhere sm:text-5xl lg:text-6xl"
+              >
                 {content.headline}
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-pretty wrap-anywhere text-muted-foreground">
+              <p
+                {...editAttribute(editAttributes?.blurb)}
+                className="mt-6 max-w-xl text-lg leading-8 text-pretty wrap-anywhere text-muted-foreground"
+              >
                 {content.blurb}
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-3">
                 <Link
                   href="/sign-up"
+                  {...editAttribute(editAttributes?.primaryCtaLabel)}
                   className={cn(
                     buttonVariants({ size: "lg" }),
                     "h-auto min-h-9 max-w-full text-center wrap-anywhere whitespace-normal"
@@ -76,6 +91,7 @@ export function LandingPage({ content }: LandingPageProps) {
                 </Link>
                 <Link
                   href="/sign-in"
+                  {...editAttribute(editAttributes?.secondaryCtaLabel)}
                   className={cn(
                     buttonVariants({ variant: "outline", size: "lg" }),
                     "h-auto min-h-9 max-w-full text-center wrap-anywhere whitespace-normal"

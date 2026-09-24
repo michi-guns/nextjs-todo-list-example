@@ -10,6 +10,7 @@ import { structureTool } from "sanity/structure"
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import { apiVersion, dataset, projectId } from "./sanity/env"
+import { editorialPresentationPlugins } from "./sanity/presentation"
 import { schema } from "./sanity/schemaTypes"
 import { structure } from "./sanity/structure"
 
@@ -24,5 +25,10 @@ export default defineConfig({
     // Vision is for querying with GROQ from inside the Studio
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({ defaultApiVersion: apiVersion }),
+    // Editorial preview (Draft Mode, Live, click-to-edit); off by default.
+    ...editorialPresentationPlugins(
+      process.env.NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED,
+      dataset
+    ),
   ],
 })

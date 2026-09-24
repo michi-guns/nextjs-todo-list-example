@@ -31,3 +31,16 @@ test("TST-LANDING-004 exits Draft Mode to the published landing page", async ({
     page.getByRole("heading", { name: "Make progress visible." })
   ).toBeVisible()
 })
+
+test("TST-LANDING-004 serves the public landing page without preview markup", async ({
+  page,
+}) => {
+  const response = await page.request.get("/")
+  expect(response.ok()).toBe(true)
+  const html = await response.text()
+  expect(html).toContain("Make progress visible.")
+  // No editing attributes, exit control or Live draft subscription.
+  expect(html).not.toContain("data-sanity")
+  expect(html).not.toContain("/api/draft-mode/disable")
+  expect(html).not.toContain("includeDrafts")
+})

@@ -39,6 +39,7 @@ describe("Playwright local runtime", () => {
       BETTER_AUTH_LOCAL_MAILBOX: "true",
       BETTER_AUTH_MAILBOX_DIR: "C:/Temp/playwright-mailbox",
       PLAYWRIGHT_E2E: "true",
+      NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "false",
     })
   })
 

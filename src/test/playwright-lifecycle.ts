@@ -14,6 +14,8 @@ export interface PlaywrightRuntimeEnvironment {
   readonly BETTER_AUTH_LOCAL_MAILBOX: "true"
   readonly BETTER_AUTH_MAILBOX_DIR: string
   readonly PLAYWRIGHT_E2E: "true"
+  /** Pinned off: a developer .env.local cannot switch the harness to preview. */
+  readonly NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "false"
 }
 
 export function createPlaywrightRuntimeEnvironment(
@@ -28,6 +30,7 @@ export function createPlaywrightRuntimeEnvironment(
     BETTER_AUTH_LOCAL_MAILBOX: "true",
     BETTER_AUTH_MAILBOX_DIR: mailboxDirectory,
     PLAYWRIGHT_E2E: "true",
+    NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "false",
   }
 }
 

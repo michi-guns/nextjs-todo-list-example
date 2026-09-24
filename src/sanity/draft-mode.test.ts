@@ -83,11 +83,13 @@ async function sanityApi(secretDocument: unknown) {
 
 function handler(
   viewerClient: (token: string) => ReturnType<typeof createClient>,
-  editorialPreview: () => unknown = () => ({ enabled: true, token: TOKEN })
+  editorialPreview: () => unknown = () => ({ enabled: true, token: TOKEN }),
+  onUnavailable?: () => void
 ) {
   return createEnableDraftModeHandler({
     editorialPreview: editorialPreview as never,
     viewerClient,
+    onUnavailable,
   })
 }
 
@@ -183,14 +185,35 @@ describe("TST-LANDING-004 Draft Mode entry boundary", () => {
 
   it("maps an unexpected Sanity failure to a quiet 503 without the secret", async () => {
     const errors = vi.spyOn(console, "error").mockImplementation(() => {})
-    const response = await handler(() => {
-      throw new Error(`boom ${TOKEN} ${SECRET}`)
-    })(request(`sanity-preview-secret=${SECRET}`))
+    const onUnavailable = vi.fn()
+    const response = await handler(
+      () => {
+        throw new Error(`boom ${TOKEN} ${SECRET}`)
+      },
+      undefined,
+      onUnavailable
+    )(request(`sanity-preview-secret=${SECRET}`))
     expect(response.status).toBe(503)
+    expect(onUnavailable).toHaveBeenCalledOnce()
+    expect(onUnavailable.mock.calls[0]).toEqual([])
     expect(await response.text()).not.toMatch(new RegExp(`${SECRET}|${TOKEN}`))
     expect(JSON.stringify(errors.mock.calls)).not.toMatch(
       new RegExp(`${SECRET}|${TOKEN}`)
     )
+  })
+
+  it("keeps the quiet 503 when the unavailable diagnostic itself fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {})
+    const response = await handler(
+      () => {
+        throw new Error("boom")
+      },
+      undefined,
+      () => {
+        throw new Error("logger down")
+      }
+    )(request(`sanity-preview-secret=${SECRET}`))
+    expect(response.status).toBe(503)
   })
 })
 

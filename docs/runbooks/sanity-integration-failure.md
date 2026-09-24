@@ -18,6 +18,20 @@ Public editorial content may be unavailable. Private PostgreSQL-backed todo beha
 6. Determine whether the failure is a provider outage, configuration issue, schema change, mapping bug, or invalidation failure.
 7. Use the explicitly marked local fallback only while Sanity is not wired; do not fabricate transactional data.
 
+## Editorial preview
+
+Editorial preview only affects Studio editors; published traffic is
+independent. See [editorial preview setup](../data/sanity.md#editorial-preview-setup).
+
+| Symptom                                           | Meaning and action                                                                                                             |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| No **Presentation** tool in Studio                | The flag is not `true` at build time or the dataset is not `production`; fix the variable and rebuild.                         |
+| `/api/draft-mode/enable` answers `404`            | Preview is disabled or refused for this profile (Preview deployments always refuse it).                                        |
+| Entry answers `401`                               | The Studio secret is missing, expired (one hour) or malformed; reopen Presentation from Studio.                                |
+| Entry answers `503`; `sanity.preview.unavailable` | The Viewer token or Sanity API failed; check the token is valid with the Viewer role, rotate it if needed, then redeploy.      |
+| Preview shows an error instead of the draft       | The draft fails landing validation (event `landing.preview` failed); fix the draft in Studio. Published traffic is unaffected. |
+| Overlays or live refresh missing                  | Check the origin is allowed under Sanity CORS with credentials and the page is inside Presentation or has Draft Mode on.       |
+
 ## Escalation
 
 Record repeated failures in an ADR or update the data availability documentation if the recovery strategy changes.

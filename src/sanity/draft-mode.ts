@@ -50,6 +50,8 @@ const quiet = (status: number, body: string) =>
 export function createEnableDraftModeHandler(dependencies: {
   editorialPreview: () => EditorialPreview
   viewerClient: (token: string) => SanityClient
+  /** Fixed, detail-free signal so an expired Viewer token is visible. */
+  onUnavailable?: () => void
 }) {
   return async function GET(request: Request): Promise<Response> {
     let preview: EditorialPreview
@@ -70,6 +72,11 @@ export function createEnableDraftModeHandler(dependencies: {
       // The successful path ends in Next's redirect; let it through.
       unstable_rethrow(error)
       // Provider errors can carry request details; report nothing specific.
+      try {
+        dependencies.onUnavailable?.()
+      } catch {
+        /* Diagnostics never replace the answer. */
+      }
       return quiet(503, "Preview is temporarily unavailable")
     }
   }
