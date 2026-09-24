@@ -1926,7 +1926,10 @@ Verification and evidence for this slice:
   post-response mail with explicit standalone draining in the four seeds, and
   synthetic client addresses in tests instead of disabled limits.
   `TST-AUTH-004`/`005` are `partial`; `006` stays `partial`.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the independent review approved `9c445bb` with no blockers or
+  should-fix items; its two documentation nits are applied. Deferred to
+  T-27.3: derive the e2e synthetic address from the test id and retry, and
+  assert the losing concurrent reset submissions answer `400`.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `better-auth-best-practices`,
   `email-and-password-best-practices`, `security-and-hardening`, `next-dev-loop`,

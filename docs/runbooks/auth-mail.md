@@ -134,10 +134,13 @@ values live in `src/modules/auth/infrastructure/auth-policy.ts`:
 RECIPIENT_COOLDOWN` with `X-Retry-After`, for known and unknown addresses
   alike, including `auth.api` calls. A send over the budget is dropped
   silently and logged only as `auth.mail.send.limited`.
-- If the counters cannot be reached, admission fails closed: explicit
-  requests answer a generic `503`, HTTP auth answers `429`, and no mail is
-  sent. Look for `auth.admission.unavailable` or
-  `auth.mail.send.unavailable` and check the database first.
+- If the counters cannot be reached, admission fails closed and no mail is
+  sent. Over HTTP the address limiter runs first, so a full outage answers
+  `429 Too many requests` on every auth endpoint; the generic `503
+EMAIL_TEMPORARILY_UNAVAILABLE` appears only for `auth.api` calls or when
+  just the recipient check fails. Look for `auth.admission.unavailable`,
+  `auth.mail.admission.unavailable` or `auth.mail.send.unavailable` and
+  check the database first.
 - A successful password reset ends every session of that account and does not
   sign in. Throttling never locks an account or ends a session.
 - On Vercel only `x-vercel-forwarded-for` identifies the client.

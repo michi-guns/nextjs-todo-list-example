@@ -28,8 +28,9 @@ dependencies were available. Installed sources read: Better Auth 1.7.5
     `/sign-in/magic-link` charge the recipient request budget (1 per 60 s)
     before any account lookup, for HTTP and `auth.api` calls alike. A limited
     recipient gets `429 RECIPIENT_COOLDOWN` with `X-Retry-After`; a store
-    failure gets a generic `503 EMAIL_TEMPORARILY_UNAVAILABLE`. Absent and
-    present addresses meet the same answer.
+    failure gets a generic `503 EMAIL_TEMPORARILY_UNAVAILABLE` (over HTTP a
+    full outage is usually answered `429` earlier by the address limiter).
+    Absent and present addresses meet the same answer.
   - Native reset: `sendResetPassword`, 30-minute tokens,
     `revokeSessionsOnPasswordReset: true`; reset does not sign in.
   - Every verification, reset and magic-link message goes through
@@ -38,7 +39,7 @@ dependencies were available. Installed sources read: Better Auth 1.7.5
     runs outside the response. A denied or failed send is suppressed without
     an account signal and logged only as a fixed event
     (`auth.mail.send.limited|unavailable|invalid`,
-    `auth.admission.unavailable`). The magic-link kind is set server-side, so
+    `auth.mail.admission.unavailable`, `auth.admission.unavailable`). The magic-link kind is set server-side, so
     client metadata cannot change the message.
 - `mail-scheduler.ts`: Next `after()` by default; seeds, scripts and
   integration tests select `selectStandaloneAuthMail()` and `drain()` it
@@ -109,4 +110,14 @@ protected release migrates before deploying, so no extra step is needed.
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+Independent review (`9c445bb`, opus, xhigh): approved, no blockers or
+should-fix items. It reproduced 70 focused unit, 20 auth integration and 694
+unit tests, typecheck, lint and the 9 browser journeys, and confirmed against
+the installed sources that `hooks.before` covers HTTP and `auth.api`, the
+address limiter runs before the hook, server-side session reads skip the
+limiter, and the e2e synthetic client only separates tests. Its two
+documentation nits (outage status over HTTP, the missing
+`auth.mail.admission.unavailable` event) are applied above and in the
+runbook. Deferred to T-27.3, which edits the same files: derive the e2e
+synthetic address from the test id and retry instead of a worker-local
+counter, and assert the losing concurrent reset submissions answer `400`.
