@@ -135,10 +135,11 @@ field.
   `502`, `503` and `504`. Other refusals stop at once.
 - If the Email cannot be handed to Resend, the step fails with one safe
   annotation (`Release-failure alert not sent: <reason>`, for example
-  `not_configured`, `rejected`, `timeout`). The release step's failure, its
-  record and the job result are unchanged.
+  `not_configured`, `rejected`, `timeout`). A `rejected` or `timeout` after a
+  slow first request may still arrive, because Resend can finish it late. The
+  release step's failure, its record and the job result are unchanged.
 - Provider acceptance is not mailbox receipt. Nothing is sent when the runner
   itself never starts, or when the job is cancelled or hits its 35-minute
   timeout (each release subprocess has its own shorter timeout, so a single
-  hang is still recorded as a stage failure). Native uptime and Sentry Email do not use this
-  port. Real delivery and receipt proof is T-26.14.
+  hang is still recorded as a stage failure). Native uptime and Sentry Email
+  do not use this port. Real delivery and receipt proof is T-26.14.

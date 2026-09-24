@@ -125,4 +125,7 @@ First independent review (`20fc5c4`, opus, xhigh): changes requested.
   no Email on preflight-only failure, record trust, key format and secret
   handling.
 
-Confirmation review pending.
+Confirmation review (`75a83a8`, opus, xhigh): approved, no blockers or
+should-fix items; it reproduced 91 focused, 269 pipeline and 668 unit tests,
+typecheck, lint and Prettier. Its optional clause, that a `rejected` after a
+timeout may still arrive, is added to the runbook as documentation only.

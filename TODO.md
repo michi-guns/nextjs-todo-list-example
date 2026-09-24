@@ -1726,7 +1726,9 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   retry Resend `409` (same key still in progress) so a retry after a timeout
   is not a false "not sent"; fixed with a collector test. Its three
   documentation nits (cancel/timeout sends nothing, exact retried codes,
-  structural release-result claim) are applied. Confirmation review pending.
+  structural release-result claim) are applied. The confirmation review
+  approved `75a83a8` with no findings; its optional runbook clause (a
+  `rejected` after a timeout may still arrive) is added as documentation only.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `api-and-interface-design`, `ci-cd-and-automation`,
   `security-and-hardening`, `documentation-and-adrs`, `code-review-and-quality`,
