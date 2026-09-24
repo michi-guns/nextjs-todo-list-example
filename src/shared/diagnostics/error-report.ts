@@ -77,8 +77,11 @@ function framePath(
 
 /**
  * V8 caches the stack header when first read. Trust frame lines only when the
- * header still matches the current own data message, so message text that
- * imitates a frame (rewritten or accessor-backed messages) is never parsed.
+ * header still matches the current own data message, so accessor-backed and
+ * most rewritten messages cannot pass frame-like text off as frames.
+ * Residual limit: a stale header is undetectable when the message was later cut
+ * to its own first line, or cleared when that first line was empty. Frame
+ * paths and names stay filtered in those cases.
  */
 function headerLength(error: Error, lines: string[]): number | undefined {
   let descriptor: PropertyDescriptor | undefined

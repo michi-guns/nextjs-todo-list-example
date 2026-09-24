@@ -99,3 +99,13 @@ accepts that header shape with a regression test, measures the record bound in
 UTF-8 bytes with an oversize test, notes `no-frame` grouping under Next and
 clarifies the rollback revision step. The final tip receives its own fresh
 review before merge.
+
+A third fresh review found that the empty-message allowance could accept a
+stale header when a message beginning with a newline was cleared after the
+stack was first read. Gating on a custom formatter would not help because
+Node 24 installs its own default `Error.prepareStackTrace`, so this residual
+limit is documented in code and here rather than engineered away: a header
+cached before the message was cut to its own first line, or cleared when that
+first line was empty, cannot be told apart from an honest header. Application
+code does not rewrite error messages, and frame paths and function names stay
+filtered in those cases.
