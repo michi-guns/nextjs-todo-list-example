@@ -1,6 +1,6 @@
 import { logEnvironmentSchema, type LogEnvironment } from "./config"
 
-/** Output selection only; runtime target validation belongs to T-26.8. */
+/** Output selection only; runtime target validation is `src/shared/environment/runtime.ts`. */
 export function loggingEnvironment(
   environment: { APP_ENV?: string; NODE_ENV?: string } = process.env
 ): LogEnvironment {

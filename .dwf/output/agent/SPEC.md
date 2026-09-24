@@ -988,6 +988,11 @@ compares actual running release identity and relevant readiness. Preserve
 protected release authorization. [TST-RUNTIME-001](../../decisions/TESTING.md#tst-runtime-001)
 owns new evidence separately from the previously verified tooling contracts.
 
+Status: runtime target validation (T-26.8) is implemented and verified locally
+([evidence](../../../docs/agentforge/evidence/2026-09-24-runtime-target-validation.md));
+dependency health (T-26.9), release smoke (T-26.10) and deployed evidence
+(T-26.12) remain planned.
+
 ## 12. Implementation notes vs current scaffold
 
 As of writing, the repo contains the runnable authenticated todo baseline: the

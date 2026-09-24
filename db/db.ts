@@ -2,14 +2,12 @@ import { attachDatabasePool } from "@vercel/functions"
 import { drizzle } from "drizzle-orm/node-postgres"
 
 import { createDatabasePool, reportIdlePoolError } from "./pool"
+import { parseRuntimeEnvironment } from "../src/shared/environment/runtime"
 import { createLoggingRuntime } from "../src/shared/logging/runtime"
 import { loggingEnvironment } from "../src/shared/logging/environment"
 
-const databaseUrl = process.env.DATABASE_URL
-
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is not defined")
-}
+// Refuse an unsafe profile/target before any client exists (TD-035).
+const { databaseUrl } = parseRuntimeEnvironment()
 
 // The asynchronous idle callback runs after composition, using the current policy.
 export const pool = createDatabasePool(databaseUrl, (error) =>

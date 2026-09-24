@@ -10,23 +10,18 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { magicLink } from "better-auth/plugins"
 
 import { deliverAuthEmail } from "@/src/modules/auth/infrastructure/auth-mail"
+import { parseRuntimeEnvironment } from "@/src/shared/environment/runtime"
 
-const configuredBaseUrl =
-  process.env.BETTER_AUTH_URL?.trim() ||
-  (process.env.APP_ENV === "preview" && process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : undefined)
-const configuredSecret = process.env.BETTER_AUTH_SECRET?.trim()
-
-if (process.env.NODE_ENV === "production" && !configuredSecret) {
-  throw new Error("BETTER_AUTH_SECRET is required in production")
-}
+// Validated before the client exists; Preview keeps its assigned origin.
+const runtime = parseRuntimeEnvironment()
+const configuredBaseUrl = runtime.auth.baseUrl
+const configuredSecret = runtime.auth.secret
 
 function getTrustedOrigins() {
   const origins: string[] = []
 
   if (configuredBaseUrl) {
-    origins.push(new URL(configuredBaseUrl).origin)
+    origins.push(configuredBaseUrl)
   }
 
   if (process.env.APP_ENV === "preview" && process.env.VERCEL_URL) {

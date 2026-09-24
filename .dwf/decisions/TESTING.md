@@ -156,7 +156,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-DIAGNOSTICS-001](#tst-diagnostics-001) | Safe diagnostics preserve routing, privacy and lifecycle                             | Unit, PostgreSQL policy, isolated Next runtime                       | T-26.4–T-26.6                                                      | `verified`  |
 | [TST-DIAGNOSTICS-002](#tst-diagnostics-002) | Both providers receive useful safe logs and grouped errors                           | Local wire and real hosted ingestion/grouping                        | T-26.5–T-26.7                                                      | `partial`   |
 | [TST-ALERTS-001](#tst-alerts-001)           | Operational alerts stay independent of app outage and have one delivery owner        | Contract, adapter, external outage and Email evidence                | T-26.11–T-26.14                                                    | `specified` |
-| [TST-RUNTIME-001](#tst-runtime-001)         | Runtime targets, health and deployed identity are safe and verifiable                | Configuration, local database/Next, pipeline and hosted smoke        | T-26.8–T-26.10, T-26.12                                            | `specified` |
+| [TST-RUNTIME-001](#tst-runtime-001)         | Runtime targets, health and deployed identity are safe and verifiable                | Configuration, local database/Next, pipeline and hosted smoke        | T-26.8–T-26.10, T-26.12                                            | `partial`   |
 
 ## Test contracts
 
@@ -932,7 +932,7 @@ These original logger contracts retain their stage-specific meaning.
 
 ### TST-RUNTIME-001 — Runtime target, health and release identity
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Runtime safety and operational readiness
 - **Evidence layers/modes:** Configuration/unit, real local PostgreSQL integration, isolated Next runtime, pipeline adapter and authorized deployed smoke
 - **Verifies product decisions:** D-012
@@ -942,7 +942,7 @@ These original logger contracts retain their stage-specific meaning.
 - **Contract:** Runtime validation refuses unsafe target/profile/origin/dataset/mail combinations before client creation while accepting runtime-only Production configuration without migration/admin credentials. No network work occurs at import/build. Provider-neutral bounded app/database/CMS health distinguishes failures, checks fresh published CMS content, protects remote dependency probes and exposes only safe status/release identity. Delivery compares actual runtime SHA/readiness with the intended deployment while retaining provider project/ref/alias guards.
 - **Required evidence:** Pure rule/input-boundary tests; real local PostgreSQL success/failure/acquisition/query timeout and connection-release evidence; controlled HTTP CMS success/failure/timeout and cache-bypass checks; real isolated Next endpoint/refusal behavior; sanitized mismatch/secret sentinels; adapter tests for wrong SHA and failed readiness; authorized deployed target/probe evidence. A timeout must bound actual work and resources. Missing monitor settings are not successful readiness. CMS-only degradation is not total-app failure.
 - **Dependencies:** Accepted runtime plan and task prerequisites; Docker/browser prerequisites for named local checks; explicit target/configuration/release authorization for hosted evidence.
-- **Current evidence:** None. Existing `TST-ENV-001`, pipeline/release and published CMS evidence do not verify the new runtime extension.
+- **Current evidence:** T-26.8 [runtime validation evidence](../../docs/agentforge/evidence/2026-09-24-runtime-target-validation.md) covers the local configuration portion: shared pure rules, runtime-only Production inputs, Preview-assigned origin, refusal codes and secret sentinels, refusal before client construction and a real `next start` refusal. Health, release smoke and deployed evidence remain outstanding. Existing `TST-ENV-001`, pipeline/release and published CMS evidence do not verify the new runtime extension.
 - **Follow-up:** Implement T-26.8–T-26.10, then reconcile separately authorized deployed evidence without changing historical verified statuses.
 
 ## SPEC traceability map

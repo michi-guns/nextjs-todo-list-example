@@ -118,6 +118,7 @@ Values below describe categories, not credentials.
 | `DATABASE_URL_UNPOOLED`          | Neon profiles     | Direct PostgreSQL URL for migrations; optional only for a direct local URL                       |
 | `DATABASE_PROJECT_ID`            | Neon profiles     | Expected Neon project identity                                                                   |
 | `DATABASE_BRANCH`                | Neon profiles     | Expected Neon branch identity; Development/Preview cannot use `main`                             |
+| `DATABASE_ENDPOINT_HOST`         | Optional          | Delivery-observed direct Neon endpoint host; the running app checks its pooled URL against it    |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Every profile     | Public Sanity project identifier                                                                 |
 | `NEXT_PUBLIC_SANITY_DATASET`     | Every profile     | `production` except `preview`, which uses `preview`                                              |
 | `NEXT_PUBLIC_SANITY_API_VERSION` | Optional          | Safe Sanity API-version identifier; defaults to `2026-08-27`                                     |
@@ -142,6 +143,37 @@ Production remote mail requires `APP_MAIL_PROVIDER=resend`, protected
 The existing `BETTER_AUTH_MAILBOX_DIR` remains a local/test-only path setting.
 It is not a deployment transport and is not accepted as a substitute for the
 Preview controlled account or the Production remote provider.
+
+## Runtime validation
+
+The running application validates its own, smaller input set before it
+creates the database pool, the Better Auth client or the Sanity client
+([TD-035](../../.dwf/decisions/TECHNICAL.md#td-035)). The rules are the same
+pure functions the tooling parser uses, in `src/shared/environment/rules.ts`;
+`src/shared/environment/runtime.ts` applies them.
+
+- With `APP_ENV` set, the app checks the profile/`NODE_ENV` pairing, origin,
+  auth secret, database provider/role/project/branch, Sanity dataset/policy
+  and mail policy exactly as the matrix above. It needs only the pooled
+  runtime `DATABASE_URL`: no `DATABASE_URL_UNPOOLED`, Neon, Vercel or GitHub
+  credentials, and no `DEPLOYMENT_OWNER`/`SECRET_NAMESPACE` (operator inputs).
+- Preview may omit `BETTER_AUTH_URL`; the deployment-assigned `VERCEL_URL`
+  origin is used and must be non-loopback HTTPS.
+- When `DATABASE_ENDPOINT_HOST` is present, the pooled runtime host must
+  belong to that endpoint. A branch label alone is not proof of the target.
+  Delivery supplies the observed endpoint in T-26.10.
+- During `next build`, Next owns `NODE_ENV`, so only that pairing check is
+  deferred to the running server.
+- Without `APP_ENV`, a local developer or test process keeps the historical
+  unprofiled behavior (a `DATABASE_URL`, plus a secret when
+  `NODE_ENV=production`). A Vercel deployment (`VERCEL=1`) without `APP_ENV`
+  is refused.
+
+A refusal is an `EnvironmentProfileError` with a stable code and the variable
+name only; it never includes values, URLs or secrets. On `next start` it
+fails the instrumentation hook, so the server answers 500 to every request
+instead of running against the wrong target. Fix the named variable and
+redeploy or restart.
 
 ## Hosted configuration ownership
 
