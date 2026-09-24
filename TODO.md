@@ -1885,7 +1885,10 @@ Verification and evidence for this slice:
   (first use, exhaustion without extension, expiry, bounded cleanup,
   environments, failure denial, prior-schema upgrade). Not yet wired into
   Better Auth (T-27.2). `TST-AUTH-006` is `partial`.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the independent review approved `861a4d5` with no blockers or
+  should-fix items. Deferred to T-27.2: pass an autocommit Pool (not an open
+  transaction client) and fix the `AdmissionQueryable` comment; wire
+  `onUnavailable` to sanitized diagnostics.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `better-auth-best-practices`,
   `migration-history-workflow`, `security-and-hardening`, `documentation-and-adrs`,

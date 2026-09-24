@@ -18,7 +18,7 @@ backend and must answer `consume(key, { window, max })` with
 before storage. Its own database backend was not reused: it reads, then updates
 by predicate, and would store raw IP keys.
 
-Migration mode: **append-only**. The existing chain is adopted by Production
+Migration mode: **append-only**. Earlier migrations are adopted by Production
 (see [CONTEXT](../../../.dwf/CONTEXT.md)), so the change is one new forward
 migration generated with `drizzle-kit generate`; no earlier file changed.
 
@@ -111,4 +111,14 @@ until T-27.2 is released.
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+Independent review (`861a4d5`, opus, xhigh): approved, no blockers or
+should-fix items. It reproduced the counts above and, in a scratch container,
+showed a naive read-then-write store admitting 24 of 24 where this store
+admits exactly 3, plus 600 concurrent consumes racing cleanup with no error
+or over-admission. Nits: the Production-adoption wording above is corrected;
+the store must receive an autocommit Pool, not a client inside an open
+transaction (frozen `now()`, held row lock, rolled-back admissions), so the
+`AdmissionQueryable` comment and the wiring are deferred to T-27.2; a rare
+race can over-report the remaining wait, which stays bounded. T-27.2 notes:
+wire `onUnavailable` to sanitized diagnostics, and remember `customStorage`
+covers every Better Auth path once limits are enabled.
