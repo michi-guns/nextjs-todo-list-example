@@ -79,9 +79,10 @@ function framePath(
  * V8 caches the stack header when first read. Trust frame lines only when the
  * header still matches the current own data message, so accessor-backed and
  * most rewritten messages cannot pass frame-like text off as frames.
- * Residual limit: a stale header is undetectable when the message was later cut
- * to its own first line, or cleared when that first line was empty. Frame
- * paths and names stay filtered in those cases.
+ * Residual limit: after the first stack read, a message rewritten to text the
+ * cached header still ends with (its leading line or lines, a `: `-delimited
+ * tail of its first line, or empty when that first line was empty) cannot be
+ * detected. Frame paths and names stay filtered in those cases.
  */
 function headerLength(error: Error, lines: string[]): number | undefined {
   let descriptor: PropertyDescriptor | undefined
