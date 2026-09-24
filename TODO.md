@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 69 files and 668 tests (T-26.11 release-failure Email, 2026-09-24).
+- [x] `pnpm test` passes 70 files and 678 tests (T-27.1 shared admission, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1131,8 +1131,8 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 through T-26.6 and T-26.8 through T-26.11 are complete, leaving 11
-unchecked children.
+remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 through T-26.11 and T-27.1 are complete,
+leaving 10 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
 and subagents only for independent review, as the owner requested.
@@ -1859,7 +1859,7 @@ Verification and evidence for this slice:
 
 #### T-27.1: Provide atomic shared authentication admission
 
-- [ ] Deliver the auth-owned PostgreSQL counter store and supported limiter adapter.
+- [x] Deliver the auth-owned PostgreSQL counter store and supported limiter adapter.
 - Files: `db/schema/auth-rate-limit.ts`, schema exports, generated forward
   migration/metadata, `src/modules/auth/infrastructure/auth-rate-limit.ts`,
   policy defaults and colocated unit/real integration tests. Preserve applied history.
@@ -1878,6 +1878,14 @@ Verification and evidence for this slice:
 - Dependencies/prerequisites: completed T-18/T-21.5/T-24 and execution authority;
   installed Better Auth API review and Docker/PostgreSQL 18. No dependency on
   logger implementation. One storage/admission review unit, no hosted mutation.
+- Evidence, 2026-09-24: [shared admission](docs/agentforge/evidence/2026-09-24-auth-admission.md) records the
+  `auth_rate_limit` forward migration, the atomic UPSERT store, opaque HMAC
+  keys, separate recipient request/send budgets, the `customStorage` adapter
+  and policy defaults, proven on disposable PostgreSQL with independent pools
+  (first use, exhaustion without extension, expiry, bounded cleanup,
+  environments, failure denial, prior-schema upgrade). Not yet wired into
+  Better Auth (T-27.2). `TST-AUTH-006` is `partial`.
+- Review: pending a fresh exact-tip independent review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `better-auth-best-practices`,
   `migration-history-workflow`, `security-and-hardening`, `documentation-and-adrs`,

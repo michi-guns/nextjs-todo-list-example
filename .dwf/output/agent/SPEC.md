@@ -200,6 +200,12 @@ Required future evidence is owned by [TST-AUTH-004](../../decisions/TESTING.md#t
 [TST-AUTH-005](../../decisions/TESTING.md#tst-auth-005) and
 [TST-AUTH-006](../../decisions/TESTING.md#tst-auth-006).
 
+Status: the shared PostgreSQL admission store, opaque keys, recipient
+request/send budgets and the `customStorage` adapter (T-27.1) are implemented
+and verified locally
+([evidence](../../../docs/agentforge/evidence/2026-09-24-auth-admission.md)); Better Auth wiring,
+recovery and browser surfaces (T-27.2/T-27.3) and hosted proof (T-27.4) remain.
+
 ---
 
 ## 3. Data model (Postgres)

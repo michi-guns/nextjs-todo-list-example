@@ -342,7 +342,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 
 ### TST-AUTH-006 — Shared authentication and recipient mail limits
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Authentication abuse resistance
 - **Evidence layers/modes:** HTTP/auth-mail boundaries, real PostgreSQL concurrency, browser feedback
 - **Verifies product decisions:** D-011
@@ -352,7 +352,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Contract:** Supported per-IP limits protect relevant sign-up, sign-in and auth-email paths. A shared per-recipient budget bounds verification, reset and magic-link mail, including automatic and server-side sends. Environment-scoped PostgreSQL counters admit requests atomically across instances. Excess requests produce a safe temporary wait, no account lockout or enumeration signal, and no sensitive logging.
 - **Required evidence:** Real database concurrency across independent limiter instances at first use, limit exhaustion and window expiry; prove IP rotation cannot bypass the recipient bound and independent environments do not share budgets. Exercise automatic signup/sign-in, explicit resend/reset/magic-link and relevant `auth.api` send paths, accounting for the HTTP limiter's server-call bypass and development defaults. Check common counter failures do not silently allow unbounded mail, recipient cooldown responses do not distinguish absent accounts, and retry feedback allows recovery without changing credentials or active sessions. Retain the existing migration and environment safety obligations for any new schema; in-memory mocks alone cannot verify shared atomicity.
 - **Dependencies:** Existing environment-selected PostgreSQL and Better Auth/Drizzle integration; planning specifies supported integration, concrete windows/counts and trusted IP handling. No new service is required.
-- **Current evidence:** None; database storage support in the library is not proof of the application's concurrent guarantee.
+- **Current evidence:** Partial, 2026-09-24 ([T-27.1 evidence](../../docs/agentforge/evidence/2026-09-24-auth-admission.md)). The storage portion is verified on disposable PostgreSQL 18 with independent pools: exactly the maximum admitted under simultaneous first use and after window expiry, rejection without counting or extending the window, bounded expired-row cleanup, a recipient send budget that holds across independent instances, separate request/send namespaces and environments, opaque HMAC keys only, denial when the database is unreachable, and the forward migration's prior-schema upgrade. Better Auth wiring, `auth.api`/automatic send paths, trusted IP handling and browser feedback remain for T-27.2/T-27.3; hosted proof is T-27.4.
 - **Follow-up:** Implement and reconcile under T-27 after consolidated planning, together with TST-AUTH-004/005.
 
 <a id="tst-lists-001"></a>

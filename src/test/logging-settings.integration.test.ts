@@ -20,6 +20,9 @@ const admin = new Pool({
   connectionTimeoutMillis: 1000,
 })
 const schemas: string[] = []
+// Pinned by content so later migrations do not change the upgrade under test.
+const isLoggingMigration = (migration: string) =>
+  migration.includes('CREATE TABLE "logging_settings"')
 const pools: Pool[] = []
 async function isolatedTarget(name: string, priorOnly = false) {
   const schema = `logging_${name}_${process.pid}_${Date.now()}`
@@ -33,7 +36,8 @@ async function isolatedTarget(name: string, priorOnly = false) {
   })
   pools.push(pool)
   const migrations = await readMigrationSqlFiles()
-  for (const migration of priorOnly ? migrations.slice(0, -1) : migrations) {
+  const prior = migrations.slice(0, migrations.findIndex(isLoggingMigration))
+  for (const migration of priorOnly ? prior : migrations) {
     for (const statement of splitMigrationStatements(migration))
       await pool.query(statement)
   }
@@ -255,7 +259,9 @@ describe("TST-LOGGING-002 real settings persistence", () => {
       "INSERT INTO users (id, name, email, email_verified, created_at, updated_at) VALUES ('upgrade-user', 'Synthetic', 'upgrade@example.test', true, now(), now())"
     )
     const migrations = await readMigrationSqlFiles()
-    for (const statement of splitMigrationStatements(migrations.at(-1)!))
+    for (const statement of splitMigrationStatements(
+      migrations.find(isLoggingMigration)!
+    ))
       await prior.query(statement)
     expect((await prior.query("SELECT id FROM users")).rows).toEqual([
       { id: "upgrade-user" },
