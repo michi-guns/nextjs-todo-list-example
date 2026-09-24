@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 62 files and 607 tests (T-26.8 runtime target validation, 2026-09-24).
+- [x] `pnpm test` passes 64 files and 618 tests (T-26.9 dependency health, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1131,7 +1131,7 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 through T-26.6 and T-26.8 are complete, leaving 14
+remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 and T-26.9 are complete, leaving 13
 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
@@ -1208,7 +1208,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.6 and T-26.8 are complete; the remaining 7 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.8 is complete and T-26.9 is next in the serial order; T-26.7 awaits hosted provider authorization. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.6, T-26.8 and T-26.9 are complete; the remaining 6 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.8 and T-26.9 are complete and T-26.10 is next in the serial order; T-26.7 awaits hosted provider authorization. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1616,7 +1616,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.9: Expose bounded, independent dependency health
 
-- [ ] Deliver app, database and CMS probes with protected remote dependency access.
+- [x] Deliver app, database and CMS probes with protected remote dependency access.
 - Files: `src/shared/health/` probes/tests, thin
   `app/api/health/[component]/route.ts`, local integration/runtime tests and
   `docs/runbooks/operations.md` with configuration and safe troubleshooting.
@@ -1636,6 +1636,13 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   do not establish bounded DB work. Native monitor setup belongs to T-26.12.
 - Dependencies/prerequisites: T-26.8; dependencies, Docker and Chromium.
   One health/readiness review unit; no external uptime account required locally.
+- Evidence, 2026-09-24: [dependency health](docs/agentforge/evidence/2026-09-24-dependency-health.md)
+  records bounded real-PostgreSQL and controlled-HTTP CMS probes (success,
+  failure, acquisition/query/request timeouts, connection release, server-side
+  cancellation, cache bypass), 618 unit and 37 integration tests, 9 Chromium
+  tests, typecheck, lint, build and a real `next start` protection proof.
+  `TST-RUNTIME-001` stays `partial` until T-26.10/T-26.12.
+- Review: pending a fresh exact-tip independent review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `api-and-interface-design`, `next-dev-loop`,
   `observability-and-instrumentation`, `security-and-hardening`,

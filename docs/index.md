@@ -19,6 +19,7 @@ This directory is the knowledge system for the Next.js Todo List Example.
 - [Authentication mail](./runbooks/auth-mail.md)
 - [Backend logging, event catalogue and diagnosis](./runbooks/logging.md)
 - [Optional backend diagnostics (Sentry or Better Stack)](./runbooks/diagnostics.md)
+- [Runtime operations: health endpoints](./runbooks/operations.md)
 - [Verified environment and pipeline evidence](./agentforge/evidence/2026-09-16-pipeline-closeout.md)
 - [Technology stack](./architecture/stack.md)
 - [Data ownership](./data/ownership.md)

@@ -27,3 +27,28 @@ test("behavior seed exposes deterministic pagination labels", async ({
     page.getByRole("button", { name: "Load more tasks" })
   ).toBeVisible()
 })
+
+test("health endpoints report liveness and real database readiness", async ({
+  request,
+}) => {
+  const app = await request.get("/api/health/app")
+  expect(app.status()).toBe(200)
+  expect(app.headers()["cache-control"]).toBe("no-store")
+  expect(await app.json()).toEqual({
+    component: "app",
+    status: "ok",
+    release: "unreleased",
+  })
+
+  // The local harness is unprofiled, so dependency probes are open here.
+  const database = await request.get("/api/health/database")
+  expect(database.status()).toBe(200)
+  expect(await database.json()).toMatchObject({
+    component: "database",
+    status: "ok",
+  })
+
+  const unknown = await request.get("/api/health/users")
+  expect(unknown.status()).toBe(404)
+  expect(await unknown.json()).toEqual({ status: "unknown_component" })
+})
