@@ -2048,7 +2048,10 @@ Verification and evidence for this slice:
   validation against a loopback API, running-server refusal and exit, and
   Preview/Production delivery wiring. No Sanity credential used.
   `TST-LANDING-004` is `partial`.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the independent review approved `bc7b7d1` with no blockers or
+  should-fix items; its two wording nits are applied. Deferred to T-28.2: pin
+  the preview flag off in the browser harness runtime, and emit a safe fixed
+  event for the Draft Mode entry's quiet `503`.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `source-driven-development`, `security-and-hardening`,
   `next-dev-loop`, `ci-cd-and-automation`, `documentation-and-adrs`,

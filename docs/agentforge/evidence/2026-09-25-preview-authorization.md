@@ -68,9 +68,10 @@ parse it; `validateSecret` looks the secret up with a one-hour
   carries the one-hour expiry filter; a valid secret enables Draft Mode, sets
   `__prerender_bypass` and redirects to the relative path only
   (`https://evil.example/landing?x=1` becomes `/landing?x=1`).
-- In development mode, missing, blank and malformed requests answer `401`
-  without creating the Viewer client and without any console output; a
-  secret and token sentinel never appear in responses or logs.
+- Missing, blank and malformed requests answer `401` without creating the
+  Viewer client, so the helper (whose parse-error log exists only under
+  `next dev`) never runs, and nothing is printed; a secret and token
+  sentinel never appear in responses or logs.
 - In the running Next server (preview disabled, the harness default), entry
   answers `404` with no Draft Mode cookie, and exit lands on the published
   landing page.
@@ -95,4 +96,15 @@ token (T-28.3).
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+Independent review (`bc7b7d1`, opus, xhigh): approved, no blockers or
+should-fix items. It reproduced 146 focused, 275 pipeline and 719 unit tests,
+typecheck, lint, the build and the editorial browser checks, and confirmed
+against the installed `@sanity/preview-url-secret` 4.1.5 that the
+pre-helper refusals cover exactly the three shapes its parser logs. Its two
+wording nits are applied (the boundary evidence above no longer implies a
+development-mode run of the helper; the variable table says Preview must
+not enable the flag). Deferred to T-28.2, which extends the browser harness:
+pin `NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED=false` in the harness
+runtime so a developer's `.env.local` cannot stop it, and emit a safe fixed
+event for the quiet `503` so an expired Viewer token is visible to
+operators.
