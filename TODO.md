@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 67 files and 640 tests (T-26.10 release smoke, 2026-09-24).
+- [x] `pnpm test` passes 67 files and 641 tests (T-26.10 release smoke, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1682,7 +1682,8 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   `partial` until T-26.12.
 - Review: the independent review approved; its optional nits were taken
   (identity-check transport retry, body-timeout classification, secret log
-  redaction, stale text). A fresh exact-tip review confirmed them before merge.
+  redaction, stale text); a confirmation review's mid-body reset nit was also
+  fixed with a test. A fresh exact-tip review confirmed them before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `ci-cd-and-automation`, `security-and-hardening`, `documentation-and-adrs`,
   `code-review-and-quality`, `git-workflow-and-versioning`.

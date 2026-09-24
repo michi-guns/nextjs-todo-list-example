@@ -11,7 +11,8 @@ import { HealthSmokeError, smokeDeployedHealth } from "./health-smoke"
 const SHA = "0123456789abcdef0123456789abcdef01234567"
 const SECRET = "monitor-secret-sentinel-0123456789abcdef"
 
-type Answer = { status: number; body?: unknown } | "hang" | "hang-body"
+type Answer =
+  { status: number; body?: unknown } | "hang" | "hang-body" | "reset-body"
 const closers: Array<() => Promise<void>> = []
 
 /** A controlled deployment exposing the health endpoints over real HTTP. */
@@ -29,6 +30,12 @@ async function deployment(
       })
       const result = answer(component, request)
       if (result === "hang") return
+      if (result === "reset-body") {
+        // Headers arrive, then the connection drops mid-body.
+        response.writeHead(200, { "content-type": "application/json" })
+        response.write("{", () => response.socket?.destroy())
+        return
+      }
       if (result === "hang-body") {
         // Headers arrive, the JSON body never does.
         response.writeHead(200, { "content-type": "application/json" })
@@ -210,7 +217,7 @@ describe("TST-RUNTIME-001 deployed release and readiness smoke", () => {
     ).toHaveLength(2)
   })
 
-  it("retries a transport blip on the identity check but never a wrong release", async () => {
+  it("retries a transport blip on the identity check", async () => {
     let appCalls = 0
     const blip = await deployment((component) =>
       component === "app" && ++appCalls === 1 ? "hang" : ok(component)
@@ -259,6 +266,22 @@ describe("TST-RUNTIME-001 deployed release and readiness smoke", () => {
       reason: "unreachable",
       code: undefined,
     })
+  })
+
+  it("retries a connection reset while reading the body", async () => {
+    let calls = 0
+    const flaky = await deployment((component) =>
+      component === "cms" && ++calls === 1 ? "reset-body" : ok(component)
+    )
+    await expect(
+      smokeDeployedHealth({
+        origin: flaky.origin,
+        commitSha: SHA,
+        secret: SECRET,
+        pauseMs: 1,
+      })
+    ).resolves.toMatchObject({ cms: "ok" })
+    expect(calls).toBe(2)
   })
 
   it("does not follow a redirect to a sign-in page as health", async () => {

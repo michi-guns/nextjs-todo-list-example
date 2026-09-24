@@ -47,9 +47,9 @@ needs it.
 
 | Command                                                            | Result                                    |
 | ------------------------------------------------------------------ | ----------------------------------------- |
-| `pnpm test:pipeline`                                               | 16 files, 253 tests passed                |
+| `pnpm test:pipeline`                                               | 16 files, 254 tests passed                |
 | `pnpm exec vitest run src/shared/environment src/test/environment` | 127 tests passed                          |
-| `pnpm test`                                                        | 67 files, 640 tests passed                |
+| `pnpm test`                                                        | 67 files, 641 tests passed                |
 | `pnpm test:integration`                                            | 9 files, 37 tests passed                  |
 | `pnpm test:e2e`, with and without the Sanity variables             | 9 Chromium tests passed each time         |
 | `pnpm typecheck`                                                   | Passed                                    |
@@ -67,7 +67,8 @@ a non-JSON 200 fail with their fixed reason; a CMS answering `timeout` twice
 passes on the third attempt; a hanging database fails as `unreachable` within
 the bounded time after two attempts; a hanging identity request is retried
 while a wrong release is not; a body that stops mid-read is a retryable
-transport failure, not an invalid response; a `307` is not followed. Secrets and the
+transport failure, not an invalid response, and so is a connection reset
+mid-body; a `307` is not followed. Secrets and the
 host never appear in errors. `scripts/deploy/preview/smoke.test.ts` runs the
 whole Preview smoke over HTTP for the right and a wrong release.
 
@@ -111,4 +112,7 @@ endpoint, secret handling in errors, records and logs, and a real Node 24
 - a stale TESTING follow-up line and stray test blank lines were corrected.
 
 The unit, pipeline, typecheck and lint checks were rerun after these changes.
-A fresh exact-tip review confirmed them before merge.
+A confirmation review approved them and noted that a connection reset
+mid-body was still classified as an invalid response; the body read now
+treats only a JSON syntax error as invalid, with a regression test that fails
+on the previous code. A fresh exact-tip review confirmed this before merge.

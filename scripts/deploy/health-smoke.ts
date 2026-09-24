@@ -103,8 +103,10 @@ export async function smokeDeployedHealth(
           signal,
         })
         raw = await response.json().catch((error: unknown) => {
-          if (signal.aborted) throw error
-          return null // Not JSON: judged below as an invalid response.
+          // Not JSON: judged below as an invalid response. A timeout or a
+          // stream reset while reading is a transport failure.
+          if (error instanceof SyntaxError) return null
+          throw error
         })
       } catch {
         await transportFailed()
