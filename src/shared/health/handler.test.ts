@@ -91,6 +91,20 @@ describe("TST-RUNTIME-001 health endpoints", () => {
     ).resolves.toMatchObject({ status: 200 })
   })
 
+  it("answers 503 when a probe cannot start, keeping liveness up", async () => {
+    const f = setup({ mode: "open" })
+    f.probes.cms.mockRejectedValue(
+      new Error("Missing NEXT_PUBLIC_SANITY_DATASET")
+    )
+    const result = await f.call("cms")
+    expect(result).toMatchObject({
+      status: 503,
+      body: { component: "cms", status: "unavailable", code: "unreachable" },
+    })
+    expect(JSON.stringify(result.body)).not.toContain("NEXT_PUBLIC")
+    await expect(f.call("app")).resolves.toMatchObject({ status: 200 })
+  })
+
   it("never reports readiness when remote monitor setup is missing", async () => {
     const f = setup({ mode: "unconfigured" })
     await expect(

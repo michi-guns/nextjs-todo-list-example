@@ -129,3 +129,20 @@ modes and constant-time comparison, and the route composition, and raised:
 After the fixes the unit, integration, browser, typecheck, lint, build and
 real-server checks were rerun. A fresh exact-tip review confirmed the fixes
 before merge.
+
+## Main CI follow-up
+
+Main CI for `9a59cfc` failed its browser job: `/api/health/app` answered 500.
+The CI harness sets no Sanity variables, and the route imported the Sanity
+client at module load, whose configuration check threw before any handler
+ran. Local runs passed because the ignored `.env.local` supplies them. The
+failure was reproduced locally by clearing `NEXT_PUBLIC_SANITY_PROJECT_ID`
+and `NEXT_PUBLIC_SANITY_DATASET` for `pnpm test:e2e`.
+
+The fix loads the Sanity client on the first CMS probe (retrying after a
+failed load) and turns any probe that cannot start into `503 unavailable
+unreachable`, so CMS configuration can never take liveness down. The browser
+suite then passed 9/9 both without the Sanity variables and with them;
+`pnpm test` passed 65 files and 620 tests, and typecheck, lint (only the
+`Geist` warning) and build passed. The follow-up was independently reviewed
+before merge.

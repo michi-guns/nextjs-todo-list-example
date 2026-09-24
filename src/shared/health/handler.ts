@@ -110,7 +110,12 @@ export function createHealthHandler(dependencies: {
         code: "unauthorized",
       })
     }
-    const result = await probes[component]()
+    // A probe that cannot even start (e.g. missing CMS configuration) is
+    // an unavailable dependency, never a failed liveness endpoint.
+    const result = await probes[component]().catch((): ProbeResult => ({
+      status: "unavailable",
+      code: "unreachable",
+    }))
     if (result.status === "ok") {
       return respond(200, { component, status: "ok", release })
     }
