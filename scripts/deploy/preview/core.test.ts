@@ -588,3 +588,31 @@ describe("Preview Vercel deploy arguments", () => {
     expect(joined).not.toContain(directUrl)
   })
 })
+
+describe("TST-LANDING-004 Preview editorial preview omission", () => {
+  it("fixes the capability off and never forwards a Viewer token", () => {
+    const profile = parseEnvironmentProfile(previewEnvironment())
+    const args = buildPreviewVercelEnvArgs(
+      profile,
+      COMMIT_SHA,
+      PREVIEW_ID,
+      HEALTH_SECRET
+    )
+    expect(
+      args.filter(
+        (arg) => arg === "NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED=false"
+      )
+    ).toHaveLength(2)
+    expect(args.join(" ")).not.toContain("SANITY_API_READ_TOKEN")
+  })
+
+  it("refuses a Preview profile that was handed a Viewer token or the capability", () => {
+    for (const forged of [
+      { SANITY_API_READ_TOKEN: "sk-viewer-preview-sentinel" },
+      { NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "true" },
+    ])
+      expect(() => parseEnvironmentProfile(previewEnvironment(forged))).toThrow(
+        /Viewer token|only for local, development or production/
+      )
+  })
+})

@@ -33,6 +33,14 @@ describe("Preview delivery workflow contract", () => {
     )
   })
 
+  it("TST-LANDING-004 never hands Preview the editorial Viewer token or capability", () => {
+    const workflow = readWorkflow()
+    expect(workflow).not.toContain("SANITY_API_READ_TOKEN")
+    expect(workflow).not.toContain(
+      "NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED"
+    )
+  })
+
   it("is manual workflow_dispatch only and never runs on push or pull_request", () => {
     const workflow = readWorkflow()
 

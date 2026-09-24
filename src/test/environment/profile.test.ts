@@ -292,6 +292,26 @@ describe("parseEnvironmentProfile", () => {
       },
     })
   })
+
+  it("TST-LANDING-004 reports editorial preview presence only, never the Viewer token", () => {
+    const VIEWER = "sk-viewer-inspection-sentinel-0123"
+    const profile = parseEnvironmentProfile({
+      ...neonEnvironment("production"),
+      NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "true",
+      SANITY_API_READ_TOKEN: VIEWER,
+    })
+    const inspection = inspectEnvironment(profile)
+    expect(profile.editorialPreview).toEqual({ enabled: true, token: VIEWER })
+    expect(inspection.sanity.editorialPreviewEnabled).toBe(true)
+    expect(inspection.secrets.sanityViewer).toBe(true)
+    expect(JSON.stringify(inspection)).not.toContain(VIEWER)
+    expect(() =>
+      parseEnvironmentProfile({
+        ...neonEnvironment("preview"),
+        SANITY_API_READ_TOKEN: VIEWER,
+      })
+    ).toThrow(expect.objectContaining({ variable: "SANITY_API_READ_TOKEN" }))
+  })
 })
 
 describe("parseDeliveryArguments", () => {

@@ -107,36 +107,38 @@ The release adapters supply application values to each Vercel deployment;
 changing a GitHub secret requires redeployment before the app receives it.
 Values below describe categories, not credentials.
 
-| Variable                         | Required           | Meaning                                                                                            |
-| -------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------- |
-| `APP_ENV`                        | Every profile      | `local`, `development`, `preview`, or `production`                                                 |
-| `NODE_ENV`                       | Every profile      | Next.js mode: `development`, `test`, or `production`; pairing is checked above                     |
-| `BETTER_AUTH_URL`                | Every profile      | Exact application origin; Local/Development loopback HTTP, Preview/Production non-loopback HTTPS   |
-| `BETTER_AUTH_SECRET`             | Every profile      | Secret in the profile's namespace; never print or commit it                                        |
-| `DATABASE_PROVIDER`              | Every profile      | `local-postgres` or `neon`, matching `APP_ENV`                                                     |
-| `DATABASE_URL`                   | Every profile      | Runtime PostgreSQL URL; pooled for Neon                                                            |
-| `DATABASE_URL_UNPOOLED`          | Neon profiles      | Direct PostgreSQL URL for migrations; optional only for a direct local URL                         |
-| `DATABASE_PROJECT_ID`            | Neon profiles      | Expected Neon project identity                                                                     |
-| `DATABASE_BRANCH`                | Neon profiles      | Expected Neon branch identity; Development/Preview cannot use `main`                               |
-| `DATABASE_ENDPOINT_HOST`         | Preview/Production | Delivery-observed direct Neon endpoint host; the running app checks its pooled URL against it      |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID`  | Every profile      | Public Sanity project identifier                                                                   |
-| `NEXT_PUBLIC_SANITY_DATASET`     | Every profile      | `production` except `preview`, which uses `preview`                                                |
-| `NEXT_PUBLIC_SANITY_API_VERSION` | Optional           | Safe Sanity API-version identifier; defaults to `2026-08-27`                                       |
-| `SANITY_WRITE_POLICY`            | Every profile      | `read-only`, `local-recovery`, or `production-recovery`, matching the matrix                       |
-| `SANITY_REVALIDATE_SECRET`       | Recovery profiles  | Server-only revalidation secret; required by recovery policies                                     |
-| `SANITY_MANUAL_RECOVERY_SECRET`  | Recovery profiles  | Server-only manual recovery secret; required by recovery policies                                  |
-| `APP_MAIL_TRANSPORT`             | Every profile      | `local-mailbox`, `controlled-account`, or `remote`, matching the matrix                            |
-| `APP_MAIL_PROVIDER`              | Remote mail only   | Provider name metadata; the provider must be owner-approved before Production                      |
-| `BETTER_AUTH_LOCAL_MAILBOX`      | Local/Development  | Must be `true`; must be absent or `false` in deployed profiles                                     |
-| `DEPLOYMENT_OWNER`               | Every profile      | `local`, `github`, or `vercel`, constrained by profile                                             |
-| `SECRET_NAMESPACE`               | Every profile      | `local`/`ci` for Local, otherwise exactly `development`, `preview`, or `production`                |
-| `HEALTH_PROBE_SECRET`            | Remote monitoring  | Server-only monitor secret for the database and CMS health probes; see [operations](operations.md) |
-| `APP_RELEASE_SHA`                | Deployments        | Resolved 40-hex deployment SHA reported by health endpoints; supplied by the delivery adapters     |
-| `DIAGNOSTICS_PROVIDER`           | Optional           | `none` (default), `sentry` or `better-stack`; see the [diagnostics runbook](diagnostics.md)        |
-| `SENTRY_DSN`                     | Sentry selected    | Server-only HTTPS DSN; never `NEXT_PUBLIC_*`                                                       |
-| `BETTER_STACK_ERRORS_DSN`        | Better Stack       | Server-only Sentry-compatible HTTPS error DSN                                                      |
-| `BETTER_STACK_LOGS_URL`          | Better Stack       | HTTPS log-ingestion host                                                                           |
-| `BETTER_STACK_LOGS_TOKEN`        | Better Stack       | Server-only source token; never print or commit it                                                 |
+| Variable                                       | Required           | Meaning                                                                                                                |
+| ---------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `APP_ENV`                                      | Every profile      | `local`, `development`, `preview`, or `production`                                                                     |
+| `NODE_ENV`                                     | Every profile      | Next.js mode: `development`, `test`, or `production`; pairing is checked above                                         |
+| `BETTER_AUTH_URL`                              | Every profile      | Exact application origin; Local/Development loopback HTTP, Preview/Production non-loopback HTTPS                       |
+| `BETTER_AUTH_SECRET`                           | Every profile      | Secret in the profile's namespace; never print or commit it                                                            |
+| `DATABASE_PROVIDER`                            | Every profile      | `local-postgres` or `neon`, matching `APP_ENV`                                                                         |
+| `DATABASE_URL`                                 | Every profile      | Runtime PostgreSQL URL; pooled for Neon                                                                                |
+| `DATABASE_URL_UNPOOLED`                        | Neon profiles      | Direct PostgreSQL URL for migrations; optional only for a direct local URL                                             |
+| `DATABASE_PROJECT_ID`                          | Neon profiles      | Expected Neon project identity                                                                                         |
+| `DATABASE_BRANCH`                              | Neon profiles      | Expected Neon branch identity; Development/Preview cannot use `main`                                                   |
+| `DATABASE_ENDPOINT_HOST`                       | Preview/Production | Delivery-observed direct Neon endpoint host; the running app checks its pooled URL against it                          |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`                | Every profile      | Public Sanity project identifier                                                                                       |
+| `NEXT_PUBLIC_SANITY_DATASET`                   | Every profile      | `production` except `preview`, which uses `preview`                                                                    |
+| `NEXT_PUBLIC_SANITY_API_VERSION`               | Optional           | Safe Sanity API-version identifier; defaults to `2026-08-27`                                                           |
+| `SANITY_WRITE_POLICY`                          | Every profile      | `read-only`, `local-recovery`, or `production-recovery`, matching the matrix                                           |
+| `SANITY_REVALIDATE_SECRET`                     | Recovery profiles  | Server-only revalidation secret; required by recovery policies                                                         |
+| `SANITY_MANUAL_RECOVERY_SECRET`                | Recovery profiles  | Server-only manual recovery secret; required by recovery policies                                                      |
+| `NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED` | Optional           | Editorial Draft Mode capability; `true` only for Local/Development/Production on `production`; Preview must not set it |
+| `SANITY_API_READ_TOKEN`                        | Editorial preview  | Server-only read-only Sanity Viewer token; required when editorial preview is enabled; never on Preview                |
+| `APP_MAIL_TRANSPORT`                           | Every profile      | `local-mailbox`, `controlled-account`, or `remote`, matching the matrix                                                |
+| `APP_MAIL_PROVIDER`                            | Remote mail only   | Provider name metadata; the provider must be owner-approved before Production                                          |
+| `BETTER_AUTH_LOCAL_MAILBOX`                    | Local/Development  | Must be `true`; must be absent or `false` in deployed profiles                                                         |
+| `DEPLOYMENT_OWNER`                             | Every profile      | `local`, `github`, or `vercel`, constrained by profile                                                                 |
+| `SECRET_NAMESPACE`                             | Every profile      | `local`/`ci` for Local, otherwise exactly `development`, `preview`, or `production`                                    |
+| `HEALTH_PROBE_SECRET`                          | Remote monitoring  | Server-only monitor secret for the database and CMS health probes; see [operations](operations.md)                     |
+| `APP_RELEASE_SHA`                              | Deployments        | Resolved 40-hex deployment SHA reported by health endpoints; supplied by the delivery adapters                         |
+| `DIAGNOSTICS_PROVIDER`                         | Optional           | `none` (default), `sentry` or `better-stack`; see the [diagnostics runbook](diagnostics.md)                            |
+| `SENTRY_DSN`                                   | Sentry selected    | Server-only HTTPS DSN; never `NEXT_PUBLIC_*`                                                                           |
+| `BETTER_STACK_ERRORS_DSN`                      | Better Stack       | Server-only Sentry-compatible HTTPS error DSN                                                                          |
+| `BETTER_STACK_LOGS_URL`                        | Better Stack       | HTTPS log-ingestion host                                                                                               |
+| `BETTER_STACK_LOGS_TOKEN`                      | Better Stack       | Server-only source token; never print or commit it                                                                     |
 
 Production remote mail requires `APP_MAIL_PROVIDER=resend`, protected
 `RESEND_API_KEY`, and `APP_MAIL_FROM` on an owner-verified domain. See the
@@ -182,13 +184,13 @@ redeploy or restart.
 
 ## Hosted configuration ownership
 
-| Owner                           | Configuration responsibility                                                                                                                                                                                                                                                                                                                    |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ignored local `.env.local`      | Local or durable Development URLs, origin, auth secret and public Sanity configuration. Do not copy Production credentials here for routine work.                                                                                                                                                                                               |
-| GitHub `preview` Environment    | `BETTER_AUTH_SECRET`, `HEALTH_PROBE_SECRET`, `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` are scoped secret entries. `NEXT_PUBLIC_SANITY_PROJECT_ID` is a repository or Environment variable. The workflow fixes the Preview profile, dataset and no-send mail policy; the adapter obtains the temporary branch's URLs. |
-| GitHub `production` Environment | Secrets: `BETTER_AUTH_SECRET`, `HEALTH_PROBE_SECRET`, `RELEASE_ALERT_EMAIL`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_API_KEY`, `VERCEL_TOKEN`, `RESEND_API_KEY`, `SANITY_REVALIDATE_SECRET`, `SANITY_MANUAL_RECOVERY_SECRET`. Required reviewer, main-only branch policy and disabled admin bypass protect consumption.                  |
-| Production non-secret variables | Profile/runtime mode, canonical auth origin, provider/project/branch, public Sanity project/dataset/API version, Sanity policy, mail transport/provider/from, local-mailbox=false, deployment owner/namespace, and Vercel organization/project IDs. Exact variable names are in the [workflow](../../.github/workflows/deploy-production.yml).  |
-| Vercel deployment               | Only required application build/runtime configuration is forwarded, plus the safe release SHA, observed database endpoint and monitor secret. Neither Preview nor Production receives direct migration URLs or Neon/Vercel/GitHub API tokens. Git auto-deploy stays disabled; GitHub owns manual delivery.                                      |
+| Owner                           | Configuration responsibility                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ignored local `.env.local`      | Local or durable Development URLs, origin, auth secret and public Sanity configuration. Do not copy Production credentials here for routine work.                                                                                                                                                                                                                                                                                                                                                        |
+| GitHub `preview` Environment    | `BETTER_AUTH_SECRET`, `HEALTH_PROBE_SECRET`, `NEON_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` are scoped secret entries. `NEXT_PUBLIC_SANITY_PROJECT_ID` is a repository or Environment variable. The workflow fixes the Preview profile, dataset and no-send mail policy; the adapter obtains the temporary branch's URLs.                                                                                                                                                          |
+| GitHub `production` Environment | Secrets: `BETTER_AUTH_SECRET`, `HEALTH_PROBE_SECRET`, `RELEASE_ALERT_EMAIL`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_API_KEY`, `VERCEL_TOKEN`, `RESEND_API_KEY`, `SANITY_REVALIDATE_SECRET`, `SANITY_MANUAL_RECOVERY_SECRET`, and optionally `SANITY_API_READ_TOKEN` with the variable `NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED` (editorial preview stays off until both are provisioned, T-28.3). Required reviewer, main-only branch policy and disabled admin bypass protect consumption. |
+| Production non-secret variables | Profile/runtime mode, canonical auth origin, provider/project/branch, public Sanity project/dataset/API version, Sanity policy, mail transport/provider/from, local-mailbox=false, deployment owner/namespace, and Vercel organization/project IDs. Exact variable names are in the [workflow](../../.github/workflows/deploy-production.yml).                                                                                                                                                           |
+| Vercel deployment               | Only required application build/runtime configuration is forwarded, plus the safe release SHA, observed database endpoint and monitor secret. Neither Preview nor Production receives direct migration URLs or Neon/Vercel/GitHub API tokens. Git auto-deploy stays disabled; GitHub owns manual delivery.                                                                                                                                                                                               |
 
 The same secret name in two GitHub Environments does not share its value.
 Provision each scope deliberately with the accepted target identities, and

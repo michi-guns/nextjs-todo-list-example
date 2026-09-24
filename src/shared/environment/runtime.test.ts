@@ -306,6 +306,7 @@ describe("TST-RUNTIME-001 runtime configuration boundary", () => {
       profile: "unprofiled",
       databaseUrl: DIRECT,
       auth: { baseUrl: "http://localhost:3000" },
+      editorialPreview: { enabled: false },
     })
     expect(refusal({ NODE_ENV: "development" }).variable).toBe("DATABASE_URL")
     expect(
@@ -326,5 +327,27 @@ describe("TST-RUNTIME-001 runtime configuration boundary", () => {
       refusal({ ...preview(), ...building, NEXT_PUBLIC_SANITY_DATASET: "x" })
         .code
     ).toBe("sanity_policy_mismatch")
+  })
+
+  it("TST-LANDING-004 carries the editorial preview capability: Production on, Preview refused", () => {
+    const VIEWER = "sk-viewer-sentinel-0123456789"
+    const enabled = parseRuntimeEnvironment({
+      ...production(),
+      NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "true",
+      SANITY_API_READ_TOKEN: VIEWER,
+    })
+    expect(enabled).toMatchObject({
+      editorialPreview: { enabled: true, token: VIEWER },
+    })
+    expect(parseRuntimeEnvironment(production())).toMatchObject({
+      editorialPreview: { enabled: false },
+    })
+    for (const forged of [
+      { NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "true" },
+      { SANITY_API_READ_TOKEN: VIEWER },
+    ]) {
+      const error = refusal({ ...preview(), ...forged })
+      expect(error.message).not.toContain(VIEWER)
+    }
   })
 })

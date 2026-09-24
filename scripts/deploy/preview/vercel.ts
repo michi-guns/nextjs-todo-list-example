@@ -181,6 +181,8 @@ export function buildPreviewVercelEnvArgs(
     NEXT_PUBLIC_SANITY_DATASET: "preview",
     NEXT_PUBLIC_SANITY_API_VERSION: profile.sanity.apiVersion,
     SANITY_WRITE_POLICY: "read-only",
+    // Deployment Preview never gets editorial preview or its Viewer token.
+    NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "false",
     APP_MAIL_TRANSPORT: "controlled-account",
     DEPLOYMENT_OWNER: "vercel",
     SECRET_NAMESPACE: "preview",

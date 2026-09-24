@@ -324,3 +324,45 @@ describe("Production provider adapter", () => {
     expect(run).not.toHaveBeenCalled()
   })
 })
+
+describe("TST-LANDING-004 Production editorial preview forwarding", () => {
+  const VIEWER = "sk-viewer-production-sentinel-0123"
+  async function deployArgs(extra: Record<string, string>) {
+    const request = provider(),
+      run = vi.fn().mockResolvedValue(
+        JSON.stringify({
+          status: "success",
+          deployment: { id: "dpl_new", url: deployment.url },
+        })
+      )
+    const configured = { ...environment, ...extra }
+    await createProductionRuntime(configured, { request, run }).deploy(
+      parseEnvironmentProfile(configured),
+      input,
+      observation
+    )
+    return run.mock.calls[0][1] as string[]
+  }
+
+  it("keeps the capability off and sends no token by default", async () => {
+    const args = await deployArgs({})
+    expect(
+      args.filter(
+        (arg) => arg === "NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED=false"
+      )
+    ).toHaveLength(2)
+    expect(args.join(" ")).not.toContain("SANITY_API_READ_TOKEN")
+  })
+
+  it("forwards the flag and Viewer token only from protected settings when enabled", async () => {
+    const args = await deployArgs({
+      NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: "true",
+      SANITY_API_READ_TOKEN: VIEWER,
+    })
+    for (const value of [
+      "NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED=true",
+      `SANITY_API_READ_TOKEN=${VIEWER}`,
+    ])
+      expect(args.filter((arg) => arg === value)).toHaveLength(2)
+  })
+})

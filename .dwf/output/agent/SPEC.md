@@ -392,6 +392,11 @@ No list/task documents.
 
 ### 6.4 Editorial draft preview, planned
 
+Status: the configuration guard and Draft Mode entry/exit routes (T-28.1)
+are implemented and verified locally
+([evidence](../../../docs/agentforge/evidence/2026-09-25-preview-authorization.md)); the capability stays off until configured.
+Studio/Live composition (T-28.2) and real provider proof (T-28.3) remain.
+
 - Use existing Sanity Studio editor identity and the supported
   `defineEnableDraftMode` handshake. Studio creates a private bearer preview
   secret using the editor's existing permission; a server-only Viewer client

@@ -40,6 +40,7 @@ function localProfile(): EnvironmentProfile {
       runtimeUrlConfigured: true,
       migrationUrlConfigured: true,
     },
+    editorialPreview: { enabled: false },
     sanity: {
       projectId: "project-id",
       dataset: "production",
@@ -101,6 +102,7 @@ function neonProfile(
       runtimeUrlConfigured: true,
       migrationUrlConfigured: true,
     },
+    editorialPreview: { enabled: false },
     sanity: {
       projectId: "project-id",
       dataset: isPreview ? "preview" : "production",

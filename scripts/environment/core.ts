@@ -28,6 +28,10 @@ import {
   type SanityPolicy,
   type SanityWritePolicy,
 } from "../../src/shared/environment/rules"
+import {
+  parseEditorialPreview,
+  type EditorialPreview,
+} from "../../src/sanity/preview-config"
 
 // Operator tooling keeps its historical import surface.
 export {
@@ -79,6 +83,8 @@ export interface EnvironmentProfile {
     readonly migrationUrlConfigured: boolean
   }
   readonly sanity: SanityPolicy
+  /** Holds the Viewer token when enabled; never include it in diagnostics. */
+  readonly editorialPreview: EditorialPreview
   readonly mail: MailPolicy
   readonly deployment: {
     readonly owner: DeploymentOwner
@@ -102,6 +108,7 @@ export interface RedactedEnvironmentInspection {
     readonly writePolicy: SanityWritePolicy
     readonly revalidateSecretConfigured: boolean
     readonly manualRecoverySecretConfigured: boolean
+    readonly editorialPreviewEnabled: boolean
   }
   readonly mail: EnvironmentProfile["mail"]
   readonly deployment: EnvironmentProfile["deployment"]
@@ -109,6 +116,7 @@ export interface RedactedEnvironmentInspection {
     readonly betterAuth: boolean
     readonly sanityRevalidate: boolean
     readonly sanityManualRecovery: boolean
+    readonly sanityViewer: boolean
     readonly mailProvider: boolean
   }
   readonly operations: EnvironmentOperations
@@ -304,6 +312,7 @@ export function parseEnvironmentProfile(
 
   const database = parseDatabase(appEnv, environment)
   const sanity = parseSanityPolicy(appEnv, environment)
+  const editorialPreview = parseEditorialPreview(appEnv, environment)
   const mail = parseMailPolicy(appEnv, environment)
   const deployment = parseDeployment(appEnv, environment)
   if (appEnv === "production") assertProductionMail(environment)
@@ -317,6 +326,7 @@ export function parseEnvironmentProfile(
     },
     database,
     sanity,
+    editorialPreview,
     mail,
     deployment,
     operations: operationsFor(appEnv, sanity.writePolicy),
@@ -349,6 +359,7 @@ export function inspectEnvironment(
       revalidateSecretConfigured: profile.sanity.revalidateSecret !== undefined,
       manualRecoverySecretConfigured:
         profile.sanity.manualRecoverySecret !== undefined,
+      editorialPreviewEnabled: profile.editorialPreview.enabled,
     },
     mail: { ...profile.mail },
     deployment: { ...profile.deployment },
@@ -356,6 +367,7 @@ export function inspectEnvironment(
       betterAuth: profile.betterAuth.secret.length > 0,
       sanityRevalidate: profile.sanity.revalidateSecret !== undefined,
       sanityManualRecovery: profile.sanity.manualRecoverySecret !== undefined,
+      sanityViewer: profile.editorialPreview.enabled,
       mailProvider: profile.mail.provider !== undefined,
     },
     operations: { ...profile.operations },

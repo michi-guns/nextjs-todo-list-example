@@ -201,6 +201,13 @@ export function createProductionRuntime(
         SANITY_WRITE_POLICY: profile.sanity.writePolicy,
         SANITY_REVALIDATE_SECRET: profile.sanity.revalidateSecret!,
         SANITY_MANUAL_RECOVERY_SECRET: profile.sanity.manualRecoverySecret!,
+        // Off unless the protected Environment enables it with a Viewer token.
+        NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: String(
+          profile.editorialPreview.enabled
+        ),
+        ...(profile.editorialPreview.enabled
+          ? { SANITY_API_READ_TOKEN: profile.editorialPreview.token }
+          : {}),
         APP_MAIL_TRANSPORT: "remote",
         APP_MAIL_PROVIDER: "resend",
         APP_MAIL_FROM: environment.APP_MAIL_FROM!,

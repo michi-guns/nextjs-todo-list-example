@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 72 files and 698 tests (T-27.3 recovery screens, 2026-09-25).
+- [x] `pnpm test` passes 74 files and 719 tests (T-28.1 preview authorization, 2026-09-25).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1131,8 +1131,8 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 through T-26.11 and T-27.1 through T-27.3
-are complete, leaving 8 unchecked children.
+remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 through T-26.11, T-27.1 through T-27.3 and
+T-28.1 are complete, leaving 7 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
 and subagents only for independent review, as the owner requested.
@@ -2020,7 +2020,7 @@ Verification and evidence for this slice:
 
 #### T-28.1: Guard editorial configuration and preview authorization
 
-- [ ] Add the environment/token boundary and supported Draft Mode entry/exit routes.
+- [x] Add the environment/token boundary and supported Draft Mode entry/exit routes.
 - Files: `src/sanity/preview-config.ts`, server-only preview composition,
   `app/api/draft-mode/enable/route.ts`, `disable/route.ts`, environment safe
   projection/tests, deployment adapters/workflows and refusal tests.
@@ -2042,6 +2042,13 @@ Verification and evidence for this slice:
   installed-version Next/Sanity guides, Docker and Chromium. Follow the default
   serial order to avoid shared environment/workflow edits; no auth feature dependency.
   One configuration/authorization review unit; no new packages or hosted mutation.
+- Evidence, 2026-09-25: [preview authorization](docs/agentforge/evidence/2026-09-25-preview-authorization.md) records the
+  capability flag and Viewer token guard (Preview refused), the Draft Mode
+  entry/exit routes with quiet pre-helper refusals and native secret
+  validation against a loopback API, running-server refusal and exit, and
+  Preview/Production delivery wiring. No Sanity credential used.
+  `TST-LANDING-004` is `partial`.
+- Review: pending a fresh exact-tip independent review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `source-driven-development`, `security-and-hardening`,
   `next-dev-loop`, `ci-cd-and-automation`, `documentation-and-adrs`,

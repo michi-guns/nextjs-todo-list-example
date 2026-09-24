@@ -33,6 +33,15 @@ Local boundary tests exercise generated signed requests, invalid signatures, irr
 
 Authenticated Draft Mode, Sanity Presentation and Visual Editing, and Sanity Live are an accepted later phase. They will provide draft reads, click-to-edit overlays, and live draft updates for authorized editors. They do not replace webhook invalidation for published traffic.
 
+Draft Mode entry and exit exist since T-28.1: `GET /api/draft-mode/enable`
+(Studio's Presentation preview URL) and `GET /api/draft-mode/disable`
+(returns to `/`). Entry answers `404` unless
+`NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED=true` and the server-only
+`SANITY_API_READ_TOKEN` are configured for Local, Development or Production on
+the `production` dataset; Preview deployments are refused. The Studio-issued
+secret is validated by `next-sanity`'s native helper (one-hour secret TTL). See
+the [evidence](../agentforge/evidence/2026-09-25-preview-authorization.md).
+
 ## Verification
 
 Use local fixtures to test unknown-payload validation, view-model mapping, optional fields, and missing or invalid required-content failures. Boundary tests cover webhook signatures and relevance, duplicate delivery, manual authorization, and shared invalidation behavior. Local acceptance may submit generated signed requests directly; deployed release evidence additionally requires one real Sanity webhook delivery. Routine Playwright uses deterministic test-only landing content through the application-facing contract and does not call Sanity. That source is unavailable in deployed runtime modes and cannot become a production fallback.

@@ -24,6 +24,10 @@ import {
   type MailPolicy,
   type SanityPolicy,
 } from "./rules"
+import {
+  parseEditorialPreview,
+  type EditorialPreview,
+} from "../../sanity/preview-config"
 
 /** Safe target identity: no URL, credential or secret. */
 export interface RuntimeTarget {
@@ -42,6 +46,8 @@ export type RuntimeEnvironment =
       /** Runtime connection string; never include it in diagnostics. */
       readonly databaseUrl: string
       readonly auth: { readonly baseUrl?: string; readonly secret?: string }
+      /** Unprofiled runs cannot enable editorial preview. */
+      readonly editorialPreview: EditorialPreview
     }
   | {
       readonly profile: AppEnv
@@ -50,6 +56,8 @@ export type RuntimeEnvironment =
       readonly auth: { readonly baseUrl: string; readonly secret: string }
       readonly target: RuntimeTarget
       readonly sanity: SanityPolicy
+      /** Holds the Viewer token when enabled; never include it in diagnostics. */
+      readonly editorialPreview: EditorialPreview
       readonly mail: MailPolicy
     }
 
@@ -83,6 +91,7 @@ export function parseRuntimeEnvironment(
   const secret = required(environment, "BETTER_AUTH_SECRET")
   const { databaseUrl, target } = parseRuntimeDatabase(appEnv, environment)
   const sanity = parseSanityPolicy(appEnv, environment)
+  const editorialPreview = parseEditorialPreview(appEnv, environment)
   const mail = parseMailPolicy(appEnv, environment)
   if (appEnv === "production") assertProductionMail(environment)
   return {
@@ -91,6 +100,7 @@ export function parseRuntimeEnvironment(
     auth: { baseUrl: origin.origin, secret },
     target,
     sanity,
+    editorialPreview,
     mail,
   }
 }
@@ -134,6 +144,7 @@ function parseUnprofiled(
       ...(configuredUrl ? { baseUrl: parseOrigin(configuredUrl).origin } : {}),
       ...(secret ? { secret } : {}),
     },
+    editorialPreview: parseEditorialPreview("unprofiled", environment),
   }
 }
 

@@ -51,7 +51,7 @@ describe("protected Production release workflow", () => {
       expect(match[1]).toMatch(/^[\w-]+\/[\w-]+@[0-9a-f]{40}$/)
     const before = source.split("      - name: Run protected release")[0]
     expect(before).not.toMatch(
-      /secrets\.(VERCEL_TOKEN|DATABASE_URL|NEON_API_KEY|RESEND_API_KEY|BETTER_AUTH_SECRET|HEALTH_PROBE_SECRET)/
+      /secrets\.(VERCEL_TOKEN|DATABASE_URL|NEON_API_KEY|RESEND_API_KEY|BETTER_AUTH_SECRET|HEALTH_PROBE_SECRET|SANITY_API_READ_TOKEN)/
     )
     const consumer = source
       .split("      - name: Run protected release")[1]
@@ -66,8 +66,13 @@ describe("protected Production release workflow", () => {
       "SANITY_REVALIDATE_SECRET",
       "SANITY_MANUAL_RECOVERY_SECRET",
       "HEALTH_PROBE_SECRET",
+      "SANITY_API_READ_TOKEN",
     ])
       expect(consumer).toContain(`${name}: \${{ secrets.${name} }}`)
+    // Editorial preview stays off unless the protected Environment enables it.
+    expect(consumer).toContain(
+      "NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED: ${{ vars.NEXT_PUBLIC_SANITY_EDITORIAL_PREVIEW_ENABLED }}"
+    )
     expect(consumer).toContain("run: pnpm release -- release")
   })
   it("sends the release-failure Email only after the release step itself fails", () => {

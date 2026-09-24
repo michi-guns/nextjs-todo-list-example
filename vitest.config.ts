@@ -10,6 +10,9 @@ export default defineConfig({
   test: {
     environment: "node",
     passWithNoTests: true,
+    // Process next-sanity through Vitest so route tests can stand in for the
+    // Next request APIs (`next/headers`) its Draft Mode helper imports.
+    server: { deps: { inline: ["next-sanity"] } },
     include: [
       "src/**/*.{test,spec}.ts",
       "src/**/*.{test,spec}.tsx",
