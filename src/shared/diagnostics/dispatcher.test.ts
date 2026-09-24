@@ -221,3 +221,20 @@ describe("TST-DIAGNOSTICS-001 dispatcher report eligibility", () => {
     expect(reportError).not.toHaveBeenCalled()
   })
 })
+
+describe("TST-DIAGNOSTICS-001 dispatcher record bound", () => {
+  it("drops a record over 16 KiB of UTF-8 with one local notice", () => {
+    const { dispatcher, notice } = fixture()
+    const log = vi.fn()
+    dispatcher.install(
+      { log, reportError: () => {}, flush: async () => {} },
+      {}
+    )
+    // 6,000 three-byte characters: under 16,384 UTF-16 units, over 16 KiB of bytes.
+    dispatcher.log("info", { ...record, module: "€".repeat(6000) })
+    expect(log).not.toHaveBeenCalled()
+    expect(notice.mock.calls).toEqual([["record_dropped"]])
+    dispatcher.log("info", record)
+    expect(log).toHaveBeenCalledOnce()
+  })
+})

@@ -211,3 +211,22 @@ describe("TST-DIAGNOSTICS-001 safe error reports", () => {
     expect(JSON.stringify(report)).not.toMatch(sentinels)
   })
 })
+
+describe("TST-DIAGNOSTICS-001 Next stack formatter compatibility", () => {
+  it("keeps frames for empty messages when the formatter writes a trailing separator", () => {
+    const original = Error.prepareStackTrace
+    // Mirrors next/dist/server/patch-error-inspect.js: `${name}: ${message || ""}`.
+    Error.prepareStackTrace = (error: Error, callSites) =>
+      `${error.name}: ${error.message || ""}${callSites
+        .map((site) => `\n    at ${site}`)
+        .join("")}`
+    try {
+      for (const error of [new Error(), new Error("")]) {
+        const report = projectErrorReport(error, context)
+        expect(report.error.frames.length).toBeGreaterThan(0)
+      }
+    } finally {
+      Error.prepareStackTrace = original
+    }
+  })
+})

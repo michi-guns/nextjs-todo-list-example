@@ -91,8 +91,12 @@ function headerLength(error: Error, lines: string[]): number | undefined {
   const message: string = descriptor?.value ?? ""
   const length = message === "" ? 1 : message.split("\n").length
   const header = lines.slice(0, length).join("\n")
+  // V8 writes `Name` for an empty message; Next's formatter writes `Name: `.
+  const separator = header.indexOf(": ")
   const verified =
-    message === "" ? !header.includes(": ") : header.endsWith(`: ${message}`)
+    message === ""
+      ? separator === -1 || separator === header.length - 2
+      : header.endsWith(`: ${message}`)
   return verified ? length : undefined
 }
 

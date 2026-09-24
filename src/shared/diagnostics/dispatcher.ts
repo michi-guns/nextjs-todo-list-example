@@ -53,7 +53,7 @@ export function createDiagnosticsDispatcher(options: {
   }
 
   function send(record: object, deliver: () => void) {
-    if (JSON.stringify(record).length > MAX_RECORD_BYTES) {
+    if (Buffer.byteLength(JSON.stringify(record)) > MAX_RECORD_BYTES) {
       notice("record_dropped")
       return
     }

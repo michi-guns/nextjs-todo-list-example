@@ -40,7 +40,11 @@ check does not apply.
   itself never queues, so suppressed records cannot be replayed.
 - Error reports carry class, classified kind/code, a static message,
   repository-relative frame locations (at most 10), up to three cause facts and
-  a fingerprint of module, event, class, code/kind and top frame. Occurrence and
+  a fingerprint of module, event, class, code/kind and the first in-app source
+  frame. Next runs application code from `.next/server` chunks without
+  source-mapped stacks, so in the Next runtime the frame slot is `no-frame` and
+  grouping rests on module, event, class and code/kind; T-26.6/T-26.7 confirm
+  runtime and hosted grouping. Occurrence and
   correlation IDs stay outside grouping.
 - `DIAGNOSTICS_PROVIDER` selects `none` (default), `sentry` or `better-stack` at
   startup. Invalid selected configuration disables export with one local notice
@@ -51,8 +55,8 @@ check does not apply.
 
 | Command                                                                          | Result                                    |
 | -------------------------------------------------------------------------------- | ----------------------------------------- |
-| `pnpm exec vitest run src/shared/logging src/shared/diagnostics scripts/logging` | 12 files, 108 tests passed                |
-| `pnpm test`                                                                      | 54 files, 528 tests passed                |
+| `pnpm exec vitest run src/shared/logging src/shared/diagnostics scripts/logging` | 12 files, 110 tests passed                |
+| `pnpm test`                                                                      | 54 files, 530 tests passed                |
 | `pnpm test:integration`                                                          | 7 files, 29 tests passed                  |
 | `pnpm typecheck`                                                                 | Passed                                    |
 | `pnpm lint`                                                                      | Passed; only the existing `Geist` warning |
@@ -86,5 +90,12 @@ matches the current own data message, with regression tests for both cases.
 The same commit applies the four nits: grouping uses the first in-app source
 frame rather than hashed `.next` chunks or packages, report policy is checked
 before projection, a failing console writer no longer blocks remote export,
-and the runbook documents rollback of version-2 rows. The final tip receives
-its own fresh review before merge.
+and the runbook documents rollback of version-2 rows.
+
+A second fresh reviewer of `23551c9` confirmed those fixes and the closeout
+counts, and found that Next's stack formatter writes `Error: ` for an empty
+message, so frames were dropped inside the Next runtime. The follow-up commit
+accepts that header shape with a regression test, measures the record bound in
+UTF-8 bytes with an oversize test, notes `no-frame` grouping under Next and
+clarifies the rollback revision step. The final tip receives its own fresh
+review before merge.

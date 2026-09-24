@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 54 files and 528 tests (T-26.4 diagnostics routing, 2026-09-24).
+- [x] `pnpm test` passes 54 files and 530 tests (T-26.4 diagnostics routing, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1425,14 +1425,15 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   accepted CLI is delivered by the upstream writer task. One policy/routing review
   unit; no hosted provider credentials required.
 - Evidence, 2026-09-24: [diagnostics routing](docs/agentforge/evidence/2026-09-24-diagnostics-routing.md)
-  records 108 focused tests, 528 total unit tests, 29 integration tests,
+  records 110 focused tests, 530 total unit tests, 29 integration tests,
   strict typecheck, lint with the existing warning, build, formatting and diff
   checks. The policy stays in the existing `jsonb` row, so no migration or Neon
   check applies. `TST-DIAGNOSTICS-001` is partial; SDK enrichment, boundary
   ownership and runtime flush remain for T-26.5/T-26.6.
 - Review: a fresh Claude Opus 5.5 reviewer (xhigh effort requested) found one
   narrow privacy gap in stack parsing and four nits; commit `f73846f` fixes
-  them with regression tests. The final tip receives its own fresh review before
+  them with regression tests. A second fresh review found an empty-message
+  header regression under Next's stack formatter, fixed with a test. The final tip receives its own fresh review before
   direct merge and main-push CI. T-26.5 is next in serial order.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `api-and-interface-design`,
