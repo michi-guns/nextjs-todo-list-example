@@ -25,7 +25,8 @@ so the alert path reads its own three variables instead of reusing it.
   the attempt-stable `alertIdentity`.
 - `src/shared/operational-alerts/resend-email.ts`: the Resend Email adapter.
   The payload and `Idempotency-Key` are fixed before the first request; up to
-  three bounded attempts retry network errors, timeouts, `429` and `5xx`;
+  three bounded attempts retry network errors, timeouts, `409` (same key
+  still in progress), `429`, `500`, `502`, `503` and `504`;
   other refusals and responses without an email id stop at once. Its config
   reader accepts only `RESEND_API_KEY`, `APP_MAIL_FROM` and
   `RELEASE_ALERT_EMAIL`, and never echoes them.
@@ -48,9 +49,9 @@ so the alert path reads its own three variables instead of reusing it.
 
 | Command                                                                        | Result                                    |
 | ------------------------------------------------------------------------------ | ----------------------------------------- |
-| `pnpm exec vitest run src/shared/operational-alerts scripts/deploy/production` | 7 files, 90 tests passed                  |
+| `pnpm exec vitest run src/shared/operational-alerts scripts/deploy/production` | 7 files, 91 tests passed                  |
 | `pnpm test:pipeline`                                                           | 17 files, 269 tests passed                |
-| `pnpm test`                                                                    | 69 files, 667 tests passed                |
+| `pnpm test`                                                                    | 69 files, 668 tests passed                |
 | `pnpm typecheck`                                                               | Passed                                    |
 | `pnpm lint`                                                                    | Passed; only the existing `Geist` warning |
 | `pnpm build`                                                                   | Passed                                    |
@@ -66,6 +67,8 @@ rerun.
   and run link; the key never appears in the body.
 - `500`, a hanging request, `429`, then `200`: four requests with one identical
   body and one identical key.
+- A hanging request, then `409` (same key still in progress), then `200`:
+  three identical requests and one Email id.
 - A second workflow attempt gets a different key.
 - `422` stops after one request as `rejected`; a hanging provider fails as
   `timeout` after two bounded attempts; a `200` without an id is
@@ -94,10 +97,13 @@ is verified. Native Better Stack uptime (T-26.12), Sentry group Email
 (T-26.13) and real release-Email acceptance and receipt (T-26.14) remain.
 `TST-RELEASE-001` and `TST-PIPELINE-001` tests pass unchanged apart from the
 new notify step. The release step's failure, record and job result are not
-altered by the notify step, which can only add its own failed step.
+altered by the notify step, which can only add its own failed step. This is a
+structural guarantee (a separate step, pinned by the workflow static test),
+not an executed workflow run.
 
 Limits: Resend keeps idempotency keys for 24 hours, so a same-attempt retry
-after that can duplicate; nothing is sent if the runner never starts;
+after that can duplicate; nothing is sent if the runner never starts or the
+job is cancelled or reaches its 35-minute timeout;
 provider acceptance is not receipt.
 
 **Operational consequence:** the `production` Environment needs a
@@ -106,4 +112,17 @@ release reports `not_configured` in its notify step.
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+First independent review (`20fc5c4`, opus, xhigh): changes requested.
+
+- Should-fix: `409` was final. Resend answers `409` while the first request
+  with the same key is still in progress, so a retry after a client timeout
+  reported a false `rejected` and could drop the alert. `409` is now retried;
+  a collector test covers hang, `409`, `200` with one key and body.
+- Nits applied: cancelled or timed-out jobs send nothing (runbook and limits),
+  the exact retried codes instead of `5xx`, and the release-result claim
+  marked structural.
+- Verified without change: the step condition, `pnpm exec tsx` in the step,
+  no Email on preflight-only failure, record trust, key format and secret
+  handling.
+
+Confirmation review pending.

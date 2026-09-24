@@ -131,11 +131,14 @@ field.
   Email. Resend keeps keys for 24 hours only, so a retry after that window can
   deliver a duplicate. There are no reminders and no incident state.
 - Each request has a ten-second timeout; up to three attempts retry network
-  errors, timeouts, `429` and `5xx`. Other refusals stop at once.
+  errors, timeouts, `409` (the same key still in progress), `429`, `500`,
+  `502`, `503` and `504`. Other refusals stop at once.
 - If the Email cannot be handed to Resend, the step fails with one safe
   annotation (`Release-failure alert not sent: <reason>`, for example
   `not_configured`, `rejected`, `timeout`). The release step's failure, its
   record and the job result are unchanged.
-- Provider acceptance is not mailbox receipt, and nothing is sent when the
-  runner itself never starts. Native uptime and Sentry Email do not use this
+- Provider acceptance is not mailbox receipt. Nothing is sent when the runner
+  itself never starts, or when the job is cancelled or hits its 35-minute
+  timeout (each release subprocess has its own shorter timeout, so a single
+  hang is still recorded as a stage failure). Native uptime and Sentry Email do not use this
   port. Real delivery and receipt proof is T-26.14.

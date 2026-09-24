@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 69 files and 667 tests (T-26.11 release-failure Email, 2026-09-24).
+- [x] `pnpm test` passes 69 files and 668 tests (T-26.11 release-failure Email, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1722,7 +1722,11 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   app/database/auth imports and the release-step-only workflow condition.
   No real mail. The `production` Environment needs a `RELEASE_ALERT_EMAIL`
   secret (owner provisioning, not done). `TST-ALERTS-001` is `partial`.
-- Review: pending a fresh exact-tip independent review before merge.
+- Review: the first independent review of `20fc5c4` requested one change:
+  retry Resend `409` (same key still in progress) so a retry after a timeout
+  is not a false "not sent"; fixed with a collector test. Its three
+  documentation nits (cancel/timeout sends nothing, exact retried codes,
+  structural release-result claim) are applied. Confirmation review pending.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `api-and-interface-design`, `ci-cd-and-automation`,
   `security-and-hardening`, `documentation-and-adrs`, `code-review-and-quality`,

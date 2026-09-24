@@ -119,6 +119,24 @@ describe("TST-ALERTS-001 Resend release-failure Email adapter", () => {
     ).toBe(1)
   })
 
+  it("retries a 409 concurrent same-key request after a timed-out attempt", async () => {
+    // Resend answers 409 while the first request with this key is still in
+    // progress; retrying later with the same key and payload is safe.
+    const api = await collector(
+      "hang",
+      { status: 409, body: { name: "concurrent_idempotent_requests" } },
+      { status: 200, body: { id: "email_4" } }
+    )
+    await expect(notifier(api.endpoint).send(alert)).resolves.toEqual({
+      id: "email_4",
+    })
+    expect(api.captured).toHaveLength(3)
+    expect(new Set(api.captured.map((c) => c.body)).size).toBe(1)
+    expect(
+      new Set(api.captured.map((c) => c.headers["idempotency-key"])).size
+    ).toBe(1)
+  })
+
   it("gives a new workflow attempt a new identity", async () => {
     const api = await collector({ status: 200, body: { id: "email_3" } })
     await notifier(api.endpoint).send(alert)

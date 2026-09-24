@@ -67,8 +67,13 @@ function render(alert: OperationalAlert) {
   }
 }
 
-/** Provider responses worth another attempt with the same key and payload. */
-const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504])
+/**
+ * Provider responses worth another attempt with the same key and payload.
+ * `409` is Resend's "same key still in progress" answer (for example after a
+ * timed-out attempt); the payload never changes, so its other `409` cannot
+ * occur here.
+ */
+const RETRYABLE_STATUS = new Set([409, 429, 500, 502, 503, 504])
 
 /**
  * NotificationPort adapter for Resend Email. The payload and idempotency key
