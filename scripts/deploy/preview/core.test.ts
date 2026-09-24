@@ -545,7 +545,7 @@ describe("Preview delivery commands", () => {
 
   it("redacts tokens, env flags, and connection strings from process logs", () => {
     const leaked = redactPreviewLog(
-      "vercel --token super-secret --env DATABASE_URL=postgresql://runtime:runtime-password@host/db BETTER_AUTH_SECRET=preview-auth-secret-for-tests failed"
+      "vercel --token super-secret --env DATABASE_URL=postgresql://runtime:runtime-password@host/db BETTER_AUTH_SECRET=preview-auth-secret-for-tests HEALTH_PROBE_SECRET=preview-health-sentinel failed"
     )
 
     expect(leaked).not.toContain("super-secret")
@@ -555,6 +555,7 @@ describe("Preview delivery commands", () => {
     expect(leaked).toContain("--token ***")
     expect(leaked).toContain("--env ***")
     expect(leaked).toContain("BETTER_AUTH_SECRET=***")
+    expect(leaked).not.toContain("preview-health-sentinel")
   })
 })
 

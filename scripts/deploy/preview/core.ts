@@ -866,7 +866,7 @@ export function redactPreviewLog(value: string): string {
     .replaceAll(/(--token)\s+\S+/gi, "$1 ***")
     .replaceAll(/(--(?:env|build-env))\s+[^\s]+/gi, "$1 ***")
     .replaceAll(
-      /\b(BETTER_AUTH_SECRET|VERCEL_TOKEN|NEON_API_KEY)=[^\s]+/gi,
+      /\b(BETTER_AUTH_SECRET|HEALTH_PROBE_SECRET|VERCEL_TOKEN|NEON_API_KEY)=[^\s]+/gi,
       "$1=***"
     )
 }

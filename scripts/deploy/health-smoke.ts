@@ -43,7 +43,7 @@ export interface HealthSmokeInput {
   readonly secret: string
   readonly request?: typeof fetch
   readonly timeoutMs?: number
-  /** Dependency attempts; a cold database or CMS may need a retry. */
+  /** Attempts per component; a cold start may need a retry. */
   readonly attempts?: number
   readonly pauseMs?: number
 }
@@ -83,8 +83,16 @@ export async function smokeDeployedHealth(
 
   async function check(component: Component): Promise<void> {
     for (let attempt = 1; ; attempt += 1) {
-      const retry = attempt < attempts && component !== "app"
+      const canRetry = attempt < attempts
+      // Transport failures (network, timeout while connecting or reading) may
+      // be a cold start on any component; a wrong answer never is.
+      const transportFailed = async () => {
+        if (!canRetry) throw new HealthSmokeError(component, "unreachable")
+        await pause(input.pauseMs ?? 2_000)
+      }
+      const signal = AbortSignal.timeout(input.timeoutMs ?? 10_000)
       let response: Response
+      let raw: unknown = null
       try {
         response = await request(`${origin}/api/health/${component}`, {
           headers:
@@ -92,18 +100,17 @@ export async function smokeDeployedHealth(
               ? undefined
               : { [HEALTH_SECRET_HEADER]: input.secret },
           redirect: "error",
-          signal: AbortSignal.timeout(input.timeoutMs ?? 10_000),
+          signal,
+        })
+        raw = await response.json().catch((error: unknown) => {
+          if (signal.aborted) throw error
+          return null // Not JSON: judged below as an invalid response.
         })
       } catch {
-        if (retry) {
-          await pause(input.pauseMs ?? 2_000)
-          continue
-        }
-        throw new HealthSmokeError(component, "unreachable")
+        await transportFailed()
+        continue
       }
-      const parsed = bodySchema
-        .partial()
-        .safeParse(await response.json().catch(() => null))
+      const parsed = bodySchema.partial().safeParse(raw)
       const body = parsed.success ? parsed.data : {}
       const code =
         body.code && SAFE_WORD.test(body.code) ? body.code : undefined
@@ -118,7 +125,13 @@ export async function smokeDeployedHealth(
           throw new HealthSmokeError(component, "release_mismatch")
         return
       }
-      if (response.status === 503 && retry && code && RETRYABLE.has(code)) {
+      if (
+        response.status === 503 &&
+        canRetry &&
+        component !== "app" &&
+        code &&
+        RETRYABLE.has(code)
+      ) {
         await pause(input.pauseMs ?? 2_000)
         continue
       }

@@ -11,7 +11,7 @@ import { HealthSmokeError, smokeDeployedHealth } from "./health-smoke"
 const SHA = "0123456789abcdef0123456789abcdef01234567"
 const SECRET = "monitor-secret-sentinel-0123456789abcdef"
 
-type Answer = { status: number; body?: unknown } | "hang"
+type Answer = { status: number; body?: unknown } | "hang" | "hang-body"
 const closers: Array<() => Promise<void>> = []
 
 /** A controlled deployment exposing the health endpoints over real HTTP. */
@@ -29,6 +29,12 @@ async function deployment(
       })
       const result = answer(component, request)
       if (result === "hang") return
+      if (result === "hang-body") {
+        // Headers arrive, the JSON body never does.
+        response.writeHead(200, { "content-type": "application/json" })
+        response.write("{")
+        return
+      }
       response.writeHead(result.status, { "content-type": "application/json" })
       response.end(JSON.stringify(result.body ?? {}))
     }
@@ -202,6 +208,57 @@ describe("TST-RUNTIME-001 deployed release and readiness smoke", () => {
     expect(
       hanging.seen.filter((call) => call.path.endsWith("database"))
     ).toHaveLength(2)
+  })
+
+  it("retries a transport blip on the identity check but never a wrong release", async () => {
+    let appCalls = 0
+    const blip = await deployment((component) =>
+      component === "app" && ++appCalls === 1 ? "hang" : ok(component)
+    )
+    await expect(
+      smokeDeployedHealth({
+        origin: blip.origin,
+        commitSha: SHA,
+        secret: SECRET,
+        timeoutMs: 100,
+        pauseMs: 1,
+      })
+    ).resolves.toMatchObject({ app: "ok" })
+    expect(appCalls).toBe(2)
+  })
+
+  it("treats a body that times out as a retryable transport failure", async () => {
+    let calls = 0
+    const slow = await deployment((component) =>
+      component === "database" && ++calls === 1 ? "hang-body" : ok(component)
+    )
+    await expect(
+      smokeDeployedHealth({
+        origin: slow.origin,
+        commitSha: SHA,
+        secret: SECRET,
+        timeoutMs: 100,
+        pauseMs: 1,
+      })
+    ).resolves.toMatchObject({ database: "ok" })
+    const stuck = await deployment((component) =>
+      component === "database" ? "hang-body" : ok(component)
+    )
+    await expect(
+      failure(
+        smokeDeployedHealth({
+          origin: stuck.origin,
+          commitSha: SHA,
+          secret: SECRET,
+          timeoutMs: 100,
+          attempts: 1,
+        })
+      )
+    ).resolves.toEqual({
+      component: "database",
+      reason: "unreachable",
+      code: undefined,
+    })
   })
 
   it("does not follow a redirect to a sign-in page as health", async () => {

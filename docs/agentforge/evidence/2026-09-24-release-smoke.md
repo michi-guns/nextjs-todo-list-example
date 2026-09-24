@@ -22,8 +22,10 @@ needs it.
   It checks `/api/health/app` first and requires its `release` to equal the
   resolved commit, then the protected database and CMS probes with the
   environment's secret header. Redirects are not followed, each request has a
-  ten-second timeout, a cold database or CMS gets two retries on
-  `timeout`/`unreachable`, and failures carry only fixed vocabulary.
+  ten-second timeout covering the body, any component gets two retries on a
+  transport failure (network error or timeout) and the dependencies also on
+  a `503 timeout`/`unreachable`; a wrong answer is never retried, and failures
+  carry only fixed vocabulary.
   `readHealthProbeSecret` applies the app's 32-256 printable-character rule.
 - **Production:** the runtime refuses to start without a valid
   `HEALTH_PROBE_SECRET`; `deploy` now receives the observation and forwards
@@ -45,9 +47,9 @@ needs it.
 
 | Command                                                            | Result                                    |
 | ------------------------------------------------------------------ | ----------------------------------------- |
-| `pnpm test:pipeline`                                               | 16 files, 251 tests passed                |
+| `pnpm test:pipeline`                                               | 16 files, 253 tests passed                |
 | `pnpm exec vitest run src/shared/environment src/test/environment` | 127 tests passed                          |
-| `pnpm test`                                                        | 67 files, 638 tests passed                |
+| `pnpm test`                                                        | 67 files, 640 tests passed                |
 | `pnpm test:integration`                                            | 9 files, 37 tests passed                  |
 | `pnpm test:e2e`, with and without the Sanity variables             | 9 Chromium tests passed each time         |
 | `pnpm typecheck`                                                   | Passed                                    |
@@ -63,7 +65,9 @@ the secret; a different or `unknown` release fails at `app` before any
 dependency request; `401`, `503 monitor_unconfigured`, `503 query_failed` and
 a non-JSON 200 fail with their fixed reason; a CMS answering `timeout` twice
 passes on the third attempt; a hanging database fails as `unreachable` within
-the bounded time after two attempts; a `307` is not followed. Secrets and the
+the bounded time after two attempts; a hanging identity request is retried
+while a wrong release is not; a body that stops mid-read is a retryable
+transport failure, not an invalid response; a `307` is not followed. Secrets and the
 host never appear in errors. `scripts/deploy/preview/smoke.test.ts` runs the
 whole Preview smoke over HTTP for the right and a wrong release.
 
@@ -92,4 +96,19 @@ not provisioned; this task changed no hosted configuration.
 
 ## Review
 
-Pending a fresh exact-tip independent review before merge.
+The first independent review (read-only, against `4127531`) approved: it
+confirmed the alias-then-origin order, Preview's disabled SSO protection, the
+endpoint host rule for real Neon hosts, that no other gate importer lacks the
+endpoint, secret handling in errors, records and logs, and a real Node 24
+`redirect: "error"` refusal. Its optional nits were taken:
+
+- a single transport failure on `/api/health/app` no longer fails a release
+  that is already live; identity requests retry like dependencies, but a
+  wrong release still fails at once;
+- a timeout while reading the body is a retryable transport failure rather
+  than `invalid_response`;
+- `HEALTH_PROBE_SECRET=` joins the Preview log redaction list;
+- a stale TESTING follow-up line and stray test blank lines were corrected.
+
+The unit, pipeline, typecheck and lint checks were rerun after these changes.
+A fresh exact-tip review confirmed them before merge.
