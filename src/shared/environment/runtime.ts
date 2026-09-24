@@ -205,6 +205,14 @@ function parseRuntimeDatabase(
     )
   }
   assertNonDefaultBranch(appEnv, branch)
+  // Deployed profiles always receive the delivery-observed endpoint (T-26.10).
+  if ((appEnv === "preview" || appEnv === "production") && !endpointHost) {
+    throw new EnvironmentProfileError(
+      "missing_variable",
+      `${appEnv} requires the delivery-observed DATABASE_ENDPOINT_HOST`,
+      "DATABASE_ENDPOINT_HOST"
+    )
+  }
   // A branch label is not proof of the target; the delivery-observed endpoint is.
   if (endpointHost && directHost(url.hostname) !== endpointHost) {
     throw new EnvironmentProfileError(

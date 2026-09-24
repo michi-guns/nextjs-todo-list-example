@@ -115,6 +115,10 @@ describe("Preview delivery workflow contract", () => {
       /VERCEL_PROJECT_ID:\s*\$\{\{ secrets\.VERCEL_PROJECT_ID \}\}/
     )
     expect(workflow).toMatch(/secrets\.BETTER_AUTH_SECRET/)
+    // Environment-scoped monitor secret for the deployment's dependency probes.
+    expect(workflow).toContain(
+      "HEALTH_PROBE_SECRET: ${{ secrets.HEALTH_PROBE_SECRET }}"
+    )
     expect(workflow).not.toMatch(/--prod\b/)
     expect(workflow).not.toMatch(/APP_ENV:\s*production/)
     expect(workflow).not.toMatch(/SANITY_WRITE_POLICY:\s*production-recovery/)

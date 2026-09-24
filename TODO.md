@@ -1131,7 +1131,7 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 and T-26.9 are complete, leaving 13
+remaining locally executable children on 2026-09-24; T-26.4 through T-26.6 and T-26.8 through T-26.10 are complete, leaving 12
 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
@@ -1208,7 +1208,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.6, T-26.8 and T-26.9 are complete; the remaining 6 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.8 and T-26.9 are complete and T-26.10 is next in the serial order; T-26.7 awaits hosted provider authorization. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.6 and T-26.8 through T-26.10 are complete; the remaining 5 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.8 through T-26.10 are complete and T-26.11 is next in the serial order; T-26.7 awaits hosted provider authorization. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1655,7 +1655,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.10: Verify the running release during deployment smoke
 
-- [ ] Extend delivery smoke to compare actual runtime identity and readiness.
+- [x] Extend delivery smoke to compare actual runtime identity and readiness.
 - Files: Production `scripts/deploy/production/runtime.ts`, core/tests;
   Preview `scripts/deploy/preview/vercel.ts`, core/tests; environment projection,
   both deployment workflows and their static tests; release/Preview runbooks.
@@ -1672,6 +1672,15 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   proof remains in T-26.12 and must not be inferred from local adapter tests.
 - Dependencies/prerequisites: T-26.9, installed dependencies; one delivery
   integration review unit. No provider credentials/deployment required locally.
+- Evidence, 2026-09-24: [release smoke](docs/agentforge/evidence/2026-09-24-release-smoke.md)
+  records the shared health smoke over controlled HTTP (valid identity, wrong
+  or unknown SHA, refused, unconfigured, failed and timed-out readiness, cold
+  retries, no redirect), both adapters' forwarded identity and fail-closed
+  secret checks, workflow static tests, pipeline, unit and browser gates.
+  Hosted runs now need `HEALTH_PROBE_SECRET` in the `preview`/`production`
+  Environments (owner provisioning, not done). `TST-RUNTIME-001` stays
+  `partial` until T-26.12.
+- Review: pending a fresh exact-tip independent review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `ci-cd-and-automation`, `security-and-hardening`, `documentation-and-adrs`,
   `code-review-and-quality`, `git-workflow-and-versioning`.

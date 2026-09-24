@@ -28,6 +28,8 @@ const database = "neondb"
 const directUrl = `postgresql://migration:migration-password@${directHost}:5432/${database}?sslmode=require`
 const pooledUrl = `postgresql://runtime:runtime-password@${pooledHost}:5432/${database}?sslmode=require`
 
+const HEALTH_SECRET = "preview-health-secret-0123456789abcdefghij"
+
 function previewEnvironment(
   overrides: Record<string, string | undefined> = {}
 ): Record<string, string | undefined> {
@@ -48,6 +50,7 @@ function previewEnvironment(
     APP_MAIL_TRANSPORT: "controlled-account",
     DEPLOYMENT_OWNER: "github",
     SECRET_NAMESPACE: "preview",
+    HEALTH_PROBE_SECRET: HEALTH_SECRET,
     ...overrides,
   }
 }
@@ -184,7 +187,36 @@ describe("Preview delivery commands", () => {
       return vi.mocked(operation).mock.invocationCallOrder[0]
     })
     expect(order).toEqual([...order].sort((a, b) => a - b))
+    expect(runtime.deploy).toHaveBeenCalledWith(
+      expect.objectContaining({ healthSecret: HEALTH_SECRET })
+    )
+    expect(runtime.smoke).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commitSha: COMMIT_SHA,
+        healthSecret: HEALTH_SECRET,
+      })
+    )
   })
+
+  it.each([undefined, "short"])(
+    "refuses a Preview deploy without a valid monitor secret (%s) before any branch exists",
+    async (secret) => {
+      const runtime = unusedRuntime()
+      await expect(
+        runPreviewCommand(
+          { command: "deploy", ref: COMMIT_SHA, previewId: PREVIEW_ID },
+          {
+            environment: previewEnvironment({ HEALTH_PROBE_SECRET: secret }),
+            runtime,
+            write: vi.fn(),
+          }
+        )
+      ).rejects.toThrow(expect.objectContaining({ code: "invalid_command" }))
+      expect(runtime.resolveRef).not.toHaveBeenCalled()
+      expect(runtime.createBranch).not.toHaveBeenCalled()
+      expect(runtime.deploy).not.toHaveBeenCalled()
+    }
+  )
 
   it.each(["migrate", "seed", "deploy", "smoke"] as const)(
     "stops after %s failure and allows only explicit matching cleanup",
@@ -529,7 +561,12 @@ describe("Preview delivery commands", () => {
 describe("Preview Vercel deploy arguments", () => {
   it("omits --prod and BETTER_AUTH_URL so the deployment origin comes from VERCEL_URL", () => {
     const profile = parseEnvironmentProfile(previewEnvironment())
-    const args = buildPreviewVercelEnvArgs(profile, COMMIT_SHA, PREVIEW_ID)
+    const args = buildPreviewVercelEnvArgs(
+      profile,
+      COMMIT_SHA,
+      PREVIEW_ID,
+      HEALTH_SECRET
+    )
     const joined = args.join(" ")
 
     expect(args).not.toContain("--prod")
@@ -538,5 +575,15 @@ describe("Preview Vercel deploy arguments", () => {
     expect(joined).toContain("APP_ENV=preview")
     expect(joined).toContain(`DATABASE_BRANCH=${BRANCH}`)
     expect(joined).toContain("NEXT_PUBLIC_SANITY_DATASET=preview")
+    // Runtime identity for the gate and health endpoints, at build and runtime.
+    for (const value of [
+      `APP_RELEASE_SHA=${COMMIT_SHA.toLowerCase()}`,
+      `DATABASE_ENDPOINT_HOST=${new URL(directUrl).hostname}`,
+      `HEALTH_PROBE_SECRET=${HEALTH_SECRET}`,
+    ])
+      expect(args.filter((arg) => arg === value)).toHaveLength(2)
+    // The app never receives the migration (direct) connection string.
+    expect(joined).not.toContain("DATABASE_URL_UNPOOLED")
+    expect(joined).not.toContain(directUrl)
   })
 })

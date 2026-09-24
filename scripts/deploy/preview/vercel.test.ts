@@ -402,6 +402,8 @@ describe("deployPreview", () => {
         profile: previewProfile(),
         commitSha: COMMIT_SHA,
         previewId: PREVIEW_ID,
+
+        healthSecret: "preview-health-secret-0123456789abcdefghij",
       },
       { ...deps, environment }
     )
@@ -449,6 +451,8 @@ describe("deployPreview", () => {
           profile: previewProfile(),
           commitSha: COMMIT_SHA,
           previewId: PREVIEW_ID,
+
+          healthSecret: "preview-health-secret-0123456789abcdefghij",
         },
         { ...deps, environment }
       )
@@ -463,6 +467,8 @@ describe("deployPreview", () => {
           profile: previewProfile(),
           commitSha: COMMIT_SHA,
           previewId: PREVIEW_ID,
+
+          healthSecret: "preview-health-secret-0123456789abcdefghij",
         },
         {
           ...deps,

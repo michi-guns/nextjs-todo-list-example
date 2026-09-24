@@ -43,7 +43,7 @@ failure never marks the database unavailable, and the reverse.
 ```dotenv
 # Server-only, 32-256 printable characters; one value per environment.
 HEALTH_PROBE_SECRET=<random secret>
-# Resolved deployment SHA, supplied by delivery (T-26.10).
+# Resolved deployment SHA; the delivery adapters supply it.
 APP_RELEASE_SHA=<40-hex commit SHA>
 ```
 
@@ -58,8 +58,13 @@ APP_RELEASE_SHA=<40-hex commit SHA>
 - `release` is `APP_RELEASE_SHA`, else `VERCEL_GIT_COMMIT_SHA`. A remote
   process with neither reports `unknown`; a local one reports `unreleased`.
 
-Provisioning the secret in a real monitor is T-26.12 and needs its own
-authorization.
+The Preview and Production delivery adapters forward the environment's
+`HEALTH_PROBE_SECRET`, `APP_RELEASE_SHA` and the observed
+`DATABASE_ENDPOINT_HOST` to the deployment, and refuse to start without a
+valid secret. Their smoke then calls all three endpoints on the exact
+deployment and fails on a wrong release, a refusal or unavailable
+dependencies (a cold database or CMS gets two retries). Provisioning the
+secret in a real monitor is T-26.12 and needs its own authorization.
 
 ## Bounds
 

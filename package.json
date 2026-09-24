@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "test:pipeline": "vitest run src/test/environment src/test/pipeline scripts/deploy/preview/core.test.ts scripts/deploy/preview/vercel.test.ts scripts/deploy/production",
+    "test:pipeline": "vitest run src/test/environment src/test/pipeline scripts/deploy/preview/core.test.ts scripts/deploy/preview/vercel.test.ts scripts/deploy/preview/smoke.test.ts scripts/deploy/health-smoke.test.ts scripts/deploy/production",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",

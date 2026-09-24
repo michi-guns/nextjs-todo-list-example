@@ -57,13 +57,17 @@ export interface ProductionRuntime {
   verifyRevision(input: ReleaseInput): Promise<void>
   observe(profile: EnvironmentProfile): Promise<ProductionObservation>
   migrate(directUrl: string): Promise<void>
+  /** `observed` supplies the endpoint identity the running app must match. */
   deploy(
     profile: EnvironmentProfile,
-    input: ReleaseInput
+    input: ReleaseInput,
+    observed: ProductionObservation
   ): Promise<ProductionDeployment>
+  /** Checks the canonical origin runs `input`'s release and is ready. */
   smoke(
     deployment: ProductionDeployment,
-    profile: EnvironmentProfile
+    profile: EnvironmentProfile,
+    input: ReleaseInput
   ): Promise<void>
 }
 
@@ -174,10 +178,10 @@ export async function runProductionRelease(
     await runtime.migrate(profile.database.migrationUrl)
     record.stages.migration = "succeeded"
     stage = "deployment"
-    record.deployment = await runtime.deploy(profile, input)
+    record.deployment = await runtime.deploy(profile, input, observed)
     record.stages.deployment = "succeeded"
     stage = "smoke"
-    await runtime.smoke(record.deployment, profile)
+    await runtime.smoke(record.deployment, profile, input)
     record.stages.smoke = "succeeded"
     record.result = "succeeded"
   } catch {

@@ -114,6 +114,7 @@ export async function deployPreview(
     readonly profile: EnvironmentProfile
     readonly commitSha: string
     readonly previewId: string
+    readonly healthSecret: string
   },
   dependencies: Partial<VercelDependencies> & {
     readonly environment?: Readonly<Record<string, string | undefined>>
@@ -128,7 +129,8 @@ export async function deployPreview(
   const envArgs = buildPreviewVercelEnvArgs(
     input.profile,
     input.commitSha,
-    input.previewId
+    input.previewId,
+    input.healthSecret
   )
   const output = await deps.run(
     "vercel",
@@ -161,7 +163,8 @@ export async function deployPreview(
 export function buildPreviewVercelEnvArgs(
   profile: EnvironmentProfile,
   commitSha: string,
-  previewId: string
+  previewId: string,
+  healthSecret: string
 ): string[] {
   const values: Record<string, string> = {
     APP_ENV: "preview",
@@ -171,7 +174,9 @@ export function buildPreviewVercelEnvArgs(
     DATABASE_PROJECT_ID: profile.database.projectId ?? "",
     DATABASE_BRANCH: profile.database.branch ?? "",
     DATABASE_URL: profile.database.runtimeUrl,
-    DATABASE_URL_UNPOOLED: profile.database.migrationUrl,
+    // The app needs no migration URL; it checks its pooled host against the
+    // observed endpoint instead (TD-035).
+    DATABASE_ENDPOINT_HOST: new URL(profile.database.migrationUrl).hostname,
     NEXT_PUBLIC_SANITY_PROJECT_ID: profile.sanity.projectId,
     NEXT_PUBLIC_SANITY_DATASET: "preview",
     NEXT_PUBLIC_SANITY_API_VERSION: profile.sanity.apiVersion,
@@ -181,6 +186,8 @@ export function buildPreviewVercelEnvArgs(
     SECRET_NAMESPACE: "preview",
     PREVIEW_ID: previewId,
     PREVIEW_COMMIT_SHA: commitSha,
+    APP_RELEASE_SHA: commitSha.toLowerCase(),
+    HEALTH_PROBE_SECRET: healthSecret,
   }
 
   const args: string[] = []

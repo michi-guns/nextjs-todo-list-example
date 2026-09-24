@@ -15,6 +15,7 @@ const RUNTIME_KEYS = [
   "DATABASE_PROVIDER",
   "DATABASE_PROJECT_ID",
   "DATABASE_BRANCH",
+  "DATABASE_ENDPOINT_HOST",
   "DATABASE_URL",
   "BETTER_AUTH_URL",
   "BETTER_AUTH_SECRET",
@@ -193,6 +194,8 @@ export function previewSeedEnvironment(
     DATABASE_PROVIDER: profile.database.provider,
     DATABASE_PROJECT_ID: profile.database.projectId,
     DATABASE_BRANCH: profile.database.branch,
+    // The observed direct endpoint, as the Preview deployment receives it.
+    DATABASE_ENDPOINT_HOST: new URL(profile.database.migrationUrl).hostname,
     DATABASE_URL: profile.database.runtimeUrl,
     BETTER_AUTH_URL: profile.betterAuth.url,
     BETTER_AUTH_SECRET: profile.betterAuth.secret,

@@ -47,6 +47,9 @@ The [TD-026](../../.dwf/decisions/TECHNICAL.md#td-026) and
 - A manual tag/full-SHA workflow that resolves one immutable revision,
   verifies CI for it, validates the profile/mail prerequisites, waits for
   approval, migrates explicitly, deploys the same revision and runs smoke.
+- From T-26.10, a `HEALTH_PROBE_SECRET` (32-256 printable characters) in both
+  the `preview` and `production` GitHub Environments. Without it the next
+  Preview or Production run refuses to start; no earlier run needed it.
 - A reviewed forward-migration and application recovery procedure with
   deployment/migration records. Follow the existing
   [failed-migration runbook](failed-database-migration.md); never assume an

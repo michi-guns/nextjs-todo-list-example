@@ -39,6 +39,7 @@ jobs:
       NODE_ENV: production
       BETTER_AUTH_URL: https://preview.example.test
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      HEALTH_PROBE_SECRET: ${{ secrets.HEALTH_PROBE_SECRET }}
       DATABASE_PROVIDER: neon
       DATABASE_PROJECT_ID: curly-dust-60603928
       NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}

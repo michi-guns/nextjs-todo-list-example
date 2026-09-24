@@ -101,6 +101,24 @@ describe("Production release stage boundary (TST-RELEASE-001)", () => {
     expect(rt.deploy.mock.invocationCallOrder[0]).toBeLessThan(
       rt.smoke.mock.invocationCallOrder[0]
     )
+    // The deployment receives the observed endpoint; the smoke the exact ref.
+    expect(rt.deploy.mock.calls[0][2]).toBe(target)
+    expect(rt.smoke.mock.calls[0][2]).toBe(input)
+  })
+
+  it("records a failed smoke stage when the running release is wrong", async () => {
+    const rt = runtime()
+    rt.smoke.mockRejectedValue(
+      new Error("Deployed app health check failed: release_mismatch")
+    )
+    const record = await runProductionRelease(
+      input,
+      productionEnvironment(),
+      rt
+    )
+    expect(record.result).toBe("failed")
+    expect(record.stages.smoke).toBe("failed")
+    expect(JSON.stringify(record)).not.toContain("release_mismatch")
   })
 
   it.each([

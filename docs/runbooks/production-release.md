@@ -48,8 +48,13 @@ See the [accepted plan](../agentforge/plans/2026-09-16-t-23-production-release.m
    release consumer. It rechecks clean checkout, main ancestry, CI attempt,
    profile, provider identities and rollback reference; applies committed
    migrations; deploys Production; verifies deployment metadata and canonical
-   alias; then checks landing, sign-in, anonymous session/list boundaries and
-   the real Sanity read path.
+   alias; then checks landing, sign-in, anonymous session/list boundaries,
+   the canonical origin's `/api/health/app` release (must equal the approved
+   SHA) and database/CMS readiness through the protected probes, and the real
+   Sanity read path. The deployment receives `APP_RELEASE_SHA`, the observed
+   `DATABASE_ENDPOINT_HOST` and `HEALTH_PROBE_SECRET`; the release refuses to
+   start without a valid `HEALTH_PROBE_SECRET` in the `production`
+   Environment. See the [operations runbook](operations.md).
 6. Review the safe JSON in the job summary and the
    `production-release-<SHA>-<attempt>` artifact. Record the workflow approval,
    SHA, CI run, migration outcome, deployment id, rollback reference and smoke

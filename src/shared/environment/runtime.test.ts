@@ -11,6 +11,8 @@ const RESEND = "re_runtime_resend_sentinel_key"
 const POOLED = `postgresql://app:${PASSWORD}@ep-quiet-sun-123456-pooler.eu-central-1.aws.neon.tech/todo?sslmode=require`
 const DIRECT = `postgresql://app:${PASSWORD}@ep-quiet-sun-123456.eu-central-1.aws.neon.tech/todo?sslmode=require`
 const LOCAL = `postgresql://app:${PASSWORD}@127.0.0.1:5432/todo`
+/** Delivery-observed direct endpoint of the pooled host above. */
+const ENDPOINT = "ep-quiet-sun-123456.eu-central-1.aws.neon.tech"
 
 function local(): Environment {
   return {
@@ -40,6 +42,7 @@ function production(): Environment {
     DATABASE_PROJECT_ID: "production-project",
     DATABASE_BRANCH: "main",
     DATABASE_URL: POOLED,
+    DATABASE_ENDPOINT_HOST: ENDPOINT,
     NEXT_PUBLIC_SANITY_PROJECT_ID: "project-id",
     NEXT_PUBLIC_SANITY_DATASET: "production",
     SANITY_WRITE_POLICY: "production-recovery",
@@ -67,6 +70,7 @@ function preview(): Environment {
     DATABASE_PROJECT_ID: "development-project",
     DATABASE_BRANCH: "preview-pr-42",
     DATABASE_URL: POOLED,
+    DATABASE_ENDPOINT_HOST: ENDPOINT,
     DATABASE_URL_UNPOOLED: DIRECT,
     NEXT_PUBLIC_SANITY_PROJECT_ID: "project-id",
     NEXT_PUBLIC_SANITY_DATASET: "preview",
@@ -159,6 +163,18 @@ describe("TST-RUNTIME-001 runtime configuration boundary", () => {
       { ...preview(), DATABASE_BRANCH: "main" },
       "database_target_mismatch",
       "DATABASE_BRANCH",
+    ],
+    [
+      "Production without the delivery-observed endpoint",
+      { ...production(), DATABASE_ENDPOINT_HOST: undefined },
+      "missing_variable",
+      "DATABASE_ENDPOINT_HOST",
+    ],
+    [
+      "Preview without the delivery-observed endpoint",
+      { ...preview(), DATABASE_ENDPOINT_HOST: " " },
+      "missing_variable",
+      "DATABASE_ENDPOINT_HOST",
     ],
     [
       "Neon without a project identity",

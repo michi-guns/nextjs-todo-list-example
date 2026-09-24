@@ -109,6 +109,7 @@ jobs:
           APP_MAIL_PROVIDER: ${{ vars.APP_MAIL_PROVIDER }}
           APP_MAIL_FROM: ${{ vars.APP_MAIL_FROM }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          HEALTH_PROBE_SECRET: ${{ secrets.HEALTH_PROBE_SECRET }}
           DEPLOYMENT_OWNER: ${{ vars.DEPLOYMENT_OWNER }}
           SECRET_NAMESPACE: ${{ vars.SECRET_NAMESPACE }}
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}

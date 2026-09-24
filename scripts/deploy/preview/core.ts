@@ -1,6 +1,7 @@
 import { spawn, type ChildProcess } from "node:child_process"
 import { URL } from "node:url"
 
+import { readHealthProbeSecret } from "../health-smoke"
 import {
   parseDeliveryArguments,
   parseEnvironmentProfile,
@@ -116,11 +117,16 @@ export interface PreviewRuntime {
     readonly profile: EnvironmentProfile
     readonly commitSha: string
     readonly previewId: string
+    /** Forwarded to the deployment's dependency probes. */
+    readonly healthSecret: string
   }): Promise<PreviewDeployment>
   smoke(input: {
     readonly url: string
     readonly email: string
     readonly password: string
+    /** The release the deployment must be running. */
+    readonly commitSha: string
+    readonly healthSecret: string
   }): Promise<PreviewSmokeResult>
 }
 
@@ -207,6 +213,16 @@ export async function runPreviewCommand(
           "Preview deploy requires --ref"
         )
       }
+      let healthSecret: string
+      try {
+        healthSecret = readHealthProbeSecret(environment)
+      } catch (error) {
+        // Refuse before any branch, migration or deployment exists.
+        throw new PreviewDeliveryError(
+          "invalid_command",
+          (error as Error).message
+        )
+      }
       const resolvedRef = await runtime.resolveRef(parsed.ref)
       assertPreviewWorkspace(resolvedRef, await runtime.inspectWorkspace())
       await runtime.preflightDeploy()
@@ -246,11 +262,14 @@ export async function runPreviewCommand(
             profile,
             commitSha: resolvedRef.commitSha,
             previewId: parsed.previewId,
+            healthSecret,
           })
           await runtime.smoke({
             url: deployment.url,
             email: PREVIEW_SEED_USER.email,
             password: PREVIEW_SEED_USER.password,
+            commitSha: resolvedRef.commitSha,
+            healthSecret,
           })
           write(
             formatDeploymentEvidence(

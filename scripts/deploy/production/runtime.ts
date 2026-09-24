@@ -1,5 +1,6 @@
 import { z } from "zod"
 import type { EnvironmentVariables } from "../../environment/core"
+import { readHealthProbeSecret, smokeDeployedHealth } from "../health-smoke"
 import { productionTarget as target, type ProductionRuntime } from "./core"
 import { runReleaseProcess } from "./process"
 import {
@@ -24,7 +25,15 @@ export function createProductionRuntime(
 ): ProductionRuntime {
   const request = dependencies.request ?? fetch
   const run = dependencies.run ?? runReleaseProcess
+  let healthSecret = ""
+  try {
+    // The deployed dependency probes and the smoke share this secret.
+    healthSecret = readHealthProbeSecret(environment)
+  } catch {
+    /* Refused below with the other provider configuration. */
+  }
   if (
+    !healthSecret ||
     environment.VERCEL_PROJECT_ID !== target.vercelProjectId ||
     environment.VERCEL_ORG_ID !== target.vercelTeamId ||
     !environment.VERCEL_TOKEN ||
@@ -176,7 +185,7 @@ export function createProductionRuntime(
         { DATABASE_URL: directUrl, DATABASE_URL_UNPOOLED: directUrl }
       )
     },
-    async deploy(profile, input) {
+    async deploy(profile, input, database) {
       const values: Record<string, string> = {
         APP_ENV: "production",
         NODE_ENV: "production",
@@ -199,6 +208,10 @@ export function createProductionRuntime(
         BETTER_AUTH_LOCAL_MAILBOX: "false",
         DEPLOYMENT_OWNER: "github",
         SECRET_NAMESPACE: "production",
+        // Safe identity the running app checks and reports (TD-035).
+        APP_RELEASE_SHA: input.ref.commitSha.toLowerCase(),
+        DATABASE_ENDPOINT_HOST: database.directHost,
+        HEALTH_PROBE_SECRET: healthSecret,
       }
       const args = [
         "deploy",
@@ -245,7 +258,7 @@ export function createProductionRuntime(
         throw new Error("Production deployment identity mismatch")
       return { deploymentId: deployed.id, url: deployed.url }
     },
-    async smoke(deployment) {
+    async smoke(deployment, _profile, input) {
       const alias = z
         .object({
           projectId: z.string(),
@@ -278,6 +291,13 @@ export function createProductionRuntime(
           throw new Error("Unexpected anonymous session")
         if (!response.bodyUsed) await response.body?.cancel()
       }
+      // The canonical origin must run this release with ready dependencies.
+      await smokeDeployedHealth({
+        origin: target.origin,
+        commitSha: input.ref.commitSha,
+        secret: healthSecret,
+        request,
+      })
       await run("pnpm", ["sanity:smoke"])
     },
   }

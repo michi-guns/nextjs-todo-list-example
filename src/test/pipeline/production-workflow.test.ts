@@ -51,7 +51,7 @@ describe("protected Production release workflow", () => {
       expect(match[1]).toMatch(/^[\w-]+\/[\w-]+@[0-9a-f]{40}$/)
     const before = source.split("      - name: Run protected release")[0]
     expect(before).not.toMatch(
-      /secrets\.(VERCEL_TOKEN|DATABASE_URL|NEON_API_KEY|RESEND_API_KEY|BETTER_AUTH_SECRET)/
+      /secrets\.(VERCEL_TOKEN|DATABASE_URL|NEON_API_KEY|RESEND_API_KEY|BETTER_AUTH_SECRET|HEALTH_PROBE_SECRET)/
     )
     const consumer = source
       .split("      - name: Run protected release")[1]
@@ -65,6 +65,7 @@ describe("protected Production release workflow", () => {
       "RESEND_API_KEY",
       "SANITY_REVALIDATE_SECRET",
       "SANITY_MANUAL_RECOVERY_SECRET",
+      "HEALTH_PROBE_SECRET",
     ])
       expect(consumer).toContain(`${name}: \${{ secrets.${name} }}`)
     expect(consumer).toContain("run: pnpm release -- release")

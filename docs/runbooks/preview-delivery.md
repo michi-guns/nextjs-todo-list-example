@@ -27,7 +27,13 @@ project and the project already has a promoted Production deployment. The
 deployment itself runs with `--target=preview --json`; the structured result
 must be `READY` and not `production`, and a second team-scoped lookup must
 return the same project, a non-Production target and the exact `commitSha`
-and `previewId` metadata before smoke runs.
+and `previewId` metadata before smoke runs. The deployment receives
+`APP_RELEASE_SHA`, the observed `DATABASE_ENDPOINT_HOST` and
+`HEALTH_PROBE_SECRET`, but no migration URL. Smoke checks landing, sign-in and
+a list mutation, then that `/api/health/app` reports the resolved commit and
+the protected database/CMS probes are ready. `deploy` refuses before any
+branch exists unless the `preview` Environment holds a valid
+`HEALTH_PROBE_SECRET`.
 
 The first successful hosted run is recorded in the
 [2026-09-14 run evidence](../agentforge/evidence/2026-09-14-preview-run.md):

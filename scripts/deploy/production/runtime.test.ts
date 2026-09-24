@@ -31,6 +31,7 @@ const environment = {
   VERCEL_TOKEN: "vercel-private",
   NEON_API_KEY: "neon-private",
   GITHUB_TOKEN: "github-private",
+  HEALTH_PROBE_SECRET: "health-private-0123456789abcdef0123456789",
   GITHUB_REPOSITORY: "michi-guns/nextjs-todo-list-example",
 }
 const profile = parseEnvironmentProfile(environment)
@@ -43,10 +44,23 @@ const input = {
   actor: "operator",
   workflowRunId: "1",
 }
+const observation = {
+  projectId: target.neonProjectId,
+  branchId: target.neonBranchId,
+  branch: "main",
+  directHost: "ep-production.neon.tech",
+  database: "neondb",
+  port: 5432,
+  rollback: {
+    deploymentId: target.placeholderDeploymentId,
+    kind: "maintenance-placeholder" as const,
+  },
+}
 const deployment = {
   deploymentId: "dpl_new",
   url: "https://deployment.vercel.app",
 }
+const health = { release: sha }
 function provider() {
   return vi.fn<typeof fetch>().mockImplementation(async (url) => {
     const path = new URL(String(url)).pathname
@@ -92,6 +106,12 @@ function provider() {
         projectId: target.vercelProjectId,
         deploymentId: "dpl_new",
         alias: new URL(target.origin).hostname,
+      })
+    if (path.startsWith("/api/health/"))
+      return Response.json({
+        component: path.split("/").at(-1),
+        status: "ok",
+        release: health.release,
       })
     if (path === "/api/auth/get-session") return Response.json(null)
     if (path === "/api/lists") return Response.json({}, { status: 401 })
@@ -184,7 +204,8 @@ describe("Production provider adapter", () => {
     expect(
       await createProductionRuntime(environment, { request, run }).deploy(
         profile,
-        input
+        input,
+        observation
       )
     ).toEqual(deployment)
     const args = run.mock.calls[0][1] as string[]
@@ -192,6 +213,14 @@ describe("Production provider adapter", () => {
     expect(args).toContain(`commitSha=${sha}`)
     expect(args).toContain(`BETTER_AUTH_URL=${target.origin}`)
     expect(args).toContain("RESEND_API_KEY=re_private")
+    for (const value of [
+      `APP_RELEASE_SHA=${sha}`,
+      "DATABASE_ENDPOINT_HOST=ep-production.neon.tech",
+      `HEALTH_PROBE_SECRET=${environment.HEALTH_PROBE_SECRET}`,
+    ]) {
+      // Runtime and build receive the same safe identity.
+      expect(args.filter((arg) => arg === value)).toHaveLength(2)
+    }
     expect(args.join(" ")).not.toMatch(
       /DATABASE_URL_UNPOOLED|NEON_API_KEY|GITHUB_TOKEN|VERCEL_TOKEN/
     )
@@ -221,7 +250,8 @@ describe("Production provider adapter", () => {
     await expect(
       createProductionRuntime(environment, { request, run }).deploy(
         profile,
-        input
+        input,
+        observation
       )
     ).rejects.toThrow()
   })
@@ -230,12 +260,50 @@ describe("Production provider adapter", () => {
       run = vi.fn().mockResolvedValue("")
     await createProductionRuntime(environment, { request, run }).smoke(
       deployment,
-      profile
+      profile,
+      input
     )
     expect(request.mock.calls.map((c) => c[0])).toContain(
       `${target.origin}/api/lists`
     )
     expect(run).toHaveBeenCalledWith("pnpm", ["sanity:smoke"])
+    const probes = request.mock.calls.filter(([url]) =>
+      String(url).startsWith(`${target.origin}/api/health/`)
+    )
+    expect(probes.map(([url]) => String(url))).toEqual(
+      ["app", "database", "cms"].map((c) => `${target.origin}/api/health/${c}`)
+    )
+    expect(new Headers(probes[1][1]?.headers).get("x-health-secret")).toBe(
+      environment.HEALTH_PROBE_SECRET
+    )
+  })
+  it("fails the smoke when the canonical origin runs another release", async () => {
+    const request = provider(),
+      run = vi.fn().mockResolvedValue("")
+    health.release = "b".repeat(40)
+    try {
+      await expect(
+        createProductionRuntime(environment, { request, run }).smoke(
+          deployment,
+          profile,
+          input
+        )
+      ).rejects.toThrow("release_mismatch")
+    } finally {
+      health.release = sha
+    }
+    expect(run).not.toHaveBeenCalled()
+  })
+  it("refuses to run without a valid monitor secret before network access", () => {
+    const request = provider()
+    for (const secret of [undefined, "short"])
+      expect(() =>
+        createProductionRuntime(
+          { ...environment, HEALTH_PROBE_SECRET: secret },
+          { request }
+        )
+      ).toThrow("Invalid Production provider configuration")
+    expect(request).not.toHaveBeenCalled()
   })
   it("refuses a canonical alias pointing at an older deployment", async () => {
     const request = vi.fn<typeof fetch>().mockResolvedValue(
@@ -249,7 +317,8 @@ describe("Production provider adapter", () => {
     await expect(
       createProductionRuntime(environment, { request, run }).smoke(
         deployment,
-        profile
+        profile,
+        input
       )
     ).rejects.toThrow()
     expect(run).not.toHaveBeenCalled()

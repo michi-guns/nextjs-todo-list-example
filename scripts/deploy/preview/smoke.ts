@@ -1,3 +1,4 @@
+import { smokeDeployedHealth } from "../health-smoke"
 import { PREVIEW_SEED_USER } from "./constants"
 import { PreviewDeliveryError } from "./core"
 
@@ -5,6 +6,9 @@ export async function smokePreview(input: {
   readonly url: string
   readonly email: string
   readonly password: string
+  readonly commitSha: string
+  readonly healthSecret: string
+  readonly request?: typeof fetch
 }): Promise<{
   readonly landing: boolean
   readonly signedIn: boolean
@@ -50,6 +54,18 @@ export async function smokePreview(input: {
       "command_failed",
       `Preview smoke failed landing=${landing} signedIn=${signedIn} mutated=${mutated}`
     )
+  }
+
+  // The assigned deployment must run this release with ready dependencies.
+  try {
+    await smokeDeployedHealth({
+      origin,
+      commitSha: input.commitSha,
+      secret: input.healthSecret,
+      request: input.request,
+    })
+  } catch (error) {
+    throw new PreviewDeliveryError("command_failed", (error as Error).message)
   }
 
   if (input.email !== PREVIEW_SEED_USER.email) {
