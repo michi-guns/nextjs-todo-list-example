@@ -203,8 +203,11 @@ Required future evidence is owned by [TST-AUTH-004](../../decisions/TESTING.md#t
 Status: the shared PostgreSQL admission store, opaque keys, recipient
 request/send budgets and the `customStorage` adapter (T-27.1) are implemented
 and verified locally
-([evidence](../../../docs/agentforge/evidence/2026-09-24-auth-admission.md)); Better Auth wiring,
-recovery and browser surfaces (T-27.2/T-27.3) and hosted proof (T-27.4) remain.
+([evidence](../../../docs/agentforge/evidence/2026-09-24-auth-admission.md)).
+Native password reset, session revocation, recipient/IP limits and
+post-response auth mail are wired through Better Auth (T-27.2,
+[evidence](../../../docs/agentforge/evidence/2026-09-25-native-recovery.md)). Recovery screens and browser journeys (T-27.3) and
+hosted proof (T-27.4) remain.
 
 ---
 

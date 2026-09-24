@@ -16,7 +16,11 @@ export interface AdmissionDecision {
   readonly retryAfter: number | null
 }
 
-/** The `pg` surface the store needs; a Pool or a client both fit. */
+/**
+ * The `pg` surface the store needs. Pass an autocommit Pool, never a client
+ * inside an open transaction: that would freeze `now()`, hold the counter
+ * row lock until commit and undo admissions on rollback.
+ */
 export interface AdmissionQueryable {
   query<Row extends Record<string, unknown>>(
     text: string,

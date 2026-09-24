@@ -3,7 +3,7 @@ import os from "node:os"
 import path from "node:path"
 
 import { Pool, type PoolClient } from "pg"
-import { afterAll, beforeAll, describe, expect, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
 
 import type { CurrentUser } from "./domain/current-user"
 
@@ -82,6 +82,12 @@ function getCookieHeader(response: Response) {
     .join("; ")
 }
 
+let syntheticAddress = 0
+function nextSyntheticAddress() {
+  syntheticAddress += 1
+  return `198.18.${Math.floor(syntheticAddress / 250)}.${(syntheticAddress % 250) + 1}`
+}
+
 function getResponseLocation(response: Response) {
   return response.headers.get("location") ?? ""
 }
@@ -100,6 +106,7 @@ type AuthTestContext = {
   } | null>
   clearMagicLinkMailbox: () => Promise<void>
   appPool: Pool
+  drainMail: () => Promise<void>
 }
 
 describe("Better Auth boundary", { concurrent: false }, () => {
@@ -151,6 +158,10 @@ describe("Better Auth boundary", { concurrent: false }, () => {
     mutableEnvironment.BETTER_AUTH_LOCAL_MAILBOX = "true"
     mutableEnvironment.BETTER_AUTH_MAILBOX_DIR = mailboxDirectory
 
+    // No request scope here: mail is sent in-process and drained explicitly.
+    const { selectStandaloneAuthMail } =
+      await import("./infrastructure/mail-scheduler")
+    const mail = selectStandaloneAuthMail()
     const [authModule, currentUserModule, mailboxModule, databaseModule] =
       await Promise.all([
         import("../../../lib/auth"),
@@ -163,16 +174,27 @@ describe("Better Auth boundary", { concurrent: false }, () => {
       auth: authModule.auth,
       getCurrentUserForHeaders: currentUserModule.getCurrentUserForHeaders,
       requireUserForHeaders: currentUserModule.requireUserForHeaders,
-      readLatestMagicLink: mailboxModule.readLatestMagicLink,
-      clearMagicLinkMailbox: mailboxModule.clearMagicLinkMailbox,
+      readLatestMagicLink: async (email) => {
+        await mail.drain()
+        return mailboxModule.readLatestMagicLink(email)
+      },
+      clearMagicLinkMailbox: async () => {
+        await mail.drain()
+        await mailboxModule.clearMagicLinkMailbox()
+      },
       appPool: databaseModule.pool,
+      drainMail: () => mail.drain(),
     }
   })
 
   afterAll(async () => {
     if (context) {
+      await context.drainMail()
       await context.appPool.end()
     }
+    const { selectAuthMailScheduler } =
+      await import("./infrastructure/mail-scheduler")
+    selectAuthMailScheduler(undefined)
 
     if (mailboxDirectory) {
       await rm(mailboxDirectory, { recursive: true, force: true })
@@ -240,6 +262,11 @@ describe("Better Auth boundary", { concurrent: false }, () => {
   ) {
     const headers = new Headers(init.headers)
     headers.set("origin", baseUrl)
+    // A distinct synthetic client per request keeps unrelated steps out of
+    // each other's HTTP limits; limit tests pass their own address.
+    if (!headers.has("x-forwarded-for")) {
+      headers.set("x-forwarded-for", nextSyntheticAddress())
+    }
     if (cookie) {
       headers.set("cookie", cookie)
     }
@@ -516,5 +543,311 @@ describe("Better Auth boundary", { concurrent: false }, () => {
     ).rejects.toMatchObject({
       code: "unauthenticated",
     })
+  })
+
+  async function createVerifiedUser(label: string) {
+    const email = `t272-${label}-${Date.now()}@example.test`
+    const password = "original password 123"
+    const signUp = await authRequest("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: "Recovery User", email, password }),
+    })
+    expect(signUp.status).toBe(200)
+    await consumeEmailVerification(email)
+    return { email, password }
+  }
+
+  async function signIn(email: string, password: string, address?: string) {
+    return authRequest("/api/auth/sign-in/email", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(address ? { "x-forwarded-for": address } : {}),
+      },
+      body: JSON.stringify({ email, password }),
+    })
+  }
+
+  async function requestReset(email: string) {
+    return authRequest("/api/auth/request-password-reset", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email, redirectTo: "/reset-password" }),
+    })
+  }
+
+  async function resetPassword(
+    token: string,
+    newPassword: string,
+    address?: string
+  ) {
+    return authRequest("/api/auth/reset-password", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(address ? { "x-forwarded-for": address } : {}),
+      },
+      body: JSON.stringify({ token, newPassword }),
+    })
+  }
+
+  async function isSignedIn(cookie: string) {
+    return (
+      (await getContext().getCurrentUserForHeaders(new Headers({ cookie }))) !==
+      null
+    )
+  }
+
+  async function readResetMessage(email: string) {
+    const message = await getContext().readLatestMagicLink(email)
+    expect(message?.metadata).toMatchObject({ kind: "password-reset" })
+    expect(message?.url).toContain("/api/auth/reset-password/")
+    return message!
+  }
+
+  it("TST-AUTH-004 answers reset requests identically for known and unknown addresses", async () => {
+    const { email } = await createVerifiedUser("neutral")
+    const unknown = `t272-unknown-${Date.now()}@example.test`
+    await getContext().clearMagicLinkMailbox()
+    const known = await requestReset(email)
+    const absent = await requestReset(unknown)
+    expect([known.status, absent.status]).toEqual([200, 200])
+    expect(await known.json()).toEqual(await absent.json())
+    await readResetMessage(email)
+    await expect(getContext().readLatestMagicLink(unknown)).resolves.toBeNull()
+    // The token expires after the policy's 30 minutes.
+    const expiry = await getContext().appPool.query<{ minutes: number }>(
+      "SELECT round(extract(epoch FROM expires_at - now()) / 60)::int AS minutes FROM verification WHERE identifier LIKE 'reset-password:%' ORDER BY created_at DESC LIMIT 1"
+    )
+    expect(expiry.rows[0]?.minutes).toBe(30)
+  })
+
+  it("TST-AUTH-004 resets once, revokes every session and does not sign in", async () => {
+    const { email, password } = await createVerifiedUser("reset")
+    const first = getCookieHeader(await signIn(email, password))
+    const second = getCookieHeader(await signIn(email, password))
+    expect([await isSignedIn(first), await isSignedIn(second)]).toEqual([
+      true,
+      true,
+    ])
+    await getContext().clearMagicLinkMailbox()
+    expect((await requestReset(email)).status).toBe(200)
+    // Requesting mail changes nothing about existing sessions.
+    expect(await isSignedIn(first)).toBe(true)
+    const { token } = await readResetMessage(email)
+
+    const reset = await resetPassword(token, "brand new password 456")
+    expect(reset.status).toBe(200)
+    expect(getCookieHeader(reset)).not.toContain("session_token=")
+    expect([await isSignedIn(first), await isSignedIn(second)]).toEqual([
+      false,
+      false,
+    ])
+    expect((await signIn(email, password)).status).toBe(401)
+    expect((await signIn(email, "brand new password 456")).status).toBe(200)
+    expect((await resetPassword(token, "another password 789")).status).toBe(
+      400
+    )
+  })
+
+  it("TST-AUTH-004 lets exactly one concurrent submission consume a reset token", async () => {
+    const { email } = await createVerifiedUser("concurrent")
+    await getContext().clearMagicLinkMailbox()
+    await requestReset(email)
+    const { token } = await readResetMessage(email)
+    const statuses = await Promise.all(
+      ["concurrent one 111", "concurrent two 222", "concurrent six 333"].map(
+        (next) => resetPassword(token, next).then((response) => response.status)
+      )
+    )
+    expect(statuses.filter((status) => status === 200)).toHaveLength(1)
+  })
+
+  it("TST-AUTH-004 leaves credentials and sessions unchanged for invalid, expired and throttled requests", async () => {
+    const { email, password } = await createVerifiedUser("unchanged")
+    const session = getCookieHeader(await signIn(email, password))
+    expect(
+      (await resetPassword("not-a-real-token", "whatever pass 1")).status
+    ).toBe(400)
+
+    await getContext().clearMagicLinkMailbox()
+    await requestReset(email)
+    const { token } = await readResetMessage(email)
+    await getContext().appPool.query(
+      "UPDATE verification SET expires_at = now() - interval '1 minute' WHERE identifier = $1",
+      [`reset-password:${token}`]
+    )
+    expect((await resetPassword(token, "expired attempt 22")).status).toBe(400)
+
+    // A second request inside the recipient window is refused, with a wait.
+    const throttled = await requestReset(email)
+    expect(throttled.status).toBe(429)
+    expect(Number(throttled.headers.get("x-retry-after"))).toBeGreaterThan(0)
+
+    expect(await isSignedIn(session)).toBe(true)
+    expect((await signIn(email, password)).status).toBe(200)
+  })
+
+  it("TST-AUTH-006 gives absent and present recipients the same cooldown, including auth.api calls", async () => {
+    const { email } = await createVerifiedUser("cooldown")
+    const unknown = `t272-cooldown-unknown-${Date.now()}@example.test`
+    for (const address of [email, unknown]) {
+      expect((await requestReset(address)).status).toBe(200)
+      const again = await requestReset(address)
+      expect(again.status).toBe(429)
+      await expect(again.json()).resolves.toMatchObject({
+        code: "RECIPIENT_COOLDOWN",
+      })
+    }
+    // Server calls bypass the HTTP limiter but not the recipient budget.
+    const serverEmail = `t272-api-${Date.now()}@example.test`
+    await getContext().auth.api.requestPasswordReset({
+      body: { email: serverEmail, redirectTo: "/reset-password" },
+    })
+    await expect(
+      getContext().auth.api.requestPasswordReset({
+        body: { email: serverEmail, redirectTo: "/reset-password" },
+      })
+    ).rejects.toMatchObject({ statusCode: 429 })
+  })
+
+  it("TST-AUTH-006 caps automatic sends per recipient across rotating client addresses", async () => {
+    const email = `t272-sendcap-${Date.now()}@example.test`
+    const password = "unverified password 1"
+    await getContext().clearMagicLinkMailbox()
+    const signUp = await authRequest("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: "Send Cap", email, password }),
+    })
+    expect(signUp.status).toBe(200)
+    let delivered = (await getContext().readLatestMagicLink(email)) ? 1 : 0
+    // Each unverified sign-in from a new address triggers an automatic send.
+    for (let attempt = 0; attempt < 7; attempt += 1) {
+      await getContext().clearMagicLinkMailbox()
+      const response = await signIn(
+        email,
+        password,
+        `203.0.113.${attempt + 10}`
+      )
+      expect(response.status).toBe(403)
+      if (await getContext().readLatestMagicLink(email)) delivered += 1
+    }
+    expect(delivered).toBe(5)
+  })
+
+  it("TST-AUTH-006 bounds reset submissions per trusted client address", async () => {
+    const address = "192.0.2.77"
+    const statuses: number[] = []
+    for (let attempt = 0; attempt < 6; attempt += 1)
+      statuses.push(
+        (await resetPassword("no-such-token", "attempt pass 1", address)).status
+      )
+    expect(statuses.slice(0, 5).every((status) => status === 400)).toBe(true)
+    expect(statuses[5]).toBe(429)
+    expect(
+      (await resetPassword("no-such-token", "attempt pass 1", "192.0.2.78"))
+        .status
+    ).toBe(400)
+    // Counter keys are opaque: no stored key carries an address or email.
+    const keys = await getContext().appPool.query<{ key: string }>(
+      "SELECT key FROM auth_rate_limit"
+    )
+    expect(keys.rows.length).toBeGreaterThan(0)
+    for (const { key } of keys.rows)
+      expect(key).toMatch(/^[a-z-]+:[0-9a-f]{64}$/)
+  })
+
+  it("TST-AUTH-004 answers before a pending mail operation finishes", async () => {
+    const { email } = await createVerifiedUser("pending")
+    await getContext().clearMagicLinkMailbox()
+    const { currentAuthMailScheduler, selectAuthMailScheduler } =
+      await import("./infrastructure/mail-scheduler")
+    const standalone = currentAuthMailScheduler()
+    const held: Array<() => Promise<void>> = []
+    selectAuthMailScheduler({ schedule: (task) => void held.push(task) })
+    try {
+      const response = await requestReset(email)
+      expect(response.status).toBe(200)
+      expect(held).toHaveLength(1)
+      await expect(getContext().readLatestMagicLink(email)).resolves.toBeNull()
+      await Promise.all(held.map((task) => task()))
+      await readResetMessage(email)
+    } finally {
+      selectAuthMailScheduler(standalone)
+    }
+  })
+
+  it("TST-AUTH-005 resends verification neutrally, bounded, and recovers invalid links", async () => {
+    const stamp = Date.now()
+    const pending = `t272-pending-${stamp}@example.test`
+    const absent = `t272-absent-${stamp}@example.test`
+    const { email: verified } = await createVerifiedUser("already-verified")
+    const signUp = await authRequest("/api/auth/sign-up/email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: "Pending",
+        email: pending,
+        password: "pending password 1",
+      }),
+    })
+    expect(signUp.status).toBe(200)
+    await getContext().clearMagicLinkMailbox()
+
+    const resend = (email: string) =>
+      authRequest("/api/auth/send-verification-email", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, callbackURL: "/dashboard" }),
+      })
+    const answers = await Promise.all(
+      [pending, absent, verified].map(async (email) => {
+        const response = await resend(email)
+        return [response.status, await response.json()]
+      })
+    )
+    expect(answers).toEqual([
+      [200, { status: true }],
+      [200, { status: true }],
+      [200, { status: true }],
+    ])
+    const fresh = await getContext().readLatestMagicLink(pending)
+    expect(fresh?.url).toContain("/verify-email")
+    await expect(getContext().readLatestMagicLink(absent)).resolves.toBeNull()
+    await expect(getContext().readLatestMagicLink(verified)).resolves.toBeNull()
+    for (const email of [pending, absent])
+      expect((await resend(email)).status).toBe(429)
+
+    const invalid = await getContext().auth.handler(
+      new Request(
+        `${baseUrl}/api/auth/verify-email?token=not-a-token&callbackURL=/dashboard`,
+        { headers: { origin: baseUrl } }
+      )
+    )
+    expect(getResponseLocation(invalid)).toContain("error=INVALID_TOKEN")
+
+    // An expired link reports TOKEN_EXPIRED and leaves the account pending.
+    vi.useFakeTimers({ toFake: ["Date"], now: Date.now() + 2 * 60 * 60 * 1000 })
+    try {
+      const expired = await getContext().auth.handler(
+        new Request(fresh!.url, { headers: { origin: baseUrl } })
+      )
+      expect(getResponseLocation(expired)).toContain("error=TOKEN_EXPIRED")
+    } finally {
+      vi.useRealTimers()
+    }
+    const state = await getContext().appPool.query<{ verified: boolean }>(
+      "SELECT email_verified AS verified FROM users WHERE email = $1",
+      [pending]
+    )
+    expect(state.rows[0]?.verified).toBe(false)
+    // The unexpired link still verifies normally.
+    const verifiedNow = await getContext().auth.handler(
+      new Request(fresh!.url, { headers: { origin: baseUrl } })
+    )
+    expect(verifiedNow.status).toBe(302)
+    expect(getCookieHeader(verifiedNow)).toContain("session_token=")
   })
 })

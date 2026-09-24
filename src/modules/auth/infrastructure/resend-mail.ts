@@ -35,11 +35,31 @@ export function readResendConfig(
   return { apiKey: result.data.RESEND_API_KEY, from: result.data.APP_MAIL_FROM }
 }
 
+const MESSAGE_COPY = {
+  "email-verification": {
+    subject: "Verify your email",
+    action: "Verify your email",
+  },
+  "password-reset": {
+    subject: "Reset your password",
+    action: "Reset your password",
+  },
+  "magic-link": { subject: "Your sign-in link", action: "Sign in" },
+} as const
+
+/** Trusted kinds come from auth-owned callbacks; anything else is a sign-in link. */
+function messageKind(message: MagicLinkMessage): keyof typeof MESSAGE_COPY {
+  const kind = message.metadata?.kind
+  return kind === "email-verification" || kind === "password-reset"
+    ? kind
+    : "magic-link"
+}
+
 export async function sendResendAuthEmail(
   config: ResendConfig,
   message: MagicLinkMessage
 ): Promise<void> {
-  const verification = message.metadata?.kind === "email-verification"
+  const copy = MESSAGE_COPY[messageKind(message)]
   try {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -52,8 +72,8 @@ export async function sendResendAuthEmail(
       body: JSON.stringify({
         from: config.from,
         to: [message.email],
-        subject: verification ? "Verify your email" : "Your sign-in link",
-        text: `${verification ? "Verify your email" : "Sign in"} using this link:\n\n${message.url}\n\nIf you did not request this, you can ignore this email.`,
+        subject: copy.subject,
+        text: `${copy.action} using this link:\n\n${message.url}\n\nIf you did not request this, you can ignore this email.`,
       }),
     })
     if (!response.ok) throw new Error("Provider rejected request")

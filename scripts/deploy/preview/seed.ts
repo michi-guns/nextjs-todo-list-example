@@ -2,6 +2,10 @@ import { Pool } from "pg"
 
 import type { EnvironmentProfile } from "../../environment/core"
 import { PREVIEW_SEED_USER } from "./constants"
+import {
+  selectAuthMailScheduler,
+  selectStandaloneAuthMail,
+} from "../../../src/modules/auth/infrastructure/mail-scheduler"
 
 export { PREVIEW_SEED_USER } from "./constants"
 
@@ -45,6 +49,8 @@ export async function seedPreview(profile: EnvironmentProfile): Promise<void> {
   const original = rememberEnvironment()
   applyEnvironment(profile)
 
+  // No request scope: send in-process and drain before closing the pool.
+  const mail = selectStandaloneAuthMail()
   const [{ auth }, database] = await Promise.all([
     import("../../../lib/auth"),
     import("../../../db/db"),
@@ -57,6 +63,8 @@ export async function seedPreview(profile: EnvironmentProfile): Promise<void> {
     )
     await replaceSyntheticRecords(profile.database.runtimeUrl, userId)
   } finally {
+    await mail.drain()
+    selectAuthMailScheduler(undefined)
     restoreEnvironment(original)
     await database.pool.end()
   }

@@ -20,7 +20,28 @@ export { PLAYWRIGHT_USERS }
 
 export { expect }
 
-export const test = base.extend<{ browserDiagnostics: void }>({
+let syntheticClients = 0
+
+export const test = base.extend<{
+  browserDiagnostics: void
+  syntheticClient: void
+}>({
+  // Real auth limits stay on. Each test (and retry) is its own synthetic
+  // client, so one journey cannot spend another's per-address budget. Only
+  // same-origin auth requests carry it; third-party requests are untouched.
+  syntheticClient: [
+    async ({ context, baseURL }, use) => {
+      syntheticClients += 1
+      const address = `198.18.${Math.floor(syntheticClients / 250)}.${(syntheticClients % 250) + 1}`
+      await context.route(`${baseURL}/api/auth/**`, (route) =>
+        route.continue({
+          headers: { ...route.request().headers(), "x-forwarded-for": address },
+        })
+      )
+      await use()
+    },
+    { auto: true },
+  ],
   browserDiagnostics: [
     async ({ page }, use, testInfo) => {
       const failures: string[] = []

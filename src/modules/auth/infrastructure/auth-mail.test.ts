@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 
-import { deliverAuthEmail } from "./auth-mail"
+import { createAuthMailer, deliverAuthEmail } from "./auth-mail"
+import { createDrainableScheduler } from "./mail-scheduler"
 import { createLogger } from "../../../shared/logging/logger"
 import { createOperationRunner } from "../../../shared/logging/operation"
 
@@ -156,5 +157,79 @@ describe("deliverAuthEmail", () => {
         token: "secret",
       })
     ).rejects.toThrow(/local mailbox/)
+  })
+})
+
+describe("TST-AUTH-006 auth mail admission and lifetime", () => {
+  const message = {
+    email: "Person@Example.test",
+    url: "https://example.test/api/auth/reset-password/secret-token",
+    token: "secret-token",
+    metadata: { kind: "password-reset" },
+  }
+
+  function mailer(
+    decision: object,
+    deliver = vi.fn().mockResolvedValue(undefined)
+  ) {
+    const scheduler = createDrainableScheduler()
+    const consumeRecipient = vi.fn().mockResolvedValue(decision)
+    const onDenied = vi.fn()
+    return {
+      scheduler,
+      consumeRecipient,
+      deliver,
+      onDenied,
+      subject: createAuthMailer({
+        admission: { consumeRecipient },
+        scheduler: () => scheduler,
+        deliver,
+        onDenied,
+      }),
+    }
+  }
+
+  it("returns before a pending provider call and delivers after admission", async () => {
+    let release!: () => void
+    const pending = new Promise<void>((done) => (release = done))
+    const { scheduler, consumeRecipient, deliver, subject } = mailer(
+      { allowed: true, retryAfter: null },
+      vi.fn().mockReturnValue(pending)
+    )
+    const settled = vi.fn()
+    subject.send(message)
+    await Promise.resolve()
+    const drained = scheduler.drain().then(settled)
+    await new Promise((done) => setTimeout(done, 20))
+    expect(consumeRecipient).toHaveBeenCalledWith("send", message.email)
+    expect(deliver).toHaveBeenCalledWith(message)
+    expect(settled).not.toHaveBeenCalled()
+    release()
+    await drained
+    expect(settled).toHaveBeenCalledOnce()
+  })
+
+  it.each(["limited", "unavailable", "invalid_recipient"] as const)(
+    "suppresses a %s send without throwing an account signal",
+    async (reason) => {
+      const { scheduler, deliver, onDenied, subject } = mailer({
+        allowed: false,
+        retryAfter: null,
+        reason,
+      })
+      expect(() => subject.send(message)).not.toThrow()
+      await scheduler.drain()
+      expect(deliver).not.toHaveBeenCalled()
+      expect(onDenied).toHaveBeenCalledWith(reason)
+    }
+  )
+
+  it("contains a delivery failure inside the scheduled task", async () => {
+    const { scheduler, subject } = mailer(
+      { allowed: true, retryAfter: null },
+      vi.fn().mockRejectedValue(new Error("provider down secret-token"))
+    )
+    subject.send(message)
+    await expect(scheduler.drain()).resolves.toBeUndefined()
   })
 })

@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 70 files and 678 tests (T-27.1 shared admission, 2026-09-24).
+- [x] `pnpm test` passes 72 files and 694 tests (T-27.2 native recovery, 2026-09-25).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1131,8 +1131,8 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 through T-26.11 and T-27.1 are complete,
-leaving 10 unchecked children.
+remaining locally executable children on 2026-09-24; T-26.4 through T-26.6, T-26.8 through T-26.11, T-27.1 and T-27.2 are
+complete, leaving 9 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
 and subagents only for independent review, as the owner requested.
@@ -1898,7 +1898,7 @@ Verification and evidence for this slice:
 
 #### T-27.2: Integrate native recovery and bounded auth-mail delivery
 
-- [ ] Wire recovery, shared admission and explicit mail lifetime through Better Auth.
+- [x] Wire recovery, shared admission and explicit mail lifetime through Better Auth.
 - Files: `lib/auth.ts`, auth configuration/factory and mail scheduler,
   `src/modules/auth/infrastructure/auth-mail.ts`, `resend-mail.ts`, auth route,
   standalone seed callers named in the account plan and focused integration tests.
@@ -1919,6 +1919,14 @@ Verification and evidence for this slice:
   responses do not await provider latency; seeds must explicitly drain delivery.
 - Dependencies/prerequisites: T-27.1; installed dependencies, Docker and Chromium.
   One auth/mail integration review unit; no new provider, queue or auth architecture.
+- Evidence, 2026-09-25: [native recovery](docs/agentforge/evidence/2026-09-25-native-recovery.md) records native reset
+  (30-minute single-use tokens, revocation of every session, no auto sign-in),
+  limits on in every environment, recipient request cooldown and actual-send
+  cap across HTTP, `auth.api` and automatic sends, fail-closed admission,
+  post-response mail with explicit standalone draining in the four seeds, and
+  synthetic client addresses in tests instead of disabled limits.
+  `TST-AUTH-004`/`005` are `partial`; `006` stays `partial`.
+- Review: pending a fresh exact-tip independent review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `better-auth-best-practices`,
   `email-and-password-best-practices`, `security-and-hardening`, `next-dev-loop`,

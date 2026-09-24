@@ -1,6 +1,8 @@
 import { captureMagicLink, type MagicLinkMessage } from "./local-mailbox"
 import { readResendConfig, sendResendAuthEmail } from "./resend-mail"
 import { observeOperation } from "../../../shared/logging/operation"
+import type { RecipientAdmission } from "./auth-rate-limit"
+import type { AuthMailScheduler } from "./mail-scheduler"
 
 export async function deliverAuthEmail(
   message: MagicLinkMessage
@@ -43,4 +45,44 @@ async function deliver(message: MagicLinkMessage): Promise<void> {
     return
   }
   await captureMagicLink(message)
+}
+
+type DeniedReason = Extract<RecipientAdmission, { allowed: false }>["reason"]
+
+/**
+ * The single auth-mail boundary Better Auth callbacks use. Every message,
+ * automatic or requested, is charged to the recipient's actual-send budget
+ * and delivered outside the auth response. A denied or failed send is
+ * suppressed without throwing, so callers cannot learn whether an account
+ * exists; the reason goes to sanitized diagnostics only.
+ */
+export function createAuthMailer(options: {
+  admission: {
+    consumeRecipient(kind: "send", email: string): Promise<RecipientAdmission>
+  }
+  scheduler: () => AuthMailScheduler
+  deliver?: (message: MagicLinkMessage) => Promise<void>
+  onDenied?: (reason: DeniedReason) => void
+}) {
+  const deliver = options.deliver ?? deliverAuthEmail
+  return {
+    send(message: MagicLinkMessage): void {
+      options.scheduler().schedule(async () => {
+        try {
+          const admission = await options.admission.consumeRecipient(
+            "send",
+            message.email
+          )
+          if (!admission.allowed) {
+            options.onDenied?.(admission.reason)
+            return
+          }
+          await deliver(message)
+        } catch {
+          // Delivery already reported its sanitized failure; nothing carrying
+          // mail content may reach the caller.
+        }
+      })
+    },
+  }
 }

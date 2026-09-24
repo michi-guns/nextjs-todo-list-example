@@ -6,6 +6,11 @@ import {
   NEON_DEVELOPMENT_BEHAVIOR_TASK_COUNT,
   NEON_DEVELOPMENT_SEED_USER,
 } from "./constants"
+import {
+  drainingMailbox,
+  selectAuthMailScheduler,
+  selectStandaloneAuthMail,
+} from "../../src/modules/auth/infrastructure/mail-scheduler"
 
 export { NEON_DEVELOPMENT_SEED_USER } from "./constants"
 
@@ -48,11 +53,14 @@ export async function seedNeonDevelopment(
   const original = rememberEnvironment()
   applyEnvironment(profile)
 
-  const [{ auth }, mailbox, database] = await Promise.all([
+  // No request scope: send in-process and drain before reading or closing.
+  const mail = selectStandaloneAuthMail()
+  const [{ auth }, localMailbox, database] = await Promise.all([
     import("../../lib/auth"),
     import("../../src/modules/auth/infrastructure/local-mailbox"),
     import("../../db/db"),
   ])
+  const mailbox = drainingMailbox(localMailbox, mail)
 
   try {
     const userId = await ensureVerifiedUser(
@@ -63,6 +71,8 @@ export async function seedNeonDevelopment(
     await replaceSyntheticRecords(profile.database.runtimeUrl, userId, mode)
     await mailbox.clearMagicLinkMailbox()
   } finally {
+    await mail.drain()
+    selectAuthMailScheduler(undefined)
     restoreEnvironment(original)
     await database.pool.end()
   }

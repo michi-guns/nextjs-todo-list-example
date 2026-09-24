@@ -50,6 +50,10 @@ describe("Resend delivery", () => {
   it.each([
     [message, "Verify your email"],
     [{ ...message, metadata: undefined }, "Your sign-in link"],
+    [
+      { ...message, metadata: { kind: "password-reset" } },
+      "Reset your password",
+    ],
   ])("sends the original auth URL as plain text", async (input, subject) => {
     const fetchMock = vi
       .fn()

@@ -2,6 +2,11 @@ import { Pool } from "pg"
 
 import { assertLocalPostgresUrl } from "../../src/test/postgres-harness"
 import type { MagicLinkMessage } from "../../src/modules/auth/infrastructure/local-mailbox"
+import {
+  drainingMailbox,
+  selectAuthMailScheduler,
+  selectStandaloneAuthMail,
+} from "../../src/modules/auth/infrastructure/mail-scheduler"
 
 export const PLAYWRIGHT_PASSWORD = "Playwright local password 123!"
 
@@ -265,6 +270,9 @@ async function createVerifiedUser(
       headers: {
         "content-type": "application/json",
         origin,
+        // One synthetic client per fixture keeps seeding inside the real
+        // sign-up limit instead of disabling it.
+        "x-forwarded-for": `192.0.2.${PLAYWRIGHT_USER_KEYS.indexOf(userKey) + 1}`,
       },
       body: JSON.stringify({
         name: `Playwright ${userKey}`,
@@ -359,11 +367,14 @@ export async function seedPlaywrightDatabase(
     throw new Error("Playwright seed requires a loopback base URL")
   }
 
-  const [{ auth }, mailbox, database] = await Promise.all([
+  // No request scope: send in-process and drain before reading or closing.
+  const mail = selectStandaloneAuthMail()
+  const [{ auth }, localMailbox, database] = await Promise.all([
     import("../../lib/auth"),
     import("../../src/modules/auth/infrastructure/local-mailbox"),
     import("../../db/db"),
   ])
+  const mailbox = drainingMailbox(localMailbox, mail)
   const authDatabasePool = database.pool
   const users: Partial<Record<PlaywrightUserKey, PlaywrightSeedUser>> = {}
 
@@ -388,6 +399,8 @@ export async function seedPlaywrightDatabase(
 
     return { users: completeUsers, ...plan }
   } finally {
+    await mail.drain()
+    selectAuthMailScheduler(undefined)
     await authDatabasePool.end()
   }
 }

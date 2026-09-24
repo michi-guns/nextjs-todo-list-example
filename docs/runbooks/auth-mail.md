@@ -1,7 +1,10 @@
 # Authentication mail
 
-Better Auth generates verification and magic-link URLs. Both callbacks await
-`deliverAuthEmail` in `src/modules/auth/infrastructure/auth-mail.ts`.
+Better Auth generates verification, password-reset and magic-link URLs. Every
+callback hands the message to `createAuthMailer` in
+`src/modules/auth/infrastructure/auth-mail.ts`, which charges the recipient's
+send budget and then calls `deliverAuthEmail` outside the auth response (see
+[Limits and delivery lifetime](#limits-and-delivery-lifetime)).
 
 Local and Development use the explicitly enabled local mailbox. Preview uses
 the controlled verified account and sends no mail. These profiles reject a
@@ -112,6 +115,37 @@ GitHub secret values cannot be read back for comparison. A credential repair
 requires an authorized secret update and a new deployment because the release
 runner supplies configuration to each deployment. Retest the owner-approved
 mail journey; a successful shape check alone cannot close the incident.
+
+## Limits and delivery lifetime
+
+Since T-27.2 the auth limits run in every environment against the shared
+PostgreSQL counters from T-27.1 (`auth_rate_limit`, opaque HMAC keys). The
+values live in `src/modules/auth/infrastructure/auth-policy.ts`:
+
+| Limit                                                          | Value                   |
+| -------------------------------------------------------------- | ----------------------- |
+| Native sign-in/sign-up, reset/verification request, magic link | Better Auth's own rules |
+| Reset submissions per client address                           | 5 per 60 s              |
+| Explicit email requests per recipient (reset, resend, link)    | 1 per 60 s              |
+| Actual auth emails per recipient, all kinds                    | 5 per 15 min            |
+| Reset link lifetime                                            | 30 min, single use      |
+
+- A second explicit request inside the window answers `429
+RECIPIENT_COOLDOWN` with `X-Retry-After`, for known and unknown addresses
+  alike, including `auth.api` calls. A send over the budget is dropped
+  silently and logged only as `auth.mail.send.limited`.
+- If the counters cannot be reached, admission fails closed: explicit
+  requests answer a generic `503`, HTTP auth answers `429`, and no mail is
+  sent. Look for `auth.admission.unavailable` or
+  `auth.mail.send.unavailable` and check the database first.
+- A successful password reset ends every session of that account and does not
+  sign in. Throttling never locks an account or ends a session.
+- On Vercel only `x-vercel-forwarded-for` identifies the client.
+- Mail runs after the response through Next `after()`. Seeds, scripts and
+  integration tests have no request scope: they call
+  `selectStandaloneAuthMail()` and `drain()` before reading the mailbox or
+  closing the pool. Tests keep the real limits and use distinct synthetic
+  client addresses instead of disabling them.
 
 References: [Resend send API](https://resend.com/docs/api-reference/emails/send-email),
 [Resend test addresses](https://resend.com/docs/dashboard/emails/send-test-emails),

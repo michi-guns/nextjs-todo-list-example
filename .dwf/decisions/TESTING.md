@@ -308,7 +308,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 
 ### TST-AUTH-004 — Password recovery and automatic session revocation
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Account recovery
 - **Evidence layers/modes:** Auth boundary, PostgreSQL integration, browser
 - **Verifies product decisions:** D-002, D-011
@@ -318,14 +318,14 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Contract:** Recovery requests remain neutral regardless of account existence. An expiring, single-use link permits a new password; successful reset revokes every existing session and requires ordinary sign-in. Requesting mail, invalid/expired/replayed links and throttled requests do not revoke sessions, lock the account or change credentials.
 - **Required evidence:** Focused boundary checks for neutral responses and timing-safe mail scheduling; real PostgreSQL checks for expiry, malformed/reused links, concurrent consumption without two successful resets, and revocation of at least two prior sessions only after a successful reset. A real browser journey requests/captures/consumes the reset link through the existing local mailbox, rejects old session cookies and the old password, and signs in normally with the new password. Logs and browser artifacts exclude reset credentials and URLs.
 - **Dependencies:** The existing Better Auth/mail seam, database and browser harnesses; implementation planning supplies exact lifetime and ordinary password-policy cases. Hosted delivery requires separately authorized evidence under the existing environment policy.
-- **Current evidence:** None for this extension. Existing TST-AUTH-001–003 evidence remains valid only for its original scope.
+- **Current evidence:** Partial, 2026-09-25 ([T-27.2 evidence](../../docs/agentforge/evidence/2026-09-25-native-recovery.md)). Backend verified on real PostgreSQL through the Better Auth handler: neutral known/unknown requests, 30-minute single-use tokens, one success under concurrent consumption, revocation of two prior sessions only after a successful reset without auto sign-in, old password refused, and invalid/expired/throttled requests leaving sessions and credentials unchanged; responses do not wait for scheduled mail. Recovery screens and the browser journey remain T-27.3; hosted proof T-27.4. Existing TST-AUTH-001–003 evidence remains valid only for its original scope.
 - **Follow-up:** Implement and reconcile under T-27 after consolidated planning; do not infer completion from this decision record.
 
 <a id="tst-auth-005"></a>
 
 ### TST-AUTH-005 — Verification resend and invalid-link recovery
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Account recovery
 - **Evidence layers/modes:** Auth boundary, PostgreSQL integration, browser
 - **Verifies product decisions:** D-002, D-011
@@ -335,7 +335,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Contract:** Pending verification offers explicit resend; expired/invalid links have clear guidance and a fresh-link path. Resend is bounded, account existence remains private, and normal Better Auth verification/session behavior is preserved.
 - **Required evidence:** Boundary/database checks for pending, absent and already-verified recipients, invalid/expired links and resend throttling; browser journeys exercise resend and recovery through the local mailbox and prove private access only after normal successful verification. Preserve the existing fresh-signup verification journey and redact link-bearing diagnostics/artifacts. Do not impose password-reset single-use semantics on native verification tokens.
 - **Dependencies:** Existing verification UI/mail seam and database/browser harnesses, plus the shared controls in TST-AUTH-006. Hosted mail evidence remains separate.
-- **Current evidence:** The completed T-27 local signup/verification slice proves the baseline only; no resend/recovery evidence yet.
+- **Current evidence:** Partial, 2026-09-25 ([T-27.2 evidence](../../docs/agentforge/evidence/2026-09-25-native-recovery.md)). Backend verified: resend answers identically for pending, absent and verified recipients and mails only the pending one, repeat requests are throttled, invalid links report `INVALID_TOKEN`, an expired link reports `TOKEN_EXPIRED` without verifying, and the unexpired link then verifies normally. Browser resend/recovery surfaces remain T-27.3. The completed local signup/verification slice remains the baseline.
 - **Follow-up:** Implement and reconcile under T-27 after consolidated planning.
 
 <a id="tst-auth-006"></a>
@@ -352,7 +352,7 @@ was exercised. The accepted local lifecycle status below is unchanged.
 - **Contract:** Supported per-IP limits protect relevant sign-up, sign-in and auth-email paths. A shared per-recipient budget bounds verification, reset and magic-link mail, including automatic and server-side sends. Environment-scoped PostgreSQL counters admit requests atomically across instances. Excess requests produce a safe temporary wait, no account lockout or enumeration signal, and no sensitive logging.
 - **Required evidence:** Real database concurrency across independent limiter instances at first use, limit exhaustion and window expiry; prove IP rotation cannot bypass the recipient bound and independent environments do not share budgets. Exercise automatic signup/sign-in, explicit resend/reset/magic-link and relevant `auth.api` send paths, accounting for the HTTP limiter's server-call bypass and development defaults. Check common counter failures do not silently allow unbounded mail, recipient cooldown responses do not distinguish absent accounts, and retry feedback allows recovery without changing credentials or active sessions. Retain the existing migration and environment safety obligations for any new schema; in-memory mocks alone cannot verify shared atomicity.
 - **Dependencies:** Existing environment-selected PostgreSQL and Better Auth/Drizzle integration; planning specifies supported integration, concrete windows/counts and trusted IP handling. No new service is required.
-- **Current evidence:** Partial, 2026-09-24 ([T-27.1 evidence](../../docs/agentforge/evidence/2026-09-24-auth-admission.md)). The storage portion is verified on disposable PostgreSQL 18 with independent pools: exactly the maximum admitted under simultaneous first use and after window expiry, rejection without counting or extending the window, bounded expired-row cleanup, a recipient send budget that holds across independent instances, separate request/send namespaces and environments, opaque HMAC keys only, denial when the database is unreachable, and the forward migration's prior-schema upgrade. Better Auth wiring, `auth.api`/automatic send paths, trusted IP handling and browser feedback remain for T-27.2/T-27.3; hosted proof is T-27.4.
+- **Current evidence:** Partial, 2026-09-24 ([T-27.1 evidence](../../docs/agentforge/evidence/2026-09-24-auth-admission.md)). The storage portion is verified on disposable PostgreSQL 18 with independent pools: exactly the maximum admitted under simultaneous first use and after window expiry, rejection without counting or extending the window, bounded expired-row cleanup, a recipient send budget that holds across independent instances, separate request/send namespaces and environments, opaque HMAC keys only, denial when the database is unreachable, and the forward migration's prior-schema upgrade. T-27.2 ([evidence](../../docs/agentforge/evidence/2026-09-25-native-recovery.md)) adds the wiring: limits on in every environment, recipient request cooldown before account lookup for HTTP and `auth.api` calls, an actual-send cap that holds across rotating client addresses for automatic sends, per-address reset-submission limits, fail-closed admission and opaque stored keys. Browser feedback remains T-27.3; hosted proof is T-27.4.
 - **Follow-up:** Implement and reconcile under T-27 after consolidated planning, together with TST-AUTH-004/005.
 
 <a id="tst-lists-001"></a>
