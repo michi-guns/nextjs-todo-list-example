@@ -103,3 +103,39 @@ Each dependency failure also writes one `warn` log
 outcome: to the console, and to the diagnostics provider's logs when policy
 allows, flushed before the response. It never creates an issue: the uptime
 monitor owns alerting.
+
+## Release-failure Email
+
+When the protected Production release step fails, the workflow's
+`Notify release failure` step runs
+`pnpm exec tsx scripts/deploy/production/notify.ts`. It uses the reusable
+`NotificationPort` (`src/shared/operational-alerts/contracts.ts`) and its Resend
+Email adapter (`resend-email.ts`). It needs no application, database or auth
+mail, so it works during a total outage as long as the GitHub runner runs.
+
+| Release record                                                    | Email                                                     |
+| ----------------------------------------------------------------- | --------------------------------------------------------- |
+| This run and commit, failed in migration/deployment/smoke         | One Email naming that stage                               |
+| This run and commit, failed only in preflight                     | None: nothing changed; the run's failure is enough        |
+| Missing, invalid, or another run's/commit's record                | One Email with stage `unknown`, from trusted run metadata |
+| Succeeded, skipped or unapproved run, or a later artifact failure | None: the step does not run                               |
+
+Configuration lives only in the protected step's environment:
+`RESEND_API_KEY` and `APP_MAIL_FROM` (the existing Production sender) and the
+`RELEASE_ALERT_EMAIL` recipient secret. None is ever an argument or a record
+field.
+
+- The idempotency key is `release_failed/<repository>/<run id>/<run attempt>`,
+  and the payload is fixed before the first request. Rerunning the same
+  attempt reuses both; re-running the workflow is a new attempt and a new
+  Email. Resend keeps keys for 24 hours only, so a retry after that window can
+  deliver a duplicate. There are no reminders and no incident state.
+- Each request has a ten-second timeout; up to three attempts retry network
+  errors, timeouts, `429` and `5xx`. Other refusals stop at once.
+- If the Email cannot be handed to Resend, the step fails with one safe
+  annotation (`Release-failure alert not sent: <reason>`, for example
+  `not_configured`, `rejected`, `timeout`). The release step's failure, its
+  record and the job result are unchanged.
+- Provider acceptance is not mailbox receipt, and nothing is sent when the
+  runner itself never starts. Native uptime and Sentry Email do not use this
+  port. Real delivery and receipt proof is T-26.14.

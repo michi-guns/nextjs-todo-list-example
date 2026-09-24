@@ -55,6 +55,9 @@ See the [accepted plan](../agentforge/plans/2026-09-16-t-23-production-release.m
    `DATABASE_ENDPOINT_HOST` and `HEALTH_PROBE_SECRET`; the release refuses to
    start without a valid `HEALTH_PROBE_SECRET` in the `production`
    Environment. See the [operations runbook](operations.md).
+   If this step fails in migration, deployment or smoke, the next step sends
+   one release-failure Email to `RELEASE_ALERT_EMAIL`
+   ([operations runbook](operations.md#release-failure-email)).
 6. Review the safe JSON in the job summary and the
    `production-release-<SHA>-<attempt>` artifact. Record the workflow approval,
    SHA, CI run, migration outcome, deployment id, rollback reference and smoke

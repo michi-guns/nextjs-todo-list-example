@@ -155,7 +155,7 @@ The `testing-first-class` project skill operationalizes this protocol. The skill
 | [TST-LOGGING-002](#tst-logging-002)         | Shared policy refresh and protected edits preserve environment isolation             | Unit, PostgreSQL integration, operator refusal checks                | T-26.2, T-26.3                                                     | `verified`  |
 | [TST-DIAGNOSTICS-001](#tst-diagnostics-001) | Safe diagnostics preserve routing, privacy and lifecycle                             | Unit, PostgreSQL policy, isolated Next runtime                       | T-26.4–T-26.6                                                      | `verified`  |
 | [TST-DIAGNOSTICS-002](#tst-diagnostics-002) | Both providers receive useful safe logs and grouped errors                           | Local wire and real hosted ingestion/grouping                        | T-26.5–T-26.7                                                      | `partial`   |
-| [TST-ALERTS-001](#tst-alerts-001)           | Operational alerts stay independent of app outage and have one delivery owner        | Contract, adapter, external outage and Email evidence                | T-26.11–T-26.14                                                    | `specified` |
+| [TST-ALERTS-001](#tst-alerts-001)           | Operational alerts stay independent of app outage and have one delivery owner        | Contract, adapter, external outage and Email evidence                | T-26.11–T-26.14                                                    | `partial`   |
 | [TST-RUNTIME-001](#tst-runtime-001)         | Runtime targets, health and deployed identity are safe and verifiable                | Configuration, local database/Next, pipeline and hosted smoke        | T-26.8–T-26.10, T-26.12                                            | `partial`   |
 
 ## Test contracts
@@ -914,7 +914,7 @@ These original logger contracts retain their stage-specific meaning.
 
 ### TST-ALERTS-001 — Independent operational notification boundary
 
-- **Status:** `specified`
+- **Status:** `partial`
 - **Capability:** Operational alerts
 - **Evidence layers/modes:** Port/adapter contract, integration, controlled external outage evidence
 - **Verifies product decisions:** D-012
@@ -925,7 +925,7 @@ These original logger contracts retain their stage-specific meaning.
 - **Required evidence:** Prove the Production-only native policy with real authorized external evidence: distinguish app/database/CMS failure, record detection/confirmation/recovery and Email timestamps, reset unstable recovery, and verify one opening/recovery Email with no repeats or duplicate application alerts. A CMS failure is not total downtime and confirmation is not an onset-to-alert deadline. Prove Sentry new-group and resolved-then-regressed Email, no per-occurrence repeats or expected-error/warning alerts, and no overlapping Issue Workflow/issue-alert notifications. Local mocks/log ingestion cannot establish native delivery or free-account entitlement.
 - **Release port/adapter evidence:** Exercise migration, deployment and final-verification failures from trusted workflow outcomes and sanitized release records, including missing-record fallback. Inspect actual Resend HTTP payloads against a local collector, same-key/same-payload retries, distinct workflow attempts, the 24-hour idempotency limit, timeout/refusal/invalid responses, secret/recipient redaction and preservation of the original nonzero release result. Prove no database/auth imports or live-app calls are required. Separately authorized real Resend acceptance and receipt, using the protected runner, remain required; HTTP acceptance alone is not mailbox proof.
 - **Dependencies:** Accepted plans and task breakdown; installed dependencies and local harness where named; protected account/project access, sender/recipient/secret configuration and explicit hosted verification authorization. Recipient configuration is not an open product decision. Recheck current free-tier eligibility/quotas at setup; no paid upgrade is authorized.
-- **Current evidence:** None. Existing logger/diagnostics contracts and source inspection do not verify this extension.
+- **Current evidence:** T-26.11 [release-failure Email evidence](../../docs/agentforge/evidence/2026-09-24-release-failure-email.md) covers the local release path: trusted-record decisions for migration/deployment/smoke failures, no alert on success or preflight-only refusal, unknown-stage fallback for absent/invalid/foreign records, actual Resend-compatible HTTP against a local collector (payload, stable idempotency key and identical retries, new key per attempt, 429/5xx/timeout retries, refusals, invalid responses), secret/recipient redaction, the runner command's exit behavior, no app/database/auth imports and the workflow's release-step-only condition. No real mail was sent; native uptime/Sentry paths and real receipt remain for T-26.12–T-26.14.
 - **Follow-up:** Implement T-26.11's local release path, then T-26.12 uptime, T-26.13 Sentry and T-26.14 protected release-Email evidence. Reconcile partial versus complete proof without reopening accepted policy or claiming hosted readiness from local tests.
 
 <a id="tst-runtime-001"></a>

@@ -55,7 +55,7 @@ describe("protected Production release workflow", () => {
     )
     const consumer = source
       .split("      - name: Run protected release")[1]
-      .split("      - name: Publish safe release record")[0]
+      .split("      - name: Notify release failure")[0]
     for (const name of [
       "VERCEL_TOKEN",
       "NEON_API_KEY",
@@ -69,6 +69,33 @@ describe("protected Production release workflow", () => {
     ])
       expect(consumer).toContain(`${name}: \${{ secrets.${name} }}`)
     expect(consumer).toContain("run: pnpm release -- release")
+  })
+  it("sends the release-failure Email only after the release step itself fails", () => {
+    const source = workflow()
+    const release = source
+      .split("      - name: Run protected release")[1]
+      .split("      - name: ")[0]
+    expect(release).toContain("id: release")
+    const notify = source
+      .split("      - name: Notify release failure")[1]
+      .split("      - name: ")[0]
+    expect(notify).toContain(
+      "if: ${{ failure() && steps.release.outcome == 'failure' }}"
+    )
+    expect(notify).toContain(
+      "run: pnpm exec tsx scripts/deploy/production/notify.ts"
+    )
+    for (const name of ["RESEND_API_KEY", "RELEASE_ALERT_EMAIL"])
+      expect(notify).toContain(`${name}: \${{ secrets.${name} }}`)
+    expect(notify).toContain("APP_MAIL_FROM: ${{ vars.APP_MAIL_FROM }}")
+    // Key, sender and recipient only: no database, Vercel, Neon or auth access.
+    expect(notify).not.toMatch(
+      /DATABASE_URL|VERCEL_TOKEN|NEON_API_KEY|BETTER_AUTH/
+    )
+    // Runs before record publication, whose own failure cannot trigger it.
+    expect(source.indexOf("Notify release failure")).toBeLessThan(
+      source.indexOf("Publish safe release record")
+    )
   })
   it("always attempts safe record publication and contains no seed or rollback command", () => {
     const source = workflow()

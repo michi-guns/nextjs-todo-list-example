@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 67 files and 641 tests (T-26.10 release smoke, 2026-09-24).
+- [x] `pnpm test` passes 69 files and 667 tests (T-26.11 release-failure Email, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1131,7 +1131,7 @@ has been performed by this planning delivery.
 The accepted plans map to **21 child tasks**: T-26.1–T-26.14,
 T-27.1–T-27.4 and T-28.1–T-28.3. Separate owner next-task instructions authorized
 T-26.1 through T-26.3 on 2026-09-19; all three are complete. The owner authorized the
-remaining locally executable children on 2026-09-24; T-26.4 through T-26.6 and T-26.8 through T-26.10 are complete, leaving 12
+remaining locally executable children on 2026-09-24; T-26.4 through T-26.6 and T-26.8 through T-26.11 are complete, leaving 11
 unchecked children.
 The plans themselves authorize task definition only. Further execution requires
 the owner's instruction and the named prerequisites. Use one implementing agent
@@ -1208,7 +1208,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Acceptance: operators can diagnose target mismatch, migration failure, auth/mail failure, and Sanity outage from safe telemetry; health checks do not leak credentials or falsely report readiness; production errors are actionable without logging tokens or personal data; deployment smoke uses the resolved release identity.
 - Contracts/evidence: `TST-LOGGING-001`/`002`, `TST-DIAGNOSTICS-001`/`002`, `TST-RUNTIME-001` and `TST-ALERTS-001`; preserve current route behavior and existing `TST-*` obligations.
 - Checks: focused unit/integration tests, `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, security/log review, and `git diff --check`.
-- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.6 and T-26.8 through T-26.10 are complete; the remaining 5 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.8 through T-26.10 are complete and T-26.11 is next in the serial order; T-26.7 awaits hosted provider authorization. Provider setup and hosted evidence retain separate authorization boundaries.
+- Dependencies/unblock: T-24/T-25 and product/technical decisions are complete. T-26.1 through T-26.6 and T-26.8 through T-26.11 are complete; the remaining 4 children have accepted plans. The owner authorized the locally executable children and the T-26.5 SDK install on 2026-09-24; hosted children still await their named authorizations. T-26.8 through T-26.11 are complete; the remaining T-26 children are hosted and await authorization; T-26.7 awaits hosted provider authorization. Provider setup and hosted evidence retain separate authorization boundaries.
 - Recommended AgentForge skills: `observability-and-instrumentation`, `security-and-hardening`, `testing-first-class`, `test-driven-development`, and `git-workflow-and-versioning`.
 
 <a id="t-261"></a>
@@ -1692,7 +1692,7 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 
 #### T-26.11: Send release-failure alerts through the workflow Email adapter
 
-- [ ] Implement the complete local release-notification path, including workflow wiring.
+- [x] Implement the complete local release-notification path, including workflow wiring.
 - Files: `src/shared/operational-alerts/contracts.ts`, `resend-email.ts` and tests;
   `scripts/deploy/production/notify.ts` with testable core, workflow/static tests,
   `docs/runbooks/operations.md` and Production release guidance. Preserve auth mail.
@@ -1715,6 +1715,14 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
 - Dependencies/prerequisites: T-26.10 for serialized workflow integration;
   installed dependencies, no new SDK/account or local database required.
   One port/adapter/workflow review unit. Real runner/receipt proof is T-26.14.
+- Evidence, 2026-09-24: [release-failure Email](docs/agentforge/evidence/2026-09-24-release-failure-email.md)
+  records the port, Resend adapter and runner command against a local
+  collector (mapping, stable key and identical retries, refusals, timeouts,
+  invalid responses, redaction), trusted-record decisions and fallback, no
+  app/database/auth imports and the release-step-only workflow condition.
+  No real mail. The `production` Environment needs a `RELEASE_ALERT_EMAIL`
+  secret (owner provisioning, not done). `TST-ALERTS-001` is `partial`.
+- Review: pending a fresh exact-tip independent review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `api-and-interface-design`, `ci-cd-and-automation`,
   `security-and-hardening`, `documentation-and-adrs`, `code-review-and-quality`,

@@ -961,6 +961,11 @@ still require their stated prerequisites and execution authorization.
 [TST-ALERTS-001](../../decisions/TESTING.md#tst-alerts-001) owns future evidence;
 existing diagnostics tests cannot prove outage notification delivery.
 
+Status: the NotificationPort, its Resend Email adapter and the protected
+workflow's release-failure step (T-26.11) are implemented and verified locally
+([evidence](../../../docs/agentforge/evidence/2026-09-24-release-failure-email.md));
+native uptime, Sentry and real release-Email evidence (T-26.12–T-26.14) remain.
+
 <a id="runtime-health-safety"></a>
 
 ### 11.4 Runtime target safety and dependency health

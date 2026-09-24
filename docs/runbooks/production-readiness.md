@@ -50,6 +50,9 @@ The [TD-026](../../.dwf/decisions/TECHNICAL.md#td-026) and
 - From T-26.10, a `HEALTH_PROBE_SECRET` (32-256 printable characters) in both
   the `preview` and `production` GitHub Environments. Without it the next
   Preview or Production run refuses to start; no earlier run needed it.
+- From T-26.11, a `RELEASE_ALERT_EMAIL` recipient secret in the `production`
+  Environment. Without it a failed release still fails normally, but its
+  release-failure Email step reports `not_configured` instead of sending.
 - A reviewed forward-migration and application recovery procedure with
   deployment/migration records. Follow the existing
   [failed-migration runbook](failed-database-migration.md); never assume an
