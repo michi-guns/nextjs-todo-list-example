@@ -93,12 +93,16 @@ export function createDiagnosticsDispatcher(options: {
     reportError(context: SafeContext, error: unknown): void {
       try {
         const active = strategy
-        if (!active) return
+        // Project (read stack/cause) only for an eligible report.
+        if (
+          !active ||
+          !allowsErrorReport(options.policy(), context.module, context.event)
+        )
+          return
         const report = projectErrorReport(error, {
           ...context,
           ...(release ? { release } : {}),
         })
-        if (!gate.allowsReport(report)) return
         send(report, () => active.reportError(report))
       } catch {
         notice("export_failed")

@@ -72,15 +72,15 @@ describe("TST-DIAGNOSTICS-001 safe error reports", () => {
   })
 
   it("groups repeated occurrences by stable safe fields, never by occurrence or request IDs", () => {
-    const stack =
-      "TypeError: x\n    at createList (C:/Users/private-person/work/app/src/a.ts:1:1)"
+    const stack = (message: string) =>
+      `Error: ${message}\n    at createList (C:/Users/private-person/work/app/src/a.ts:1:1)`
     const first = projectErrorReport(
-      errorWithStack("first person@example.com", stack),
+      errorWithStack("first", stack("first")),
       context,
       { root }
     )
     const second = projectErrorReport(
-      errorWithStack("second text", stack),
+      errorWithStack("second", stack("second")),
       { ...context, correlationId: "22222222-2222-4222-8222-222222222222" },
       { root }
     )
@@ -124,7 +124,7 @@ describe("TST-DIAGNOSTICS-001 safe error reports", () => {
     for (let i = 0; i < 6; i++)
       chain = new Error(`level ${i}`, { cause: chain })
     Object.defineProperty(chain as Error, "stack", {
-      value: `Error\n${"    at f (/x/a.ts:1:1)\n".repeat(50)}`,
+      value: `Error: level 5\n${"    at f (/x/a.ts:1:1)\n".repeat(50)}`,
     })
     const report = projectErrorReport(chain, context, { root })
     expect(report.causes).toHaveLength(3)
@@ -147,6 +147,53 @@ describe("TST-DIAGNOSTICS-001 safe error reports", () => {
     expect(report.error.frames.map((frame) => frame.function)).not.toContain(
       "forged"
     )
+  })
+
+  it.each([
+    [
+      "rewritten after the stack was formatted",
+      (error: Error) => {
+        void error.stack
+        error.message = "wrapped"
+      },
+    ],
+    [
+      "an accessor",
+      (error: Error) => {
+        void error.stack
+        Object.defineProperty(error, "message", { get: () => "x" })
+      },
+    ],
+  ])(
+    "drops all frames when the header cannot be verified because the message is %s",
+    (_, change) => {
+      const error = new Error(
+        "orig for person@example.com\n    at leak (/tmp/person@example.com.ts:1:1)"
+      )
+      change(error)
+      const report = projectErrorReport(error, context, { root })
+      expect(report.error.frames).toEqual([])
+      expect(report.fingerprint.at(-1)).toBe("no-frame")
+      expect(JSON.stringify(report)).not.toMatch(/person@example\.com|leak/)
+    }
+  )
+
+  it("groups by the first in-app frame, ignoring hashed build chunks and packages", () => {
+    const stack = (...frames: string[]) =>
+      errorWithStack("x", ["Error: x", ...frames].join("\n"))
+    const chunk = `    at a (${root}/.next/server/chunks/06bi_zod._.js:1:1)`
+    const pkg = `    at b (${root}/node_modules/pg/lib/client.js:2:2)`
+    const app = `    at createList (${root}/src/modules/lists/service.ts:3:3)`
+    expect(
+      projectErrorReport(stack(chunk, pkg, app), context, {
+        root,
+      }).fingerprint.at(-1)
+    ).toBe("src/modules/lists/service.ts:createList")
+    expect(
+      projectErrorReport(stack(chunk, pkg), context, { root }).fingerprint.at(
+        -1
+      )
+    ).toBe("no-frame")
   })
 
   it.each([

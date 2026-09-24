@@ -268,7 +268,11 @@ An absent row inspects as `policy: null, revision: 0`. For the first write,
 }
 ```
 
-A version-1 file is still accepted and stored as its version-2 upgrade.
+A version-1 file is still accepted and stored as its version-2 upgrade. Code
+older than T-26.4 rejects a stored version-2 row as `invalid_policy`: running
+instances keep their last valid policy and new instances start from cold
+defaults. After such a rollback, publish a version-1 file with that release's
+CLI to restore control.
 
 For later updates, inspect the current revision, increment `revision` by one
 in the full policy file, and pass the old revision as `--expected-revision`.

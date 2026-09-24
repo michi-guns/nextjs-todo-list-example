@@ -66,7 +66,14 @@ export function createLogger(options: {
           environment: environment.data!,
           ...currentLogContext(),
         }
-        if (route.console) write(level, record)
+        // Each destination fails independently of the other.
+        if (route.console) {
+          try {
+            write(level, record)
+          } catch {
+            /* No fallback output: a failing destination must not recurse. */
+          }
+        }
         if (remote) {
           try {
             diagnostics!.log(level, record)

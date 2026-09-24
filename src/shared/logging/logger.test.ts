@@ -280,3 +280,30 @@ describe("TST-DIAGNOSTICS-001 facade routing", () => {
     expect(write).toHaveBeenCalledOnce()
   })
 })
+
+describe("TST-DIAGNOSTICS-001 destination failure isolation", () => {
+  it("still exports an eligible remote event when the console writer fails", () => {
+    const diagnostics = {
+      active: () => true,
+      log: vi.fn(),
+      reportError: vi.fn(),
+    }
+    const log = createLogger({
+      environment: "local",
+      policy: () => ({
+        ...defaultLogPolicy,
+        diagnostics: {
+          ...defaultLogPolicy.diagnostics,
+          enabled: true,
+          minimumLevel: "info" as const,
+        },
+      }),
+      write: () => {
+        throw new Error("stdout closed")
+      },
+      diagnostics,
+    })("lists")
+    expect(() => log.emit("warn", "list.read.slow")).not.toThrow()
+    expect(diagnostics.log).toHaveBeenCalledOnce()
+  })
+})

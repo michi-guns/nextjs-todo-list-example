@@ -201,3 +201,23 @@ describe("TST-DIAGNOSTICS-001 dispatcher", () => {
     expect(notice).toHaveBeenCalledOnce()
   })
 })
+
+describe("TST-DIAGNOSTICS-001 dispatcher report eligibility", () => {
+  it("checks report policy before reading or projecting a disallowed failure", () => {
+    const { dispatcher } = fixture({
+      ...exporting,
+      diagnostics: { ...exporting.diagnostics, errorReportsEnabled: false },
+    })
+    const reportError = vi.fn()
+    dispatcher.install(
+      { log: () => {}, reportError, flush: async () => {} },
+      {}
+    )
+    const stackReads = vi.fn(() => "Error: x")
+    const failure = new Error("x")
+    Object.defineProperty(failure, "stack", { get: stackReads })
+    dispatcher.reportError(reportContext, failure)
+    expect(stackReads).not.toHaveBeenCalled()
+    expect(reportError).not.toHaveBeenCalled()
+  })
+})
