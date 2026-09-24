@@ -53,8 +53,16 @@ beforeAll(() => {
     leak: "secret-token",
     operation: "secret-token",
     "sentry.release": "secret-token",
+    correlation_id: "secret-token",
   })
   getIsolationScope().setAttributes({ other: "hostname-secret" })
+  // Scope tags and fingerprints merge into events, including allowlisted keys.
+  getGlobalScope().setTags({
+    operation: "secret-token",
+    correlation_id: "person@example.com",
+    "error.code": "sk_live",
+  })
+  getIsolationScope().setFingerprint(["hostname-secret"])
 })
 
 async function setup(
@@ -295,6 +303,35 @@ describe("TST-DIAGNOSTICS-002 Sentry adapter local wire evidence", () => {
       expect.stringMatching(/^[0-9a-f]{32}$/),
       "11111111111141118111111111111111",
       "33333333333343338333333333333333",
+    ])
+    for (const request of collector.requests)
+      expect(request.body).not.toMatch(sentinels)
+  })
+})
+
+describe("TST-DIAGNOSTICS-002 Sentry event enrichment", () => {
+  it("sends exactly the constructed event even when scopes carry allowlisted tags and fingerprints", async () => {
+    const { collector, dispatcher } = await setup()
+    dispatcher.reportError(
+      { module: "lists", event: "list.read.failed", environment: "preview" },
+      new Error("x")
+    )
+    await dispatcher.flush(2000)
+    const [event] = collector.requests
+      .flatMap((request) => parseEnvelopeBody(request.body).items)
+      .filter((item) => item.type === "event")
+      .map((item) => item.payload)
+    expect(event.tags).toEqual({
+      module: "lists",
+      event: "list.read.failed",
+      "error.kind": "unexpected",
+    })
+    expect(event.fingerprint).toEqual([
+      "lists",
+      "list.read.failed",
+      "Error",
+      "unexpected",
+      expect.any(String),
     ])
     for (const request of collector.requests)
       expect(request.body).not.toMatch(sentinels)

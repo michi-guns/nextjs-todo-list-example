@@ -30,8 +30,10 @@ Better Stack's documentation was checked on 2026-09-24: HTTP log ingestion is
   from `SafeErrorReport` (static message, safe frames, fingerprint, safe tags,
   occurrence ID and flat cause facts); logs use the Sentry Logs API with
   explicitly projected attributes.
-- `beforeSend` and `beforeSendLog` rebuild payloads from allowlists after SDK
-  enrichment. A gated transport is the last point before transmission: it
+- `beforeSend` returns exactly the event this module constructed (looked up by
+  event ID, at most 100 pending), because scope tags and fingerprints merge into
+  events before that hook. `beforeSendLog` rebuilds log attributes from an
+  allowlist. A gated transport is the last point before transmission: it
   rechecks current policy for every event and every buffered log, re-allowlists
   attributes added after `beforeSendLog`, drops other item types and the
   envelope `trace` header, and gives each log the trace ID of its own request
@@ -57,18 +59,19 @@ Better Stack's documentation was checked on 2026-09-24: HTTP log ingestion is
 
 | Command                                                                          | Result                                    |
 | -------------------------------------------------------------------------------- | ----------------------------------------- |
-| `pnpm exec vitest run src/shared/diagnostics` (three consecutive runs)           | 6 files, 52 tests passed each run         |
-| `pnpm exec vitest run src/shared/logging src/shared/diagnostics scripts/logging` | 129 tests passed                          |
-| `pnpm test`                                                                      | 56 files, 549 tests passed                |
+| `pnpm exec vitest run src/shared/diagnostics` (three consecutive runs)           | 5 files, 53 tests passed each run         |
+| `pnpm exec vitest run src/shared/logging src/shared/diagnostics scripts/logging` | 130 tests passed                          |
+| `pnpm test`                                                                      | 56 files, 550 tests passed                |
 | `pnpm typecheck`                                                                 | Passed                                    |
 | `pnpm lint`                                                                      | Passed; only the existing `Geist` warning |
 | `pnpm build`                                                                     | Passed                                    |
 | Changed-file Prettier, `git diff --check`                                        | Passed                                    |
 
 The wire tests run a real HTTP collector on `127.0.0.1`. Sentinels are placed
-in the global and isolation scopes (user, tags, extras, breadcrumbs and
-attributes, including an allowlisted key), in error messages and causes, and in
-console output; none appears in any request body. The collector's responses
+in the global and isolation scopes (user, tags, extras, breadcrumbs, a
+fingerprint and attributes, including allowlisted tag and attribute keys), in
+error messages and causes, and in console output; none appears in any request
+body, tag, fingerprint or log `trace_id`. The collector's responses
 exercise `401`, `402`, `403`, `406`, `413`, `429`, `500` and hanging requests.
 Local collector responses do not prove that hosted Sentry or Better Stack
 accept these payloads, that Better Stack accepts the Sentry envelope endpoint,
@@ -94,5 +97,13 @@ process-wide `trace_id`, and re-allowlisting of scope attributes merged after
 pass when the log lacked it). The nits were also applied: the flush deadline
 now aborts in-flight requests, event items are re-allowlisted in the transport
 with string tag checks, SDK-side drops raise a notice, background sends are
-documented and two test names were corrected. The final tip receives its own
-fresh review before merge.
+documented and two test names were corrected.
+
+A second fresh reviewer of `48a386b` confirmed the marker and abort logic and
+the timing tests (12 runs under load), and found two remaining enrichment
+paths with real-SDK probes: a scope `correlation_id` could become a log's
+`trace_id`, and scope tags and fingerprints merged into error events before
+`beforeSend`, affecting both providers' error path. The trace ID is now taken
+only from the filtered own attributes and must be 32 hex characters, and
+`beforeSend` returns the constructed event itself; regression tests cover
+both. The final tip receives its own fresh review before merge.

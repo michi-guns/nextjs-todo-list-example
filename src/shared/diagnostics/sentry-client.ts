@@ -28,6 +28,8 @@ import type {
  * every in-flight request, so the flush deadline bounds the actual I/O.
  */
 export const REQUEST_TIMEOUT_MS = 1000
+/** Constructed events awaiting beforeSend. */
+const MAX_PENDING_EVENTS = 100
 /** Maximum concurrent/pending envelope requests; excess is dropped by the SDK. */
 export const MAX_PENDING_REQUESTS = 10
 
@@ -232,19 +234,21 @@ function gateEnvelope(
           })
         )
         .map((log) => {
-          const correlation = attributeValue(log.attributes, "correlation_id")
+          const attributes = finalAttributes(
+            log.attributes as Record<string, unknown>,
+            identity
+          )
+          // One private scope would give every log the same trace; use this
+          // log's own request correlation (a server UUID) or a fresh random ID.
+          const correlation = String(
+            attributeValue(attributes, "correlation_id") ?? ""
+          ).replace(/-/g, "")
           return {
             ...log,
-            // One private scope would give every log the same trace; use the
-            // request correlation (a server UUID) or a fresh random ID instead.
-            trace_id: (typeof correlation === "string"
+            trace_id: /^[0-9a-f]{32}$/.test(correlation)
               ? correlation
-              : randomUUID()
-            ).replace(/-/g, ""),
-            attributes: finalAttributes(
-              log.attributes as Record<string, unknown>,
-              identity
-            ),
+              : randomUUID().replace(/-/g, ""),
+            attributes,
           }
         })
       if (kept.length > 0)
@@ -345,6 +349,7 @@ export function createSentryCompatibleClient(options: {
     environment: options.environment,
     release: options.release,
   }
+  const constructed = new Map<string, ErrorEvent>()
   const client = new ServerRuntimeClient({
     dsn: options.dsn,
     environment: options.environment,
@@ -365,7 +370,13 @@ export function createSentryCompatibleClient(options: {
       stackFrameVariables: false,
       frameContextLines: 0,
     },
-    beforeSend: allowlistEvent,
+    // Scope tags and fingerprints merge before this hook, so return exactly the
+    // event this module constructed rather than filtering the enriched one.
+    beforeSend: (event) => {
+      const own = event.event_id ? constructed.get(event.event_id) : undefined
+      if (event.event_id) constructed.delete(event.event_id)
+      return own ?? null
+    },
     beforeSendLog: (log: Log) => ({
       level: log.level,
       message: log.message,
@@ -384,7 +395,12 @@ export function createSentryCompatibleClient(options: {
       logger[event.level](event.event, logAttributes(event), { scope })
     },
     report(report: SafeErrorReport) {
-      client.captureEvent(toEvent(report), {}, scope)
+      const event = toEvent(report)
+      constructed.set(event.event_id!, event)
+      // Bounded: an event dropped before beforeSend must not accumulate here.
+      while (constructed.size > MAX_PENDING_EVENTS)
+        constructed.delete(constructed.keys().next().value!)
+      client.captureEvent(event, {}, scope)
     },
     async flush(timeoutMs: number) {
       await client.flush(timeoutMs)

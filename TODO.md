@@ -54,7 +54,7 @@ PR references below record earlier deliveries; they do not require new PRs.
 - [x] The runnable authenticated todo reference and reusable foundations are implemented across the capability modules, database, UI, and test harness.
 - [x] `pnpm typecheck` passes.
 - [x] `pnpm lint` exits successfully, with one existing unused-`Geist` warning in `app/layout.tsx`.
-- [x] `pnpm test` passes 56 files and 549 tests (T-26.5 diagnostics adapters, 2026-09-24).
+- [x] `pnpm test` passes 56 files and 550 tests (T-26.5 diagnostics adapters, 2026-09-24).
 - [x] Meaningful migration, Sanity, integration, browser, and performance evidence is recorded. Remaining partial or blocked obligations stay visible in [`TESTING.md`](.dwf/decisions/TESTING.md).
 
 ## Phase 0: prerequisites
@@ -1475,13 +1475,15 @@ Review context, existing planned work: `db/db.ts` consumes `DATABASE_URL` withou
   registry access and installed-version public API/source review. One adapter
   delivery/review unit. Accounts/secrets are unnecessary for this local evidence.
 - Evidence, 2026-09-24: [diagnostics adapters](docs/agentforge/evidence/2026-09-24-diagnostics-adapters.md)
-  records 52 focused diagnostics tests against a local collector with the real
-  `@sentry/core` 11.0.0 client, 549 total unit tests, typecheck, lint with the
+  records 53 focused diagnostics tests against a local collector with the real
+  `@sentry/core` 11.0.0 client, 550 total unit tests, typecheck, lint with the
   existing warning and build. `TST-DIAGNOSTICS-002` is partial: hosted ingestion
   and grouping remain T-26.7.
 - Review: a fresh Claude Opus 5.5 reviewer (xhigh effort requested) found no
   blockers and two should-fix items (shared log `trace_id`, unproven scope
   attribute re-allowlisting) plus nits; all are fixed with regression tests.
+  A second fresh review found scope data reaching log trace IDs and event
+  tags/fingerprints; both are fixed with regression tests.
   The final tip receives its own fresh review before merge.
 - Recommended AgentForge skills: `testing-first-class`, `test-driven-development`,
   `incremental-implementation`, `source-driven-development`,
